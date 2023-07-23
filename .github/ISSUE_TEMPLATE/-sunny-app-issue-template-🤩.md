@@ -1,6 +1,6 @@
 ---
 name: "Sunny APP Issue Template \U0001F929"
-about: ""
+about: "Sunny APP Issue"
 title: ''
 labels: ''
 assignees: ''
