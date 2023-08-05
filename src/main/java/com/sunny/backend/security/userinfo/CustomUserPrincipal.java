@@ -1,16 +1,12 @@
 package com.sunny.backend.security.userinfo;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.sunny.backend.user.Users;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-
-import com.sunny.backend.user.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,18 +17,29 @@ import lombok.Setter;
 public class CustomUserPrincipal implements OAuth2User, UserDetails {
 	private Long id;
 	private String email;
+
 	private Collection<? extends GrantedAuthority> authorities;
 	@Setter
 	private Map<String, Object> attributes;
+	private Users users;
 
-	public static CustomUserPrincipal create(User user) {
+	public Users getUser() {
+		return users;
+	}
+	public CustomUserPrincipal(Long id, String email,  Collection<? extends GrantedAuthority> authorities, Users users) {
+		this.id = id;
+		this.email = email;
+		this.authorities = authorities;
+		this.users = users;
+	}
+	public static CustomUserPrincipal create(Users users) {
 		List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 
-		return new CustomUserPrincipal(user.getId(), user.getEmail(), authorities, null);
+		return new CustomUserPrincipal(users.getId(), users.getEmail(), authorities, users);
 	}
 
-	public static CustomUserPrincipal create(User user, Map<String, Object> attributes) {
-		CustomUserPrincipal customUserPrincipal = CustomUserPrincipal.create(user);
+	public static CustomUserPrincipal create(Users users, Map<String, Object> attributes) {
+		CustomUserPrincipal customUserPrincipal = CustomUserPrincipal.create(users);
 		customUserPrincipal.setAttributes(attributes);
 		return customUserPrincipal;
 	}
