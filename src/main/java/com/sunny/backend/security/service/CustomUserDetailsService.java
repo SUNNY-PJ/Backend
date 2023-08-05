@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.user.User;
+import com.sunny.backend.user.Users;
 import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -17,8 +17,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 	@Override
 	public CustomUserPrincipal loadUserByUsername(String email) throws UsernameNotFoundException {
-		User user = userRepository.findByEmail(email)
+		Users users = userRepository.findByEmail(email)
 			.orElseThrow(() -> new UsernameNotFoundException("User not found with email : " + email));
-		return CustomUserPrincipal.create(user);
+		return CustomUserPrincipal.create(users);
 	}
 }

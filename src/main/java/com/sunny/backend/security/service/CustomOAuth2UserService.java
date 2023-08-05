@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import com.sunny.backend.user.Users;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -18,7 +19,6 @@ import com.sunny.backend.security.exception.OAuth2AuthenticationProcessingExcept
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.AuthProvider;
 import com.sunny.backend.user.Role;
-import com.sunny.backend.user.User;
 import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -55,26 +55,26 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
 		}
 
-		Optional<User> optionalUser = userRepository.findByEmail(attributes.getEmail());
-		User user;
+		Optional<Users> optionalUser = userRepository.findByEmail(attributes.getEmail());
+		Users users;
 		if (optionalUser.isPresent()) {
-			user = optionalUser.get();
-			if (!user.getAuthProvider()
+			users = optionalUser.get();
+			if (!users.getAuthProvider()
 				.equals(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
 				throw new OAuth2AuthenticationProcessingException(
-					"Looks like you're signed up with " + user.getAuthProvider() + " account. Please use your "
-						+ user.getAuthProvider() + " account to login.");
+					"Looks like you're signed up with " + users.getAuthProvider() + " account. Please use your "
+						+ users.getAuthProvider() + " account to login.");
 			}
-			user = updateUser(user, attributes);
+			users = updateUser(users, attributes);
 		} else {
-			user = registerUser(oAuth2UserRequest, attributes);
+			users = registerUser(oAuth2UserRequest, attributes);
 		}
 
-		return CustomUserPrincipal.create(user, oAuth2User.getAttributes());
+		return CustomUserPrincipal.create(users, oAuth2User.getAttributes());
 	}
 
-	private User registerUser(OAuth2UserRequest oAuth2UserRequest, OAuthAttributes attributes) {
-		User user = User.builder()
+	private Users registerUser(OAuth2UserRequest oAuth2UserRequest, OAuthAttributes attributes) {
+		Users users = Users.builder()
 			.authProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))
 			.providerId(attributes.getNameAttributeKey())
 			.name(attributes.getName())
@@ -82,13 +82,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			.role(Role.USER)
 			.build();
 
-		return userRepository.save(user);
+		return userRepository.save(users);
 	}
 
 	@Transactional
-	private User updateUser(User user, OAuthAttributes attributes) {
-		user.setName(attributes.getName());
-		user.setUpdatedDate(LocalDateTime.now());
-		return userRepository.save(user);
+	private Users updateUser(Users users, OAuthAttributes attributes) {
+		users.setName(attributes.getName());
+		users.setUpdatedDate(LocalDateTime.now());
+		return userRepository.save(users);
 	}
 }
