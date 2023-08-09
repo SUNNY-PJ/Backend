@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sunny.backend.entity.BaseTime;
 import com.sunny.backend.entity.Community;
 import com.sunny.backend.entity.Consumption;
+import com.sunny.backend.entity.Friends;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +23,6 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "users")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,7 +32,7 @@ public class Users extends BaseTime {
 	@Column(name = "user_id")
 	private Long id;
 
-	@Column(nullable = false)
+	@Column
 	private String email;
 
 	@Column
@@ -58,5 +59,11 @@ public class Users extends BaseTime {
 
 	@Column
 	private String profile;
+
+	@OneToMany(mappedBy = "users")
+	private List<Friends> userList = new ArrayList<>();
+
+	@OneToMany(mappedBy = "friends")
+	private List<Friends> friendsList = new ArrayList<>();
 
 }

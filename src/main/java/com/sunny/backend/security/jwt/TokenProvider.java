@@ -38,10 +38,10 @@ public class TokenProvider {
 
 	public AuthDto.TokenDto createTokenOAuth2(Authentication authentication) {
 		CustomUserPrincipal userPrincipal = (CustomUserPrincipal)authentication.getPrincipal();
-		return createToken(userPrincipal.getId(), userPrincipal.getEmail(), getAuthorities(authentication));
+		return createToken(userPrincipal.getEmail(), getAuthorities(authentication));
 	}
 
-	public AuthDto.TokenDto createToken(Long userId, String email, String authorities) {
+	public AuthDto.TokenDto createToken(String email, String authorities) {
 		String accessToken = Jwts.builder()
 			.setHeader(createHeader())
 			.claim("email", email)
@@ -58,8 +58,7 @@ public class TokenProvider {
 			.signWith(SignatureAlgorithm.HS512, tokenSecret)
 			.compact();
 
-		redisService.setValuesWithTimeout(userId.toString(), refreshToken,
-			getClaims(refreshToken).getExpiration().getTime());
+		redisService.setValuesWithTimeout(email, refreshToken, getClaims(refreshToken).getExpiration().getTime());
 
 		return new AuthDto.TokenDto(accessToken, refreshToken);
 	}
