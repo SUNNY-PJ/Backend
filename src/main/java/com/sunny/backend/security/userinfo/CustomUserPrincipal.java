@@ -21,21 +21,16 @@ public class CustomUserPrincipal implements OAuth2User, UserDetails {
 	private Collection<? extends GrantedAuthority> authorities;
 	@Setter
 	private Map<String, Object> attributes;
-	private Users users;
 
-	public Users getUser() {
-		return users;
-	}
-	public CustomUserPrincipal(Long id, String email,  Collection<? extends GrantedAuthority> authorities, Users users) {
+	public CustomUserPrincipal(Long id, String email,  Collection<? extends GrantedAuthority> authorities) {
 		this.id = id;
 		this.email = email;
 		this.authorities = authorities;
-		this.users = users;
 	}
 	public static CustomUserPrincipal create(Users users) {
 		List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 
-		return new CustomUserPrincipal(users.getId(), users.getEmail(), authorities, users);
+		return new CustomUserPrincipal(users.getId(), users.getEmail(), authorities);
 	}
 
 	public static CustomUserPrincipal create(Users users, Map<String, Object> attributes) {
