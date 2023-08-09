@@ -1,5 +1,6 @@
 package com.sunny.backend.security;
 
+import com.sunny.backend.security.handler.CustomOAuth2AuthenticationSuccessHandler;
 import com.sunny.backend.user.repository.CustomAuthorizationRequestRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,7 +36,7 @@ public class SecurityConfig {
 	private final CustomJwtFilter customJwtFilter;
 	private final CustomOAuth2UserService oAuth2UserService;
 	private final CustomAuthorizationRequestRepository customAuthorizationRequestRepository;
-	private final com.sunny.backend.security.handler.CustomOAuth2AuthenticationSuccessHandler oAuth2AuthorizationSuccessHandler;
+	private final CustomOAuth2AuthenticationSuccessHandler oAuth2AuthorizationSuccessHandler;
 	private final CustomOAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	private final JwtAccessDeniedHandler jwtAccessDeniedHandler;

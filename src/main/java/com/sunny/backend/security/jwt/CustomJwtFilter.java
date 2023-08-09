@@ -23,16 +23,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CustomJwtFilter extends OncePerRequestFilter {
 	private final TokenProvider tokenProvider;
-	List<String> list = Arrays.asList("/api/v1/member/*");
+	// List<String> list = Arrays.asList("/api/v1/member/*");
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
 
-		if (list.contains(request.getRequestURI())) {
-			filterChain.doFilter(request, response);
-			return;
-		}
+		// if (list.contains(request.getRequestURI())) {
+		// 	filterChain.doFilter(request, response);
+		// 	return;
+		// }
 
 		String token = getTokenFromRequest(request);
 
@@ -40,9 +40,10 @@ public class CustomJwtFilter extends OncePerRequestFilter {
 			Authentication authentication = tokenProvider.getAuthentication(token);
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 			log.info("Save Authentication");
-		} else {
-			log.error("유효한 JWT 토큰이 없습니다!!, uri: {}", request.getRequestURI());
 		}
+		// else {
+		// 	log.error("유효한 JWT 토큰이 없습니다!!, uri: {}", request.getRequestURI());
+		// }
 
 		filterChain.doFilter(request, response);
 	}

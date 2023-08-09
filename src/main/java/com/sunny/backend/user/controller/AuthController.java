@@ -1,10 +1,8 @@
 package com.sunny.backend.user.controller;
 
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class UserController {
+public class AuthController {
 
 	@GetMapping("/token")
 	public ResponseEntity kakaoCallback(@RequestParam String Authorization){
