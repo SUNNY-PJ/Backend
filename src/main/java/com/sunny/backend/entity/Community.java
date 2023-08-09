@@ -11,6 +11,7 @@ import java.util.List;
 @Entity
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 
@@ -31,6 +32,7 @@ public class Community extends BaseTime {
     @Column(columnDefinition = "integer default 0", nullable = false) //기본값 0으로 세팅
     private int view_cnt; //조회수
 
+
     //users 다대일 관계 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "users_id")
@@ -40,6 +42,9 @@ public class Community extends BaseTime {
     @OneToMany(mappedBy = "community")
     @Builder.Default
     private List<Photo> photoList = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    private BoardType boardType;
 
     @OneToMany(mappedBy = "community")
     private List<Comment> commentList=new ArrayList<>();

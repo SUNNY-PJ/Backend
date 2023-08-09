@@ -3,18 +3,19 @@ package com.sunny.backend.dto.response;
 import com.sunny.backend.entity.Comment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @NoArgsConstructor
 
 public class CommentResponse {
     private Long id;
     private String content;
     private String writer;
-
     private List<CommentResponse> children = new ArrayList<>();
 
     public CommentResponse(Long id, String content, String writer) {

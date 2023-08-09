@@ -20,6 +20,8 @@ public class Comment extends BaseTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //댓글 id
 
+    @Column
+    private String writer;
     @Column(name="text", nullable = false)
     private String content; //댓글 내용 , 글자 수 제한 없는지? , notnull 설정
 

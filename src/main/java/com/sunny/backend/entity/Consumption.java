@@ -1,7 +1,6 @@
 package com.sunny.backend.entity;
 
 import com.sunny.backend.user.Users;
-import jdk.jfr.Category;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,11 +21,8 @@ public class Consumption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @Column
-//    @NotNull
-//    private String place; //장소 (의,식,주 카테고리)
     @Enumerated(EnumType.STRING)
-    private Cons_Category category;
+    private SpendType category;
 
     @Column
     @NotNull
@@ -46,5 +42,3 @@ public class Consumption {
     private Users users;
 
 }
-
-// 지출 통계 : query 값으로 카테고리 조회 후, 카테고리별로 모두 더한 뒤 dateField 개수로 나눔? -> 통계

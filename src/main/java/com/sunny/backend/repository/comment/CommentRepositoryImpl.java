@@ -23,7 +23,7 @@ public class CommentRepositoryImpl extends QuerydslRepositorySupport implements 
     public Optional<Comment> findCommentByIdWithParent(Long id) {
         Comment selectedComment=queryFactory.select(comment)
                 .from(comment)
-                .leftJoin(comment.parent).fetchJoin() // leftjoin,fetchjoin 에 대해
+                .leftJoin(comment.parent).fetchJoin()
                 .where(comment.id.eq(id))
                 .fetchOne(); // 정확한 의미
 

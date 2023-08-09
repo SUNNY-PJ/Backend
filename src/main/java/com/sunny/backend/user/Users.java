@@ -5,6 +5,7 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sunny.backend.entity.BaseTime;
+import com.sunny.backend.entity.Comment;
 import com.sunny.backend.entity.Community;
 import com.sunny.backend.entity.Consumption;
 import lombok.AccessLevel;
@@ -13,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +55,12 @@ public class Users extends BaseTime {
 	@JsonBackReference
 	@Builder.Default
 	private List<Consumption> consumptionList =new ArrayList<>();
+
+	@OneToMany(mappedBy = "users", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JsonBackReference
+	@Builder.Default
+	@JsonIgnore
+	private List<Comment> commentList =new ArrayList<>();
 	@Column
 	private String providerId;
 

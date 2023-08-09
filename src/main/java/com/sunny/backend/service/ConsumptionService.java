@@ -3,7 +3,10 @@ package com.sunny.backend.service;
 import com.sunny.backend.dto.request.ConsumptionRequest;
 import com.sunny.backend.dto.response.ConsumptionResponse;
 import com.sunny.backend.dto.response.Response;
+import com.sunny.backend.dto.response.SpendTypeStatisticsResponse;
 import com.sunny.backend.entity.Consumption;
+import com.sunny.backend.entity.SpendType;
+
 import com.sunny.backend.repository.consumption.ConsumptionRepository;
 import com.sunny.backend.user.Users;
 import com.sunny.backend.user.repository.UserRepository;
@@ -14,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,10 +30,10 @@ public class ConsumptionService {
     public ResponseEntity createConsumption(Users users, ConsumptionRequest consumptionRequest) throws IOException {
         try {
             Consumption consumption = Consumption.builder()
-                    .place(consumptionRequest.getPlace())
                     .name(consumptionRequest.getName())  //유저 값 생기면 수정 .users.getName()
+                    .category(SpendType.valueOf(consumptionRequest.getPlace()))
                     .money(consumptionRequest.getMoney())
-                    .dateField(consumptionRequest.getDateField())
+                    .dateField(consumptionRequest.getParsedDateField())
                     .users(users)
                     .build();
 
@@ -39,7 +43,24 @@ public class ConsumptionService {
 
             return response.success(new ConsumptionResponse(consumption), "지출 등록 성공", HttpStatus.OK);
         } catch (Exception e) {
-            return response.fail(e,"컨테스트 글 등록 실패",HttpStatus.BAD_REQUEST);
+            return response.fail(e,"지출 등록 실패",HttpStatus.BAD_REQUEST);
         }
     }
+
+
+    public ResponseEntity<?> getConsumptionList(Users user) throws IOException {
+        try {
+            List<Consumption> consumptions = consumptionRepository.findByUsersId(user.getId());
+            List<ConsumptionResponse> consumptionResponses = ConsumptionResponse.fromConsumptions(consumptions);
+
+            return response.success(consumptionResponses, "지출 조회 성공", HttpStatus.OK);
+        } catch (Exception e) {
+            return response.fail(e, "지출 조회 실패", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public List<SpendTypeStatisticsResponse> getSpendTypeStatistics() {
+        return consumptionRepository.getSpendTypeStatistics();
+    }
+
 }
