@@ -16,18 +16,7 @@ public class AuthDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class LoginDto {
-		private String userId;
-		private String password;
-	}
-
-	@Getter
-	@Setter
-	@Builder
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class SignupRequest {
-		private String userId;
-		private String name;
+		private String email;
 		private String password;
 	}
 
