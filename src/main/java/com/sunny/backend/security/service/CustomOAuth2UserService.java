@@ -85,7 +85,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		return userRepository.save(users);
 	}
 
-	@Transactional
+
 	private Users updateUser(Users users, OAuthAttributes attributes) {
 		users.setName(attributes.getName());
 		users.setUpdatedDate(LocalDateTime.now());

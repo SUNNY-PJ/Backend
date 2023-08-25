@@ -31,6 +31,7 @@ public class CustomUserPrincipal implements OAuth2User, UserDetails {
 		this.email = email;
 		this.authorities = authorities;
 		this.users = users;
+
 	}
 	public static CustomUserPrincipal create(Users users) {
 		List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));

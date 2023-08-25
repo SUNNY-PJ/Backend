@@ -22,6 +22,6 @@ public class SearchType {
 
     //글 작성자
     private String writer;
-    private BoardType boardType = BoardType.꿀팁;
+
 
 }

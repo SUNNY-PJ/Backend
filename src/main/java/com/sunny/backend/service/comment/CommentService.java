@@ -1,4 +1,4 @@
-package com.sunny.backend.service;
+package com.sunny.backend.service.comment;
 
 
 import com.amazonaws.services.kms.model.NotFoundException;
@@ -32,7 +32,7 @@ public class CommentService {
     private final CommentRequestMapper commentRequestMapper;
 
     @Transactional
-    public ResponseEntity<?> insert(Long contestId, Users user, CommentRequest commentRequestDTO) {
+    public ResponseEntity<?> insertComment(Long contestId, Users user, CommentRequest commentRequestDTO) {
 
         Users users = usersRepository.findById(user.getId())
                 .orElseThrow(() -> new NotFoundException("Could not found user id"));
@@ -63,7 +63,7 @@ public class CommentService {
     }
 
     @Transactional
-    public ResponseEntity<?> delete(Users users, Long commentId) {
+    public ResponseEntity<?> deleteComment(Users users, Long commentId) {
         Comment comment = commentRepository.findCommentByIdWithParent(commentId)
                 .orElseThrow(() -> new NotFoundException("Could not found comment id : " + commentId));
         if(checkCommentLoginUser(users,comment)) {
@@ -86,7 +86,7 @@ public class CommentService {
     }
 
     @Transactional
-    public ResponseEntity<?> update(Users users, Long commentId, CommentRequest commentRequestDTO) {
+    public ResponseEntity<?> updateComment(Users users, Long commentId, CommentRequest commentRequestDTO) {
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundException("Could not found comment id : " + commentId));

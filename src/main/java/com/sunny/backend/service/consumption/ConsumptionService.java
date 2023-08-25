@@ -1,4 +1,4 @@
-package com.sunny.backend.service;
+package com.sunny.backend.service.consumption;
 
 import com.sunny.backend.dto.request.ConsumptionRequest;
 import com.sunny.backend.dto.response.ConsumptionResponse;
@@ -30,7 +30,7 @@ public class ConsumptionService {
     public ResponseEntity createConsumption(Users users, ConsumptionRequest consumptionRequest) throws IOException {
         try {
             Consumption consumption = Consumption.builder()
-                    .name(consumptionRequest.getName())  //유저 값 생기면 수정 .users.getName()
+                    .name(consumptionRequest.getName())
                     .category(SpendType.valueOf(consumptionRequest.getPlace()))
                     .money(consumptionRequest.getMoney())
                     .dateField(consumptionRequest.getParsedDateField())

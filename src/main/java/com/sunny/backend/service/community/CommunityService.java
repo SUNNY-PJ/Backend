@@ -1,4 +1,4 @@
-package com.sunny.backend.service;
+package com.sunny.backend.service.community;
 
 import com.sunny.backend.dto.request.CommunityRequest;
 import com.sunny.backend.dto.response.CommunityResponse;
@@ -9,13 +9,13 @@ import com.sunny.backend.entity.Community;
 import com.sunny.backend.entity.Photo;
 
 import com.sunny.backend.entity.SearchType;
-import com.sunny.backend.repository.PhotoRepository;
+import com.sunny.backend.repository.photo.PhotoRepository;
 import com.sunny.backend.repository.community.CommunityRepository;
+import com.sunny.backend.service.s3.S3Service;
 import com.sunny.backend.user.Users;
 import com.sunny.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.HashOperations;
@@ -25,8 +25,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -48,7 +46,7 @@ public class CommunityService {
     private String uploadPath="/Users/eom-yelim/Downloads/backend/fileStore";
 
     private final S3Service s3Service;
-    private static final String CONTEST_VIEW_COUNT_KEY = "community:viewCount:";
+    private static final String COMMUNITY_VIEW_COUNT_KEY = "community:viewCount:";
     private static final int EXPIRATION_DAYS = 1;
     private final RedisTemplate redisTemplate;
 
@@ -76,7 +74,7 @@ public class CommunityService {
 
     public ResponseEntity findById(Users users, Long communityId) {
         try {
-            String contestViewCountKey = CONTEST_VIEW_COUNT_KEY + communityId;
+            String contestViewCountKey = COMMUNITY_VIEW_COUNT_KEY + communityId;
             Community community = communityRepository.findById(communityId).orElseThrow(() -> new RuntimeException("Community post not found"));
             HashOperations<String, String, Long> hashOps = redisTemplate.opsForHash();
 
@@ -127,7 +125,7 @@ public class CommunityService {
 
     //커뮤니티 게시글 생성
     @Transactional
-    public ResponseEntity createContest(Users users, CommunityRequest communityRequest, List<String> files) throws IOException {
+    public ResponseEntity createCommunity(Users users, CommunityRequest communityRequest, List<String> files) throws IOException {
         try {
             Community community = Community.builder()
                     .title(communityRequest.getTitle())
@@ -162,7 +160,7 @@ public class CommunityService {
 
     //수정
     @Transactional
-    public ResponseEntity updateContest(Users users, Long communityId, CommunityRequest communityRequest , List<String> files) throws IOException {
+    public ResponseEntity updateCommunity(Users users, Long communityId, CommunityRequest communityRequest , List<String> files) throws IOException {
         try {
             Community community = communityRepository.findById(communityId).orElseThrow(() -> new IllegalArgumentException("Community not found!"));
 
@@ -205,7 +203,7 @@ public class CommunityService {
 
     //삭제
     @Transactional
-    public ResponseEntity deleteCommunityById(Users users, Long communityId) {
+    public ResponseEntity deleteCommunity(Users users, Long communityId) {
         try {
             Community community = communityRepository.findById(communityId).orElseThrow(() -> new IllegalArgumentException(String.format("community is not Found!")));
             List<Photo> photo = photoRepository.findByCommunityId(communityId);

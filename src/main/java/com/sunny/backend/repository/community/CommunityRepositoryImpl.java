@@ -51,7 +51,6 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
     public PageImpl<PageResponse> getQuestionListPageWithSearch(BoardType boardType, SearchType searchCondition, Pageable pageable){
         JPQLQuery<Community> query = queryFactory.select(community).from(community);
 
-        //wherewjf
         BooleanBuilder whereClause = new BooleanBuilder();
         //whereClause 기준에 맞는 레코드만 출력
         whereClause.and(ContentMessageTitleEq(searchCondition.getContent(), searchCondition.getTitle()))
@@ -74,10 +73,7 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
                 .collect(Collectors.toList());
 
         return new PageImpl<>(dtoList, pageable, totalCount);
-
     }
-
-
     //제목 + 내용에 필요한 동적 쿼리문
     private BooleanExpression ContentMessageTitleEq(String boardContent,String boardTitle){
         // 글 내용 x, 글 제목 o
@@ -96,8 +92,6 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
         }
         return null;
     }
-
-
     //  작성자 검색
     private BooleanExpression boardWriterEq(String boardWriter){
         if(boardWriter.isEmpty()){
@@ -105,7 +99,5 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
         }
         return community.writer.contains(boardWriter);
     }
-
-
 }
 

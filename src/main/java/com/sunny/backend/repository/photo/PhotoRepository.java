@@ -1,4 +1,4 @@
-package com.sunny.backend.repository;
+package com.sunny.backend.repository.photo;
 
 import com.sunny.backend.entity.Photo;
 import org.springframework.data.jpa.repository.JpaRepository;

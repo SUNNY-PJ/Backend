@@ -1,4 +1,4 @@
-package com.sunny.backend.service;
+package com.sunny.backend.service.s3;
 
 
 
