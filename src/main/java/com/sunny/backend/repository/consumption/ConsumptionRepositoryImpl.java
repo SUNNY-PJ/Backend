@@ -22,6 +22,7 @@ public class ConsumptionRepositoryImpl  extends QuerydslRepositorySupport implem
     @Override
     public List<SpendTypeStatisticsResponse> getSpendTypeStatistics() {
         QConsumption consumption = QConsumption.consumption;
+        //튜플로 저장
         List<Tuple> tuples = queryFactory
                 .select(
                         consumption.category,
@@ -32,7 +33,7 @@ public class ConsumptionRepositoryImpl  extends QuerydslRepositorySupport implem
                 .groupBy(consumption.category)
                 .fetch();
 
-        // total 금액 계싼
+        // total 금액 계산
         long totalSpending = getTotalSpending();
 
         // 각 카테고리별로 계산

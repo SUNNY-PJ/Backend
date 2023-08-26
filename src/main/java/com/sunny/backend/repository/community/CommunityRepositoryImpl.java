@@ -8,6 +8,7 @@ import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.entity.BoardType;
 import com.sunny.backend.entity.Community;
 import com.sunny.backend.entity.SearchType;
+import com.sunny.backend.entity.SortType;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
@@ -47,19 +48,26 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
     }
 
     @Override
-    public PageImpl<CommunityResponse.PageResponse> getPageListWithSearch(BoardType boardType, SearchType searchCondition, Pageable pageable){
+    public PageImpl<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType, BoardType boardType, SearchType searchCondition, Pageable pageable){
         JPQLQuery<Community> query = queryFactory.select(community).from(community);
 
-        //wherewjf
+
         BooleanBuilder whereClause = new BooleanBuilder();
         //whereClause 기준에 맞는 레코드만 출력
         whereClause.and(ContentMessageTitleEq(searchCondition.getContent(), searchCondition.getTitle()))
                 .and(boardWriterEq(searchCondition.getWriter()));
 
+        System.out.println("쿼리문"+whereClause);
         if (boardType == BoardType.자유) {
             whereClause.and(community.boardType.eq(BoardType.자유));
         } else if (boardType == BoardType.꿀팁) {
             whereClause.and(community.boardType.eq(BoardType.꿀팁));
+        }
+
+        if (sortType == SortType.최신순) {
+            query.orderBy(community.createdDate.desc());
+        } else if (sortType == SortType.조회순) {
+            query.orderBy(community.view_cnt.desc());
         }
 
         query.where(whereClause).orderBy(community.createdDate.desc());
