@@ -20,6 +20,8 @@ public class Comment extends BaseTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //댓글 id
 
+    @Column
+    private String writer;
     @Column(name="text", nullable = false)
     private String content; //댓글 내용 , 글자 수 제한 없는지? , notnull 설정
 
@@ -43,22 +45,8 @@ public class Comment extends BaseTime {
     private List<Comment> children = new ArrayList<>(); //자식 댓글
 
 
-    //댓글 좋아요 기능?
-
     public Comment(String content) {
         this.content = content;
-    }
-
-    public void updateWriter(Users users) {
-        this.users = users;
-    }
-
-    public void updateCommunity(Community community) {
-        this.community = community;
-    }
-
-    public void updateParent(Comment comment) {
-        this.parent = comment;
     }
 
     public void changeIsDeleted(Boolean isDeleted) {
