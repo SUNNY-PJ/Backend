@@ -6,10 +6,7 @@ import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.entity.BoardType;
-import com.sunny.backend.entity.Community;
-import com.sunny.backend.entity.Photo;
-import com.sunny.backend.entity.SearchType;
+import com.sunny.backend.entity.*;
 import com.sunny.backend.repository.photo.PhotoRepository;
 import com.sunny.backend.repository.community.CommunityRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
@@ -78,8 +75,8 @@ public class CommunityService {
         return result;
     }
     //검색 조건 추가해서 조회
-    public PageImpl<CommunityResponse.PageResponse> getPageListWithSearch(BoardType boardType, SearchType searchCondition, Pageable pageable) {
-        PageImpl<CommunityResponse.PageResponse> result = communityRepository.getPageListWithSearch(boardType, searchCondition, pageable);
+    public PageImpl<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType,BoardType boardType, SearchType searchCondition, Pageable pageable) {
+        PageImpl<CommunityResponse.PageResponse> result = communityRepository.getPageListWithSearch(sortType,boardType, searchCondition, pageable);
         return result;
     }
 

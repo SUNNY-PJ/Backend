@@ -7,6 +7,7 @@ import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.entity.BoardType;
 import com.sunny.backend.entity.SearchType;
+import com.sunny.backend.entity.SortType;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.service.community.CommunityService;
 import lombok.RequiredArgsConstructor;
@@ -28,13 +29,13 @@ public class CommunityController {
     private final CommunityService communityService;
     //게시판 조회
     @GetMapping("")
-    public ResponseEntity<PageImpl<CommunityResponse.PageResponse>> getCommunityList(@RequestParam(required = false) BoardType boardType, @RequestBody SearchType searchCondition, Pageable pageable){
+    public ResponseEntity<PageImpl<CommunityResponse.PageResponse>> getCommunityList(@RequestParam(required = false) SortType sortType, @RequestParam(required = false) BoardType boardType, @RequestBody SearchType searchCondition, Pageable pageable){
         PageImpl<CommunityResponse.PageResponse> responseDTO;
         //검색조건 중 모든 내용을 입력하지 않고 요청을 보냈을 때 일반 목록 페이지 출력
         if (searchCondition.getContent().isEmpty() && searchCondition.getWriter().isEmpty() && searchCondition.getTitle().isEmpty()) {
             responseDTO = communityService.getCommunityList(pageable);
         } else {
-            responseDTO = communityService.getPageListWithSearch(boardType,searchCondition, pageable);
+            responseDTO = communityService.getPageListWithSearch(sortType,boardType,searchCondition, pageable);
 
         }
         return ResponseEntity.ok().body(responseDTO);
