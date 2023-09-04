@@ -43,11 +43,6 @@ public class FriendsService {
 	public CommonResponse.GeneralResponse addFriends(CustomUserPrincipal customUserPrincipal, Long friendsUserId) {
 		Users user = userRepository.findById(customUserPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 		Users friend = userRepository.findById(friendsUserId).orElseThrow(() -> new IllegalArgumentException("친구가 존재하지 않습니다."));
-		Friends userFriends = Friends.builder()
-			.users(user)
-			.friends(friend)
-			.build();
-		friendsRepository.save(userFriends);
 
 		Friends friendsUser = Friends.builder()
 			.users(friend)
@@ -62,12 +57,16 @@ public class FriendsService {
 		Friends userFriends = friendsRepository.findByUsers_IdAndFriends_Id(customUserPrincipal.getId(),
 			friendsApproveRequest.getFriendsId());
 
-		// Friends friendsUser = friendsRepository.findByUsers_IdAndFriends_Id(friendsApproveRequest.getFriendsId(),
-		// 	customUserPrincipal.getId());
-
 		userFriends.setApprove(friendsApproveRequest.getApprove());
 		String msg;
 		msg =  friendsApproveRequest.getApprove()=='Y' ? "승인되었습니다" :  "거절되었습니다";
+
+		Friends friendsUser = Friends.builder()
+				.users(userFriends.getFriends())
+				.friends(userFriends.getUsers())
+				.approve('Y')
+				.build();
+		friendsRepository.save(friendsUser);
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), msg);
 	}
 

@@ -38,7 +38,7 @@ public class TokenProvider {
 
 	public AuthDto.TokenDto createTokenOAuth2(Authentication authentication) {
 		CustomUserPrincipal userPrincipal = (CustomUserPrincipal)authentication.getPrincipal();
-		return createToken(userPrincipal.getEmail(), getAuthorities(authentication));
+		return createToken(userPrincipal.getUsers().getEmail(), userPrincipal.getUsers().getRole().getRole());
 	}
 
 	public AuthDto.TokenDto createToken(String email, String authorities) {
