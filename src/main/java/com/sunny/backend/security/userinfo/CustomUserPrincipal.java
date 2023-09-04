@@ -3,43 +3,30 @@ package com.sunny.backend.security.userinfo;
 import java.util.*;
 
 import com.sunny.backend.user.Users;
-import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@AllArgsConstructor
-
 public class CustomUserPrincipal implements OAuth2User, UserDetails {
-	private Long id;
-	private String email;
+	private Users users;
 
 	private Collection<? extends GrantedAuthority> authorities;
 	@Setter
 	private Map<String, Object> attributes;
 
-	public CustomUserPrincipal(Long id, String email,  Collection<? extends GrantedAuthority> authorities) {
-		this.id = id;
-		this.email = email;
+	public CustomUserPrincipal(Users users) {
+		this.users = users;
+	}
+
+	public CustomUserPrincipal(Users users, Collection<? extends GrantedAuthority> authorities,
+		Map<String, Object> attributes) {
+		this.users = users;
 		this.authorities = authorities;
-	}
-	public static CustomUserPrincipal create(Users users) {
-		List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
-
-		return new CustomUserPrincipal(users.getId(), users.getEmail(), authorities);
-	}
-
-	public static CustomUserPrincipal create(Users users, Map<String, Object> attributes) {
-		CustomUserPrincipal customUserPrincipal = CustomUserPrincipal.create(users);
-		customUserPrincipal.setAttributes(attributes);
-		return customUserPrincipal;
+		this.attributes = attributes;
 	}
 
 	@Override
@@ -49,7 +36,7 @@ public class CustomUserPrincipal implements OAuth2User, UserDetails {
 
 	@Override
 	public String getUsername() {
-		return email;
+		return users.getEmail();
 	}
 
 	@Override
@@ -84,6 +71,6 @@ public class CustomUserPrincipal implements OAuth2User, UserDetails {
 
 	@Override
 	public String getName() {
-		return id.toString();
+		return users.getName();
 	}
 }
