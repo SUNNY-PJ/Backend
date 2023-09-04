@@ -57,7 +57,7 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
         whereClause.and(ContentMessageTitleEq(searchCondition.getContent(), searchCondition.getTitle()))
                 .and(boardWriterEq(searchCondition.getWriter()));
 
-        System.out.println("쿼리문"+whereClause);
+
         if (boardType == BoardType.자유) {
             whereClause.and(community.boardType.eq(BoardType.자유));
         } else if (boardType == BoardType.꿀팁) {

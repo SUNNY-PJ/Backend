@@ -38,7 +38,6 @@ public class CommunityService {
     private final S3Service s3Service;
 
     //게시글 등록
-    @Transactional
     public CommonResponse.SingleResponse<CommunityResponse> createCommunity(CustomUserPrincipal customUserPrincipal, CommunityRequest communityRequest, List<MultipartFile> multipartFileList) {
 
         Users user = userRepository.findById(customUserPrincipal.getId()).orElseThrow(
@@ -93,8 +92,6 @@ public class CommunityService {
 
 
     //게시글 수정
-
-    @Transactional
     public CommonResponse updateCommunity(CustomUserPrincipal customUserPrincipal, Long communityId, CommunityRequest communityRequest , List<MultipartFile> files) {
         //To do : error 처리
         Users user = userRepository.findById(customUserPrincipal.getId()).orElseThrow(

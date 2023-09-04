@@ -30,10 +30,10 @@ public class SaveService {
                 .cost(saveRequest.getCost())
                 .startDate(saveRequest.getStartDate())
                 .endDate(saveRequest.getEndDate())
-                .user(user)
+                .users(user)
                 .build();
-        user.getSaveList().add(saveGoal);
         saveRepository.save(saveGoal);
+        user.setSave(saveGoal);
         return responseService.getSingleResponse(HttpStatus.OK.value(), new SaveResponse(saveGoal));
 
     }
@@ -46,11 +46,18 @@ public class SaveService {
         Save save = saveRepository.findById(savedId).orElseThrow(() -> new NotFoundException("could not found save goal"));
 
         save.updateSave(saveRequest);
-        saveRepository.save(save);
+        //To do -> Transactional , save()에 대해
+        saveRepository.save(save); //update시에는 sava 필요 없음 ?
         return responseService.getSingleResponse(HttpStatus.OK.value(), new SaveResponse(save));
 
     }
+
     //절약 현황 (현재까지의 지출 금액 / 목표 금액)
+    /*
+    사용자는 절약 목표 알림을 받을 수 있다.
+    [절약 목표 금액 < 소비 금액]
+    -소비 금액이 절약 목표 금액 보다 근접&초과(기준 : 50% , 90%, 100%) 시 앱 자체에서 알림을 준다.
+    **/
 
 
 }
