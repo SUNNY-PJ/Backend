@@ -58,11 +58,14 @@ public class Users extends BaseTime {
 	@Builder.Default
 	private List<Comment> commentList =new ArrayList<>();
 
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToOne(mappedBy = "users")
+	private Save save;
+
+
+	@OneToMany(mappedBy = "users", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JsonBackReference
 	@Builder.Default
-	private List<Save> saveList = new ArrayList<>();
-
+	private List<Scrap> scrapList =new ArrayList<>();
 
 
 
