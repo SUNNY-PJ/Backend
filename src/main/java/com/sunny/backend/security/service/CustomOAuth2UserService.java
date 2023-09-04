@@ -70,7 +70,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			users = registerUser(oAuth2UserRequest, attributes);
 		}
 
-		return CustomUserPrincipal.create(users, oAuth2User.getAttributes());
+		return new CustomUserPrincipal(users, oAuth2User.getAuthorities(), oAuth2User.getAttributes());
 	}
 
 	private Users registerUser(OAuth2UserRequest oAuth2UserRequest, OAuthAttributes attributes) {
