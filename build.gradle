@@ -1,14 +1,24 @@
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.1.2'
-	id 'io.spring.dependency-management' version '1.1.2'
+	id 'org.springframework.boot' version '2.7.7'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'com.sunny'
 version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
 
-java {
-	sourceCompatibility = '17'
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
 }
 
 repositories {
@@ -18,8 +28,74 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
+	//JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	//lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	//Mysql
+	implementation 'mysql:mysql-connector-java'
+	//swaggerUI
+	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+
+	// Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// OAuth
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	//aws
+	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.415'
+
+	// redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// JWT
+	implementation "io.jsonwebtoken:jjwt:0.9.1"
+
+	// h2
+	runtimeOnly 'com.h2database:h2'
+
+	// querydsl
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+def querydslDir = "$buildDir/generated/'querydsl'"
+// JPA 사용여부 및 사용 경로 설정
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+
+// build시 사용할 sourceSet 추가 설정
+sourceSets {
+	main.java.srcDir querydslDir
+}
+
+
+// querydsl 컴파일 시 사용할 옵션 설정
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+// querydsl-> compileClassPath 상속
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	querydsl.extendsFrom compileClasspath
+}
+
