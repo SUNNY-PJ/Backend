@@ -3,6 +3,8 @@ package com.sunny.backend.security.userinfo;
 import java.util.*;
 
 import com.sunny.backend.user.Users;
+import lombok.NoArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +16,7 @@ import lombok.Setter;
 
 @Getter
 @AllArgsConstructor
+
 public class CustomUserPrincipal implements OAuth2User, UserDetails {
 	private Long id;
 	private String email;
