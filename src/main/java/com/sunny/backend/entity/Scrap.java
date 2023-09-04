@@ -1,32 +1,36 @@
 package com.sunny.backend.entity;
 
-import lombok.*;
+import com.sunny.backend.user.Users;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 @Entity
-@Getter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Photo {
+@Builder
+@Getter
+public class Scrap {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //community와 다대일 관계
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Users users;
+
+
     @ManyToOne(fetch = FetchType.LAZY) //default 값이 EAGER (즉시로딩)이므로 LAZY(지연로딩)으로 설정
     @JoinColumn(name= "community_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Community community;
 
-    @Column
-    private String filename;
-    @Column
-    private String fileUrl;
-    @Column
-    private Long fileSize;
+
+
 }
