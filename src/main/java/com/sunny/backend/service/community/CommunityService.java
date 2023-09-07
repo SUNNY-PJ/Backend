@@ -63,6 +63,7 @@ public class CommunityService {
             photoList.add(photo);
         }
         photoRepository.saveAll(photoList);
+
         return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community));
     }
 

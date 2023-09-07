@@ -31,14 +31,15 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
     public PageImpl<CommunityResponse.PageResponse> getCommunityList(Pageable pageable) {
         List<Community> results = queryFactory
                 .selectFrom(community)
-                .orderBy(community.createdDate.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .orderBy(community.createdDate.desc()) // 기본 정렬은 최신순
+                .offset(pageable.getOffset()) //시작점
+                .limit(pageable.getPageSize()) //페이지 사이즈
                 .fetch();
 
         long totalCount = queryFactory
-                .selectFrom(community)
-                .fetchCount();
+                .select(community.count()) //count(community.id)
+                .from(community)
+                .fetchOne(); //응답 결과 숫자 1개
 
         List<CommunityResponse.PageResponse> dtoList = results.stream()
                 .map(CommunityResponse.PageResponse::new)
@@ -49,11 +50,11 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
 
     @Override
     public PageImpl<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType, BoardType boardType, SearchType searchCondition, Pageable pageable){
-        JPQLQuery<Community> query = queryFactory.select(community).from(community);
+        JPQLQuery<Community> query = queryFactory.selectFrom(community);
 
 
         BooleanBuilder whereClause = new BooleanBuilder();
-        //whereClause 기준에 맞는 레코드만 출력
+        // refactor : BooleanBuilder  -> Where
         whereClause.and(ContentMessageTitleEq(searchCondition.getContent(), searchCondition.getTitle()))
                 .and(boardWriterEq(searchCondition.getWriter()));
 
