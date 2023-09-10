@@ -23,8 +23,7 @@ public class SaveService {
 
     //절약 목표 등록
     public CommonResponse createSaveGoal(CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
-        Users user=userRepository.findById(customUserPrincipal.getId())
-                .orElseThrow(()->new NotFoundException("could not found user!"));
+        Users user = customUserPrincipal.getUsers();
         // To do : save 명칭 변경
         Save saveGoal= Save.builder()
                 .cost(saveRequest.getCost())
@@ -34,21 +33,20 @@ public class SaveService {
                 .build();
         saveRepository.save(saveGoal);
         user.setSave(saveGoal);
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new SaveResponse(saveGoal));
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new SaveResponse(saveGoal), "");
 
     }
 
     //절약 목표 수정
     public CommonResponse updateSaveGoal(CustomUserPrincipal customUserPrincipal, Long savedId,SaveRequest saveRequest) {
-        Users user=userRepository.findById(customUserPrincipal.getId())
-                .orElseThrow(()->new NotFoundException("could not found user!"));
+        Users user = customUserPrincipal.getUsers();
         // To do : save 명칭 변경
         Save save = saveRepository.findById(savedId).orElseThrow(() -> new NotFoundException("could not found save goal"));
 
         save.updateSave(saveRequest);
         //To do -> Transactional , save()에 대해
         saveRepository.save(save); //update시에는 sava 필요 없음 ?
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new SaveResponse(save));
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new SaveResponse(save), "");
 
     }
 

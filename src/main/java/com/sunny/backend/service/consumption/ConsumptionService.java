@@ -33,7 +33,7 @@ public class ConsumptionService {
                 .name(user.getName())
                 .category(SpendType.valueOf(consumptionRequest.getPlace()))
                 .money(consumptionRequest.getMoney())
-                .dateField(consumptionRequest.getParsedDateField())
+                .dateField(consumptionRequest.getDateField())
                 .users(user)
                 .build();
 

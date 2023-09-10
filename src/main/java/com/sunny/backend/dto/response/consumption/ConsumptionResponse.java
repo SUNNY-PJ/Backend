@@ -4,7 +4,7 @@ package com.sunny.backend.dto.response.consumption;
 import com.sunny.backend.entity.*;
 import lombok.Getter;
 
-
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +17,7 @@ public class ConsumptionResponse {
 
     private Long money; //지출 금액
 
-    private Date dateField; //지출 일자
+    private LocalDate dateField; //지출 일자
 
     public ConsumptionResponse(Consumption consumption) {
 
