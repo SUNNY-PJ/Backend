@@ -20,14 +20,14 @@ public class CompetitionResponseDto {
 	@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 	public static class CompetitionStatus {
 		private Long competitionId;
-		private Integer price;
+		private Long price;
 		private String compensation;
 		private LocalDate endDate;
 		private long dDay;
 		private String username;
 		private String friendName;
-		private Integer userPercent;
-		private Integer friendsPercent;
+		private Long userPercent;
+		private Long friendsPercent;
 		private String result;
 	}
 }

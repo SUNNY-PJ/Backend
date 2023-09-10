@@ -61,4 +61,14 @@ public class Community extends BaseTime {
 
     }
 
+    public void increaseView() {
+        this.view_cnt+=1;
+    }
+
+    public void updateView() {
+        this.view_cnt++;
+    }
+
+
+
 }

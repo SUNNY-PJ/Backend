@@ -31,7 +31,6 @@ public class CommentRepositoryImpl extends QuerydslRepositorySupport implements 
 
     @Override
     public List<CommentResponse> findByCommunityId(Long id) {
-
         List<Comment> comments = queryFactory.selectFrom(comment)
                 .leftJoin(comment.parent).fetchJoin()
                 .where(comment.community.id.eq(id))
