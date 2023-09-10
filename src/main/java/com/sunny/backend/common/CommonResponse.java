@@ -17,14 +17,13 @@ public class CommonResponse {
 
 	public static class ErrorResponse extends CommonResponse {
 		@ApiModelProperty(value = "응답 코드")
-		private String code;
-		@ApiModelProperty(value = "응답 메세지")
-		private String msg;
+		private ErrorCode errorCode;
 
-		public ErrorResponse(boolean success, int status, String code, String msg) {
+
+		public ErrorResponse(boolean success, int status, ErrorCode errorCode) {
 			super(success, status);
-			this.code = code;
-			this.msg = msg;
+			this.errorCode = errorCode;
+
 		}
 	}
 
