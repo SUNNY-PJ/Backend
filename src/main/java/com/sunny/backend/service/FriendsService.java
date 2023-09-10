@@ -29,7 +29,7 @@ public class FriendsService {
 
 	public CommonResponse.ListResponse<FriendsResponse> getFriendsList(CustomUserPrincipal customUserPrincipal) {
 		List<FriendsResponse> responseList = new ArrayList<>();
-		for (Friends friends : friendsRepository.findByUsers_IdAndApprove(customUserPrincipal.getId(), 'Y')) {
+		for (Friends friends : friendsRepository.findByUsers_IdAndApprove(customUserPrincipal.getUsers().getId(), 'Y')) {
 			responseList.add(FriendsResponse.builder()
 					.id(friends.getId())
 					.friendsId(friends.getFriends().getId())
@@ -37,11 +37,12 @@ public class FriendsService {
 					.friendsProfile(friends.getFriends().getProfile())
 				.build());
 		}
-		return responseService.getListResponse(HttpStatus.OK.value(), responseList);
+		return responseService.getListResponse(HttpStatus.OK.value(), responseList, "");
 	}
 
 	public CommonResponse.GeneralResponse addFriends(CustomUserPrincipal customUserPrincipal, Long friendsUserId) {
-		Users user = userRepository.findById(customUserPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+		Users user = customUserPrincipal.getUsers();
+		// Users user = userRepository.findById(customUserPrincipal.getUsers().getId()).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 		Users friend = userRepository.findById(friendsUserId).orElseThrow(() -> new IllegalArgumentException("친구가 존재하지 않습니다."));
 
 		Friends friendsUser = Friends.builder()
@@ -54,7 +55,7 @@ public class FriendsService {
 
 	@Transactional
 	public CommonResponse.GeneralResponse approveFriends(CustomUserPrincipal customUserPrincipal, FriendsApproveRequest friendsApproveRequest) {
-		Friends userFriends = friendsRepository.findByUsers_IdAndFriends_Id(customUserPrincipal.getId(),
+		Friends userFriends = friendsRepository.findByUsers_IdAndFriends_Id(customUserPrincipal.getUsers().getId(),
 			friendsApproveRequest.getFriendsId());
 
 		userFriends.setApprove(friendsApproveRequest.getApprove());
@@ -72,7 +73,7 @@ public class FriendsService {
 
 	public CommonResponse.GeneralResponse deleteFriends(CustomUserPrincipal customUserPrincipal, Long friendsId) {
 		Friends friends = friendsRepository.findById(friendsId).orElseThrow(() -> new IllegalArgumentException("친구가 존재하지 않습니다."));
-		if(!friends.getUsers().getId().equals(customUserPrincipal.getId())) {
+		if(!friends.getUsers().getId().equals(customUserPrincipal.getUsers().getId())) {
 			return responseService.getGeneralResponse(HttpStatus.BAD_REQUEST.value(), "권한이 없습니다.");
 		}
 		friendsRepository.deleteById(friendsId);

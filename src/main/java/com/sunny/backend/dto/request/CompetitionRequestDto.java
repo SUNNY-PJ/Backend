@@ -13,7 +13,7 @@ public class CompetitionRequestDto {
     public static class CompetitionApply {
         private Long friendsId;
         private String message;
-        private Integer price;
+        private Long price;
         private String compensation;
         private LocalDate startDate;
         private LocalDate endDate;
