@@ -2,6 +2,7 @@ package com.sunny.backend.service;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.List;
 
 import javax.transaction.Transactional;
 
@@ -10,6 +11,7 @@ import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.CompetitionRequestDto;
 import com.sunny.backend.dto.response.CompetitionResponseDto;
 import com.sunny.backend.entity.Competition;
+import com.sunny.backend.entity.Consumption;
 import com.sunny.backend.repository.CompetitionRepository;
 import com.sunny.backend.repository.consumption.ConsumptionRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
@@ -76,6 +78,18 @@ public class CompetitionService {
         Duration diff = Duration.between(LocalDate.now(), competition.getEndDate());
 
         // 날짜 간의 소비 금액 구하기 로직
+        Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), competition.getStartDate(), competition.getEndDate());
+        Long friendsMoney = consumptionRepository.getComsumptionMoney(user.getId(), competition.getStartDate(), competition.getEndDate());
+
+        String result;
+        if(userMoney>friendsMoney) {
+            result = "유저가 이기고 있습니다.";
+        } else if(userMoney<friendsMoney) {
+            result = "유저가 지고 있습니다.";
+        } else {
+            result = "비기고 있습니다.";
+        }
+
 
         CompetitionResponseDto.CompetitionStatus competitionStatus = CompetitionResponseDto.CompetitionStatus.builder()
             .competitionId(competitionId)
@@ -85,7 +99,10 @@ public class CompetitionService {
             .dDay(diff.toMinutes()/60)
             .username(user.getName())
             .friendName(friends.getName())
+            .userPercent(userMoney/competition.getPrice())
+            .friendsPercent(friendsMoney/competition.getPrice())
+            .result(result)
             .build();
-        return null;
+        return responseService.getSingleResponse(HttpStatus.OK.value(), competitionStatus, "결과 조회");
     }
 }

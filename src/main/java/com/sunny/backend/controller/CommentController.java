@@ -6,10 +6,14 @@ import com.sunny.backend.config.AuthUser;
 import com.sunny.backend.dto.request.comment.CommentRequest;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.service.comment.CommentService;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 @Slf4j
 @RestController
@@ -20,6 +24,7 @@ public class CommentController {
     private final CommentService commentService;
 
     //댓글 등록
+    @ApiOperation(tags = "댓글", value = "댓글 생성")
     @PostMapping("/{communityId}")
     public ResponseEntity<CommonResponse> createComment(@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId,
                                                         @RequestBody CommentRequest commentRequestDTO) {

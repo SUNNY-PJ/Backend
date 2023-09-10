@@ -34,7 +34,7 @@ public class Competition {
     private LocalDate endDate; // 종료 기간
 
     @Column
-    private Integer price; // 대결 금액
+    private Long price; // 대결 금액
 
     @Column
     private String compensation; // 대결 보상

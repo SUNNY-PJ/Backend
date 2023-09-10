@@ -24,7 +24,7 @@ public class SwaggerConfig {
                 .ignoredParameterTypes(AuthUser.class)
                 .useDefaultResponseMessages(false)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.omo.be"))
+                .apis(RequestHandlerSelectors.basePackage("com.sunny.backend"))
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(apiInfo())
@@ -34,7 +34,7 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title(" Swagger")
+                .title("Swagger")
                 .description(" swagger config")
                 .version("1.0")
                 .build();

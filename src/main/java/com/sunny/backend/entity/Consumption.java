@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -34,7 +36,7 @@ public class Consumption {
 
     @Column
     @NotNull
-    private Date dateField; //string으로 등록?
+    private LocalDate dateField; //string으로 등록?
 
     //users 다대일 관계 매핑
     @ManyToOne(fetch = FetchType.LAZY)

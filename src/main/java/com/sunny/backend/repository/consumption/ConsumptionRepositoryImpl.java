@@ -1,5 +1,8 @@
 package com.sunny.backend.repository.consumption;
 
+import static com.sunny.backend.entity.QConsumption.*;
+import static com.sunny.backend.user.QUsers.*;
+
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -9,8 +12,13 @@ import com.sunny.backend.entity.QConsumption;
 import com.sunny.backend.entity.SpendType;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import net.bytebuddy.asm.Advice;
 
 public class ConsumptionRepositoryImpl  extends QuerydslRepositorySupport implements ConsumptionCustomRepository {
     private JPAQueryFactory queryFactory;
@@ -48,6 +56,15 @@ public class ConsumptionRepositoryImpl  extends QuerydslRepositorySupport implem
                     return new SpendTypeStatisticsResponse(category, totalCount, totalMoney, percentage);
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Long getComsumptionMoney(Long id, LocalDate startDate, LocalDate endDate) {
+        return queryFactory.select(consumption.money.sum())
+            .from(consumption)
+            .join(users).on(users.id.eq(consumption.users.id))
+            .where(consumption.dateField.between(startDate, endDate))
+            .fetchOne();
     }
 
     private long getTotalSpending() {
