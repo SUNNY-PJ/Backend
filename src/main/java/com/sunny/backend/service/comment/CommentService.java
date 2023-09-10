@@ -4,11 +4,12 @@ package com.sunny.backend.service.comment;
 import com.amazonaws.services.kms.model.NotFoundException;
 
 import com.sunny.backend.common.CommonResponse;
+import com.sunny.backend.common.CustomException;
+import com.sunny.backend.common.ErrorCode;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.comment.CommentRequest;
 import com.sunny.backend.dto.request.comment.CommentRequestMapper;
 import com.sunny.backend.dto.response.comment.CommentResponse;
-import com.sunny.backend.dto.response.Response;
 import com.sunny.backend.entity.Comment;
 import com.sunny.backend.entity.Community;
 import com.sunny.backend.repository.comment.CommentRepository;
@@ -18,17 +19,18 @@ import com.sunny.backend.user.Users;
 import com.sunny.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
+import static com.sunny.backend.common.ErrorCode.COMMENT_NOT_FOUND;
+import static com.sunny.backend.common.ErrorCode.COMMUNITY_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
 
-    private final Response response;
     private final CommentRepository commentRepository;
     private final UserRepository usersRepository;
     private final CommunityRepository communityRepository;
@@ -37,32 +39,30 @@ public class CommentService {
 
     //댓글 등록
     @Transactional
-    public CommonResponse createComment(CustomUserPrincipal customUserPrincipal,Long communityId, CommentRequest commentRequestDTO) {
 
-        Users users = usersRepository.findById(customUserPrincipal.getId())
-                .orElseThrow(() -> new NotFoundException("Could not found user"));
-
+    public CommonResponse.SingleResponse<CommentResponse> createComment(CustomUserPrincipal customUserPrincipal,Long communityId, CommentRequest commentRequestDTO) {
+        Users user = customUserPrincipal.getUsers();
         Community community = communityRepository.findById(communityId)
-                .orElseThrow(() -> new NotFoundException("Could not found communuty"));
+                .orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
 
         Comment comment = commentRequestMapper.toEntity(commentRequestDTO);
 
         Comment parentComment;
         if (commentRequestDTO.getParentId() != null) {
             parentComment = commentRepository.findById(commentRequestDTO.getParentId())
-                    .orElseThrow(() -> new NotFoundException("Could not found comment id "));
+                    .orElseThrow(() ->new CustomException(COMMENT_NOT_FOUND));
             comment.setParent(parentComment);
         }
 
-        comment.setWriter(users.getName());
+        comment.setWriter(user.getName());
         comment.setCommunity(community);
         comment.setContent(commentRequestDTO.getContent());
-        comment.setUsers(users);
+        comment.setUsers(user);
 
         commentRepository.save(comment);
-        users.getCommentList().add(comment);
+        user.getCommentList().add(comment);
 
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommentResponse(comment.getId(),comment.getWriter(),comment.getContent()));
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommentResponse(comment.getId(),comment.getWriter(),comment.getContent()),"댓글을 등록했습니다.");
 
     }
 
@@ -70,7 +70,7 @@ public class CommentService {
     @Transactional
     public CommonResponse deleteComment(CustomUserPrincipal customUserPrincipal, Long commentId) {
         Comment comment = commentRepository.findCommentByIdWithParent(commentId)
-                .orElseThrow(() -> new NotFoundException("Could not found comment id : " + commentId));
+                .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
         if(checkCommentLoginUser(customUserPrincipal,comment)) {
             if (comment.getChildren().size() != 0) { // 자식이 있으면 상태만 변경
                 comment.changeIsDeleted(true);
@@ -95,11 +95,11 @@ public class CommentService {
     public CommonResponse updateComment(CustomUserPrincipal customUserPrincipal, Long commentId, CommentRequest commentRequestDTO) {
 
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NotFoundException("Could not found comment id "));
+                .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
         if(checkCommentLoginUser(customUserPrincipal,comment)) {
             comment.setContent(commentRequestDTO.getContent());
         }
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommentResponse(comment.getId(),comment.getWriter(),comment.getContent()));
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommentResponse(comment.getId(),comment.getWriter(),comment.getContent()),"댓글을 수정했습니다.");
     }
 
     //수정 및 삭제 권한 체크

@@ -28,9 +28,7 @@ public class ScrapService {
 
     //스크랩 조회
     public CommonResponse getScrapsByUserId(CustomUserPrincipal customUserPrincipal) {
-        Users user = userRepository.findById(customUserPrincipal.getId()).orElseThrow(
-                () -> new NotFoundException("user not found"));
-
+        Users user = customUserPrincipal.getUsers();
         List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId()); //user id 이용해서 전체 스크랩 조회
 
         List<CommunityResponse> communityResponseList = scrapList.stream()
@@ -42,8 +40,7 @@ public class ScrapService {
 
     //스크랩 추가
     public CommonResponse addScrapToCommunity(CustomUserPrincipal customUserPrincipal, Long communityId) {
-        Users user = userRepository.findById(customUserPrincipal.getId()).orElseThrow(
-                () -> new NotFoundException("user not found"));
+        Users user = customUserPrincipal.getUsers();
 
         Community community = communityRepository.findById(communityId)
                 .orElseThrow(()->new NotFoundException("could not found community"));
@@ -61,10 +58,7 @@ public class ScrapService {
     public CommonResponse removeScrapFromCommunity(CustomUserPrincipal customUserPrincipal, Long communityId) {
 
         try {
-            Users user = userRepository.findById(customUserPrincipal.getId()).orElseThrow(
-                    () -> new NotFoundException("user not found"));
-
-
+            Users user = customUserPrincipal.getUsers();
             Community community = communityRepository.findById(communityId)
                     .orElseThrow(()->new NotFoundException("could not found community"));
 

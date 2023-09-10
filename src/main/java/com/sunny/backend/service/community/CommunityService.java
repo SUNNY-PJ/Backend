@@ -3,6 +3,7 @@ package com.sunny.backend.service.community;
 
 import com.amazonaws.services.kms.model.NotFoundException;
 import com.sunny.backend.common.CommonResponse;
+import com.sunny.backend.common.CustomException;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.dto.response.community.CommunityResponse;
@@ -13,6 +14,7 @@ import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.service.S3Service;
 import com.sunny.backend.user.Users;
 import com.sunny.backend.user.repository.UserRepository;
+import com.sunny.backend.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageImpl;
@@ -22,9 +24,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import static com.sunny.backend.common.ErrorCode.COMMUNITY_NOT_FOUND;
+import static com.sunny.backend.common.ErrorCode.NO_USER_PERMISSION;
 
 @Service
 @RequiredArgsConstructor
@@ -36,12 +44,54 @@ public class CommunityService {
     private final PhotoRepository photoRepository;
     private final ResponseService responseService;
     private final S3Service s3Service;
+    private final RedisUtil redisUtil;
 
+
+    //게시글 상세 조회
+    @Transactional
+    public CommonResponse.SingleResponse<CommunityResponse> findCommunity(CustomUserPrincipal customUserPrincipal, Long communityId){
+        Users users = customUserPrincipal.getUsers();
+        Community community=communityRepository.findById(communityId)
+                .orElseThrow(()->new CustomException(COMMUNITY_NOT_FOUND));
+        String viewCount = redisUtil.getData(String.valueOf(users.getId()));
+        System.out.println(viewCount);
+        if (viewCount == null) {
+
+            redisUtil.setDateExpire(String.valueOf(users.getId()), communityId + "_", calculateTimeUntilMidnight());
+            community.increaseView();
+        } else {
+            String[] strArray = viewCount.split("_");
+            List<String> redisBoardList = Arrays.asList(strArray);
+
+            boolean isView = false;
+
+            if (!redisBoardList.isEmpty()) {
+                for (String redisBoardId : redisBoardList) {
+                    if (String.valueOf(communityId).equals(redisBoardId)) {
+                        isView = true;
+                        break;
+                    }
+                }
+                if (!isView) {
+                    viewCount += communityId + "_";
+
+                    redisUtil.setDateExpire(String.valueOf(users.getId()), viewCount, calculateTimeUntilMidnight());
+                    community.updateView();
+                }
+            }
+        }
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),"게시글을 성공적으로 불러왔습니다. ");
+    }
+
+    public static long calculateTimeUntilMidnight() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime midnight = now.truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        return ChronoUnit.SECONDS.between(now, midnight);
+    }
     //게시글 등록
     public CommonResponse.SingleResponse<CommunityResponse> createCommunity(CustomUserPrincipal customUserPrincipal, CommunityRequest communityRequest, List<MultipartFile> multipartFileList) {
 
-        Users user = userRepository.findById(customUserPrincipal.getId()).orElseThrow(
-                () -> new NotFoundException("user not found"));
+        Users user = customUserPrincipal.getUsers();
         Community community= Community.builder()
                 .title(communityRequest.getTitle())
                 .contents(communityRequest.getContents())
@@ -64,7 +114,7 @@ public class CommunityService {
         }
         photoRepository.saveAll(photoList);
 
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community));
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),"게시글을 성공적으로 작성했습니다. ");
     }
 
     //게시판 조회
@@ -83,20 +133,18 @@ public class CommunityService {
     //게시글 조회
 
     public CommonResponse getCommunity(CustomUserPrincipal customUserPrincipal, Long communityId){
-        Users user=userRepository.findById(customUserPrincipal.getId())
-                .orElseThrow(()-> new NotFoundException("could not found user"));
+        Users user = customUserPrincipal.getUsers();
         Community community=communityRepository.findById(communityId)
                 .orElseThrow(()-> new NotFoundException("could not found Community"));
 
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community));
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),"게시글 목록을 불러왔습니다.");
     }
 
 
     //게시글 수정
     public CommonResponse updateCommunity(CustomUserPrincipal customUserPrincipal, Long communityId, CommunityRequest communityRequest , List<MultipartFile> files) {
         //To do : error 처리
-        Users user = userRepository.findById(customUserPrincipal.getId()).orElseThrow(
-                () -> new NotFoundException("user not found"));
+        Users user = customUserPrincipal.getUsers();
         Community community = communityRepository.findById(communityId).orElseThrow(() -> new NotFoundException("Community Post not found!"));
         System.out.println(community);
         if (checkCommunityLoginUser(customUserPrincipal,community)) {
@@ -133,7 +181,7 @@ public class CommunityService {
         user.getCommunityList().add(community);
         userRepository.save(user);
 
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community));
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),"게시글 수정을 완료했습니다.");
     }
 
     //게시글 삭제
@@ -141,8 +189,7 @@ public class CommunityService {
     public CommonResponse deleteCommunity(CustomUserPrincipal customUserPrincipal, Long communityId) {
 
         //To do : error 처리
-        Users user = userRepository.findById(customUserPrincipal.getId()).orElseThrow(
-                () -> new NotFoundException("user not found"));
+        Users user = customUserPrincipal.getUsers();
         Community community = communityRepository.findById(communityId).orElseThrow(() -> new NotFoundException("Community post  not found!"));
         List<Photo> photoList=photoRepository.findByCommunityId(communityId);
         if (checkCommunityLoginUser(customUserPrincipal,community)) {
@@ -157,7 +204,7 @@ public class CommunityService {
         photoRepository.deleteByCommunityId(communityId);
         communityRepository.deleteById(communityId);
 
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community));
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),"게시글을 삭제했습니다.");
     }
     //수정 및 삭제 권한 체크
     private boolean checkCommunityLoginUser(CustomUserPrincipal customUserPrincipal, Community community) {

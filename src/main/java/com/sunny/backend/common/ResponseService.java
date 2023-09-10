@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ResponseService {
-	public CommonResponse.ErrorResponse getErrorResponse(int status, String code, String msg) {
-		return new CommonResponse.ErrorResponse(true, status, code, msg);
+public class ResponseService extends RuntimeException{
+	public CommonResponse.ErrorResponse getErrorResponse(int status, ErrorCode errorCode) {
+		return new CommonResponse.ErrorResponse(true,status,errorCode);
 	}
 
 	public CommonResponse.GeneralResponse getGeneralResponse(int status, String msg) {
@@ -21,5 +21,6 @@ public class ResponseService {
 	public <T> CommonResponse.ListResponse<T> getListResponse(int status, List<T> data, String msg) {
 		return new CommonResponse.ListResponse<>(true, status, data, msg);
 	}
+
 
 }
