@@ -88,6 +88,7 @@ public class CommunityService {
         LocalDateTime midnight = now.truncatedTo(ChronoUnit.DAYS).plusDays(1);
         return ChronoUnit.SECONDS.between(now, midnight);
     }
+    @Transactional
     //게시글 등록
     public CommonResponse.SingleResponse<CommunityResponse> createCommunity(CustomUserPrincipal customUserPrincipal, CommunityRequest communityRequest, List<MultipartFile> multipartFileList) {
 
@@ -120,6 +121,7 @@ public class CommunityService {
     //게시판 조회
     //To do  -> Slice 찾아보고 수정
     //단순 조회
+    @Transactional
     public PageImpl<CommunityResponse.PageResponse> getCommunityList(Pageable pageable) {
         PageImpl<CommunityResponse.PageResponse> result = communityRepository.getCommunityList(pageable);
         return result;
@@ -131,7 +133,7 @@ public class CommunityService {
     }
 
     //게시글 조회
-
+    @Transactional
     public CommonResponse getCommunity(CustomUserPrincipal customUserPrincipal, Long communityId){
         Users user = customUserPrincipal.getUsers();
         Community community=communityRepository.findById(communityId)
@@ -142,6 +144,7 @@ public class CommunityService {
 
 
     //게시글 수정
+    @Transactional
     public CommonResponse updateCommunity(CustomUserPrincipal customUserPrincipal, Long communityId, CommunityRequest communityRequest , List<MultipartFile> files) {
         //To do : error 처리
         Users user = customUserPrincipal.getUsers();
