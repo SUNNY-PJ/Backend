@@ -27,7 +27,7 @@ public class ConsumptionService {
     private final ConsumptionRepository consumptionRepository;
     private final ResponseService responseService;
     //지출 등록
-    public CommonResponse createConsumption(CustomUserPrincipal customUserPrincipal, ConsumptionRequest consumptionRequest) {
+    public CommonResponse.SingleResponse createConsumption(CustomUserPrincipal customUserPrincipal, ConsumptionRequest consumptionRequest) {
         Users user = customUserPrincipal.getUsers();
         Consumption consumption = Consumption.builder()
                 .name(user.getName())
@@ -45,7 +45,7 @@ public class ConsumptionService {
 
 
     //지출 조회
-    public CommonResponse getConsumptionList(CustomUserPrincipal customUserPrincipal) {
+    public CommonResponse.ListResponse getConsumptionList(CustomUserPrincipal customUserPrincipal) {
         //유저 id 기준으로 지출 내역 조회
         List<Consumption> consumptions = consumptionRepository.findByUsersId(customUserPrincipal.getUsers().getId());
         List<ConsumptionResponse> consumptionResponses = ConsumptionResponse.fromConsumptions(consumptions);
