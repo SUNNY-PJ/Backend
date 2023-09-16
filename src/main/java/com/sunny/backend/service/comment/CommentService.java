@@ -68,7 +68,7 @@ public class CommentService {
 
     //댓글 삭제
     @Transactional
-    public CommonResponse deleteComment(CustomUserPrincipal customUserPrincipal, Long commentId) {
+    public CommonResponse.GeneralResponse deleteComment(CustomUserPrincipal customUserPrincipal, Long commentId) {
         Comment comment = commentRepository.findCommentByIdWithParent(commentId)
                 .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
         if(checkCommentLoginUser(customUserPrincipal,comment)) {
@@ -92,7 +92,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommonResponse updateComment(CustomUserPrincipal customUserPrincipal, Long commentId, CommentRequest commentRequestDTO) {
+    public CommonResponse.SingleResponse updateComment(CustomUserPrincipal customUserPrincipal, Long commentId, CommentRequest commentRequestDTO) {
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));

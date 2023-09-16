@@ -1,5 +1,6 @@
 package com.sunny.backend.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import com.sunny.backend.service.FriendsService;
 
 import lombok.RequiredArgsConstructor;
 
+@Tag(name="Save", description = "Save API")
 @RequestMapping(value = "/api/v1/friends")
 @RestController
 @RequiredArgsConstructor

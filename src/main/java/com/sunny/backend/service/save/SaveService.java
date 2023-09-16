@@ -22,7 +22,7 @@ public class SaveService {
     private final ResponseService responseService;
 
     //절약 목표 등록
-    public CommonResponse createSaveGoal(CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
+    public CommonResponse.SingleResponse createSaveGoal(CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
         Users user = customUserPrincipal.getUsers();
         // To do : save 명칭 변경
         Save saveGoal= Save.builder()
@@ -38,7 +38,7 @@ public class SaveService {
     }
 
     //절약 목표 수정
-    public CommonResponse updateSaveGoal(CustomUserPrincipal customUserPrincipal, Long savedId,SaveRequest saveRequest) {
+    public CommonResponse.SingleResponse updateSaveGoal(CustomUserPrincipal customUserPrincipal, Long savedId,SaveRequest saveRequest) {
         Users user = customUserPrincipal.getUsers();
         // To do : save 명칭 변경
         Save save = saveRepository.findById(savedId).orElseThrow(() -> new NotFoundException("could not found save goal"));
