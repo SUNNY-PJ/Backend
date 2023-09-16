@@ -134,7 +134,7 @@ public class CommunityService {
 
     //게시글 조회
     @Transactional
-    public CommonResponse getCommunity(CustomUserPrincipal customUserPrincipal, Long communityId){
+    public CommonResponse.SingleResponse getCommunity(CustomUserPrincipal customUserPrincipal, Long communityId){
         Users user = customUserPrincipal.getUsers();
         Community community=communityRepository.findById(communityId)
                 .orElseThrow(()-> new NotFoundException("could not found Community"));
@@ -145,13 +145,13 @@ public class CommunityService {
 
     //게시글 수정
     @Transactional
-    public CommonResponse updateCommunity(CustomUserPrincipal customUserPrincipal, Long communityId, CommunityRequest communityRequest , List<MultipartFile> files) {
+    public CommonResponse.SingleResponse updateCommunity(CustomUserPrincipal customUserPrincipal, Long communityId, CommunityRequest communityRequest , List<MultipartFile> files) {
         //To do : error 처리
         Users user = customUserPrincipal.getUsers();
         Community community = communityRepository.findById(communityId).orElseThrow(() -> new NotFoundException("Community Post not found!"));
         System.out.println(community);
         if (checkCommunityLoginUser(customUserPrincipal,community)) {
-            return responseService.getGeneralResponse(HttpStatus.BAD_REQUEST.value(), "게시글 수정 권한이 없습니다.");
+            new CustomException(COMMUNITY_NOT_FOUND);
         }
 
 
@@ -189,14 +189,14 @@ public class CommunityService {
 
     //게시글 삭제
     @Transactional
-    public CommonResponse deleteCommunity(CustomUserPrincipal customUserPrincipal, Long communityId) {
+    public CommonResponse.SingleResponse deleteCommunity(CustomUserPrincipal customUserPrincipal, Long communityId) {
 
         //To do : error 처리
         Users user = customUserPrincipal.getUsers();
         Community community = communityRepository.findById(communityId).orElseThrow(() -> new NotFoundException("Community post  not found!"));
         List<Photo> photoList=photoRepository.findByCommunityId(communityId);
         if (checkCommunityLoginUser(customUserPrincipal,community)) {
-            return responseService.getGeneralResponse(HttpStatus.BAD_REQUEST.value(), "게시글 삭제 권한이 없습니다.");
+            new CustomException(COMMUNITY_NOT_FOUND);
         }
 
         for (Photo existingFile : photoList) {

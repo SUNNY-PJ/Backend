@@ -27,7 +27,7 @@ public class ScrapService {
     private final ResponseService responseService;
 
     //스크랩 조회
-    public CommonResponse getScrapsByUserId(CustomUserPrincipal customUserPrincipal) {
+    public CommonResponse.ListResponse getScrapsByUserId(CustomUserPrincipal customUserPrincipal) {
         Users user = customUserPrincipal.getUsers();
         List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId()); //user id 이용해서 전체 스크랩 조회
 
@@ -39,7 +39,7 @@ public class ScrapService {
     }
 
     //스크랩 추가
-    public CommonResponse addScrapToCommunity(CustomUserPrincipal customUserPrincipal, Long communityId) {
+    public CommonResponse.GeneralResponse addScrapToCommunity(CustomUserPrincipal customUserPrincipal, Long communityId) {
         Users user = customUserPrincipal.getUsers();
 
         Community community = communityRepository.findById(communityId)
@@ -55,7 +55,7 @@ public class ScrapService {
     }
 
     //스크랩 취소
-    public CommonResponse removeScrapFromCommunity(CustomUserPrincipal customUserPrincipal, Long communityId) {
+    public CommonResponse.GeneralResponse removeScrapFromCommunity(CustomUserPrincipal customUserPrincipal, Long communityId) {
 
         try {
             Users user = customUserPrincipal.getUsers();
