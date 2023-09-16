@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Comment", description = "댓글 API")
+@Tag(name = "1. Comment", description = "댓글 API")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class CommentController {
 
     //댓글 등록
 
-    @ApiOperation(tags = "댓글", value = "댓글 생성")
+    @ApiOperation(tags = "1. Comment", value = "댓글 생성")
     @PostMapping("/{communityId}")
     public ResponseEntity<CommonResponse.SingleResponse> createComment(@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId,
                                                         @RequestBody CommentRequest commentRequestDTO) {
@@ -33,7 +33,7 @@ public class CommentController {
 
     }
     //댓글 수정
-    @ApiOperation(tags = "댓글", value = "댓글 수정")
+    @ApiOperation(tags = "1. Comment", value = "댓글 수정")
     @PutMapping("/{commentId}")
     public ResponseEntity<CommonResponse.SingleResponse> updateComment(@AuthUser CustomUserPrincipal customUserPrincipal,@PathVariable Long commentId, @RequestBody CommentRequest commentRequestDTO) {
         return ResponseEntity.ok().body(commentService.updateComment(customUserPrincipal, commentId, commentRequestDTO));
@@ -42,9 +42,8 @@ public class CommentController {
 
 
     //댓글 삭제
-    @ApiOperation(tags = "댓글", value = "댓글 삭제")
+    @ApiOperation(tags = "1. Comment", value = "댓글 삭제")
     @DeleteMapping("/{commentId}")
-
     public ResponseEntity<CommonResponse.GeneralResponse> deleteComment(@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long commentId) {
         return ResponseEntity.ok().body(commentService.deleteComment(customUserPrincipal, commentId));
 
