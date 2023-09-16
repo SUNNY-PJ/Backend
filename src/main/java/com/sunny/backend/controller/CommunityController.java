@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 
-@Tag(name="Community", description = "Community API")
+@Tag(name="2. Community", description = "Community API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/community")
@@ -33,7 +33,7 @@ public class CommunityController {
 
     private final CommunityService communityService;
     //게시판 조회
-    @ApiOperation(tags = "Community", value = "커뮤니티 게시판 목록 조회")
+    @ApiOperation(tags = "2. Community", value = "커뮤니티 게시판 목록 조회")
     @GetMapping("")
     public ResponseEntity<PageImpl<CommunityResponse.PageResponse>> getCommunityList(@RequestParam(required = false) SortType sortType, @RequestParam(required = false) BoardType boardType, @RequestBody SearchType searchCondition, Pageable pageable){
         PageImpl<CommunityResponse.PageResponse> responseDTO;
@@ -47,33 +47,32 @@ public class CommunityController {
         return ResponseEntity.ok().body(responseDTO);
     }
 
-    @ApiOperation(tags = "Community", value = "커뮤니티 게시글 상세 조회")
+    @ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 상세 조회")
     @GetMapping( "/{communityId}")
     public ResponseEntity<CommonResponse.SingleResponse> getCommunity(@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId){
 
         return ResponseEntity.ok().body(communityService.getCommunity(customUserPrincipal,communityId));
     }
-    @ApiOperation(tags = "Community", value = "커뮤니티 게시글 등록")
+
+    @ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 등록")
     @PostMapping( "")
     public ResponseEntity<CommonResponse.SingleResponse> createCommunity(@AuthUser CustomUserPrincipal customUserPrincipal,@RequestPart(value = "communityRequest") CommunityRequest communityRequest , @RequestPart(required = false) List<MultipartFile> files ){
         return ResponseEntity.ok().body(communityService.createCommunity(customUserPrincipal,communityRequest,files));
     }
 
-    @ApiOperation(tags = "Community", value = "커뮤니티 게시글 수정")
+    @ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 수정")
     @PutMapping("/{communityId}")
     public ResponseEntity<CommonResponse.SingleResponse> updateCommunity(@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId ,@RequestPart(value = "communityRequest") CommunityRequest communityRequest , @RequestPart(required = false) List<MultipartFile> files ){
 
         return ResponseEntity.ok().body(communityService.updateCommunity(customUserPrincipal,communityId,communityRequest,files));
     }
 
-
     //게시글 삭제
-    @ApiOperation(tags = "Community", value = "커뮤니티 게시글 삭제")
+    @ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 삭제")
     @DeleteMapping("/{communityId}")
     public ResponseEntity<CommonResponse.SingleResponse> deleteCommunity(@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId){
         return ResponseEntity.ok().body(communityService.deleteCommunity(customUserPrincipal, communityId));
     }
-
 
 }
 

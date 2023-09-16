@@ -12,14 +12,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name="Scrap", description = "Scrap API")
+@Tag(name="7. Scrap", description = "Scrap API")
 @RestController
 @RequestMapping("/scrap")
 @RequiredArgsConstructor
 public class ScrapController {
     private final ScrapService scrapService;
 
-    @ApiOperation(tags = "Scrap", value = "스크랩 조회")
+    @ApiOperation(tags = "7. Scrap", value = "스크랩 조회")
     @GetMapping("")
     public ResponseEntity<CommonResponse.ListResponse>  getScrapsByUserId(@AuthUser CustomUserPrincipal customUserPrincipal){
         return ResponseEntity.ok().body(scrapService.getScrapsByUserId(customUserPrincipal));
@@ -31,7 +31,7 @@ public class ScrapController {
         return ResponseEntity.ok().body(scrapService.addScrapToCommunity(customUserPrincipal,communityId));
     }
 
-    @ApiOperation(tags = "Scrap", value = "스크랩 삭제")
+    @ApiOperation(tags = "7. Scrap", value = "스크랩 삭제")
 
     @DeleteMapping("/{communityId}")
     public ResponseEntity<CommonResponse.GeneralResponse> removeScrapFromCommunity(@AuthUser CustomUserPrincipal customUserPrincipal,@PathVariable Long communityId){
