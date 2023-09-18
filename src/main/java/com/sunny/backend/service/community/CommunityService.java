@@ -99,7 +99,7 @@ public class CommunityService {
                 .boardType(communityRequest.getType())
                 .users(user)
                 .build();
-        user.getCommunityList().add(community);
+
 
         if (multipartFileList!=null) {
             List<Photo> photoList = new ArrayList<>();
@@ -115,8 +115,13 @@ public class CommunityService {
             photoRepository.saveAll(photoList);
             community.addPhoto(photoList);
         }
-        Community savedCommunity=communityRepository.save(community);
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(savedCommunity),"게시글을 성공적으로 작성했습니다. ");
+        communityRepository.save(community);
+        if(user.getCommunityList()==null) {
+            user.addCommunity(community);
+        }
+
+
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),"게시글을 성공적으로 작성했습니다. ");
     }
 
     //게시판 조회
@@ -154,10 +159,10 @@ public class CommunityService {
             new CustomException(COMMUNITY_NOT_FOUND);
         }
 
+         // To do 기존 photolist 값 null로 초기화 ??
+        community.getPhotoList().clear();
 
         community.updateCommunity(communityRequest);
-        communityRepository.save(community);
-
 
         if (!files.isEmpty()) {
             List<Photo> existingPhotos = photoRepository.findByCommunityId(communityId);
@@ -167,7 +172,6 @@ public class CommunityService {
             for(Photo photo : existingPhotos){
                 s3Service.deleteFile(photo.getFileUrl());
             }
-
             //새롭게 등록
             List<Photo> photoList = new ArrayList<>();
             for (MultipartFile multipartFile : files) {
@@ -179,11 +183,10 @@ public class CommunityService {
                         .build();
                 photoList.add(photo);
             }
-            photoRepository.saveAll(photoList);
-        }
-        user.getCommunityList().add(community);
-        userRepository.save(user);
 
+            photoRepository.saveAll(photoList);
+            community.addPhoto(photoList);
+        }
         return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),"게시글 수정을 완료했습니다.");
     }
 
@@ -202,8 +205,6 @@ public class CommunityService {
         for (Photo existingFile : photoList) {
             s3Service.deleteFile(existingFile.getFileUrl());
         }
-
-
         photoRepository.deleteByCommunityId(communityId);
         communityRepository.deleteById(communityId);
 
