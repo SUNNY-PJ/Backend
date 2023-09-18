@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,6 +28,8 @@ public class ConsumptionService {
     private final ConsumptionRepository consumptionRepository;
     private final ResponseService responseService;
     //지출 등록
+
+    @Transactional
     public CommonResponse.SingleResponse createConsumption(CustomUserPrincipal customUserPrincipal, ConsumptionRequest consumptionRequest) {
         Users user = customUserPrincipal.getUsers();
         Consumption consumption = Consumption.builder()
@@ -44,6 +47,7 @@ public class ConsumptionService {
     }
 
 
+    @Transactional
     //지출 조회
     public CommonResponse.ListResponse getConsumptionList(CustomUserPrincipal customUserPrincipal) {
         //유저 id 기준으로 지출 내역 조회
@@ -54,6 +58,7 @@ public class ConsumptionService {
 
     }
 
+    @Transactional
     //지출 통계
     public CommonResponse.ListResponse getSpendTypeStatistics() {
         List<SpendTypeStatisticsResponse> statistics = consumptionRepository.getSpendTypeStatistics();
