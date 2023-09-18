@@ -45,22 +45,21 @@ public class Users extends BaseTime {
 	@Column//(nullable = false)
 	@Enumerated(value = EnumType.STRING)
 	private AuthProvider authProvider;
-	@OneToMany(mappedBy = "users",fetch = FetchType.EAGER)
-	@Builder.Default
-	private List<Community> communityList =new ArrayList<>();
+	@OneToMany(mappedBy = "users")
+	private  List<Community> communityList ;
 
 	@OneToMany(mappedBy = "users")
-	private List<Consumption> consumptionList =new ArrayList<>();
+	private  List<Consumption> consumptionList ;
 
 	@OneToMany(mappedBy = "users")
-	private List<Comment> commentList =new ArrayList<>();
+	private  List<Comment> commentList;
 
 	@OneToOne(mappedBy = "users")
 	private Save save;
 
 
 	@OneToMany(mappedBy = "users")
-	private List<Scrap> scrapList =new ArrayList<>();
+	private List<Scrap> scrapList ;
 
 	@Column
 	private String providerId;
@@ -74,4 +73,19 @@ public class Users extends BaseTime {
 	@OneToMany(mappedBy = "friends")
 	private List<Friends> friendsList = new ArrayList<>();
 
+	public void addComment(Comment comment) {
+		this.commentList = new ArrayList<>();
+		this.commentList.add(comment);
+	}
+	public void addCommunity(Community community) {
+
+			this.communityList = new ArrayList<>();
+			this.communityList.add(community);
+	}
+
+	public void addConsumption(Consumption consumption) {
+
+		this.consumptionList = new ArrayList<>();
+		this.consumptionList.add(consumption);
+	}
 }
