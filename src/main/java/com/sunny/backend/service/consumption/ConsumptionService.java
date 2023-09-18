@@ -24,6 +24,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+
 public class ConsumptionService {
     private final ConsumptionRepository consumptionRepository;
     private final ResponseService responseService;
