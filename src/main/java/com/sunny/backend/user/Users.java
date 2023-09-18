@@ -43,18 +43,15 @@ public class Users extends BaseTime {
 	@Column//(nullable = false)
 	@Enumerated(value = EnumType.STRING)
 	private AuthProvider authProvider;
-	@OneToMany(mappedBy = "users", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JsonBackReference
+	@OneToMany(mappedBy = "users")
 	@Builder.Default
 	private List<Community> communityList =new ArrayList<>();
 
-	@OneToMany(mappedBy = "users", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JsonBackReference
+	@OneToMany(mappedBy = "users")
 	@Builder.Default
 	private List<Consumption> consumptionList =new ArrayList<>();
 
-	@OneToMany(mappedBy = "users", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JsonBackReference
+	@OneToMany(mappedBy = "users")
 	@Builder.Default
 	private List<Comment> commentList =new ArrayList<>();
 
@@ -62,12 +59,10 @@ public class Users extends BaseTime {
 	private Save save;
 
 
-	@OneToMany(mappedBy = "users", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "users")
 	@JsonBackReference
 	@Builder.Default
 	private List<Scrap> scrapList =new ArrayList<>();
-
-
 
 	@Column
 	private String providerId;
