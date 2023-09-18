@@ -43,7 +43,7 @@ public class Users extends BaseTime {
 	@Column//(nullable = false)
 	@Enumerated(value = EnumType.STRING)
 	private AuthProvider authProvider;
-	@OneToMany(mappedBy = "users")
+	@OneToMany(mappedBy = "users",fetch = FetchType.EAGER)
 	@Builder.Default
 	private List<Community> communityList =new ArrayList<>();
 
