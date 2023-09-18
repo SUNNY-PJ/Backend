@@ -42,9 +42,7 @@ public class SaveService {
         Users user = customUserPrincipal.getUsers();
         // To do : save 명칭 변경
         Save save = saveRepository.findById(savedId).orElseThrow(() -> new NotFoundException("could not found save goal"));
-
         save.updateSave(saveRequest);
-        //To do -> Transactional , save()에 대해
         saveRepository.save(save); //update시에는 sava 필요 없음 ?
         return responseService.getSingleResponse(HttpStatus.OK.value(), new SaveResponse(save), "절약 목표를 수정했습니다.");
 

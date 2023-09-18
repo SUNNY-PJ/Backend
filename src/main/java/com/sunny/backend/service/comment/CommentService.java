@@ -32,7 +32,6 @@ import static com.sunny.backend.common.ErrorCode.COMMUNITY_NOT_FOUND;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final UserRepository usersRepository;
     private final CommunityRepository communityRepository;
     private final CommentRequestMapper commentRequestMapper;
     private final ResponseService responseService;
@@ -59,10 +58,13 @@ public class CommentService {
         comment.setContent(commentRequestDTO.getContent());
         comment.setUsers(user);
 
-        commentRepository.save(comment);
-        user.getCommentList().add(comment);
+        Comment saveComment= commentRepository.save(comment);
+        if(user.getCommentList()==null) {
+            user.addComment(comment);
+        }
 
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommentResponse(comment.getId(),comment.getWriter(),comment.getContent()),"댓글을 등록했습니다.");
+
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommentResponse(comment.getId(),comment.getContent(),comment.getWriter()),"댓글을 등록했습니다.");
 
     }
 

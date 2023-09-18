@@ -42,8 +42,10 @@ public class ConsumptionService {
                 .build();
 
         consumptionRepository.save(consumption);
-        user.getConsumptionList().add(consumption);
 
+        if(user.getConsumptionList()==null) {
+            user.addConsumption(consumption);
+        }
         return responseService.getSingleResponse(HttpStatus.OK.value(),new ConsumptionResponse(consumption),"지출을 등록했습니다.");
     }
 
