@@ -89,9 +89,7 @@ public class CommunityService {
         return ChronoUnit.SECONDS.between(now, midnight);
     }
     @Transactional
-    //게시글 등록
     public CommonResponse.SingleResponse<CommunityResponse> createCommunity(CustomUserPrincipal customUserPrincipal, CommunityRequest communityRequest, List<MultipartFile> multipartFileList) {
-
         Users user = customUserPrincipal.getUsers();
         Community community= Community.builder()
                 .title(communityRequest.getTitle())
@@ -141,7 +139,6 @@ public class CommunityService {
 
         return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),"게시글 목록을 불러왔습니다.");
     }
-
 
     //게시글 수정
     @Transactional
