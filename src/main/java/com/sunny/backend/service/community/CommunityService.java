@@ -88,6 +88,7 @@ public class CommunityService {
         LocalDateTime midnight = now.truncatedTo(ChronoUnit.DAYS).plusDays(1);
         return ChronoUnit.SECONDS.between(now, midnight);
     }
+
     @Transactional
     public CommonResponse.SingleResponse<CommunityResponse> createCommunity(CustomUserPrincipal customUserPrincipal, CommunityRequest communityRequest, List<MultipartFile> multipartFileList) {
         Users user = customUserPrincipal.getUsers();
@@ -99,21 +100,23 @@ public class CommunityService {
                 .users(user)
                 .build();
         user.getCommunityList().add(community);
-        communityRepository.save(community);
 
-        List<Photo> photoList = new ArrayList<>();
-        for (MultipartFile multipartFile : multipartFileList) {
-            Photo photo=Photo.builder()
-                    .filename(multipartFile.getOriginalFilename())
-                    .fileSize(multipartFile.getSize())
-                    .fileUrl(s3Service.upload(multipartFile))
-                    .community(community)
-                    .build();
-            photoList.add(photo);
+        if (multipartFileList!=null) {
+            List<Photo> photoList = new ArrayList<>();
+            for (MultipartFile multipartFile : multipartFileList) {
+                Photo photo = Photo.builder()
+                        .filename(multipartFile.getOriginalFilename())
+                        .fileSize(multipartFile.getSize())
+                        .fileUrl(s3Service.upload(multipartFile))
+                        .community(community)
+                        .build();
+                photoList.add(photo);
+            }
+            photoRepository.saveAll(photoList);
+            community.addPhoto(photoList);
         }
-        photoRepository.saveAll(photoList);
-
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),"게시글을 성공적으로 작성했습니다. ");
+        Community savedCommunity=communityRepository.save(community);
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(savedCommunity),"게시글을 성공적으로 작성했습니다. ");
     }
 
     //게시판 조회
