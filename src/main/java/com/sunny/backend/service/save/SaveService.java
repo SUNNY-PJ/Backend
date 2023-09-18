@@ -33,7 +33,7 @@ public class SaveService {
                 .build();
         saveRepository.save(saveGoal);
         user.setSave(saveGoal);
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new SaveResponse(saveGoal), "");
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new SaveResponse(saveGoal), "절약 목표를 등록했습니다.");
 
     }
 
@@ -46,7 +46,7 @@ public class SaveService {
         save.updateSave(saveRequest);
         //To do -> Transactional , save()에 대해
         saveRepository.save(save); //update시에는 sava 필요 없음 ?
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new SaveResponse(save), "");
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new SaveResponse(save), "절약 목표를 수정했습니다.");
 
     }
 
