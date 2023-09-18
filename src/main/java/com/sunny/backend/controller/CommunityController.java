@@ -32,7 +32,6 @@ import java.util.List;
 public class CommunityController {
 
     private final CommunityService communityService;
-    //게시판 조회
     @ApiOperation(tags = "2. Community", value = "커뮤니티 게시판 목록 조회")
     @GetMapping("")
     public ResponseEntity<PageImpl<CommunityResponse.PageResponse>> getCommunityList(@RequestParam(required = false) SortType sortType, @RequestParam(required = false) BoardType boardType, @RequestBody SearchType searchCondition, Pageable pageable){
