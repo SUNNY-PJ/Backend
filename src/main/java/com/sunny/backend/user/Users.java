@@ -13,6 +13,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.minidev.json.annotate.JsonIgnore;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +50,7 @@ public class Users extends BaseTime {
 	private List<Community> communityList =new ArrayList<>();
 
 	@OneToMany(mappedBy = "users")
+	@Fetch(FetchMode.JOIN)
 	private List<Consumption> consumptionList =new ArrayList<>();
 
 	@OneToMany(mappedBy = "users")
