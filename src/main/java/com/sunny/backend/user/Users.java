@@ -47,11 +47,11 @@ public class Users extends BaseTime {
 	@Builder.Default
 	private List<Community> communityList =new ArrayList<>();
 
-	@OneToMany(mappedBy = "users")
+	@OneToMany(mappedBy = "users",fetch = FetchType.EAGER)
 	@Builder.Default
 	private List<Consumption> consumptionList =new ArrayList<>();
 
-	@OneToMany(mappedBy = "users")
+	@OneToMany(mappedBy = "users",fetch = FetchType.EAGER)
 	@Builder.Default
 	private List<Comment> commentList =new ArrayList<>();
 
