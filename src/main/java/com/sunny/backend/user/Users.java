@@ -50,7 +50,6 @@ public class Users extends BaseTime {
 	private List<Community> communityList =new ArrayList<>();
 
 	@OneToMany(mappedBy = "users")
-	@Fetch(FetchMode.JOIN)
 	private List<Consumption> consumptionList =new ArrayList<>();
 
 	@OneToMany(mappedBy = "users")
