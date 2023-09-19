@@ -25,7 +25,7 @@ public class ScrapController {
         return ResponseEntity.ok().body(scrapService.getScrapsByUserId(customUserPrincipal));
     }
 
-    @ApiOperation(tags = "Scrap", value = "스크랩 등록")
+    @ApiOperation(tags = "7. Scrap", value = "스크랩 등록")
     @PostMapping("/{communityId}")
     public ResponseEntity<CommonResponse.GeneralResponse > addScrapToCommunity(@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId){
         return ResponseEntity.ok().body(scrapService.addScrapToCommunity(customUserPrincipal,communityId));
