@@ -1,6 +1,8 @@
 package com.sunny.backend.security.jwt;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,7 +36,7 @@ public class CustomJwtFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 			return;
 		}
-
+		Instant beforeTime = Instant.now();
 		String token = getTokenFromRequest(request);
 
 		if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
@@ -47,6 +49,10 @@ public class CustomJwtFilter extends OncePerRequestFilter {
 		// }
 
 		filterChain.doFilter(request, response);
+		log.info("url {} ,response 응답까지 시간  {}ms, {}s",
+			request.getRequestURI(),
+			Duration.between(beforeTime, Instant.now()).toMillis(),
+			Duration.between(beforeTime, Instant.now()).toSeconds());
 	}
 
 	public String getTokenFromRequest(HttpServletRequest request) {
