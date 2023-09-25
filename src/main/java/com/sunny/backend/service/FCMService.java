@@ -21,7 +21,7 @@ public class FCMService {
 
 
     //API URL : 메세지 전송을 위해 요청하는 주소
-    private final String API_URL = "";
+    private final String API_URL = "https://fcm.googleapis.com/v1/projects/sunny-50a2f/messages:send";
     private final ObjectMapper objectMapper;
 
     //메시지 전송, 생성, 토큰 발급 메서드 작성
