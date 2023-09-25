@@ -2,6 +2,7 @@ package com.sunny.backend.user.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @Tag(name = "0. User", description = "User API")
+@CrossOrigin(origins = "http://localhost:19006")
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
@@ -39,5 +41,6 @@ public class AuthController {
 
 		return ResponseEntity.ok(responseService.getSingleResponse(HttpStatus.OK.value(), 
 			new AuthDto.TokenDto(accessToken, refreshToken), "카카오 로그인 성공"));
+
 	}
 }
