@@ -22,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 
 @Tag(name = "0. User", description = "User API")
-@CrossOrigin(origins = "http://localhost:19006")
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
@@ -52,7 +51,7 @@ public class AuthController {
 	}
 
 	@GetMapping("/auth/kakao/callback")
-	public ResponseEntity<CommonResponse.GeneralResponse>  kakaoCallback(String code) throws IOException { // Data를 리턴해주는 컨트롤러 함수
+	public ResponseEntity<CommonResponse.GeneralResponse>  kakaoCallback(@RequestParam("code") String code) throws IOException { // Data를 리턴해주는 컨트롤러 함수
 
 		String access_Token = kaKaoService.getAccessToken(code);
 		System.out.println(access_Token);

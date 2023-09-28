@@ -28,7 +28,11 @@ import java.util.Map;
 @Service
 public class KaKaoService {
 
-    private String client_id="56e15a4c7aaa857397437034b58c0016";
+    @Value("${oauth2.client_id}")
+    private String client_id;
+    @Value("${oauth2.redirect_uri}")
+    private String redirect_uri;
+
 
     public String getAccessToken(String code) throws IOException {
 
@@ -40,7 +44,7 @@ public class KaKaoService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", client_id);
-        params.add("redirect_uri", "http://localhost:8080/auth/kakao/callback");
+        params.add("redirect_uri", redirect_uri);
         params.add("code", code);
 
 //		// kakaoTokenRequest는 데이터(Body)와 헤더(Header)를 Entity가 된다.
