@@ -19,17 +19,18 @@ public class UsersService {
     private final KaKaoService kaKaoService;
     private final UserRepository userRepository;
     private final ResponseService responseService;
-    public CommonResponse.GeneralResponse kakaoLogin(String access_Token) throws IOException {
+    public CommonResponse.SingleResponse kakaoLogin(String access_Token) throws IOException {
         Map<String, Object> userInfo = kaKaoService.getUserInfo(access_Token);
         System.out.println(userInfo);
 
         Users users = Users.builder()
                 .email(userInfo.get("email").toString())
                 .name(userInfo.get("nickname").toString())
+                .role(Role.USER)
                 .build();
         userRepository.save(users);
 
-        return responseService.getGeneralResponse(HttpStatus.OK.value(), "success");
+        return responseService.getSingleResponse(HttpStatus.OK.value(), users,"성공");
 
     }
 
