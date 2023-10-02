@@ -51,13 +51,13 @@ public class AuthController {
 	}
 
 	@GetMapping("/auth/kakao/callback")
-	public ResponseEntity<CommonResponse.GeneralResponse>  kakaoCallback(@RequestParam("code") String code) throws IOException { // Data를 리턴해주는 컨트롤러 함수
+	public ResponseEntity<CommonResponse.SingleResponse> kakaoCallback(String code) throws IOException { // Data를 리턴해주는 컨트롤러 함수
 
 		String access_Token = kaKaoService.getAccessToken(code);
-		System.out.println(access_Token);
+
+//		System.out.println(access_Token);
 		return ResponseEntity.ok()
 				.body(usersService.kakaoLogin(access_Token));
 	}
-
-	}
+}
 
