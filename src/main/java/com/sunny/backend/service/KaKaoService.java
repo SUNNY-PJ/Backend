@@ -7,12 +7,12 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.JSONParser;
 import com.nimbusds.jose.shaded.json.parser.ParseException;
 
+import com.sunny.backend.common.CommonResponse;
+import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.entity.OAuthToken;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -26,36 +26,35 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 @Service
+@RequiredArgsConstructor
 public class KaKaoService {
-
-    private String client_id="56e15a4c7aaa857397437034b58c0016";
-
     public String getAccessToken(String code) throws IOException {
-
-//		// POST 방식으로 key=value 데이터 요청
         RestTemplate rt = new RestTemplate();
+
+        // HTTP POST를 요청할 때 보내는 데이터(body)를 설명해주는 헤더도 만들어 같이 보내줘야 한다.
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
+        // body 데이터를 담을 오브젝트인 MultiValueMap를 만들어보자
+        // body는 보통 key, value의 쌍으로 이루어지기 때문에 자바에서 제공해주는 MultiValueMap 타입을 사용한다.
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
-        params.add("client_id", client_id);
+        params.add("client_id", "7ff971db2010c97a3e191dd319ec45cd");
         params.add("redirect_uri", "http://localhost:8080/auth/kakao/callback");
         params.add("code", code);
+        System.out.println("params"+params);
 
-//		// kakaoTokenRequest는 데이터(Body)와 헤더(Header)를 Entity가 된다.
+        // 요청하기 위해 헤더(Header)와 데이터(Body)를 합친다.
+        // kakaoTokenRequest는 데이터(Body)와 헤더(Header)를 Entity가 된다.
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
 
-        // POST 방식으로 Http 요청
+        // POST 방식으로 Http 요청한다. 그리고 response 변수의 응답 받는다.
         ResponseEntity<String> response = rt.exchange(
                 "https://kauth.kakao.com/oauth/token", // https://{요청할 서버 주소}
                 HttpMethod.POST, // 요청할 방식
                 kakaoTokenRequest, // 요청할 때 보낼 데이터
-                String.class
+                String.class // 요청 시 반환되는 데이터 타입
         );
-
-        System.out.println("응답" + response.getBody());
-
         ObjectMapper objectMapper = new ObjectMapper();
         OAuthToken oAuthToken = null;
 
@@ -70,6 +69,7 @@ public class KaKaoService {
         System.out.print("Refreshtoken:" + oAuthToken.getRefresh_token());
         //return "카카오 토큰 요청 완료 : 토큰 요청에 대한 응답 : "+response;
         return oAuthToken.getAccess_token();
+
     }
 
     public Map<String, Object> getUserInfo(String access_token) throws IOException {
