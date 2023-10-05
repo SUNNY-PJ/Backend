@@ -10,6 +10,12 @@ import com.nimbusds.jose.shaded.json.parser.ParseException;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.entity.OAuthToken;
+import com.sunny.backend.security.dto.AuthDto;
+import com.sunny.backend.security.jwt.TokenProvider;
+import com.sunny.backend.user.Role;
+import com.sunny.backend.user.Users;
+import com.sunny.backend.user.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -32,7 +38,11 @@ public class KaKaoService {
     private String client_id;
     @Value("${custom_oauth2.redirect_uri}")
     private String redirect_uri;
-    public String getAccessToken(String code) throws IOException {
+
+    private final TokenProvider tokenProvider;
+    private final UserRepository userRepository;
+
+    public AuthDto.TokenDto getAccessToken(String code) throws Exception {
         RestTemplate rt = new RestTemplate();
 
         // HTTP POST를 요청할 때 보내는 데이터(body)를 설명해주는 헤더도 만들어 같이 보내줘야 한다.
@@ -64,26 +74,26 @@ public class KaKaoService {
 
         try {
             oAuthToken = objectMapper.readValue(response.getBody(), OAuthToken.class);
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        System.out.print("Accesstoken:" + oAuthToken.getAccess_token());
-        System.out.print("Refreshtoken:" + oAuthToken.getRefresh_token());
-        //return "카카오 토큰 요청 완료 : 토큰 요청에 대한 응답 : "+response;
-        return oAuthToken.getAccess_token();
 
+
+        AuthDto.TokenDto tokenDto = tokenProvider.createToken(getEmailForUserInfo(oAuthToken.getAccess_token()), "ROLE_USER");
+        if(tokenDto==null) {
+            throw new Exception("로그인 실패");
+        }
+
+        return tokenDto;
     }
 
-    public Map<String, Object> getUserInfo(String access_token) throws IOException {
+    public String getEmailForUserInfo(String accessToken) {
         String host = "https://kapi.kakao.com/v2/user/me";
-        Map<String, Object> result = new HashMap<>();
         try {
             URL url = new URL(host);
 
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestProperty("Authorization", "Bearer " + access_token);
+            urlConnection.setRequestProperty("Authorization", "Bearer " + accessToken);
             urlConnection.setRequestMethod("GET");
 
             int responseCode = urlConnection.getResponseCode();
@@ -101,25 +111,26 @@ public class KaKaoService {
             JSONObject kakao_account = (JSONObject) obj.get("kakao_account");
             JSONObject properties = (JSONObject) obj.get("properties");
 
-
-            String id = obj.get("id").toString();
-            String nickname = properties.get("nickname").toString();
             String email = kakao_account.get("email").toString();
+            String nickname = properties.get("nickname").toString();
 
 
-            result.put("id", id);
-            result.put("nickname", nickname);
-            result.put("email", email);
+            Users users = Users.builder()
+                .email(email)
+                .name(nickname)
+                .role(Role.USER)
+                .build();
+            userRepository.save(users);
 
             br.close();
 
-
+            return email;
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-
-        return result;
+        return null;
     }
+
 }
