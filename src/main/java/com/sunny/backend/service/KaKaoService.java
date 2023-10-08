@@ -31,6 +31,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class KaKaoService {
@@ -114,16 +116,16 @@ public class KaKaoService {
             String email = kakao_account.get("email").toString();
             String nickname = properties.get("nickname").toString();
 
-
-            Users users = Users.builder()
-                .email(email)
-                .name(nickname)
-                .role(Role.USER)
-                .build();
-            userRepository.save(users);
-
+            Optional<Users> usersOptional = userRepository.findByEmail(email);
+            if(usersOptional.isEmpty()) {
+                Users users = Users.builder()
+                    .email(email)
+                    .name(nickname)
+                    .role(Role.USER)
+                    .build();
+                userRepository.save(users);
+            }
             br.close();
-
             return email;
         } catch (IOException e) {
             e.printStackTrace();
