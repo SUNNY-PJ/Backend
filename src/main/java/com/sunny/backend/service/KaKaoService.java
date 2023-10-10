@@ -1,17 +1,14 @@
 package com.sunny.backend.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.JSONParser;
 import com.nimbusds.jose.shaded.json.parser.ParseException;
-
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.entity.OAuthToken;
 import com.sunny.backend.security.dto.AuthDto;
 import com.sunny.backend.security.jwt.TokenProvider;
+import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Role;
 import com.sunny.backend.user.Users;
 import com.sunny.backend.user.repository.UserRepository;
@@ -119,10 +116,10 @@ public class KaKaoService {
             Optional<Users> usersOptional = userRepository.findByEmail(email);
             if(usersOptional.isEmpty()) {
                 Users users = Users.builder()
-                    .email(email)
-                    .name(nickname)
-                    .role(Role.USER)
-                    .build();
+                        .email(email)
+                        .name(nickname)
+                        .role(Role.USER)
+                        .build();
                 userRepository.save(users);
             }
             br.close();
@@ -134,5 +131,11 @@ public class KaKaoService {
         }
         return null;
     }
+    public AuthDto.UserDto changeNickname(CustomUserPrincipal customUserPrincipal, String name){
+        Users user = customUserPrincipal.getUsers();
+        user.setName(name);
+        userRepository.save(user);
 
+        return new AuthDto.UserDto(user.getName());
+    }
 }
