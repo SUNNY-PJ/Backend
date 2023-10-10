@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import com.google.cloud.firestore.Firestore;
+import com.google.firebase.cloud.FirestoreClient;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.CompetitionRequestDto;
@@ -63,6 +65,8 @@ public class CompetitionService {
                 return responseService.getGeneralResponse(HttpStatus.OK.value(),
                     customUserPrincipal.getUsers().getName()+ "님이 대결 신청을 거절했어요 :(");
             }
+
+            // 위 로직 제거하고 알람만?
         }
         return responseService.getGeneralResponse(HttpStatus.OK.value(), "잘못된 사용자입니다.");
     }
@@ -89,7 +93,6 @@ public class CompetitionService {
         } else {
             result = "비기고 있습니다.";
         }
-
 
         CompetitionResponseDto.CompetitionStatus competitionStatus = CompetitionResponseDto.CompetitionStatus.builder()
             .competitionId(competitionId)

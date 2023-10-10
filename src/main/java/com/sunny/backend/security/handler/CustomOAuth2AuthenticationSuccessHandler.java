@@ -67,7 +67,10 @@ public class CustomOAuth2AuthenticationSuccessHandler extends SimpleUrlAuthentic
 		String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
 		AuthDto.TokenDto Token = tokenProvider.createTokenOAuth2(authentication);
-		return UriComponentsBuilder.fromUriString(targetUrl).queryParam("Authorization", Token.getAccessToken()).build().toUriString();
+		return UriComponentsBuilder.fromUriString(targetUrl)
+			.queryParam("accessToken", Token.getAccessToken())
+			.queryParam("refreshToken", Token.getRefreshToken())
+			.build().toUriString();
 	}
 
 	protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

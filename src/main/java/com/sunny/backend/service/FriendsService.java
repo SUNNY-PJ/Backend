@@ -8,6 +8,10 @@ import javax.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.WriteResult;
+import com.google.firebase.cloud.FirestoreClient;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.FriendsApproveRequest;
@@ -42,7 +46,6 @@ public class FriendsService {
 
 	public CommonResponse.GeneralResponse addFriends(CustomUserPrincipal customUserPrincipal, Long friendsUserId) {
 		Users user = customUserPrincipal.getUsers();
-		// Users user = userRepository.findById(customUserPrincipal.getUsers().getId()).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 		Users friend = userRepository.findById(friendsUserId).orElseThrow(() -> new IllegalArgumentException("친구가 존재하지 않습니다."));
 
 		Friends friendsUser = Friends.builder()
@@ -65,7 +68,7 @@ public class FriendsService {
 		Friends friendsUser = Friends.builder()
 				.users(userFriends.getFriends())
 				.friends(userFriends.getUsers())
-				.approve('Y')
+				.approve(friendsApproveRequest.getApprove())
 				.build();
 		friendsRepository.save(friendsUser);
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), msg);

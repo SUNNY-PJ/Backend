@@ -1,14 +1,10 @@
 package com.sunny.backend.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.JSONParser;
 import com.nimbusds.jose.shaded.json.parser.ParseException;
-
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.entity.OAuthToken;
 import com.sunny.backend.security.dto.AuthDto;
 import com.sunny.backend.security.jwt.TokenProvider;
