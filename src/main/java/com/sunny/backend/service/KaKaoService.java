@@ -7,9 +7,18 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.JSONParser;
 import com.nimbusds.jose.shaded.json.parser.ParseException;
 
+import com.sunny.backend.common.CommonResponse;
+import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.entity.OAuthToken;
-import lombok.RequiredArgsConstructor;
+import com.sunny.backend.security.dto.AuthDto;
+import com.sunny.backend.security.jwt.TokenProvider;
+import com.sunny.backend.security.userinfo.CustomUserPrincipal;
+import com.sunny.backend.user.Role;
+import com.sunny.backend.user.Users;
+import com.sunny.backend.user.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,10 +32,20 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class KaKaoService {
-    public String getAccessToken(String code) throws IOException {
+    @Value("${custom_oauth2.client_id}")
+    private String client_id;
+    @Value("${custom_oauth2.redirect_uri}")
+    private String redirect_uri;
+
+    private final TokenProvider tokenProvider;
+    private final UserRepository userRepository;
+
+    public AuthDto.TokenDto getAccessToken(String code) throws Exception {
         RestTemplate rt = new RestTemplate();
 
         // HTTP POST를 요청할 때 보내는 데이터(body)를 설명해주는 헤더도 만들어 같이 보내줘야 한다.
@@ -37,8 +56,8 @@ public class KaKaoService {
         // body는 보통 key, value의 쌍으로 이루어지기 때문에 자바에서 제공해주는 MultiValueMap 타입을 사용한다.
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
-        params.add("client_id", "7ff971db2010c97a3e191dd319ec45cd");
-        params.add("redirect_uri", "http://localhost:8080/auth/kakao/callback");
+        params.add("client_id", client_id);
+        params.add("redirect_uri", redirect_uri);
         params.add("code", code);
         System.out.println("params"+params);
 
@@ -55,27 +74,29 @@ public class KaKaoService {
         );
         ObjectMapper objectMapper = new ObjectMapper();
         OAuthToken oAuthToken = null;
+
         try {
             oAuthToken = objectMapper.readValue(response.getBody(), OAuthToken.class);
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        System.out.print("Accesstoken:" + oAuthToken.getAccess_token());
-        System.out.print("Refreshtoken:" + oAuthToken.getRefresh_token());
-        //return "카카오 토큰 요청 완료 : 토큰 요청에 대한 응답 : "+response;
-        return oAuthToken.getAccess_token();
+
+
+        AuthDto.TokenDto tokenDto = tokenProvider.createToken(getEmailForUserInfo(oAuthToken.getAccess_token()), "ROLE_USER");
+        if(tokenDto==null) {
+            throw new Exception("로그인 실패");
+        }
+
+        return tokenDto;
     }
 
-    public Map<String, Object> getUserInfo(String access_token) throws IOException {
+    public String getEmailForUserInfo(String accessToken) {
         String host = "https://kapi.kakao.com/v2/user/me";
-        Map<String, Object> result = new HashMap<>();
         try {
             URL url = new URL(host);
 
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestProperty("Authorization", "Bearer " + access_token);
+            urlConnection.setRequestProperty("Authorization", "Bearer " + accessToken);
             urlConnection.setRequestMethod("GET");
 
             int responseCode = urlConnection.getResponseCode();
@@ -93,25 +114,32 @@ public class KaKaoService {
             JSONObject kakao_account = (JSONObject) obj.get("kakao_account");
             JSONObject properties = (JSONObject) obj.get("properties");
 
-
-            String id = obj.get("id").toString();
-            String nickname = properties.get("nickname").toString();
             String email = kakao_account.get("email").toString();
+            String nickname = properties.get("nickname").toString();
 
-
-            result.put("id", id);
-            result.put("nickname", nickname);
-            result.put("email", email);
-
+            Optional<Users> usersOptional = userRepository.findByEmail(email);
+            if(usersOptional.isEmpty()) {
+                Users users = Users.builder()
+                        .email(email)
+                        .name(nickname)
+                        .role(Role.USER)
+                        .build();
+                userRepository.save(users);
+            }
             br.close();
-
-
+            return email;
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+        return null;
+    }
+    public AuthDto.UserDto changeNickname(CustomUserPrincipal customUserPrincipal, String name){
+        Users user = customUserPrincipal.getUsers();
+        user.setName(name);
+        userRepository.save(user);
 
-        return result;
+        return new AuthDto.UserDto(user.getName());
     }
 }
