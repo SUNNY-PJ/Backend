@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 @Getter
 public class CommunityResponse {
     //제목, 작성자, 등록일 , 등록 시간, 조회수 , 내용 , 댓글 리스트, 비밀 댓글
+
+    private Long id;
     private String title; //제목
     private String contents; //내용
     private String writer; //작성자
@@ -26,13 +28,13 @@ public class CommunityResponse {
     private LocalDateTime updateDate;
 
     public CommunityResponse(Community community) {
+        this.id=community.getId();
         this.writer = community.getWriter();
         this.title = community.getTitle();
         this.contents = community.getContents();
         this.viewCount = community.getView_cnt();
         this.createdDate = community.getCreatedDate();
         this.updateDate=community.getUpdatedDate();
-
         this.photoList = community.getPhotoList()
                 .stream()
                 .map(photo -> photo.getFileUrl())
@@ -65,6 +67,7 @@ public class CommunityResponse {
 
     @Getter
     public static class PageResponse {
+        private Long id;
         //제목, 작성자, 조회수 , 댓글수
         private String title; //제목
         private String writer; //작성자
@@ -72,7 +75,7 @@ public class CommunityResponse {
         private int comment_cnt; //댓글 수
 
         public PageResponse(Community community) {
-
+            this.id=community.getId();
             this.title = community.getTitle();
             this.writer = community.getWriter();
             this.view_cnt = community.getView_cnt();
