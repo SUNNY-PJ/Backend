@@ -7,11 +7,9 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.JSONParser;
 import com.nimbusds.jose.shaded.json.parser.ParseException;
 
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.entity.OAuthToken;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -57,7 +55,6 @@ public class KaKaoService {
         );
         ObjectMapper objectMapper = new ObjectMapper();
         OAuthToken oAuthToken = null;
-
         try {
             oAuthToken = objectMapper.readValue(response.getBody(), OAuthToken.class);
         } catch (JsonMappingException e) {
@@ -69,7 +66,6 @@ public class KaKaoService {
         System.out.print("Refreshtoken:" + oAuthToken.getRefresh_token());
         //return "카카오 토큰 요청 완료 : 토큰 요청에 대한 응답 : "+response;
         return oAuthToken.getAccess_token();
-
     }
 
     public Map<String, Object> getUserInfo(String access_token) throws IOException {
