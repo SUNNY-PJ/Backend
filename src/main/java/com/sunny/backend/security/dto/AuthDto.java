@@ -29,4 +29,13 @@ public class AuthDto {
 		private String accessToken;
 		private String refreshToken;
 	}
+
+	@Getter
+	@Setter
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class UserDto {
+		private String name;
+	}
 }
