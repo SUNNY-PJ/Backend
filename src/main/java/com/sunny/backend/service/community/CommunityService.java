@@ -17,8 +17,10 @@ import com.sunny.backend.user.repository.UserRepository;
 import com.sunny.backend.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +42,6 @@ import static com.sunny.backend.common.ErrorCode.NO_USER_PERMISSION;
 public class CommunityService {
 
     private final CommunityRepository communityRepository;
-    private final UserRepository userRepository;
     private final PhotoRepository photoRepository;
     private final ResponseService responseService;
     private final S3Service s3Service;
@@ -120,7 +121,6 @@ public class CommunityService {
             user.addCommunity(community);
         }
 
-
         return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),"게시글을 성공적으로 작성했습니다. ");
     }
 
@@ -128,13 +128,13 @@ public class CommunityService {
     //To do  -> Slice 찾아보고 수정
     //단순 조회
     @Transactional
-    public PageImpl<CommunityResponse.PageResponse> getCommunityList(Pageable pageable) {
-        PageImpl<CommunityResponse.PageResponse> result = communityRepository.getCommunityList(pageable);
+    public Slice<CommunityResponse.PageResponse> getCommunityList(Pageable pageable) {
+        Slice<CommunityResponse.PageResponse> result = communityRepository.getCommunityList(pageable);
         return result;
     }
     //검색 조건 추가해서 조회
-    public PageImpl<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType,BoardType boardType, SearchType searchCondition, Pageable pageable) {
-        PageImpl<CommunityResponse.PageResponse> result = communityRepository.getPageListWithSearch(sortType,boardType, searchCondition, pageable);
+    public Slice<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType,BoardType boardType, String searchText, Pageable pageable) {
+        Slice<CommunityResponse.PageResponse> result = communityRepository.getPageListWithSearch(sortType,boardType,searchText, pageable);
         return result;
     }
 
@@ -210,14 +210,12 @@ public class CommunityService {
 
         return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),"게시글을 삭제했습니다.");
     }
+
     //수정 및 삭제 권한 체크
     private boolean checkCommunityLoginUser(CustomUserPrincipal customUserPrincipal, Community community) {
         if (!Objects.equals(customUserPrincipal.getName(), community.getWriter())) {
             return false;
         }
         return true;
-
     }
-
-
 }
