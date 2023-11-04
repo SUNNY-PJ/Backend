@@ -54,14 +54,11 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
 
-        BooleanExpression searchCondition = eqSearchText(searchText);
-        BooleanExpression boardTypeCondition = eqBoardType(boardType);
-
-        if (searchCondition != null) {
-            query.where(searchCondition);
+        if (searchText != null) {
+            query.where(eqSearchText(searchText));
         }
-        if (boardTypeCondition != null) {
-            query.where(boardTypeCondition);
+        if (boardType != null) {
+            query.where(eqBoardType(boardType));
         }
 
         List<Community> results = query.fetch();
