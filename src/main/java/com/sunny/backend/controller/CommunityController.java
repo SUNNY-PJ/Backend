@@ -30,16 +30,16 @@ public class CommunityController {
     private final CommunityService communityService;
     @ApiOperation(tags = "2. Community", value = "커뮤니티 게시판 목록 조회")
     @GetMapping("")
-    public ResponseEntity<Slice<CommunityResponse.PageResponse>> getCommunityList(@RequestParam(required = false) SortType sortType,
+    public ResponseEntity<Slice<CommunityResponse.PageResponse>> getCommunityList(@RequestParam(required = false) SortType sort,
                                                                                   @RequestParam(required = false) BoardType boardType,
                                                                                   @RequestParam(required = false) String search,
                                                                                   Pageable pageable){
         Slice<CommunityResponse.PageResponse> responseDTO;
         //검색조건 중 모든 내용을 입력하지 않고 요청을 보냈을 때 일반 목록 페이지 출력
-        if(search==null) {
+        if(search==null && boardType==null && sort==null) {
             responseDTO = communityService.getCommunityList(pageable);
         } else {
-            responseDTO = communityService.getPageListWithSearch(sortType,boardType,search, pageable);
+            responseDTO = communityService.getPageListWithSearch(sort,boardType,search, pageable);
 
         }
         return ResponseEntity.ok().body(responseDTO);
