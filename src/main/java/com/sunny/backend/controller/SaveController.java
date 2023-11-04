@@ -34,4 +34,12 @@ public class SaveController {
         return ResponseEntity.ok().body(saveService.updateSaveGoal(customUserPrincipal,savedId,saveRequest));
     }
 
+    @ApiOperation(tags = "6. Save", value = "절약 목표 조회")
+    //절약 목표 수정
+    @GetMapping("/{savedId}")
+    public ResponseEntity<CommonResponse.SingleResponse> getSaveGaol(@AuthUser CustomUserPrincipal customUserPrincipal,@PathVariable Long savedId){
+        return ResponseEntity.ok().body(saveService.getSaveGoal(customUserPrincipal,savedId));
+    }
+
+
 }
