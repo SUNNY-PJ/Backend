@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.entity.Comment;
 import com.sunny.backend.entity.Community;
+import com.sunny.backend.entity.Photo;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
@@ -37,8 +39,8 @@ public class CommunityResponse {
         this.updateDate=community.getUpdatedDate();
         this.photoList = community.getPhotoList()
                 .stream()
-                .map(photo -> photo.getFileUrl())
-                .filter(file -> file != null)
+                .map(Photo::getFileUrl)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
 

@@ -27,6 +27,7 @@ public class SaveService {
         // To do : save 명칭 변경
         Save saveGoal= Save.builder()
                 .cost(saveRequest.getCost())
+                .saveContent(saveRequest.getSaveContent())
                 .startDate(saveRequest.getStartDate())
                 .endDate(saveRequest.getEndDate())
                 .users(user)
@@ -45,7 +46,14 @@ public class SaveService {
         save.updateSave(saveRequest);
         saveRepository.save(save); //update시에는 sava 필요 없음 ?
         return responseService.getSingleResponse(HttpStatus.OK.value(), new SaveResponse(save), "절약 목표를 수정했습니다.");
+    }
 
+    public CommonResponse.SingleResponse getSaveGoal(CustomUserPrincipal customUserPrincipal, Long savedId) {
+        Users user = customUserPrincipal.getUsers();
+        // To do : save 명칭 변경
+        Save save = saveRepository.findById(savedId).orElseThrow(() -> new NotFoundException("could not found save goal"));
+
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new SaveResponse(save), "절약 목표를 성공적으로 조회했습니다..");
     }
 
     //절약 현황 (현재까지의 지출 금액 / 목표 금액)
