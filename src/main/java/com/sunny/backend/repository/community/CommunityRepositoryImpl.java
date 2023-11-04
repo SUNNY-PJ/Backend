@@ -1,16 +1,15 @@
 package com.sunny.backend.repository.community;
 
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.entity.BoardType;
 import com.sunny.backend.entity.Community;
-import com.sunny.backend.entity.SearchType;
 import com.sunny.backend.entity.SortType;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
@@ -28,91 +27,78 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
 
 
     @Override
-    public PageImpl<CommunityResponse.PageResponse> getCommunityList(Pageable pageable) {
+    public Slice<CommunityResponse.PageResponse> getCommunityList(Pageable pageable) {
         List<Community> results = queryFactory
                 .selectFrom(community)
                 .orderBy(community.createdDate.desc()) // 기본 정렬은 최신순
                 .offset(pageable.getOffset()) //시작점
-                .limit(pageable.getPageSize()) //페이지 사이즈
+                .limit(pageable.getPageSize()+1) //limit보다 데이터를 1개 더 갖고와서, 해당 데이터가 있다면 hasNext 변수에 true 값 넣어줌
                 .fetch();
-
-        long totalCount = queryFactory
-                .select(community.count()) //count(community.id)
-                .from(community)
-                .fetchOne(); //응답 결과 숫자 1개
 
         List<CommunityResponse.PageResponse> dtoList = results.stream()
                 .map(CommunityResponse.PageResponse::new)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(dtoList, pageable, totalCount);
+        boolean hasNext = false;
+        if (dtoList.size() > pageable.getPageSize()) {
+            dtoList.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+        return new SliceImpl<>(dtoList, pageable, hasNext);
     }
 
     @Override
-    public PageImpl<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType, BoardType boardType, SearchType searchCondition, Pageable pageable){
-        JPQLQuery<Community> query = queryFactory.selectFrom(community);
+    public Slice<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType, BoardType boardType, String searchText, Pageable pageable) {
+        JPAQuery<Community> query = queryFactory.selectFrom(community)
+                .orderBy(sortType == SortType.조회순 ? community.view_cnt.desc() : community.createdDate.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1);
 
+        BooleanExpression searchCondition = eqSearchText(searchText);
+        BooleanExpression boardTypeCondition = eqBoardType(boardType);
 
-        BooleanBuilder whereClause = new BooleanBuilder();
-        // refactor : BooleanBuilder  -> Where
-        whereClause.and(ContentMessageTitleEq(searchCondition.getContent(), searchCondition.getTitle()))
-                .and(boardWriterEq(searchCondition.getWriter()));
-
-
-        if (boardType == BoardType.자유) {
-            whereClause.and(community.boardType.eq(BoardType.자유));
-        } else if (boardType == BoardType.꿀팁) {
-            whereClause.and(community.boardType.eq(BoardType.꿀팁));
+        if (searchCondition != null) {
+            query.where(searchCondition);
+        }
+        if (boardTypeCondition != null) {
+            query.where(boardTypeCondition);
         }
 
-        if (sortType == SortType.최신순) {
-            query.orderBy(community.createdDate.desc());
-        } else if (sortType == SortType.조회순) {
-            query.orderBy(community.view_cnt.desc());
-        }
+        List<Community> results = query.fetch();
 
-        query.where(whereClause).orderBy(community.createdDate.desc());
-
-        List<Community> results = getQuerydsl().applyPagination(pageable, query).fetch();
-        long totalCount = query.fetchCount();
-
-        // 엔티티 -> Dto 매핑
         List<CommunityResponse.PageResponse> dtoList = results.stream()
                 .map(CommunityResponse.PageResponse::new)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(dtoList, pageable, totalCount);
+        boolean hasNext = results.size() > pageable.getPageSize();
+        if (hasNext) {
+            dtoList.remove(pageable.getPageSize());
+        }
 
+        return new SliceImpl<>(dtoList, pageable, hasNext);
     }
 
 
     //제목 + 내용에 필요한 동적 쿼리문
-    private BooleanExpression ContentMessageTitleEq(String communityContent,String communityTitle){
-        // 글 내용 x, 글 제목 o
-        if(!communityContent.isEmpty() && !communityTitle.isEmpty()){
-            return community.title.contains(communityTitle).or(community.contents.contains(communityContent));
+    private BooleanExpression eqSearchText(String searchText) {
+        if (!searchText.isEmpty()) {
+            return community.title.contains(searchText)
+                    .or(community.contents.contains(searchText))
+                    .or(community.writer.contains(searchText));
         }
+        return null;
+    }
 
-        //글 내용 o, 글 제목 x
-        if(!communityContent.isEmpty() && communityTitle.isEmpty()){
-            return community.contents.contains(communityContent);
-        }
-
-        //글 제목 o
-        if(communityContent.isEmpty() && !communityTitle.isEmpty()){
-            return community.title.contains(communityTitle);
+    private BooleanExpression eqBoardType(BoardType boardType) {
+        if (boardType == BoardType.꿀팁) {
+            return community.boardType.eq(BoardType.꿀팁);
+        } else if (boardType == BoardType.자유) {
+            return community.boardType.eq(BoardType.자유);
         }
         return null;
     }
 
 
-    //  작성자 검색
-    private BooleanExpression boardWriterEq(String boardWriter){
-        if(boardWriter.isEmpty()){
-            return null;
-        }
-        return community.writer.contains(boardWriter);
-    }
 
 
 }

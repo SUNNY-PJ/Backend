@@ -29,6 +29,10 @@ public class Save {
     @Column
     private Long cost;
 
+    //절약 내용
+    @Column
+    private String saveContent;
+
     //절약 시작 , 시간까지 포함 -> datetime 수정
     @Column
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -48,6 +52,7 @@ public class Save {
 
     public void updateSave(SaveRequest saveRequest){
         this.cost=saveRequest.getCost();
+        this.saveContent=saveRequest.getSaveContent();
         this.startDate=saveRequest.getStartDate();
         this.endDate=saveRequest.getEndDate();
 
