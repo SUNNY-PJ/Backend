@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -49,7 +50,6 @@ public class ConsumptionService {
         return responseService.getSingleResponse(HttpStatus.OK.value(),new ConsumptionResponse(consumption),"지출을 등록했습니다.");
     }
 
-
     @Transactional
     //지출 조회
     public CommonResponse.ListResponse getConsumptionList(CustomUserPrincipal customUserPrincipal) {
@@ -66,6 +66,17 @@ public class ConsumptionService {
     public CommonResponse.ListResponse getSpendTypeStatistics() {
         List<SpendTypeStatisticsResponse> statistics = consumptionRepository.getSpendTypeStatistics();
         return responseService.getListResponse(HttpStatus.OK.value(), statistics,"지출 통계 내역을 불러왔습니다.");
+    }
+
+    @Transactional
+    //지출 내역 조회
+    public CommonResponse.ListResponse getDetailConsumption(CustomUserPrincipal customUserPrincipal, LocalDate datefield) {
+
+        List<Consumption> detailConsumption =
+                consumptionRepository.findByUsersIdAndDateField(customUserPrincipal.getUsers().getId(),datefield);
+
+        List<ConsumptionResponse.DetailConsumption> detailConsumptions = ConsumptionResponse.DetailConsumption.fromDetailConsumptions(detailConsumption);
+        return responseService.getListResponse(HttpStatus.OK.value(), detailConsumptions,datefield+" 에 맞는 지출 내역을 불러왔습니다.");
     }
 
 }

@@ -19,19 +19,6 @@ public class ConsumptionRequest {
 
     private LocalDate dateField; // 지출 일자
 
-    // public Date getParsedDateField() {
-    //     try {
-    //         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    //         return dateFormat.parse(dateField.split(" ")[0]);
-    //     } catch (ParseException e) {
-    //         // Handle date parsing exception, or return null/throw exception based on your requirement
-    //         return null;
-    //     }
-    // }
-    //
-    // public void setDateField(String dateField) {
-    //     this.dateField = dateField;
-    // }
 }
 
 
