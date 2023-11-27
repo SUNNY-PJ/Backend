@@ -14,7 +14,7 @@ import java.util.Date;
 public class ConsumptionRequest {
 
     private String name; //지출명
-    private String place; //지출 장소
+    private String category; //지출 장소
     private Long money; //지출 금액
 
     private LocalDate dateField; // 지출 일자
