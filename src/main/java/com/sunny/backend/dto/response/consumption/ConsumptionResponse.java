@@ -5,7 +5,6 @@ import com.sunny.backend.entity.*;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,4 +33,23 @@ public class ConsumptionResponse {
                 .collect(Collectors.toList());
     }
 
+    @Getter
+    public static class DetailConsumption {
+        private String name; //지출명
+        private Long money; //지출 금액
+
+        public DetailConsumption(Consumption consumption) {
+            this.name=consumption.getName();
+            this.money = consumption.getMoney();
+        }
+
+        public static List<ConsumptionResponse.DetailConsumption> fromDetailConsumptions(List<Consumption> consumptions) {
+            return consumptions.stream()
+                    .map(ConsumptionResponse.DetailConsumption::new)
+                    .collect(Collectors.toList());
+        }
+    }
+
+
 }
+

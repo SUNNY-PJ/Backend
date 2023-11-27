@@ -11,8 +11,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @Tag(name="4. Consumption", description = "Consumption API")
 @RestController
@@ -41,5 +44,15 @@ public class ConsumptionController {
     @GetMapping("/spendTypeStatistics")
     public ResponseEntity<CommonResponse.ListResponse> getSpendTypeStatistics() {
         return ResponseEntity.ok().body(consumptionService.getSpendTypeStatistics());
+    }
+
+    @ApiOperation(tags = "5. Consumption", value = "날짜에 맞는 지출 내역 조회")
+    //지출 내역
+
+    @GetMapping("/date")
+
+    public ResponseEntity<CommonResponse.ListResponse>getDetailConsumption (@AuthUser CustomUserPrincipal customUserPrincipal,
+                                                                            @RequestParam("datefield") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate datefield) {
+        return ResponseEntity.ok().body(consumptionService.getDetailConsumption(customUserPrincipal,datefield));
     }
 }

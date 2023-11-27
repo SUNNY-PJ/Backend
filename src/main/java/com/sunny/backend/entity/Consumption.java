@@ -36,7 +36,8 @@ public class Consumption {
 
     @Column
     @NotNull
-    private LocalDate dateField; //string으로 등록?
+    private LocalDate dateField;
+
 
     //users 다대일 관계 매핑
     @ManyToOne(fetch = FetchType.LAZY)
