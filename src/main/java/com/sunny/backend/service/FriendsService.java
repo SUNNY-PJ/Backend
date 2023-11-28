@@ -8,15 +8,12 @@ import javax.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.WriteResult;
-import com.google.firebase.cloud.FirestoreClient;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.FriendsApproveRequest;
 import com.sunny.backend.dto.response.FriendsResponse;
-import com.sunny.backend.entity.Friends;
+import com.sunny.backend.entity.friends.ApproveType;
+import com.sunny.backend.entity.friends.Friends;
 import com.sunny.backend.repository.FriendsRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
@@ -33,12 +30,13 @@ public class FriendsService {
 
 	public CommonResponse.ListResponse<FriendsResponse> getFriendsList(CustomUserPrincipal customUserPrincipal) {
 		List<FriendsResponse> responseList = new ArrayList<>();
-		for (Friends friends : friendsRepository.findByUsers_IdAndApprove(customUserPrincipal.getUsers().getId(), 'Y')) {
+		for (Friends friends : friendsRepository.findByUsers_IdAndApproveNot(customUserPrincipal.getUsers().getId(), ApproveType.REFUSE)) {
 			responseList.add(FriendsResponse.builder()
-					.id(friends.getId())
+					.friendsSn(friends.getFriendsSn())
 					.friendsId(friends.getFriends().getId())
 					.friendsName(friends.getFriends().getName())
 					.friendsProfile(friends.getFriends().getProfile())
+					.approveType(friends.getApprove().getStatus())
 				.build());
 		}
 		return responseService.getListResponse(HttpStatus.OK.value(), responseList, "");
@@ -49,26 +47,26 @@ public class FriendsService {
 		Users friend = userRepository.findById(friendsUserId).orElseThrow(() -> new IllegalArgumentException("친구가 존재하지 않습니다."));
 
 		Friends friendsUser = Friends.builder()
-			.users(friend)
-			.friends(user)
+			.users(user)
+			.friends(friend)
+			.approve(ApproveType.WAIT)
 			.build();
 		friendsRepository.save(friendsUser);
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), user.getName() + "이 " + friend.getName() +"에게 친구 신청했습니다.");
 	}
 
 	@Transactional
-	public CommonResponse.GeneralResponse approveFriends(CustomUserPrincipal customUserPrincipal, FriendsApproveRequest friendsApproveRequest) {
-		Friends userFriends = friendsRepository.findByUsers_IdAndFriends_Id(customUserPrincipal.getUsers().getId(),
-			friendsApproveRequest.getFriendsId());
+	public CommonResponse.GeneralResponse approveFriends(CustomUserPrincipal customUserPrincipal, FriendsApproveRequest request) {
+		Friends userFriends = friendsRepository.findByFriendsSnAndUsers_Id(request.getFriendsSn(),
+			customUserPrincipal.getUsers().getId()).orElseThrow(() -> new IllegalArgumentException("해당 관계가 존재하지 않습니다."));
 
-		userFriends.setApprove(friendsApproveRequest.getApprove());
-		String msg;
-		msg =  friendsApproveRequest.getApprove()=='Y' ? "승인되었습니다" :  "거절되었습니다";
+		userFriends.setApprove(request.getApprove());
+		String msg =request.getApprove().getStatus() + "되었습니다";
 
 		Friends friendsUser = Friends.builder()
 				.users(userFriends.getFriends())
 				.friends(userFriends.getUsers())
-				.approve(friendsApproveRequest.getApprove())
+				.approve(request.getApprove())
 				.build();
 		friendsRepository.save(friendsUser);
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), msg);
