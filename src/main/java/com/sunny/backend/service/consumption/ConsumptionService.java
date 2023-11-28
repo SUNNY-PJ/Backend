@@ -36,7 +36,7 @@ public class ConsumptionService {
         Users user = customUserPrincipal.getUsers();
         Consumption consumption = Consumption.builder()
                 .name(user.getName())
-                .category(SpendType.valueOf(consumptionRequest.getPlace()))
+                .category(SpendType.valueOf(consumptionRequest.getCategory()))
                 .money(consumptionRequest.getMoney())
                 .dateField(consumptionRequest.getDateField())
                 .users(user)
