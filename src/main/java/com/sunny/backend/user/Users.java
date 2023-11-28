@@ -2,9 +2,8 @@ package com.sunny.backend.user;
 
 import javax.persistence.*;
 
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sunny.backend.entity.*;
+import com.sunny.backend.entity.friends.Friends;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,9 +11,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.minidev.json.annotate.JsonIgnore;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +38,7 @@ public class Users extends BaseTime {
 	@Enumerated(value = EnumType.STRING)
 	private Role role;
 
-	@Column//(nullable = false)
+	@Column
 	@Enumerated(value = EnumType.STRING)
 	private AuthProvider authProvider;
 	@OneToMany(mappedBy = "users")
