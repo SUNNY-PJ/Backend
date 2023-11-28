@@ -1,8 +1,10 @@
-package com.sunny.backend.entity;
+package com.sunny.backend.entity.friends;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,7 +29,7 @@ public class Friends {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column
-	private Long id;
+	private Long friendsSn;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")
@@ -38,6 +40,7 @@ public class Friends {
 	private Users friends;
 
 	@Column
-	private Character approve;
+	@Enumerated(value = EnumType.STRING)
+	private ApproveType approve;
 
 }
