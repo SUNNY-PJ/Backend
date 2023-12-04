@@ -2,7 +2,6 @@ package com.sunny.backend.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.sunny.backend.entity.friends.ApproveType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +18,7 @@ import lombok.Setter;
 public class FriendsResponse {
 	private Long friendsSn;
 	private Long friendsId;
-	private String friendsName;
-	private String friendsProfile;
+	private String name;
+	private String profile;
 	private String approveType;
 }

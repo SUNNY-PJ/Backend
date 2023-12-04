@@ -1,4 +1,4 @@
-package com.sunny.backend.repository;
+package com.sunny.backend.repository.friends;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +10,7 @@ import com.sunny.backend.entity.friends.ApproveType;
 import com.sunny.backend.entity.friends.Friends;
 
 @Repository
-public interface FriendsRepository extends JpaRepository<Friends, Long> {
+public interface FriendsRepository extends JpaRepository<Friends, Long>, FriendsRepositoryCustom {
 	List<Friends> findByUsers_IdAndApproveNot(Long userIdm, ApproveType approve);
 	Optional<Friends> findByFriendsSnAndUsers_Id(Long friendsSn, Long userId);
 	Friends findByUsers_IdAndFriends_Id(Long userId, Long friendsId);
