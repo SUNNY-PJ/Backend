@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,7 +53,7 @@ public class CommunityController {
     }
 
     @ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 등록")
-    @PostMapping( "")
+    @PostMapping( value = "", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<CommonResponse.SingleResponse> createCommunity(@AuthUser CustomUserPrincipal customUserPrincipal,@RequestPart(value = "communityRequest") CommunityRequest communityRequest , @RequestPart(required = false) List<MultipartFile> files ){
         return ResponseEntity.ok().body(communityService.createCommunity(customUserPrincipal,communityRequest,files));
     }
