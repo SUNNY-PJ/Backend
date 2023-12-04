@@ -1,8 +1,24 @@
 package com.sunny.backend.user;
 
-import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.sunny.backend.entity.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+
+import com.sunny.backend.entity.BaseTime;
+import com.sunny.backend.entity.Comment;
+import com.sunny.backend.entity.Community;
+import com.sunny.backend.entity.Consumption;
+import com.sunny.backend.entity.Save;
+import com.sunny.backend.entity.Scrap;
 import com.sunny.backend.entity.friends.Friends;
 
 import lombok.AccessLevel;
@@ -11,10 +27,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 @Getter
 @Setter
@@ -42,20 +54,19 @@ public class Users extends BaseTime {
 	@Enumerated(value = EnumType.STRING)
 	private AuthProvider authProvider;
 	@OneToMany(mappedBy = "users")
-	private  List<Community> communityList ;
+	private List<Community> communityList;
 
 	@OneToMany(mappedBy = "users")
-	private  List<Consumption> consumptionList ;
+	private List<Consumption> consumptionList;
 
 	@OneToMany(mappedBy = "users")
-	private  List<Comment> commentList;
+	private List<Comment> commentList;
 
 	@OneToOne(mappedBy = "users")
 	private Save save;
 
-
 	@OneToMany(mappedBy = "users")
-	private List<Scrap> scrapList ;
+	private List<Scrap> scrapList;
 
 	@Column
 	private String providerId;
@@ -66,17 +77,18 @@ public class Users extends BaseTime {
 	@OneToMany(mappedBy = "users")
 	private List<Friends> userList = new ArrayList<>();
 
-	@OneToMany(mappedBy = "friends")
+	@OneToMany(mappedBy = "friend")
 	private List<Friends> friendsList = new ArrayList<>();
 
 	public void addComment(Comment comment) {
 		this.commentList = new ArrayList<>();
 		this.commentList.add(comment);
 	}
+
 	public void addCommunity(Community community) {
 
-			this.communityList = new ArrayList<>();
-			this.communityList.add(community);
+		this.communityList = new ArrayList<>();
+		this.communityList.add(community);
 	}
 
 	public void addConsumption(Consumption consumption) {
