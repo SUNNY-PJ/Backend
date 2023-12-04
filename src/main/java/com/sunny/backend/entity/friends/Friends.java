@@ -28,7 +28,6 @@ import lombok.Setter;
 public class Friends {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column
 	private Long friendsSn;
 
 	@ManyToOne
@@ -37,7 +36,7 @@ public class Friends {
 
 	@ManyToOne
 	@JoinColumn(name = "friends_id")
-	private Users friends;
+	private Users friend;
 
 	@Column
 	@Enumerated(value = EnumType.STRING)
