@@ -36,9 +36,15 @@ public class FriendsRepositoryImpl extends QuerydslRepositorySupport implements 
 			return null;
 		}
 		switch (approveType) {
-			case APPROVE -> friends.approve.eq(ApproveType.APPROVE);
-			case REFUSE -> friends.approve.eq(ApproveType.REFUSE);
-			case WAIT -> friends.approve.eq(ApproveType.WAIT);
+			case APPROVE -> {
+				return friends.approve.eq(ApproveType.APPROVE);
+			}
+			case REFUSE -> {
+				return friends.approve.eq(ApproveType.REFUSE);
+			}
+			case WAIT -> {
+				return friends.approve.eq(ApproveType.WAIT);
+			}
 		}
 		return null;
 	}
