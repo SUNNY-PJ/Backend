@@ -32,7 +32,7 @@ public class FriendsService {
 		ApproveType approveType) {
 		List<FriendsResponse> responseList = new ArrayList<>(
 			friendsRepository.getFindUserIdAndApproveType(customUserPrincipal.getUsers().getId(), approveType));
-		return responseService.getListResponse(HttpStatus.OK.value(), responseList, "");
+		return responseService.getListResponse(HttpStatus.OK.value(), responseList, "친구 목록 가져오기");
 	}
 
 	public CommonResponse.GeneralResponse addFriends(CustomUserPrincipal customUserPrincipal, Long friendsUserId) {
