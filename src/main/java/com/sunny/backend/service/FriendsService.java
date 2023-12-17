@@ -6,6 +6,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.sunny.backend.common.CommonResponse;
@@ -28,14 +29,16 @@ public class FriendsService {
 	private final FriendsRepository friendsRepository;
 	private final UserRepository userRepository;
 
-	public CommonResponse.ListResponse<FriendsResponse> getFriendsList(CustomUserPrincipal customUserPrincipal,
+	public ResponseEntity<CommonResponse.ListResponse<FriendsResponse>> getFriendsList(
+		CustomUserPrincipal customUserPrincipal,
 		ApproveType approveType) {
 		List<FriendsResponse> responseList = new ArrayList<>(
 			friendsRepository.getFindUserIdAndApproveType(customUserPrincipal.getUsers().getId(), approveType));
 		return responseService.getListResponse(HttpStatus.OK.value(), responseList, "친구 목록 가져오기");
 	}
 
-	public CommonResponse.GeneralResponse addFriends(CustomUserPrincipal customUserPrincipal, Long friendsUserId) {
+	public ResponseEntity<CommonResponse.GeneralResponse> addFriends(CustomUserPrincipal customUserPrincipal,
+		Long friendsUserId) {
 		Users user = customUserPrincipal.getUsers();
 		Users friend = userRepository.findById(friendsUserId)
 			.orElseThrow(() -> new IllegalArgumentException("친구가 존재하지 않습니다."));
@@ -51,7 +54,7 @@ public class FriendsService {
 	}
 
 	@Transactional
-	public CommonResponse.GeneralResponse approveFriends(CustomUserPrincipal customUserPrincipal,
+	public ResponseEntity<CommonResponse.GeneralResponse> approveFriends(CustomUserPrincipal customUserPrincipal,
 		FriendsApproveRequest request) {
 		Friends userFriends = friendsRepository.findByFriendsSnAndUsers_Id(request.getFriendsSn(),
 				customUserPrincipal.getUsers().getId())
@@ -69,7 +72,8 @@ public class FriendsService {
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), msg);
 	}
 
-	public CommonResponse.GeneralResponse deleteFriends(CustomUserPrincipal customUserPrincipal, Long friendsId) {
+	public ResponseEntity<CommonResponse.GeneralResponse> deleteFriends(CustomUserPrincipal customUserPrincipal,
+		Long friendsId) {
 		Friends friends = friendsRepository.findById(friendsId)
 			.orElseThrow(() -> new IllegalArgumentException("친구가 존재하지 않습니다."));
 		if (!friends.getUsers().getId().equals(customUserPrincipal.getUsers().getId())) {

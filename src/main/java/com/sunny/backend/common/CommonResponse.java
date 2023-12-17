@@ -6,12 +6,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-
 @Getter
 @AllArgsConstructor
 public class CommonResponse {
-	@ApiModelProperty(value = "응답 성공여부 : true/false")
-	private boolean success;
 	@ApiModelProperty(value = "응답 코드 번호")
 	private int status;
 
@@ -19,19 +16,17 @@ public class CommonResponse {
 		@ApiModelProperty(value = "응답 코드")
 		private ErrorCode errorCode;
 
-
-		public ErrorResponse(boolean success, int status, ErrorCode errorCode) {
-			super(success, status);
+		public ErrorResponse(int status, ErrorCode errorCode) {
+			super(status);
 			this.errorCode = errorCode;
-
 		}
 	}
 
 	public static class GeneralResponse extends CommonResponse {
 		private String msg;
 
-		public GeneralResponse(boolean success, int status, String msg) {
-			super(success, status);
+		public GeneralResponse(int status, String msg) {
+			super(status);
 			this.msg = msg;
 		}
 	}
@@ -42,8 +37,8 @@ public class CommonResponse {
 		@ApiModelProperty(value = "응답 메세지")
 		private String msg;
 
-		public SingleResponse(boolean success, int status, T data, String msg) {
-			super(success, status);
+		public SingleResponse(int status, T data, String msg) {
+			super(status);
 			this.data = data;
 			this.msg = msg;
 		}
@@ -55,8 +50,8 @@ public class CommonResponse {
 		@ApiModelProperty(value = "응답 메세지")
 		private String msg;
 
-		public ListResponse(boolean success, int status, List<T> data, String msg) {
-			super(success, status);
+		public ListResponse(int status, List<T> data, String msg) {
+			super(status);
 			this.data = data;
 			this.msg = msg;
 		}

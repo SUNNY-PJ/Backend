@@ -57,37 +57,37 @@ public class CommunityController {
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 상세 조회")
 	@GetMapping("/{communityId}")
-	public ResponseEntity<CommonResponse.SingleResponse> getCommunity(@AuthUser CustomUserPrincipal customUserPrincipal,
+	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> getCommunity(
+		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@PathVariable Long communityId) {
-		return ResponseEntity.ok().body(communityService.findCommunity(customUserPrincipal, communityId));
+		return communityService.findCommunity(customUserPrincipal, communityId);
 	}
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 등록")
 	@PostMapping("")
-	public ResponseEntity<CommonResponse.SingleResponse> createCommunity(
+	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> createCommunity(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
 		@RequestPart(required = false) List<MultipartFile> files) {
-		return ResponseEntity.ok().body(communityService.createCommunity(customUserPrincipal, communityRequest, files));
+		return communityService.createCommunity(customUserPrincipal, communityRequest, files);
 	}
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 수정")
 	@PutMapping("/{communityId}")
-	public ResponseEntity<CommonResponse.SingleResponse> updateCommunity(
+	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> updateCommunity(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId,
 		@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
 		@RequestPart(required = false) List<MultipartFile> files) {
 
-		return ResponseEntity.ok()
-			.body(communityService.updateCommunity(customUserPrincipal, communityId, communityRequest, files));
+		return communityService.updateCommunity(customUserPrincipal, communityId, communityRequest, files);
 	}
 
 	//게시글 삭제
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 삭제")
 	@DeleteMapping("/{communityId}")
-	public ResponseEntity<CommonResponse.SingleResponse> deleteCommunity(
+	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> deleteCommunity(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId) {
-		return ResponseEntity.ok().body(communityService.deleteCommunity(customUserPrincipal, communityId));
+		return communityService.deleteCommunity(customUserPrincipal, communityId);
 	}
 }
 
