@@ -33,28 +33,28 @@ public class FriendsController {
 	@GetMapping("")
 	public ResponseEntity<CommonResponse.ListResponse<FriendsResponse>> getFriendsList(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestParam(name = "type") ApproveType approveType) {
-		return ResponseEntity.ok().body(friendsService.getFriendsList(customUserPrincipal, approveType));
+		return friendsService.getFriendsList(customUserPrincipal, approveType);
 	}
 
 	@ApiOperation(tags = "5. Friends", value = "친구 추가하기")
 	@PostMapping("/{user_id}")
 	public ResponseEntity<CommonResponse.GeneralResponse> addFriends(@AuthUser CustomUserPrincipal customUserPrincipal,
 		@PathVariable(name = "user_id") Long friendsId) {
-		return ResponseEntity.ok().body(friendsService.addFriends(customUserPrincipal, friendsId));
+		return friendsService.addFriends(customUserPrincipal, friendsId);
 	}
 
 	@ApiOperation(tags = "5. Friends", value = "친구 승인하기")
 	@PostMapping("/approve")
 	public ResponseEntity<CommonResponse.GeneralResponse> approveFriends(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody FriendsApproveRequest friendsApproveRequest) {
-		return ResponseEntity.ok().body(friendsService.approveFriends(customUserPrincipal, friendsApproveRequest));
+		return friendsService.approveFriends(customUserPrincipal, friendsApproveRequest);
 	}
 
 	@ApiOperation(tags = "5. Friends", value = "친구 삭제하기")
 	@DeleteMapping("/{friends_id}")
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteFriends(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable(name = "friends_id") Long friendsId) {
-		return ResponseEntity.ok().body(friendsService.deleteFriends(customUserPrincipal, friendsId));
+		return friendsService.deleteFriends(customUserPrincipal, friendsId);
 	}
 
 }

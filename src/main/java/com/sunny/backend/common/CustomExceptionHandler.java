@@ -18,6 +18,6 @@ public class CustomExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
 	protected ResponseEntity<CommonResponse.GeneralResponse> handleException(Exception e) {
-		return ResponseEntity.ok(responseService.getGeneralResponse(400, e.getMessage()));
+		return responseService.getGeneralResponse(400, e.getMessage());
 	}
 }
