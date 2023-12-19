@@ -60,6 +60,7 @@ public class CommentService {
 			user.addComment(comment);
 		}
 
+
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 			new CommentResponse(comment.getId(), comment.getContent(), comment.getWriter()), "댓글을 등록했습니다.");
 	}
@@ -80,6 +81,7 @@ public class CommentService {
 
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "댓글을 삭제 하였습니다..");
 	}
+
 
 	//조상 댓글 있는지 check
 	private Comment getDeletableAncestorComment(Comment comment) {

@@ -1,6 +1,7 @@
 package com.sunny.backend.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.user.Users;
 import lombok.*;

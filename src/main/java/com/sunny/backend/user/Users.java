@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sunny.backend.entity.BaseTime;
 import com.sunny.backend.entity.Comment;
 import com.sunny.backend.entity.Community;
@@ -60,8 +61,8 @@ public class Users extends BaseTime {
 	private List<Consumption> consumptionList;
 
 	@OneToMany(mappedBy = "users")
-	private List<Comment> commentList;
-
+	@JsonIgnore
+	private  List<Comment> commentList;
 	@OneToOne(mappedBy = "users")
 	private Save save;
 
@@ -86,13 +87,12 @@ public class Users extends BaseTime {
 	}
 
 	public void addCommunity(Community community) {
+			this.communityList = new ArrayList<>();
+			this.communityList.add(community);
 
-		this.communityList = new ArrayList<>();
-		this.communityList.add(community);
 	}
 
 	public void addConsumption(Consumption consumption) {
-
 		this.consumptionList = new ArrayList<>();
 		this.consumptionList.add(consumption);
 	}

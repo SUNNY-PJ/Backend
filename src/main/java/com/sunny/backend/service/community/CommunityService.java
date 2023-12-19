@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import com.nimbusds.oauth2.sdk.util.StringUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -48,43 +49,40 @@ public class CommunityService {
 	private final S3Service s3Service;
 	private final RedisUtil redisUtil;
 
-	//게시글 상세 조회
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> findCommunity(
-		CustomUserPrincipal customUserPrincipal, Long communityId) {
+			CustomUserPrincipal customUserPrincipal, Long communityId) {
+		System.out.println("Success:11111 ");
 		Users users = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
-			.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
-		String viewCount = redisUtil.getData(String.valueOf(users.getId()));
-		System.out.println(viewCount);
-		if (viewCount == null) {
+				.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
 
+		String viewCount = redisUtil.getData(String.valueOf(users.getId()));
+		System.out.println("View Count: " + viewCount);
+
+		if (StringUtils.isBlank(viewCount)) {
 			redisUtil.setDateExpire(String.valueOf(users.getId()), communityId + "_", calculateTimeUntilMidnight());
 			community.increaseView();
 		} else {
-			String[] strArray = viewCount.split("_");
-			List<String> redisBoardList = Arrays.asList(strArray);
+			List<String> redisBoardList = Arrays.asList(viewCount.split("_"));
 
-			boolean isView = false;
+			boolean isViewed = redisBoardList.contains(String.valueOf(communityId));
 
-			if (!redisBoardList.isEmpty()) {
-				for (String redisBoardId : redisBoardList) {
-					if (String.valueOf(communityId).equals(redisBoardId)) {
-						isView = true;
-						break;
-					}
-				}
-				if (!isView) {
-					viewCount += communityId + "_";
-
-					redisUtil.setDateExpire(String.valueOf(users.getId()), viewCount, calculateTimeUntilMidnight());
-					community.updateView();
-				}
+			if (!isViewed) {
+				viewCount += communityId + "_";
+				redisUtil.setDateExpire(String.valueOf(users.getId()), viewCount, calculateTimeUntilMidnight());
+				community.updateView();
 			}
 		}
-		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),
-			"게시글을 성공적으로 불러왔습니다. ");
+
+		// Log community details for debugging purposes
+		System.out.println("Success: ");
+
+		return responseService.getSingleResponse(
+				HttpStatus.OK.value(), new CommunityResponse(community),
+				"게시글을 성공적으로 불러왔습니다.");
 	}
+
 
 	public static long calculateTimeUntilMidnight() {
 		LocalDateTime now = LocalDateTime.now();
@@ -128,6 +126,9 @@ public class CommunityService {
 			"게시글을 성공적으로 작성했습니다. ");
 	}
 
+
+
+
 	//게시판 조회
 	//To do  -> Slice 찾아보고 수정
 	//단순 조회
@@ -137,25 +138,14 @@ public class CommunityService {
 		return result;
 	}
 
+
+
 	//검색 조건 추가해서 조회
-	public Slice<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType, BoardType boardType,
-		String searchText, Pageable pageable) {
-		Slice<CommunityResponse.PageResponse> result = communityRepository.getPageListWithSearch(sortType, boardType,
-			searchText, pageable);
+	public Slice<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType,BoardType boardType, String searchText, Pageable pageable) {
+		Slice<CommunityResponse.PageResponse> result = communityRepository.getPageListWithSearch(sortType,boardType,searchText, pageable);
 		return result;
 	}
 
-	//게시글 조회
-	// @Transactional
-	// public ResponseEntity<CommonResponse.SingleResponse> getCommunity(CustomUserPrincipal customUserPrincipal,
-	// 	Long communityId) {
-	// 	Users user = customUserPrincipal.getUsers();
-	// 	Community community = communityRepository.findById(communityId)
-	// 		.orElseThrow(() -> new NotFoundException("could not found Community"));
-	//
-	// 	return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),
-	// 		"게시글 목록을 불러왔습니다.");
-	// }
 
 	//게시글 수정
 	@Transactional
@@ -227,11 +217,13 @@ public class CommunityService {
 			"게시글을 삭제했습니다.");
 	}
 
-	//수정 및 삭제 권한 체크
-	private boolean checkCommunityLoginUser(CustomUserPrincipal customUserPrincipal, Community community) {
-		if (!Objects.equals(customUserPrincipal.getName(), community.getWriter())) {
-			return false;
-		}
-		return true;
-	}
+
+    //수정 및 삭제 권한 체크 (도메인에서 처리)
+    private boolean checkCommunityLoginUser(CustomUserPrincipal customUserPrincipal, Community community) {
+        if (!Objects.equals(customUserPrincipal.getName(), community.getWriter())) {
+            return false;
+        }
+        return true;
+    }
+
 }
