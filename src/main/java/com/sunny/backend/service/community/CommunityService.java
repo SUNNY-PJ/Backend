@@ -132,6 +132,9 @@ public class CommunityService {
         Slice<CommunityResponse.PageResponse> result = communityRepository.getCommunityList(pageable);
         return result;
     }
+
+
+
     //검색 조건 추가해서 조회
     public Slice<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType,BoardType boardType, String searchText, Pageable pageable) {
         Slice<CommunityResponse.PageResponse> result = communityRepository.getPageListWithSearch(sortType,boardType,searchText, pageable);
@@ -211,7 +214,7 @@ public class CommunityService {
         return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),"게시글을 삭제했습니다.");
     }
 
-    //수정 및 삭제 권한 체크
+    //수정 및 삭제 권한 체크 (도메인에서 처리)
     private boolean checkCommunityLoginUser(CustomUserPrincipal customUserPrincipal, Community community) {
         if (!Objects.equals(customUserPrincipal.getName(), community.getWriter())) {
             return false;

@@ -62,8 +62,6 @@ public class CommentService {
         if(user.getCommentList()==null) {
             user.addComment(comment);
         }
-
-
         return responseService.getSingleResponse(HttpStatus.OK.value(), new CommentResponse(comment.getId(),comment.getContent(),comment.getWriter()),"댓글을 등록했습니다.");
 
     }

@@ -52,6 +52,7 @@ public class Users extends BaseTime {
 	private  List<Consumption> consumptionList ;
 
 	@OneToMany(mappedBy = "users")
+	@JsonIgnore
 	private  List<Comment> commentList;
 
 	@OneToOne(mappedBy = "users")
@@ -78,13 +79,11 @@ public class Users extends BaseTime {
 		this.commentList.add(comment);
 	}
 	public void addCommunity(Community community) {
-
 			this.communityList = new ArrayList<>();
 			this.communityList.add(community);
 	}
 
 	public void addConsumption(Consumption consumption) {
-
 		this.consumptionList = new ArrayList<>();
 		this.consumptionList.add(consumption);
 	}
