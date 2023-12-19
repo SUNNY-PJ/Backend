@@ -31,6 +31,7 @@ public class ConsumptionService {
 	private final ResponseService responseService;
 	//지출 등록
 
+
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> createConsumption(
 		CustomUserPrincipal customUserPrincipal,
