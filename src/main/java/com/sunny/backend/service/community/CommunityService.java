@@ -2,7 +2,9 @@ package com.sunny.backend.service.community;
 
 import static com.sunny.backend.common.ErrorCode.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,26 +94,26 @@ public class CommunityService {
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> createCommunity(
-		CustomUserPrincipal customUserPrincipal,
-		CommunityRequest communityRequest, List<MultipartFile> multipartFileList) {
+			CustomUserPrincipal customUserPrincipal,
+			CommunityRequest communityRequest, List<MultipartFile> multipartFileList) {
 		Users user = customUserPrincipal.getUsers();
 		Community community = Community.builder()
-			.title(communityRequest.getTitle())
-			.contents(communityRequest.getContents())
-			.writer(user.getName())
-			.boardType(communityRequest.getType())
-			.users(user)
-			.build();
+				.title(communityRequest.getTitle())
+				.contents(communityRequest.getContents())
+				.writer(user.getName())
+				.boardType(communityRequest.getType())
+				.users(user)
+				.build();
 
-		if (multipartFileList != null) {
+		if (multipartFileList != null && !multipartFileList.isEmpty()) {
 			List<Photo> photoList = new ArrayList<>();
 			for (MultipartFile multipartFile : multipartFileList) {
 				Photo photo = Photo.builder()
-					.filename(multipartFile.getOriginalFilename())
-					.fileSize(multipartFile.getSize())
-					.fileUrl(s3Service.upload(multipartFile))
-					.community(community)
-					.build();
+						.filename(multipartFile.getOriginalFilename())
+						.fileSize(multipartFile.getSize())
+						.fileUrl(s3Service.upload(multipartFile))
+						.community(community)
+						.build();
 				photoList.add(photo);
 			}
 			photoRepository.saveAll(photoList);
@@ -122,8 +124,9 @@ public class CommunityService {
 			user.addCommunity(community);
 		}
 
+
 		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),
-			"게시글을 성공적으로 작성했습니다. ");
+				"게시글을 성공적으로 작성했습니다. ");
 	}
 
 
@@ -150,12 +153,12 @@ public class CommunityService {
 	//게시글 수정
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> updateCommunity(
-		CustomUserPrincipal customUserPrincipal, Long communityId,
-		CommunityRequest communityRequest, List<MultipartFile> files) {
+			CustomUserPrincipal customUserPrincipal, Long communityId,
+			CommunityRequest communityRequest, List<MultipartFile> files) {
 		//To do : error 처리
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
-			.orElseThrow(() -> new NotFoundException("Community Post not found!"));
+				.orElseThrow(() -> new NotFoundException("Community Post not found!"));
 		System.out.println(community);
 		if (checkCommunityLoginUser(customUserPrincipal, community)) {
 			new CustomException(COMMUNITY_NOT_FOUND);
@@ -178,11 +181,11 @@ public class CommunityService {
 			List<Photo> photoList = new ArrayList<>();
 			for (MultipartFile multipartFile : files) {
 				Photo photo = Photo.builder()
-					.filename(multipartFile.getOriginalFilename())
-					.fileSize(multipartFile.getSize())
-					.fileUrl(s3Service.upload(multipartFile))
-					.community(community)
-					.build();
+						.filename(multipartFile.getOriginalFilename())
+						.fileSize(multipartFile.getSize())
+						.fileUrl(s3Service.upload(multipartFile))
+						.community(community)
+						.build();
 				photoList.add(photo);
 			}
 
@@ -190,18 +193,18 @@ public class CommunityService {
 			community.addPhoto(photoList);
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),
-			"게시글 수정을 완료했습니다.");
+				"게시글 수정을 완료했습니다.");
 	}
 
 	//게시글 삭제
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> deleteCommunity(
-		CustomUserPrincipal customUserPrincipal, Long communityId) {
+			CustomUserPrincipal customUserPrincipal, Long communityId) {
 
 		//To do : error 처리
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
-			.orElseThrow(() -> new NotFoundException("Community post  not found!"));
+				.orElseThrow(() -> new NotFoundException("Community post  not found!"));
 		List<Photo> photoList = photoRepository.findByCommunityId(communityId);
 		if (checkCommunityLoginUser(customUserPrincipal, community)) {
 			new CustomException(COMMUNITY_NOT_FOUND);
@@ -214,16 +217,16 @@ public class CommunityService {
 		communityRepository.deleteById(communityId);
 
 		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),
-			"게시글을 삭제했습니다.");
+				"게시글을 삭제했습니다.");
 	}
 
 
-    //수정 및 삭제 권한 체크 (도메인에서 처리)
-    private boolean checkCommunityLoginUser(CustomUserPrincipal customUserPrincipal, Community community) {
-        if (!Objects.equals(customUserPrincipal.getName(), community.getWriter())) {
-            return false;
-        }
-        return true;
-    }
+	//수정 및 삭제 권한 체크 (도메인에서 처리)
+	private boolean checkCommunityLoginUser(CustomUserPrincipal customUserPrincipal, Community community) {
+		if (!Objects.equals(customUserPrincipal.getName(), community.getWriter())) {
+			return false;
+		}
+		return true;
+	}
 
 }
