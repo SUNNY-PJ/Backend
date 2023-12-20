@@ -1,13 +1,13 @@
 package com.sunny.backend.dto.response.community;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.sunny.backend.common.DatetimeUtil;
 import com.sunny.backend.dto.response.comment.CommentResponse;
+import com.sunny.backend.entity.BoardType;
 import com.sunny.backend.entity.Comment;
 import com.sunny.backend.entity.Community;
 import com.sunny.backend.entity.Photo;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -23,11 +23,14 @@ public class CommunityResponse {
     private int viewCount; // 조회수
     private List<String> photoList; // 이미지 리스트
     private List<CommentResponse> commentList; //댓글 리스트
+    private BoardType type;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-    private LocalDateTime createdDate;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-    private LocalDateTime updateDate;
+    private String createdAt; // 등록
+    private String modifiedAt; // 수정
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+//    private LocalDateTime createdDate;
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+//    private LocalDateTime updateDate;
 
     public CommunityResponse(Community community) {
         this.id=community.getId();
@@ -35,8 +38,6 @@ public class CommunityResponse {
         this.title = community.getTitle();
         this.contents = community.getContents();
         this.viewCount = community.getView_cnt();
-        this.createdDate = community.getCreatedDate();
-        this.updateDate=community.getUpdatedDate();
         this.photoList = community.getPhotoList()
                 .stream()
                 .map(Photo::getFileUrl)
@@ -49,6 +50,9 @@ public class CommunityResponse {
                 .filter(comment -> comment.getParent() == null)
                 .map(this::mapCommentToResponse)
                 .collect(Collectors.toList());
+        this.createdAt = DatetimeUtil.timesAgo(community.getCreatedDate());
+        this.modifiedAt = DatetimeUtil.timesAgo(community.getUpdatedDate());
+        this.type=community.getBoardType();
     }
 
     private CommentResponse mapCommentToResponse(Comment comment) {
@@ -75,6 +79,8 @@ public class CommunityResponse {
         private String writer; //작성자
         private int view_cnt; //조회수
         private int comment_cnt; //댓글 수
+        private String createdAt; // 등록
+        private String modifiedAt; // 수정
 
         public PageResponse(Community community) {
             this.id=community.getId();
@@ -82,6 +88,8 @@ public class CommunityResponse {
             this.writer = community.getWriter();
             this.view_cnt = community.getView_cnt();
             this.comment_cnt = community.getCommentList().size();
+            this.createdAt = DatetimeUtil.timesAgo(community.getCreatedDate());
+            this.modifiedAt = DatetimeUtil.timesAgo(community.getUpdatedDate());
         }
     }
 
