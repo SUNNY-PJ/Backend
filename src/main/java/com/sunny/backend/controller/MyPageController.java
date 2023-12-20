@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Optional;
+
 @RestController
 @Tag(name = "8. MyPage", description = "My Page API")
 @RequestMapping(value="/mypage")
@@ -42,12 +44,11 @@ public class MyPageController {
     }
 
     @ApiOperation(tags = "8. MyPage - Profile", value = "프로필 설정")
-    @GetMapping("/profile")
+    @PostMapping("/profile")
     public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
             @AuthUser CustomUserPrincipal customUserPrincipal,
-            @RequestPart(required = false) MultipartFile profile,
-            @RequestParam(required = false) String nickname) {
-        return myPageService.updateProfile(customUserPrincipal,profile,nickname);
+            @RequestPart(required = false) String nickname,
+            @RequestPart(value = "profile",required = false) MultipartFile profile){
+        return myPageService.updateProfile(customUserPrincipal,nickname,profile);
     }
-
 }
