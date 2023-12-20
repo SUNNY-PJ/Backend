@@ -69,7 +69,7 @@ public class CommunityController {
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> createCommunity(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
-		@RequestPart(required = false) List<MultipartFile> files) {
+		@RequestPart(value = "files",required = false) List<MultipartFile> files) {
 		return communityService.createCommunity(customUserPrincipal, communityRequest, files);
 	}
 

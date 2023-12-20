@@ -9,7 +9,6 @@ import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.entity.Comment;
 import com.sunny.backend.entity.Community;
-import com.sunny.backend.entity.Photo;
 import com.sunny.backend.entity.Scrap;
 import com.sunny.backend.repository.ScrapRepository;
 import com.sunny.backend.repository.comment.CommentRepository;
