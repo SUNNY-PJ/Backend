@@ -86,7 +86,7 @@ public class MyPageService {
         List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId());
 
         List<CommunityResponse> ScrapByCommunity = scrapList.stream()
-                .map(scrap -> new CommunityResponse(scrap.getCommunity()))
+                .map(scrap -> new CommunityResponse(scrap.getCommunity(),false))
                 .collect(Collectors.toList());
 
 
@@ -103,7 +103,6 @@ public class MyPageService {
 
         if (!profile.isEmpty()) {
             System.out.println("success");
-            // s3Service.deleteFile(user.getProfile()); -> This should be done after specifying the default profile.
             user.setProfile(s3Service.upload(profile));
             System.out.println("User Profile: " + user.getProfile());
         }
