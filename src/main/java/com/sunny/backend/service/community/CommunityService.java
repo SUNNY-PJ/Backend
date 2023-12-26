@@ -147,16 +147,16 @@ public class CommunityService {
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new NotFoundException("Community Post not found!"));
+		boolean ismodifieed=true;
 		System.out.println(community);
 		if (!checkCommunityLoginUser(user, community)) {
 			throw new CustomException(NO_USER_PERMISSION);
 		}
 		// To do 기존 photolist 값 null로 초기화 ??
 		community.getPhotoList().clear();
-
 		community.updateCommunity(communityRequest);
 
-		if (!files.isEmpty()) {
+		if (files != null && !files.isEmpty()) {
 			List<Photo> existingPhotos = photoRepository.findByCommunityId(communityId);
 			// 기존 photo 삭제
 			photoRepository.deleteAll(existingPhotos);
@@ -175,12 +175,12 @@ public class CommunityService {
 						.build();
 				photoList.add(photo);
 			}
-
 			photoRepository.saveAll(photoList);
 			community.addPhoto(photoList);
 		}
-		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community,true),
+		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community,ismodifieed),
 				"게시글 수정을 완료했습니다.");
+
 	}
 
 	//게시글 삭제
@@ -210,9 +210,9 @@ public class CommunityService {
 
 	//수정 및 삭제 권한 체크 (도메인에서 처리)
 	private boolean checkCommunityLoginUser(Users users, Community community) {
-		if (!Objects.equals(users.getName(), community.getWriter())) {
-			System.out.println(users.getName());
-			System.out.println(community.getWriter());
+		if (!Objects.equals(users.getId(), community.getUsers().getId())){
+			System.out.println(users.getId());
+			System.out.println(community.getId());
 			return false;
 		}
 		return true;
