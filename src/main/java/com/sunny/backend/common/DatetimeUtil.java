@@ -1,6 +1,8 @@
 package com.sunny.backend.common;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
@@ -13,7 +15,8 @@ public class DatetimeUtil {
         return ChronoUnit.DAYS.between(dayAfter,LocalDateTime.now());
     }
     public static String timesAgo(LocalDateTime dayBefore) {
-        long gap = ChronoUnit.MINUTES.between(dayBefore, LocalDateTime.now());
+        ZoneId seoulZone = ZoneId.of("Asia/Seoul");
+        long gap = ChronoUnit.MINUTES.between(dayBefore.atZone(seoulZone).toLocalDateTime(), ZonedDateTime.now(seoulZone).toLocalDateTime());
         String word;
         if (gap == 0){
             word = "방금 전";
@@ -31,4 +34,3 @@ public class DatetimeUtil {
         return date.format(DateTimeFormatter.ofPattern("MM월 dd일"));
     }
 }
-

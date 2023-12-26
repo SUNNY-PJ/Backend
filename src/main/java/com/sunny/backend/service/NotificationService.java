@@ -1,6 +1,10 @@
 package com.sunny.backend.service;
 
+import com.sunny.backend.common.CommonResponse;
+import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.FcmRequestDto;
+import com.sunny.backend.dto.response.NotificationResponse;
+import com.sunny.backend.dto.response.comment.CommentResponse;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import org.springframework.http.HttpStatus;
@@ -12,9 +16,10 @@ import java.io.IOException;
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
+    private final ResponseService responseService;
 
-    private  String expoPushNotificationUrl = "https://exp.host/--/api/v2/push/send";
-    public ResponseEntity<String> sendPushNotification(FcmRequestDto fcmRequestDto) {
+    private String expoPushNotificationUrl = "https://exp.host/--/api/v2/push/send";
+    public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendPushNotification(FcmRequestDto fcmRequestDto) throws IOException {
         OkHttpClient client = new OkHttpClient();
 
         MediaType mediaType = MediaType.parse("application/json");
@@ -33,15 +38,18 @@ public class NotificationService {
                 .addHeader("Accept", "application/json")
                 .build();
 
-        try {
             Response response = client.newCall(request).execute();
             String responseBody = response.body().string();
             System.out.println("Push notification sent. Response: " + responseBody);
-            return ResponseEntity.ok(responseBody);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Error sending push notification: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending push notification");
+
+            // Create a custom response object
+            NotificationResponse notificationResponse = new NotificationResponse(
+                    fcmRequestDto.getTitle(),
+                    fcmRequestDto.getBody(),
+                    responseBody
+            );
+
+            return responseService.getSingleResponse(HttpStatus.OK.value(), notificationResponse, "알림 성공");
         }
-    }
+
 }

@@ -77,4 +77,5 @@ public class ConsumptionService {
         return responseService.getListResponse(HttpStatus.OK.value(),
                 detailConsumptions, datefield + " 에 맞는 지출 내역을 불러왔습니다.");
     }
+
 }
