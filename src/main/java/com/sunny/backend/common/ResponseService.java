@@ -10,7 +10,9 @@ public class ResponseService extends RuntimeException {
 	public CommonResponse.ErrorResponse getErrorResponse(int status, ErrorCode errorCode) {
 		return new CommonResponse.ErrorResponse(status, errorCode);
 	}
-
+	public CommonResponse.GeneralErrorResponse getGeneralErrorResponse(int status, String msg) {
+		return new CommonResponse.GeneralErrorResponse(status, msg);
+	}
 	public ResponseEntity<CommonResponse.GeneralResponse> getGeneralResponse(int status, String msg) {
 		return ResponseEntity.ok().body(new CommonResponse.GeneralResponse(status, msg));
 	}
