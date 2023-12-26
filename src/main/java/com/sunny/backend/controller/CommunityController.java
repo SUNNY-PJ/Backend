@@ -56,7 +56,7 @@ public class CommunityController {
 	}
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 상세 조회")
-	@PostMapping("/{communityId}")
+	@GetMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> getCommunity(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@PathVariable Long communityId) {
