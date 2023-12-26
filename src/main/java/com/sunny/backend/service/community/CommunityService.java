@@ -54,7 +54,6 @@ public class CommunityService {
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> findCommunity(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
-		System.out.println("Success:11111 ");
 		Users users = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
@@ -77,11 +76,8 @@ public class CommunityService {
 			}
 		}
 
-		// Log community details for debugging purposes
-		System.out.println("Success: ");
-
 		return responseService.getSingleResponse(
-				HttpStatus.OK.value(), new CommunityResponse(community),
+				HttpStatus.OK.value(), new CommunityResponse(community,false),
 				"게시글을 성공적으로 불러왔습니다.");
 	}
 
@@ -123,25 +119,17 @@ public class CommunityService {
 		if (user.getCommunityList() == null) {
 			user.addCommunity(community);
 		}
-
-
-		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),
+		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community,false),
 				"게시글을 성공적으로 작성했습니다. ");
 	}
 
 
-
-
 	//게시판 조회
-	//To do  -> Slice 찾아보고 수정
-	//단순 조회
 	@Transactional
 	public Slice<CommunityResponse.PageResponse> getCommunityList(Pageable pageable) {
 		Slice<CommunityResponse.PageResponse> result = communityRepository.getCommunityList(pageable);
 		return result;
 	}
-
-
 
 	//검색 조건 추가해서 조회
 	public Slice<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType,BoardType boardType, String searchText, Pageable pageable) {
@@ -160,10 +148,9 @@ public class CommunityService {
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new NotFoundException("Community Post not found!"));
 		System.out.println(community);
-		if (checkCommunityLoginUser(customUserPrincipal, community)) {
-			new CustomException(COMMUNITY_NOT_FOUND);
+		if (!checkCommunityLoginUser(user, community)) {
+			throw new CustomException(NO_USER_PERMISSION);
 		}
-
 		// To do 기존 photolist 값 null로 초기화 ??
 		community.getPhotoList().clear();
 
@@ -192,7 +179,7 @@ public class CommunityService {
 			photoRepository.saveAll(photoList);
 			community.addPhoto(photoList);
 		}
-		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),
+		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community,true),
 				"게시글 수정을 완료했습니다.");
 	}
 
@@ -206,8 +193,8 @@ public class CommunityService {
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new NotFoundException("Community post  not found!"));
 		List<Photo> photoList = photoRepository.findByCommunityId(communityId);
-		if (checkCommunityLoginUser(customUserPrincipal, community)) {
-			new CustomException(COMMUNITY_NOT_FOUND);
+		if (!checkCommunityLoginUser(user, community)) {
+			throw new CustomException(NO_USER_PERMISSION);
 		}
 
 		for (Photo existingFile : photoList) {
@@ -216,17 +203,18 @@ public class CommunityService {
 		photoRepository.deleteByCommunityId(communityId);
 		communityRepository.deleteById(communityId);
 
-		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),
+		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community,false),
 				"게시글을 삭제했습니다.");
 	}
 
 
 	//수정 및 삭제 권한 체크 (도메인에서 처리)
-	private boolean checkCommunityLoginUser(CustomUserPrincipal customUserPrincipal, Community community) {
-		if (!Objects.equals(customUserPrincipal.getName(), community.getWriter())) {
+	private boolean checkCommunityLoginUser(Users users, Community community) {
+		if (!Objects.equals(users.getName(), community.getWriter())) {
+			System.out.println(users.getName());
+			System.out.println(community.getWriter());
 			return false;
 		}
 		return true;
 	}
-
 }

@@ -34,6 +34,15 @@ public class CommonResponse {
 		}
 	}
 
+	public static class GeneralErrorResponse extends CommonResponse {
+		private String msg;
+
+		public GeneralErrorResponse(int status, String msg) {
+			super(status);
+			this.msg = msg;
+		}
+	}
+
 	@Getter
 	public static class SingleResponse<T> extends CommonResponse {
 		private T data;
