@@ -60,7 +60,6 @@ public class CommunityController {
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> getCommunity(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@PathVariable Long communityId) {
-
 		return communityService.findCommunity(customUserPrincipal, communityId);
 	}
 
