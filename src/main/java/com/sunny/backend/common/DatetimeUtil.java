@@ -15,8 +15,7 @@ public class DatetimeUtil {
         return ChronoUnit.DAYS.between(dayAfter,LocalDateTime.now());
     }
     public static String timesAgo(LocalDateTime dayBefore) {
-        ZoneId seoulZone = ZoneId.of("Asia/Seoul");
-        long gap = ChronoUnit.MINUTES.between(dayBefore.atZone(seoulZone).toLocalDateTime(), ZonedDateTime.now(seoulZone).toLocalDateTime());
+        long gap = ChronoUnit.MINUTES.between(dayBefore, LocalDateTime.now());
         String word;
         if (gap == 0){
             word = "방금 전";
