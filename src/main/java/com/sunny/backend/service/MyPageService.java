@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,7 +86,7 @@ public class MyPageService {
         List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId());
 
         List<CommunityResponse> ScrapByCommunity = scrapList.stream()
-                .map(scrap -> new CommunityResponse(scrap.getCommunity()))
+                .map(scrap -> new CommunityResponse(scrap.getCommunity(),false))
                 .collect(Collectors.toList());
 
 
@@ -93,7 +94,7 @@ public class MyPageService {
     }
 
     @Transactional
-    public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(CustomUserPrincipal customUserPrincipal, MultipartFile profile, String nickname) {
+    public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(CustomUserPrincipal customUserPrincipal, String nickname, MultipartFile profile) {
         Users user = customUserPrincipal.getUsers();
 
         if (nickname != null) {
@@ -102,9 +103,8 @@ public class MyPageService {
 
         if (!profile.isEmpty()) {
             System.out.println("success");
-//            s3Service.deleteFile(user.getProfile()); -> 이거 기본 프로필 지정한 뒤에 해야함
             user.setProfile(s3Service.upload(profile));
-            System.out.println("User Profile:" + user.getProfile());
+            System.out.println("User Profile: " + user.getProfile());
         }
 
         userRepository.save(user);
