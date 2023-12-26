@@ -56,9 +56,12 @@ public class CommunityResponse {
 
         this.createdAt =  DatetimeUtil.timesAgo(community.getCreatedDate());
         this.isModified=isModified;
+
         //수정된 값이 null x : 수정 함 ->  수정된 값으로 업데이트
         if(isModified){
             this.modifiedAt = DatetimeUtil.timesAgo(community.getUpdatedDate());
+            System.out.println(modifiedAt);
+            System.out.println(modifiedAt);
         }
         //수정된 값이 null : 수정을 아직 안함 ->  수정된 값은 createdAt 업데이트
         else {
