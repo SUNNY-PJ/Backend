@@ -39,7 +39,7 @@ public class MyPageController {
 
     @ApiOperation(tags = "8. MyPage - Comment", value = "댓글 가져오기")
     @GetMapping("/mycomment")
-    public ResponseEntity<CommonResponse.ListResponse<CommentResponse>> getCommentList(@AuthUser CustomUserPrincipal customUserPrincipal) {
+    public ResponseEntity<CommonResponse.ListResponse<CommentResponse.Mycomment>> getCommentList(@AuthUser CustomUserPrincipal customUserPrincipal) {
         return myPageService.getCommentByUserId(customUserPrincipal);
     }
 
