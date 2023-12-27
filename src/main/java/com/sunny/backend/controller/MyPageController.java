@@ -13,6 +13,7 @@ import com.sunny.backend.service.MyPageService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,5 +51,13 @@ public class MyPageController {
             @RequestPart(required = false) String nickname,
             @RequestPart(value = "profile",required = false) MultipartFile profile){
         return myPageService.updateProfile(customUserPrincipal,nickname,profile);
+    }
+
+    //이거 일단 임시 테스트임
+    @GetMapping("/auth/kakao/logout")
+    public ResponseEntity<CommonResponse.GeneralResponse> handleKakaoLogout(@RequestParam(name = "client_id") String clientId,
+                                    @RequestParam(name = "logout_redirect_uri") String logoutRedirectUri) {
+        CommonResponse.GeneralResponse response = new CommonResponse.GeneralResponse(HttpStatus.OK.value(), "Logout 성공");
+        return ResponseEntity.ok().body(response);
     }
 }
