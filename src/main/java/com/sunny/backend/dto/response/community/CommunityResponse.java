@@ -22,7 +22,6 @@ public class CommunityResponse {
     private String writer; //작성자
     private int viewCount; // 조회수
     private List<String> photoList; // 이미지 리스트
-    private List<CommentResponse> commentList; //댓글 리스트
     private int comment_cnt; //댓글 수
     private BoardType type;
 
@@ -42,11 +41,6 @@ public class CommunityResponse {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        this.commentList = community.getCommentList()
-                .stream()
-                .filter(comment -> comment.getParent() == null)
-                .map(this::mapCommentToResponse)
-                .collect(Collectors.toList());
 
         this.comment_cnt = community.getCommentList().size();
 
@@ -67,23 +61,6 @@ public class CommunityResponse {
         this.type=community.getBoardType();
     }
 
-    private CommentResponse mapCommentToResponse(Comment comment) {
-        CommentResponse commentResponse = new CommentResponse(
-                comment.getId(),
-                comment.getWriter(),
-                comment.getContent(),
-                comment.getCreatedDate(),
-                comment.getUpdatedDate()
-        );
-
-        commentResponse.setChildren(comment.getChildren()
-                .stream()
-                .map(this::mapCommentToResponse)
-                .collect(Collectors.toList())
-        );
-
-        return commentResponse;
-    }
 
     @Getter
     public static class PageResponse {
