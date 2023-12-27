@@ -70,8 +70,10 @@ public class CommunityResponse {
     private CommentResponse mapCommentToResponse(Comment comment) {
         CommentResponse commentResponse = new CommentResponse(
                 comment.getId(),
-                comment.getWriter(), // 필드에 따라 업데이트
-                comment.getContent()
+                comment.getWriter(),
+                comment.getContent(),
+                comment.getCreatedDate(),
+                comment.getUpdatedDate()
         );
 
         commentResponse.setChildren(comment.getChildren()

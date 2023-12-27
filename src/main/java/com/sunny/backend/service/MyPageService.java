@@ -73,7 +73,7 @@ public class MyPageService {
         List<Comment> commentList = commentRepository.findAllByUsers_Id(user.getId());
         List<CommentResponse> commentDTOList =
                 commentList.stream()
-                        .map(comment -> new CommentResponse(comment.getId(), comment.getContent(), comment.getWriter()))
+                        .map(comment -> new CommentResponse(comment.getId(), comment.getContent(), comment.getWriter(),comment.getCreatedDate(),comment.getUpdatedDate()))
                         .collect(Collectors.toList());
 //        List<CommentResponse> commentRes = new ArrayList<>();
         return responseService.getListResponse(HttpStatus.OK.value(), commentDTOList, "내가 쓴 댓글 조회");

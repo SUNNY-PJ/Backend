@@ -1,13 +1,7 @@
 package com.sunny.backend.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.config.AuthUser;
@@ -39,6 +33,14 @@ public class CommentController {
 		@RequestBody CommentRequest commentRequestDTO) {
 		return commentService.createComment(customUserPrincipal, communityId, commentRequestDTO);
 
+	}
+
+	//댓글 조회
+	@ApiOperation(tags = "1. Comment", value = "댓글 조회")
+	@GetMapping("/{communityId}")
+	public ResponseEntity<CommonResponse.ListResponse<CommentResponse>> createComment(
+			@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId) {
+		return commentService.getCommentList(customUserPrincipal, communityId);
 	}
 
 	//댓글 수정

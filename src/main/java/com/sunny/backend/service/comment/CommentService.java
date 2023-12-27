@@ -2,7 +2,9 @@ package com.sunny.backend.service.comment;
 
 import static com.sunny.backend.common.ErrorCode.*;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,41 @@ public class CommentService {
 	private final CommentRequestMapper commentRequestMapper;
 	private final ResponseService responseService;
 
+	//댓글 조회
+	@Transactional
+	public ResponseEntity<CommonResponse.ListResponse<CommentResponse>> getCommentList(
+			CustomUserPrincipal customUserPrincipal, Long communityId) {
+		Users user = customUserPrincipal.getUsers();
+		Community community = communityRepository.findById(communityId)
+				.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
+		List<Comment> comments = commentRepository.findAllByCommunity_Id(communityId);
+
+		List<CommentResponse> commentResponses = comments.stream()
+				.filter(comment -> comment.getParent() == null) // Filter top-level comments
+				.map(this::mapCommentToResponse) // Use the existing mapping method
+				.collect(Collectors.toList());
+
+		return responseService.getListResponse(HttpStatus.OK.value(), commentResponses, "댓글을 조회했습니다.");
+	}
+
+	private CommentResponse mapCommentToResponse(Comment comment) {
+		CommentResponse commentResponse = new CommentResponse(
+				comment.getId(),
+				comment.getWriter(),
+				comment.getContent(),
+				comment.getCreatedDate(),
+				comment.getUpdatedDate()
+		);
+
+		commentResponse.setChildren(comment.getChildren()
+				.stream()
+				.map(this::mapCommentToResponse)
+				.collect(Collectors.toList())
+		);
+
+		return commentResponse;
+
+	}
 	//댓글 등록
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> createComment(
@@ -62,7 +99,7 @@ public class CommentService {
 
 
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-			new CommentResponse(comment.getId(), comment.getContent(), comment.getWriter()), "댓글을 등록했습니다.");
+			new CommentResponse(comment.getId(), comment.getContent(), comment.getWriter(),comment.getCreatedDate(),comment.getUpdatedDate()), "댓글을 등록했습니다.");
 	}
 
 	//댓글 삭제
@@ -102,7 +139,7 @@ public class CommentService {
 			comment.setContent(commentRequestDTO.getContent());
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-			new CommentResponse(comment.getId(), comment.getWriter(), comment.getContent()), "댓글을 수정했습니다.");
+			new CommentResponse(comment.getId(), comment.getWriter(), comment.getContent(),comment.getCreatedDate(),comment.getUpdatedDate()), "댓글을 수정했습니다.");
 	}
 
 	//수정 및 삭제 권한 체크
