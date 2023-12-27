@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.nimbusds.oauth2.sdk.util.StringUtils;
+import com.sunny.backend.entity.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -26,10 +27,6 @@ import com.sunny.backend.common.CustomException;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.entity.BoardType;
-import com.sunny.backend.entity.Community;
-import com.sunny.backend.entity.Photo;
-import com.sunny.backend.entity.SortType;
 import com.sunny.backend.repository.community.CommunityRepository;
 import com.sunny.backend.repository.photo.PhotoRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
@@ -80,6 +77,7 @@ public class CommunityService {
 				HttpStatus.OK.value(), new CommunityResponse(community,false),
 				"게시글을 성공적으로 불러왔습니다.");
 	}
+
 
 
 	public static long calculateTimeUntilMidnight() {
