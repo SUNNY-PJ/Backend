@@ -25,35 +25,33 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping(value = "/mypage")
 @RequiredArgsConstructor
 public class MyPageController {
-	private final MyPageService myPageService;
 
-	@ApiOperation(tags = "8. MyPage", value = "작성 글 가져오기")
-	@GetMapping("")
-	public ResponseEntity<CommonResponse.ListResponse<CommunityResponse.PageResponse>> getCommunityList(
-		@AuthUser CustomUserPrincipal customUserPrincipal) {
-		return myPageService.getMyCommunity(customUserPrincipal);
-	}
+    private final MyPageService myPageService;
+    @ApiOperation(tags = "8. MyPage", value = "작성 글 가져오기")
+    @GetMapping("")
+    public ResponseEntity<CommonResponse.ListResponse<CommunityResponse.PageResponse>> getCommunityList(@AuthUser CustomUserPrincipal customUserPrincipal) {
+        return myPageService.getMyCommunity(customUserPrincipal);
+    }
 
-	@ApiOperation(tags = "8. MyPage - Scrap", value = "스크랩 글 가져오기")
-	@GetMapping("/myscrap")
-	public ResponseEntity<CommonResponse.ListResponse<CommunityResponse>> getScrapList(
-		@AuthUser CustomUserPrincipal customUserPrincipal) {
-		return myPageService.getScrapByUserId(customUserPrincipal);
-	}
+    @ApiOperation(tags = "8. MyPage - Scrap", value = "스크랩 글 가져오기")
+    @GetMapping("/myscrap")
+    public ResponseEntity<CommonResponse.ListResponse<CommunityResponse>> getScrapList(@AuthUser CustomUserPrincipal customUserPrincipal) {
+        return myPageService.getScrapByUserId(customUserPrincipal);
+    }
 
-	@ApiOperation(tags = "8. MyPage - Comment", value = "댓글 가져오기")
-	@GetMapping("/mycomment")
-	public ResponseEntity<CommonResponse.ListResponse<CommentResponse>> getCommentList(
-		@AuthUser CustomUserPrincipal customUserPrincipal) {
-		return myPageService.getCommentByUserId(customUserPrincipal);
-	}
+    @ApiOperation(tags = "8. MyPage - Comment", value = "댓글 가져오기")
+    @GetMapping("/mycomment")
+    public ResponseEntity<CommonResponse.ListResponse<CommentResponse.Mycomment>> getCommentList(@AuthUser CustomUserPrincipal customUserPrincipal) {
+        return myPageService.getCommentByUserId(customUserPrincipal);
+    }
 
-	@ApiOperation(tags = "8. MyPage - Profile", value = "프로필 설정")
-	@PostMapping("/profile")
-	public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
-		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@RequestPart(required = false) String nickname,
-		@RequestPart(value = "profile", required = false) MultipartFile profile) {
-		return myPageService.updateProfile(customUserPrincipal, nickname, profile);
-	}
+    @ApiOperation(tags = "8. MyPage - Profile", value = "프로필 설정")
+    @PostMapping("/profile")
+    public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
+            @AuthUser CustomUserPrincipal customUserPrincipal,
+            @RequestPart(required = false) String nickname,
+            @RequestPart(value = "profile",required = false) MultipartFile profile){
+        return myPageService.updateProfile(customUserPrincipal,nickname,profile);
+    }
+
 }
