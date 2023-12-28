@@ -1,12 +1,14 @@
 package com.sunny.backend.entity;
 
 
+
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.user.Users;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +17,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Community extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +36,11 @@ public class Community extends BaseTime {
     @ColumnDefault("0")
     @Column
     private int view_cnt; //조회수
+
+    @Column
+    private String createdAt;
+    @Column
+    private String modifiedAt;
 
 
     //users 다대일 관계 매핑
@@ -65,10 +71,12 @@ public class Community extends BaseTime {
         this.view_cnt+=1;
     }
 
+
     public void updateView() {
         this.view_cnt++;
     }
 
-
-
+    public void addPhoto(List<Photo> photoList) {
+        this.photoList=photoList;
+    }
 }

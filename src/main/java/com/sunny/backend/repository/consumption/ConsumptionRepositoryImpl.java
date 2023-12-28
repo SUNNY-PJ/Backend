@@ -61,10 +61,10 @@ public class ConsumptionRepositoryImpl  extends QuerydslRepositorySupport implem
     @Override
     public Long getComsumptionMoney(Long id, LocalDate startDate, LocalDate endDate) {
         return queryFactory.select(consumption.money.sum())
-            .from(consumption)
-            .join(users).on(users.id.eq(consumption.users.id))
-            .where(consumption.dateField.between(startDate, endDate))
-            .fetchOne();
+                .from(consumption)
+                .join(users).on(users.id.eq(consumption.users.id))
+                .where(consumption.dateField.between(startDate, endDate))
+                .fetchOne();
     }
 
     private long getTotalSpending() {
