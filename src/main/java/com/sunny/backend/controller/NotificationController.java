@@ -18,7 +18,7 @@ import java.io.IOException;
 public class NotificationController {
     private final NotificationService notificationService;
     @ApiOperation(tags = "9. Alarm", value = "알림 설정")
-    @GetMapping("")
+    @PostMapping("")
     public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> pushNotification(@RequestBody FcmRequestDto fcmRequestDto) throws IOException {
         return notificationService.sendPushNotification(fcmRequestDto);
     }
