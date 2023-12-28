@@ -72,7 +72,6 @@ public class CommunityService {
 				community.updateView();
 			}
 		}
-
 		return responseService.getSingleResponse(
 				HttpStatus.OK.value(), new CommunityResponse(community,false),
 				"게시글을 성공적으로 불러왔습니다.");

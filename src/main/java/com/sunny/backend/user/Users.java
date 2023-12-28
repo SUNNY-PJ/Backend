@@ -68,6 +68,9 @@ public class Users extends BaseTime {
 	@OneToMany(mappedBy = "friend")
 	private List<Friends> friendsList = new ArrayList<>();
 
+	@OneToOne
+	@JoinColumn(name = "notification_id")
+	private Notification notification;
 
 	public void addComment(Comment comment) {
 		this.commentList = new ArrayList<>();
