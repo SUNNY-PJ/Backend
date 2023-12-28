@@ -112,6 +112,6 @@ public class ChatService {
 		}
 		ChatMessage chatMessage = new ChatMessage(chatSendMessage.getMessage(), users, chatRoom);
 		chatMessageRepository.save(chatMessage);
-		template.convertAndSend("/sub/room/" + chatSendMessage.getChatRoomId(), chatSendMessage.getMessage());
+		template.convertAndSend("/sub/room/" + chatRoom.getId(), chatSendMessage.getMessage());
 	}
 }
