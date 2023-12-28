@@ -1,10 +1,13 @@
 package com.sunny.backend.user;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.*;
 
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sunny.backend.entity.*;
+import com.sunny.backend.entity.friends.Friends;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,11 +15,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.minidev.json.annotate.JsonIgnore;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 @Getter
 @Setter
@@ -40,29 +38,23 @@ public class Users extends BaseTime {
 	@Enumerated(value = EnumType.STRING)
 	private Role role;
 
-	@Column//(nullable = false)
+	@Column
 	@Enumerated(value = EnumType.STRING)
 	private AuthProvider authProvider;
-	@OneToMany(mappedBy = "users",fetch = FetchType.EAGER)
-	@Builder.Default
-	private List<Community> communityList =new ArrayList<>();
+	@OneToMany(mappedBy = "users")
+	private List<Community> communityList;
 
-	@OneToMany(mappedBy = "users",fetch = FetchType.EAGER)
-	@Builder.Default
-	private List<Consumption> consumptionList =new ArrayList<>();
+	@OneToMany(mappedBy = "users")
+	private List<Consumption> consumptionList;
 
-	@OneToMany(mappedBy = "users",fetch = FetchType.EAGER)
-	@Builder.Default
-	private List<Comment> commentList =new ArrayList<>();
-
+	@OneToMany(mappedBy = "users")
+	@JsonIgnore
+	private  List<Comment> commentList;
 	@OneToOne(mappedBy = "users")
 	private Save save;
 
-
 	@OneToMany(mappedBy = "users")
-	@JsonBackReference
-	@Builder.Default
-	private List<Scrap> scrapList =new ArrayList<>();
+	private List<Scrap> scrapList;
 
 	@Column
 	private String providerId;
@@ -73,7 +65,26 @@ public class Users extends BaseTime {
 	@OneToMany(mappedBy = "users")
 	private List<Friends> userList = new ArrayList<>();
 
-	@OneToMany(mappedBy = "friends")
+	@OneToMany(mappedBy = "friend")
 	private List<Friends> friendsList = new ArrayList<>();
 
+	@OneToOne
+	@JoinColumn(name = "notification_id")
+	private Notification notification;
+
+	public void addComment(Comment comment) {
+		this.commentList = new ArrayList<>();
+		this.commentList.add(comment);
+	}
+
+	public void addCommunity(Community community) {
+			this.communityList = new ArrayList<>();
+			this.communityList.add(community);
+
+	}
+
+	public void addConsumption(Consumption consumption) {
+		this.consumptionList = new ArrayList<>();
+		this.consumptionList.add(consumption);
+	}
 }

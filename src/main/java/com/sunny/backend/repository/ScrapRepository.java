@@ -1,5 +1,6 @@
 package com.sunny.backend.repository;
 
+import com.sunny.backend.dto.response.ScrapResponse;
 import com.sunny.backend.entity.Community;
 import com.sunny.backend.entity.Scrap;
 import com.sunny.backend.user.Users;
