@@ -48,18 +48,16 @@ public class ConsumptionController {
 		return consumptionService.createConsumption(customUserPrincipal, consumtionRequest);
 	}
 
-	@ApiOperation(tags = "4. Consumption", value = "지출 통계")
 	//지출 통계
+	@ApiOperation(tags = "4. Consumption", value = "지출 통계")
 	@GetMapping("/spendTypeStatistics")
 	public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>> getSpendTypeStatistics() {
 		return consumptionService.getSpendTypeStatistics();
 	}
 
-	@ApiOperation(tags = "5. Consumption", value = "날짜에 맞는 지출 내역 조회")
 	//지출 내역
-
+	@ApiOperation(tags = "4. Consumption", value = "날짜에 맞는 지출 내역 조회")
 	@GetMapping("/date")
-
 	public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumption>> getDetailConsumption(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@RequestParam("datefield") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate datefield) {

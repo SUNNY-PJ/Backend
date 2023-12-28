@@ -1,18 +1,25 @@
 package com.sunny.backend.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.config.AuthUser;
-import com.sunny.backend.dto.response.FriendsResponse;
 import com.sunny.backend.dto.response.ProfileResponse;
-import com.sunny.backend.dto.response.ScrapResponse;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.entity.Comment;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.service.MyPageService;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +29,10 @@ import java.util.Optional;
 
 @RestController
 @Tag(name = "8. MyPage", description = "My Page API")
-@RequestMapping(value="/mypage")
+@RequestMapping(value = "/mypage")
 @RequiredArgsConstructor
 public class MyPageController {
+
     private final MyPageService myPageService;
     @ApiOperation(tags = "8. MyPage", value = "작성 글 가져오기")
     @GetMapping("")
@@ -52,6 +60,7 @@ public class MyPageController {
             @RequestPart(value = "profile",required = false) MultipartFile profile){
         return myPageService.updateProfile(customUserPrincipal,nickname,profile);
     }
+
 
     //이거 일단 임시 테스트임
     @GetMapping("/auth/kakao/logout")
