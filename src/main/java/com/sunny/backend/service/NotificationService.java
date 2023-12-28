@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static com.sunny.backend.common.ErrorCode.NOTIFICATIONS_NOT_SENT;
 
@@ -27,16 +28,22 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     private String expoPushNotificationUrl = "https://exp.host/--/api/v2/push/send";
-    public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(CustomUserPrincipal customUserPrincipal, NotificationRequestDto notificationRequestDto)  {
+    public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(CustomUserPrincipal customUserPrincipal, NotificationRequestDto notificationRequestDto) {
         Users user = customUserPrincipal.getUsers();
+        Notification existingNotification = notificationRepository.findByUsers_Id(user.getId());
 
-        Notification notification=Notification.builder()
-                .DeviceToken(notificationRequestDto.getTargetToken())
-                .users(user)
-                .build();
-        notificationRepository.save(notification);
+        if (existingNotification!=null) {
+            // Notification already exists, you can handle this case accordingly
+            return responseService.getGeneralResponse(HttpStatus.OK.value(), "이미 알림을 허용한 사용자입니다.");
+        } else {
+            Notification notification = Notification.builder()
+                    .DeviceToken(notificationRequestDto.getTargetToken())
+                    .users(user)
+                    .build();
+            notificationRepository.save(notification);
             return responseService.getGeneralResponse(HttpStatus.OK.value(), "토큰 저장 성공");
         }
+    }
 
 //    //이건 혹시 모르는 사용자 자체 알림?
 //
@@ -77,7 +84,7 @@ public class NotificationService {
     public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(CustomUserPrincipal customUserPrincipal, PushRequestDto pushRequestDto) throws IOException {
 
         Notification notification = notificationRepository.findByUsers_Id(pushRequestDto.getFriendsId());
-        System.out.println(notification.getDeviceToken());
+
         if (notification != null) {
             OkHttpClient client = new OkHttpClient();
 
