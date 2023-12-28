@@ -2,6 +2,8 @@ package com.sunny.backend.controller;
 
 import java.util.List;
 
+import com.sunny.backend.dto.response.ProfileResponse;
+import com.sunny.backend.dto.response.comment.CommentResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
@@ -88,6 +90,32 @@ public class CommunityController {
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> deleteCommunity(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId) {
 		return communityService.deleteCommunity(customUserPrincipal, communityId);
+	}
+
+
+	@ApiOperation(tags = "2. Community", value = "커뮤니티 친구 프로필 조회")
+	@GetMapping("/{communityId}/friends/profile")
+	public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> getUserProfile(
+			@AuthUser CustomUserPrincipal customUserPrincipal,
+			@PathVariable Long communityId) {
+		return communityService.getUserProfile(customUserPrincipal, communityId);
+	}
+
+	@ApiOperation(tags = "2. Community", value = "커뮤니티 친구 작성 글 조회")
+	@GetMapping("/{communityId}/friends/community")
+	public ResponseEntity<CommonResponse.ListResponse<CommunityResponse.PageResponse>> getFriendsCommunity(
+			@AuthUser CustomUserPrincipal customUserPrincipal,
+			@PathVariable Long communityId) {
+		return communityService.getFriendsCommunity(customUserPrincipal, communityId);
+	}
+
+
+	@ApiOperation(tags = "2. Community", value = "커뮤니티 친구가 쓴 댓글 조회")
+	@GetMapping("/{communityId}/friends/comment")
+	public ResponseEntity<CommonResponse.ListResponse<CommentResponse.Mycomment>> getCommentByFriendsId(
+			@AuthUser CustomUserPrincipal customUserPrincipal,
+			@PathVariable Long communityId) {
+		return communityService.getCommentByFriendsId(customUserPrincipal, communityId);
 	}
 }
 
