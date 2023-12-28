@@ -3,23 +3,10 @@ package com.sunny.backend.user;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sunny.backend.entity.BaseTime;
-import com.sunny.backend.entity.Comment;
-import com.sunny.backend.entity.Community;
-import com.sunny.backend.entity.Consumption;
-import com.sunny.backend.entity.Save;
-import com.sunny.backend.entity.Scrap;
+import com.sunny.backend.entity.*;
 import com.sunny.backend.entity.friends.Friends;
 
 import lombok.AccessLevel;
@@ -80,6 +67,7 @@ public class Users extends BaseTime {
 
 	@OneToMany(mappedBy = "friend")
 	private List<Friends> friendsList = new ArrayList<>();
+
 
 	public void addComment(Comment comment) {
 		this.commentList = new ArrayList<>();

@@ -1,11 +1,7 @@
 package com.sunny.backend.dto.request;
 
-import lombok.Getter;
-
-@Getter
-public class FcmRequestDto {
+public class PushRequestDto {
     private String targetToken;
     private String title;
     private String body;
-
 }

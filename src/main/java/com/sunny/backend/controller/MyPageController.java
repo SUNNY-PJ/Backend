@@ -40,19 +40,19 @@ public class MyPageController {
         return myPageService.getMyCommunity(customUserPrincipal);
     }
 
-    @ApiOperation(tags = "8. MyPage - Scrap", value = "스크랩 글 가져오기")
+    @ApiOperation(tags = "8. MyPage", value = "스크랩 글 가져오기")
     @GetMapping("/myscrap")
     public ResponseEntity<CommonResponse.ListResponse<CommunityResponse>> getScrapList(@AuthUser CustomUserPrincipal customUserPrincipal) {
         return myPageService.getScrapByUserId(customUserPrincipal);
     }
 
-    @ApiOperation(tags = "8. MyPage - Comment", value = "댓글 가져오기")
+    @ApiOperation(tags = "8. MyPage", value = "댓글 가져오기")
     @GetMapping("/mycomment")
     public ResponseEntity<CommonResponse.ListResponse<CommentResponse.Mycomment>> getCommentList(@AuthUser CustomUserPrincipal customUserPrincipal) {
         return myPageService.getCommentByUserId(customUserPrincipal);
     }
 
-    @ApiOperation(tags = "8. MyPage - Profile", value = "프로필 설정")
+    @ApiOperation(tags = "8. MyPage", value = "프로필 설정")
     @PostMapping("/profile")
     public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
             @AuthUser CustomUserPrincipal customUserPrincipal,
@@ -63,6 +63,7 @@ public class MyPageController {
 
 
     //이거 일단 임시 테스트임
+    @ApiOperation(tags = "8. MyPage", value = "로그아웃")
     @GetMapping("/auth/kakao/logout")
     public ResponseEntity<CommonResponse.GeneralResponse> handleKakaoLogout(@RequestParam(name = "client_id") String clientId,
                                     @RequestParam(name = "logout_redirect_uri") String logoutRedirectUri) {

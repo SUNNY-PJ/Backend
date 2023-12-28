@@ -45,8 +45,8 @@ public class CommentService {
 		List<Comment> comments = commentRepository.findAllByCommunity_Id(communityId);
 
 		List<CommentResponse> commentResponses = comments.stream()
-				.filter(comment -> comment.getParent() == null) // Filter top-level comments
-				.map(this::mapCommentToResponse) // Use the existing mapping method
+				.filter(comment -> comment.getParent() == null)
+				.map(this::mapCommentToResponse)
 				.collect(Collectors.toList());
 
 		return responseService.getListResponse(HttpStatus.OK.value(), commentResponses, "댓글을 조회했습니다.");
