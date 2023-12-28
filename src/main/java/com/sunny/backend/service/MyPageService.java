@@ -9,7 +9,6 @@ import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.entity.Comment;
 import com.sunny.backend.entity.Community;
-import com.sunny.backend.entity.Photo;
 import com.sunny.backend.entity.Scrap;
 import com.sunny.backend.repository.ScrapRepository;
 import com.sunny.backend.repository.comment.CommentRepository;
@@ -29,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,14 +68,14 @@ public class MyPageService {
     }
     // 내가 쓴 댓글
 
-    public ResponseEntity<CommonResponse.ListResponse<CommentResponse>> getCommentByUserId(CustomUserPrincipal customUserPrincipal) {
+    public ResponseEntity<CommonResponse.ListResponse<CommentResponse.Mycomment>> getCommentByUserId(CustomUserPrincipal customUserPrincipal) {
         Users user = customUserPrincipal.getUsers();
         List<Comment> commentList = commentRepository.findAllByUsers_Id(user.getId());
-        List<CommentResponse> commentDTOList =
+        List<CommentResponse.Mycomment> commentDTOList =
                 commentList.stream()
-                        .map(comment -> new CommentResponse(comment.getId(), comment.getContent(), comment.getWriter()))
+                        .map(comment -> new CommentResponse.Mycomment(comment.getCommunity().getId(),comment.getId(), comment.getContent(), comment.getWriter(),comment.getCreatedDate(),comment.getUpdatedDate()))
                         .collect(Collectors.toList());
-//        List<CommentResponse> commentRes = new ArrayList<>();
+
         return responseService.getListResponse(HttpStatus.OK.value(), commentDTOList, "내가 쓴 댓글 조회");
     }
 
@@ -86,7 +86,7 @@ public class MyPageService {
         List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId());
 
         List<CommunityResponse> ScrapByCommunity = scrapList.stream()
-                .map(scrap -> new CommunityResponse(scrap.getCommunity()))
+                .map(scrap -> new CommunityResponse(scrap.getCommunity(),false))
                 .collect(Collectors.toList());
 
 
@@ -94,7 +94,7 @@ public class MyPageService {
     }
 
     @Transactional
-    public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(CustomUserPrincipal customUserPrincipal, MultipartFile profile, String nickname) {
+    public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(CustomUserPrincipal customUserPrincipal, String nickname, MultipartFile profile) {
         Users user = customUserPrincipal.getUsers();
 
         if (nickname != null) {
@@ -103,9 +103,8 @@ public class MyPageService {
 
         if (!profile.isEmpty()) {
             System.out.println("success");
-//            s3Service.deleteFile(user.getProfile()); -> 이거 기본 프로필 지정한 뒤에 해야함
             user.setProfile(s3Service.upload(profile));
-            System.out.println("User Profile:" + user.getProfile());
+            System.out.println("User Profile: " + user.getProfile());
         }
 
         userRepository.save(user);
@@ -115,4 +114,6 @@ public class MyPageService {
     //알림 설정?
 
     //로그아웃, 회원 탈퇴 (로그아웃은 카톡에서 해야되는 걸로 해야 하나?)
+
+
 }

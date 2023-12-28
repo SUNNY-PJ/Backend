@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class ScrapController {
 	private final ScrapService scrapService;
 
-	// @ApiOperation(tags = "7. Scrap", value = "스크랩 조회")
+	@ApiOperation(tags = "7. Scrap", value = "스크랩 조회")
 	@GetMapping("")
 	public ResponseEntity<CommonResponse.ListResponse<CommunityResponse>> getScrapsByUserId(
 		@AuthUser CustomUserPrincipal customUserPrincipal) {

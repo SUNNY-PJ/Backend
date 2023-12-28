@@ -2,7 +2,9 @@ package com.sunny.backend.service.community;
 
 import static com.sunny.backend.common.ErrorCode.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.nimbusds.oauth2.sdk.util.StringUtils;
+import com.sunny.backend.entity.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -24,10 +27,6 @@ import com.sunny.backend.common.CustomException;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.entity.BoardType;
-import com.sunny.backend.entity.Community;
-import com.sunny.backend.entity.Photo;
-import com.sunny.backend.entity.SortType;
 import com.sunny.backend.repository.community.CommunityRepository;
 import com.sunny.backend.repository.photo.PhotoRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
@@ -52,7 +51,6 @@ public class CommunityService {
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> findCommunity(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
-		System.out.println("Success:11111 ");
 		Users users = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
@@ -74,14 +72,11 @@ public class CommunityService {
 				community.updateView();
 			}
 		}
-
-		// Log community details for debugging purposes
-		System.out.println("Success: ");
-
 		return responseService.getSingleResponse(
-				HttpStatus.OK.value(), new CommunityResponse(community),
+				HttpStatus.OK.value(), new CommunityResponse(community,false),
 				"게시글을 성공적으로 불러왔습니다.");
 	}
+
 
 
 	public static long calculateTimeUntilMidnight() {
@@ -92,26 +87,26 @@ public class CommunityService {
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> createCommunity(
-		CustomUserPrincipal customUserPrincipal,
-		CommunityRequest communityRequest, List<MultipartFile> multipartFileList) {
+			CustomUserPrincipal customUserPrincipal,
+			CommunityRequest communityRequest, List<MultipartFile> multipartFileList) {
 		Users user = customUserPrincipal.getUsers();
 		Community community = Community.builder()
-			.title(communityRequest.getTitle())
-			.contents(communityRequest.getContents())
-			.writer(user.getName())
-			.boardType(communityRequest.getType())
-			.users(user)
-			.build();
+				.title(communityRequest.getTitle())
+				.contents(communityRequest.getContents())
+				.writer(user.getName())
+				.boardType(communityRequest.getType())
+				.users(user)
+				.build();
 
-		if (multipartFileList != null) {
+		if (multipartFileList != null && !multipartFileList.isEmpty()) {
 			List<Photo> photoList = new ArrayList<>();
 			for (MultipartFile multipartFile : multipartFileList) {
 				Photo photo = Photo.builder()
-					.filename(multipartFile.getOriginalFilename())
-					.fileSize(multipartFile.getSize())
-					.fileUrl(s3Service.upload(multipartFile))
-					.community(community)
-					.build();
+						.filename(multipartFile.getOriginalFilename())
+						.fileSize(multipartFile.getSize())
+						.fileUrl(s3Service.upload(multipartFile))
+						.community(community)
+						.build();
 				photoList.add(photo);
 			}
 			photoRepository.saveAll(photoList);
@@ -121,24 +116,17 @@ public class CommunityService {
 		if (user.getCommunityList() == null) {
 			user.addCommunity(community);
 		}
-
-		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),
-			"게시글을 성공적으로 작성했습니다. ");
+		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community,false),
+				"게시글을 성공적으로 작성했습니다. ");
 	}
 
 
-
-
 	//게시판 조회
-	//To do  -> Slice 찾아보고 수정
-	//단순 조회
 	@Transactional
 	public Slice<CommunityResponse.PageResponse> getCommunityList(Pageable pageable) {
 		Slice<CommunityResponse.PageResponse> result = communityRepository.getCommunityList(pageable);
 		return result;
 	}
-
-
 
 	//검색 조건 추가해서 조회
 	public Slice<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType,BoardType boardType, String searchText, Pageable pageable) {
@@ -150,23 +138,22 @@ public class CommunityService {
 	//게시글 수정
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> updateCommunity(
-		CustomUserPrincipal customUserPrincipal, Long communityId,
-		CommunityRequest communityRequest, List<MultipartFile> files) {
+			CustomUserPrincipal customUserPrincipal, Long communityId,
+			CommunityRequest communityRequest, List<MultipartFile> files) {
 		//To do : error 처리
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
-			.orElseThrow(() -> new NotFoundException("Community Post not found!"));
+				.orElseThrow(() -> new NotFoundException("Community Post not found!"));
+		boolean ismodifieed=true;
 		System.out.println(community);
-		if (checkCommunityLoginUser(customUserPrincipal, community)) {
-			new CustomException(COMMUNITY_NOT_FOUND);
+		if (!checkCommunityLoginUser(user, community)) {
+			throw new CustomException(NO_USER_PERMISSION);
 		}
-
 		// To do 기존 photolist 값 null로 초기화 ??
 		community.getPhotoList().clear();
-
 		community.updateCommunity(communityRequest);
 
-		if (!files.isEmpty()) {
+		if (files != null && !files.isEmpty()) {
 			List<Photo> existingPhotos = photoRepository.findByCommunityId(communityId);
 			// 기존 photo 삭제
 			photoRepository.deleteAll(existingPhotos);
@@ -178,33 +165,33 @@ public class CommunityService {
 			List<Photo> photoList = new ArrayList<>();
 			for (MultipartFile multipartFile : files) {
 				Photo photo = Photo.builder()
-					.filename(multipartFile.getOriginalFilename())
-					.fileSize(multipartFile.getSize())
-					.fileUrl(s3Service.upload(multipartFile))
-					.community(community)
-					.build();
+						.filename(multipartFile.getOriginalFilename())
+						.fileSize(multipartFile.getSize())
+						.fileUrl(s3Service.upload(multipartFile))
+						.community(community)
+						.build();
 				photoList.add(photo);
 			}
-
 			photoRepository.saveAll(photoList);
 			community.addPhoto(photoList);
 		}
-		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),
-			"게시글 수정을 완료했습니다.");
+		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community,ismodifieed),
+				"게시글 수정을 완료했습니다.");
+
 	}
 
 	//게시글 삭제
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> deleteCommunity(
-		CustomUserPrincipal customUserPrincipal, Long communityId) {
+			CustomUserPrincipal customUserPrincipal, Long communityId) {
 
 		//To do : error 처리
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
-			.orElseThrow(() -> new NotFoundException("Community post  not found!"));
+				.orElseThrow(() -> new NotFoundException("Community post  not found!"));
 		List<Photo> photoList = photoRepository.findByCommunityId(communityId);
-		if (checkCommunityLoginUser(customUserPrincipal, community)) {
-			new CustomException(COMMUNITY_NOT_FOUND);
+		if (!checkCommunityLoginUser(user, community)) {
+			throw new CustomException(NO_USER_PERMISSION);
 		}
 
 		for (Photo existingFile : photoList) {
@@ -213,17 +200,18 @@ public class CommunityService {
 		photoRepository.deleteByCommunityId(communityId);
 		communityRepository.deleteById(communityId);
 
-		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community),
-			"게시글을 삭제했습니다.");
+		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community,false),
+				"게시글을 삭제했습니다.");
 	}
 
 
-    //수정 및 삭제 권한 체크 (도메인에서 처리)
-    private boolean checkCommunityLoginUser(CustomUserPrincipal customUserPrincipal, Community community) {
-        if (!Objects.equals(customUserPrincipal.getName(), community.getWriter())) {
-            return false;
-        }
-        return true;
-    }
-
+	//수정 및 삭제 권한 체크 (도메인에서 처리)
+	private boolean checkCommunityLoginUser(Users users, Community community) {
+		if (!Objects.equals(users.getId(), community.getUsers().getId())){
+			System.out.println(users.getId());
+			System.out.println(community.getId());
+			return false;
+		}
+		return true;
+	}
 }
