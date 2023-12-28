@@ -109,7 +109,7 @@ public class MyPageService {
 
         userRepository.save(user);
 
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new ProfileResponse(user.getName(), user.getProfile()), "프로필 변경 성공");
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new ProfileResponse(user.getId(),user.getName(), user.getProfile()), "프로필 변경 성공");
     }
     //알림 설정?
 
