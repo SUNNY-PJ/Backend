@@ -75,8 +75,8 @@ public class SecurityConfig {
 				// HttpServletRequest를 사용하는 요청들에 대한 접근 제한 설정
 				.and()
 				.authorizeRequests()
-				// .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/h2-console/**").permitAll()
-				// .antMatchers("/auth/token/**").permitAll()
+				.antMatchers("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/h2-console/**").permitAll()
+				.antMatchers("/auth/**").permitAll()
 				// .anyRequest().authenticated()
 			.anyRequest().permitAll()
 
