@@ -3,7 +3,6 @@ package com.sunny.backend.controller;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.dto.request.FcmRequestDto;
 import com.sunny.backend.dto.response.NotificationResponse;
-import com.sunny.backend.dto.response.ProfileResponse;
 import com.sunny.backend.service.NotificationService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
