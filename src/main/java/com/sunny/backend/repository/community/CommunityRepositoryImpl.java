@@ -94,9 +94,5 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
         }
         return null;
     }
-
-
-
-
 }
 

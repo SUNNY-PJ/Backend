@@ -1,18 +1,20 @@
 
 # Services or Containers List definition
+
 services:
-  db:
-    image: mysql:latest
-    container_name: mysql-sunny-server
-    ports:
-      - 3306:3306
+  mysql:
+    container_name: mysql_sunny
+    image: mysql:8.0.30
     volumes:
-      - ./data/:/var/lib/mysql # Mount directory settings (-v option)
+      - ./db/conf.d:/etc/mysql/conf.d
+      - ./db/initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=sunny
-      - MYSQL_DATABASE=sunny-server
-      - MYSQL_USER=sunny_user_server
-      - MYSQL_PASSWORD=sunnyPassword
+      - MYSQL_DATABASE=pass_local
+      - MYSQL_USER=sunny_admin
+      - MYSQL_PASSWORD=sunny_admin_159
+      - MYSQL_ROOT_PASSWORD=sunny_admin_1597
       - TZ=Asia/Seoul
     command: # Command execution
       - --character-set-server=utf8mb4
@@ -29,3 +31,4 @@ services:
 #      - ./jenkins:/var/jenkins_home
 #    ports:
 #      - 8080:8080
+

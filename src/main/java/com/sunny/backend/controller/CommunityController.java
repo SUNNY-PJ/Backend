@@ -60,7 +60,6 @@ public class CommunityController {
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> getCommunity(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@PathVariable Long communityId) {
-		System.out.println("sgsgsgg");
 		return communityService.findCommunity(customUserPrincipal, communityId);
 	}
 
@@ -69,7 +68,7 @@ public class CommunityController {
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> createCommunity(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
-		@RequestPart(required = false) List<MultipartFile> files) {
+		@RequestPart(value = "files",required = false) List<MultipartFile> files) {
 		return communityService.createCommunity(customUserPrincipal, communityRequest, files);
 	}
 
