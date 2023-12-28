@@ -28,12 +28,12 @@ public class NotificationService {
     public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(CustomUserPrincipal customUserPrincipal, NotificationRequestDto notificationRequestDto) {
         Users user = customUserPrincipal.getUsers();
 
-            Notification notification = Notification.builder()
-                    .DeviceToken(notificationRequestDto.getTargetToken())
-                    .users(user)
-                    .build();
-            notificationRepository.save(notification);
-            return responseService.getGeneralResponse(HttpStatus.OK.value(), "토큰 저장 성공");
+        Notification notification = Notification.builder()
+                .DeviceToken(notificationRequestDto.getTargetToken())
+                .users(user)
+                .build();
+        notificationRepository.save(notification);
+        return responseService.getGeneralResponse(HttpStatus.OK.value(), "토큰 저장 성공");
         }
 
 
