@@ -68,14 +68,14 @@ public class MyPageService {
     }
     // 내가 쓴 댓글
 
-    public ResponseEntity<CommonResponse.ListResponse<CommentResponse>> getCommentByUserId(CustomUserPrincipal customUserPrincipal) {
+    public ResponseEntity<CommonResponse.ListResponse<CommentResponse.Mycomment>> getCommentByUserId(CustomUserPrincipal customUserPrincipal) {
         Users user = customUserPrincipal.getUsers();
         List<Comment> commentList = commentRepository.findAllByUsers_Id(user.getId());
-        List<CommentResponse> commentDTOList =
+        List<CommentResponse.Mycomment> commentDTOList =
                 commentList.stream()
-                        .map(comment -> new CommentResponse(comment.getId(), comment.getContent(), comment.getWriter()))
+                        .map(comment -> new CommentResponse.Mycomment(comment.getCommunity().getId(),comment.getId(), comment.getContent(), comment.getWriter(),comment.getCreatedDate(),comment.getUpdatedDate()))
                         .collect(Collectors.toList());
-//        List<CommentResponse> commentRes = new ArrayList<>();
+
         return responseService.getListResponse(HttpStatus.OK.value(), commentDTOList, "내가 쓴 댓글 조회");
     }
 
@@ -114,4 +114,6 @@ public class MyPageService {
     //알림 설정?
 
     //로그아웃, 회원 탈퇴 (로그아웃은 카톡에서 해야되는 걸로 해야 하나?)
+
+
 }

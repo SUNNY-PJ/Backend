@@ -1,34 +1,37 @@
 package com.sunny.backend.controller;
 
+import com.sunny.backend.common.CommonResponse;
+import com.sunny.backend.config.AuthUser;
+import com.sunny.backend.dto.request.NotificationRequestDto;
+import com.sunny.backend.dto.request.PushRequestDto;
+import com.sunny.backend.dto.response.NotificationResponse;
+import com.sunny.backend.security.userinfo.CustomUserPrincipal;
+import com.sunny.backend.service.NotificationService;
+import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.dto.request.FcmRequestDto;
-import com.sunny.backend.dto.response.NotificationResponse;
-import com.sunny.backend.service.NotificationService;
-
-import io.swagger.annotations.ApiOperation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-
 @RestController
-@Tag(name = "9. Alarm", description = "Alarm API")
 @RequiredArgsConstructor
 @RequestMapping("/alarm")
 public class NotificationController {
-	private final NotificationService notificationService;
+    private final NotificationService notificationService;
+    @ApiOperation(tags = "9. Alarm", value = "알림 토큰 전송")
+    @PostMapping("/token")
+    public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(
+            @AuthUser CustomUserPrincipal customUserPrincipal,
+            @RequestBody NotificationRequestDto notificationRequestDto) {
+        return notificationService.allowNotification(customUserPrincipal,notificationRequestDto);
+    }
 
-	@ApiOperation(tags = "9. Alarm", value = "알림 설정")
-	@GetMapping("")
-	public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> pushNotification(
-		@RequestBody FcmRequestDto fcmRequestDto) throws IOException {
-		return notificationService.sendPushNotification(fcmRequestDto);
-	}
-
+    @ApiOperation(tags = "9. Alarm", value = "알림 전송")
+    @PostMapping("")
+    public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(
+            @AuthUser CustomUserPrincipal customUserPrincipal,
+            @RequestBody PushRequestDto pushRequestDto) throws IOException {
+        return notificationService.sendNotificationToFriends(customUserPrincipal,pushRequestDto);
+    }
 }

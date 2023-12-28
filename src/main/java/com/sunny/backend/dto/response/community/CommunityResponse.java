@@ -22,17 +22,12 @@ public class CommunityResponse {
     private String writer; //작성자
     private int viewCount; // 조회수
     private List<String> photoList; // 이미지 리스트
-    private List<CommentResponse> commentList; //댓글 리스트
     private int comment_cnt; //댓글 수
     private BoardType type;
 
     private String createdAt; // 등록
     private String modifiedAt; // 수정
     private boolean isModified; //수정 여부
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-//    private LocalDateTime createdDate;
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-//    private LocalDateTime updateDate;
 
     public CommunityResponse(Community community,boolean isModified) {
         this.id=community.getId();
@@ -46,11 +41,6 @@ public class CommunityResponse {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        this.commentList = community.getCommentList()
-                .stream()
-                .filter(comment -> comment.getParent() == null)
-                .map(this::mapCommentToResponse)
-                .collect(Collectors.toList());
 
         this.comment_cnt = community.getCommentList().size();
 
@@ -71,21 +61,6 @@ public class CommunityResponse {
         this.type=community.getBoardType();
     }
 
-    private CommentResponse mapCommentToResponse(Comment comment) {
-        CommentResponse commentResponse = new CommentResponse(
-                comment.getId(),
-                comment.getWriter(), // 필드에 따라 업데이트
-                comment.getContent()
-        );
-
-        commentResponse.setChildren(comment.getChildren()
-                .stream()
-                .map(this::mapCommentToResponse)
-                .collect(Collectors.toList())
-        );
-
-        return commentResponse;
-    }
 
     @Getter
     public static class PageResponse {
@@ -96,7 +71,7 @@ public class CommunityResponse {
         private int view_cnt; //조회수
         private int comment_cnt; //댓글 수
         private String createdAt; // 등록
-        private String modifiedAt; // 수정
+        private String modifiedAt; // 등록
 
         public PageResponse(Community community) {
             this.id=community.getId();
@@ -105,6 +80,7 @@ public class CommunityResponse {
             this.view_cnt = community.getView_cnt();
             this.comment_cnt = community.getCommentList().size();
             this.createdAt = DatetimeUtil.timesAgo(community.getCreatedDate());
+            this.modifiedAt = DatetimeUtil.timesAgo(community.getUpdatedDate() != null ? community.getUpdatedDate() : community.getCreatedDate());
 
         }
     }
