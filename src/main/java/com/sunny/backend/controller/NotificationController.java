@@ -22,13 +22,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/alarm")
 public class NotificationController {
-	private final NotificationService notificationService;
+    private final NotificationService notificationService;
+    @ApiOperation(tags = "9. Alarm", value = "알림 설정")
+    @PostMapping("")
+    public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> pushNotification(@RequestBody FcmRequestDto fcmRequestDto) throws IOException {
+        return notificationService.sendPushNotification(fcmRequestDto);
+    }
 
-	@ApiOperation(tags = "9. Alarm", value = "알림 설정")
-	@GetMapping("")
-	public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> pushNotification(
-		@RequestBody FcmRequestDto fcmRequestDto) throws IOException {
-		return notificationService.sendPushNotification(fcmRequestDto);
-	}
 
 }

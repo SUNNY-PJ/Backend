@@ -20,6 +20,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
+
 @RestController
 @Tag(name = "8. MyPage", description = "My Page API")
 @RequestMapping(value = "/mypage")
@@ -54,4 +61,12 @@ public class MyPageController {
         return myPageService.updateProfile(customUserPrincipal,nickname,profile);
     }
 
+
+    //이거 일단 임시 테스트임
+    @GetMapping("/auth/kakao/logout")
+    public ResponseEntity<CommonResponse.GeneralResponse> handleKakaoLogout(@RequestParam(name = "client_id") String clientId,
+                                    @RequestParam(name = "logout_redirect_uri") String logoutRedirectUri) {
+        CommonResponse.GeneralResponse response = new CommonResponse.GeneralResponse(HttpStatus.OK.value(), "Logout 성공");
+        return ResponseEntity.ok().body(response);
+    }
 }
