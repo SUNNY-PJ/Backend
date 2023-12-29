@@ -110,12 +110,11 @@ public class KaKaoService {
             JSONObject obj = (JSONObject) parser.parse(res);
             JSONObject kakao_account = (JSONObject) obj.get("kakao_account");
             JSONObject properties = (JSONObject) obj.get("properties");
-            String imageObject = (String) properties.get("profile_image");
-            System.out.println("imageObject:+"+imageObject);
+
 
             String email = kakao_account.get("email").toString();
             String nickname = properties.get("nickname").toString();
-            String profileImg = (imageObject != null) ? properties.get("profile_image").toString() : null;
+            String profileImg = properties.get("profile_image").toString();
             if (profileImg == null) {
                  profileImg="https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png";
             }
