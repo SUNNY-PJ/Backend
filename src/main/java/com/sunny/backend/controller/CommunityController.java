@@ -42,10 +42,10 @@ public class CommunityController {
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시판 목록 조회")
 	@GetMapping("")
 	public ResponseEntity<Slice<CommunityResponse.PageResponse>> getCommunityList(
-		@RequestParam(required = false) SortType sort,
-		@RequestParam(required = false) BoardType boardType,
-		@RequestParam(required = false) String search,
-		Pageable pageable) {
+			@RequestParam(required = false) SortType sort,
+			@RequestParam(required = false) BoardType boardType,
+			@RequestParam(required = false) String search,
+			Pageable pageable) {
 		Slice<CommunityResponse.PageResponse> responseDTO;
 		//검색조건 중 모든 내용을 입력하지 않고 요청을 보냈을 때 일반 목록 페이지 출력
 		if (search == null && boardType == null && sort == null) {
@@ -60,26 +60,26 @@ public class CommunityController {
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 상세 조회")
 	@GetMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> getCommunity(
-		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@PathVariable Long communityId) {
+			@AuthUser CustomUserPrincipal customUserPrincipal,
+			@PathVariable Long communityId) {
 		return communityService.findCommunity(customUserPrincipal, communityId);
 	}
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 등록")
 	@PostMapping("")
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> createCommunity(
-		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
-		@RequestPart(value = "files",required = false) List<MultipartFile> files) {
+			@AuthUser CustomUserPrincipal customUserPrincipal,
+			@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
+			@RequestPart(value = "files", required = false) List<MultipartFile> files) {
 		return communityService.createCommunity(customUserPrincipal, communityRequest, files);
 	}
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 수정")
 	@PutMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> updateCommunity(
-		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId,
-		@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
-		@RequestPart(required = false) List<MultipartFile> files) {
+			@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId,
+			@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
+			@RequestPart(required = false) List<MultipartFile> files) {
 
 		return communityService.updateCommunity(customUserPrincipal, communityId, communityRequest, files);
 	}
@@ -88,34 +88,8 @@ public class CommunityController {
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 삭제")
 	@DeleteMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> deleteCommunity(
-		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId) {
+			@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId) {
 		return communityService.deleteCommunity(customUserPrincipal, communityId);
 	}
 
-
-	@ApiOperation(tags = "2. Community", value = "커뮤니티 친구 프로필 조회")
-	@GetMapping("/{communityId}/friends/profile")
-	public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> getUserProfile(
-			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@PathVariable Long communityId) {
-		return communityService.getUserProfile(customUserPrincipal, communityId);
-	}
-
-	@ApiOperation(tags = "2. Community", value = "커뮤니티 친구 작성 글 조회")
-	@GetMapping("/{communityId}/friends/community")
-	public ResponseEntity<CommonResponse.ListResponse<CommunityResponse.PageResponse>> getFriendsCommunity(
-			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@PathVariable Long communityId) {
-		return communityService.getFriendsCommunity(customUserPrincipal, communityId);
-	}
-
-
-	@ApiOperation(tags = "2. Community", value = "커뮤니티 친구가 쓴 댓글 조회")
-	@GetMapping("/{communityId}/friends/comment")
-	public ResponseEntity<CommonResponse.ListResponse<CommentResponse.Mycomment>> getCommentByFriendsId(
-			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@PathVariable Long communityId) {
-		return communityService.getCommentByFriendsId(customUserPrincipal, communityId);
-	}
 }
-
