@@ -17,9 +17,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class ChatUser extends BaseTime {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
