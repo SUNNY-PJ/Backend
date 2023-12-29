@@ -62,8 +62,6 @@ public class MyPageService {
         for (Community community : communityList) {
             communityRes.add(new CommunityResponse.PageResponse(community));
         }
-
-
         return responseService.getListResponse(HttpStatus.OK.value(), communityRes, "내가 쓴 작성글 조회");
     }
     // 내가 쓴 댓글
@@ -100,13 +98,11 @@ public class MyPageService {
         if (nickname != null) {
             user.setName(nickname);
         }
-
         if (!profile.isEmpty()) {
             System.out.println("success");
             user.setProfile(s3Service.upload(profile));
             System.out.println("User Profile: " + user.getProfile());
         }
-
         userRepository.save(user);
 
         return responseService.getSingleResponse(HttpStatus.OK.value(), new ProfileResponse(user.getId(),user.getName(), user.getProfile()), "프로필 변경 성공");
@@ -114,6 +110,4 @@ public class MyPageService {
     //알림 설정?
 
     //로그아웃, 회원 탈퇴 (로그아웃은 카톡에서 해야되는 걸로 해야 하나?)
-
-
 }

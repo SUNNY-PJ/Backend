@@ -33,7 +33,6 @@ public class UserProfileService {
     @Transactional
     public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> getUserProfile(
             CustomUserPrincipal customUserPrincipal, Long communityId) {
-
         Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
 
@@ -44,7 +43,6 @@ public class UserProfileService {
 
     @Transactional
     public ResponseEntity<CommonResponse.ListResponse<CommunityResponse.PageResponse>> getFriendsCommunity (CustomUserPrincipal customUserPrincipal, Long communityId) {
-
         Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
 
@@ -54,8 +52,6 @@ public class UserProfileService {
         for (Community communities : communityList) {
             communityRes.add(new CommunityResponse.PageResponse(communities));
         }
-
-
         return responseService.getListResponse(HttpStatus.OK.value(), communityRes, "친구가 쓴 작성글 조회");
     }
 
@@ -70,5 +66,4 @@ public class UserProfileService {
 
         return responseService.getListResponse(HttpStatus.OK.value(), commentDTOList, "친구가 쓴 댓글 조회");
     }
-
 }

@@ -49,7 +49,6 @@ public class CommunityService {
 
 	private final CommunityRepository communityRepository;
 	private final PhotoRepository photoRepository;
-	private final CommentRepository commentRepository;
 	private final ResponseService responseService;
 	private final S3Service s3Service;
 	private final RedisUtil redisUtil;
@@ -82,8 +81,6 @@ public class CommunityService {
 				HttpStatus.OK.value(), new CommunityResponse(community,false),
 				"게시글을 성공적으로 불러왔습니다.");
 	}
-
-
 
 	public static long calculateTimeUntilMidnight() {
 		LocalDateTime now = LocalDateTime.now();
@@ -140,7 +137,6 @@ public class CommunityService {
 		return result;
 	}
 
-
 	//게시글 수정
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> updateCommunity(
@@ -183,7 +179,6 @@ public class CommunityService {
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community,ismodifieed),
 				"게시글 수정을 완료했습니다.");
-
 	}
 
 	//게시글 삭제
@@ -199,7 +194,6 @@ public class CommunityService {
 		if (!checkCommunityLoginUser(user, community)) {
 			throw new CustomException(NO_USER_PERMISSION);
 		}
-
 		for (Photo existingFile : photoList) {
 			s3Service.deleteFile(existingFile.getFileUrl());
 		}
@@ -210,7 +204,6 @@ public class CommunityService {
 				"게시글을 삭제했습니다.");
 	}
 
-
 	//수정 및 삭제 권한 체크 (도메인에서 처리)
 	private boolean checkCommunityLoginUser(Users users, Community community) {
 		if (!Objects.equals(users.getId(), community.getUsers().getId())){
@@ -220,6 +213,4 @@ public class CommunityService {
 		}
 		return true;
 	}
-
-
 }

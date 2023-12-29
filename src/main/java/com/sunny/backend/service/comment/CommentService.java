@@ -43,12 +43,10 @@ public class CommentService {
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
 		List<Comment> comments = commentRepository.findAllByCommunity_Id(communityId);
-
 		List<CommentResponse> commentResponses = comments.stream()
 				.filter(comment -> comment.getParent() == null)
 				.map(this::mapCommentToResponse)
 				.collect(Collectors.toList());
-
 		return responseService.getListResponse(HttpStatus.OK.value(), commentResponses, "댓글을 조회했습니다.");
 	}
 
@@ -73,17 +71,21 @@ public class CommentService {
 	//댓글 등록
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> createComment(
-		CustomUserPrincipal customUserPrincipal, Long communityId, CommentRequest commentRequestDTO) {
+			CustomUserPrincipal customUserPrincipal, Long communityId, CommentRequest commentRequestDTO) {
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
-			.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
+				.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
 
 		Comment comment = commentRequestMapper.toEntity(commentRequestDTO);
 
-		Comment parentComment;
+		Comment parentComment = null;
 		if (commentRequestDTO.getParentId() != null) {
 			parentComment = commentRepository.findById(commentRequestDTO.getParentId())
-				.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
+					.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
+
+			if (parentComment.getParent() != null) {
+				throw new CustomException(REPLYING_NOT_ALLOWED);
+			}
 			comment.setParent(parentComment);
 		}
 
@@ -96,10 +98,8 @@ public class CommentService {
 		if (user.getCommentList() == null) {
 			user.addComment(comment);
 		}
-
-
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-			new CommentResponse(comment.getId(), comment.getContent(), comment.getWriter(),comment.getCreatedDate(),comment.getUpdatedDate()), "댓글을 등록했습니다.");
+				new CommentResponse(comment.getId(), comment.getContent(), comment.getWriter(), comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 등록했습니다.");
 	}
 
 	//댓글 삭제
@@ -115,7 +115,6 @@ public class CommentService {
 				commentRepository.delete(getDeletableAncestorComment(comment));
 			}
 		}
-
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "댓글을 삭제 하였습니다..");
 	}
 
@@ -148,6 +147,5 @@ public class CommentService {
 			return false;
 		}
 		return true;
-
 	}
 }
