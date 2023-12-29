@@ -8,12 +8,14 @@ import com.sunny.backend.dto.response.NotificationResponse;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.service.NotificationService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
+@Tag(name = "9. Alarm", description = "Alarm API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/alarm")
