@@ -78,17 +78,14 @@ public class CommentService {
 
 		Comment comment = commentRequestMapper.toEntity(commentRequestDTO);
 
-		// Check if the parent comment exists
 		Comment parentComment = null;
 		if (commentRequestDTO.getParentId() != null) {
 			parentComment = commentRepository.findById(commentRequestDTO.getParentId())
 					.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
 
-			// Check the depth of the parent comment
 			if (parentComment.getParent() != null) {
 				throw new CustomException(REPLYING_NOT_ALLOWED);
 			}
-
 			comment.setParent(parentComment);
 		}
 
