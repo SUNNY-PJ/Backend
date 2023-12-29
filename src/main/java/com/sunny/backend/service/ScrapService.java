@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ScrapService {
-	private final UserRepository userRepository;
 	private final ScrapRepository scrapRepository;
 	private final CommunityRepository communityRepository;
 	private final ResponseService responseService;
@@ -56,7 +55,6 @@ public class ScrapService {
 		scrapRepository.save(scrap);
 
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "스크랩하였습니다.");
-
 	}
 
 	//스크랩 취소
