@@ -67,7 +67,7 @@ public class KaKaoService {
 
         // POST 방식으로 Http 요청한다. 그리고 response 변수의 응답 받는다.
         ResponseEntity<String> response = rt.exchange(
-                "https://kauth.kakao.com/oauth/token", // https://{요청할 서버 주소}
+                "https://kauth.kakao.com/oauth/token",
                 HttpMethod.POST, // 요청할 방식
                 kakaoTokenRequest, // 요청할 때 보낼 데이터
                 String.class // 요청 시 반환되는 데이터 타입
@@ -80,8 +80,6 @@ public class KaKaoService {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-
-
         AuthDto.TokenDto tokenDto = tokenProvider.createToken(getEmailForUserInfo(oAuthToken.getAccess_token()), "ROLE_USER");
         if(tokenDto==null) {
             throw new Exception("로그인 실패");
@@ -94,7 +92,6 @@ public class KaKaoService {
         String host = "https://kapi.kakao.com/v2/user/me";
         try {
             URL url = new URL(host);
-
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestProperty("Authorization", "Bearer " + accessToken);
             urlConnection.setRequestMethod("GET");
@@ -113,15 +110,22 @@ public class KaKaoService {
             JSONObject obj = (JSONObject) parser.parse(res);
             JSONObject kakao_account = (JSONObject) obj.get("kakao_account");
             JSONObject properties = (JSONObject) obj.get("properties");
+            JSONObject imageObject = (JSONObject) properties.get("profile_image");
+
+
 
             String email = kakao_account.get("email").toString();
             String nickname = properties.get("nickname").toString();
-
+            String profileImg = (imageObject != null) ? properties.get("profile_image").toString() : null;
+            if (profileImg == null) {
+                 profileImg="https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png";
+            }
             Optional<Users> usersOptional = userRepository.findByEmail(email);
             if(usersOptional.isEmpty()) {
                 Users users = Users.builder()
                         .email(email)
                         .name(nickname)
+                        .profile(profileImg)
                         .role(Role.USER)
                         .build();
                 userRepository.save(users);
