@@ -19,7 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "9. Chat", description = "Chat API")
+@Tag(name = "10. Chat", description = "Chat API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/chat")
@@ -27,14 +27,14 @@ public class ChatRestController {
 
 	private final ChatService chatService;
 
-	@ApiOperation(tags = "9. Chat", value = "채팅 대화 조회")
+	@ApiOperation(tags = "10. Chat", value = "채팅 대화 조회")
 	@GetMapping("/{chat_room_id}")
 	public ResponseEntity<CommonResponse.ListResponse<ChatMessageResponse>> getChatMessageList(
 		@PathVariable(name = "chat_room_id") Long chatRoomId) {
 		return chatService.getChatMessageList(chatRoomId);
 	}
 
-	@ApiOperation(tags = "9. Chat", value = "채팅방 조회 조회")
+	@ApiOperation(tags = "10. Chat", value = "채팅방 조회 조회")
 	@GetMapping("/room")
 	public ResponseEntity<CommonResponse.ListResponse<ChatRoomResponse>> getChatRoomList(
 		@AuthUser CustomUserPrincipal customUserPrincipal) {
@@ -48,7 +48,7 @@ public class ChatRestController {
 	// 	return chatService.createChatRoom(customUserPrincipal, friendId);
 	// }
 
-	@ApiOperation(tags = "9. Chat", value = "채팅방 삭제")
+	@ApiOperation(tags = "10. Chat", value = "채팅방 삭제")
 	@DeleteMapping("/{chat_user_id}")
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteChatRoom(@PathVariable(name = "chat_user_id") Long chatUserId) {
 		return chatService.deleteChatRoom(chatUserId);
