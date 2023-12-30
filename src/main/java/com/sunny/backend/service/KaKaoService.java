@@ -115,7 +115,9 @@ public class KaKaoService {
             String email = kakao_account.get("email").toString();
             String nickname = properties.get("nickname").toString();
             String profileImg = properties.get("profile_image").toString();
-            if (profileImg == null) {
+            System.out.println(profileImg);
+            String defaultImageUrl = "http://k.kakaocdn.net/dn/1G9kp/btsAot8liOn/8CWudi3uy07rvFNUkk3ER0/img_640x640.jpg";
+            if (profileImg.equals(defaultImageUrl)) {
                  profileImg="https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png";
             }
             Optional<Users> usersOptional = userRepository.findByEmail(email);

@@ -26,7 +26,6 @@ public class CommunityResponse {
     private BoardType type;
 
     private String createdAt; // 등록
-    private String modifiedAt; // 수정
     private boolean isModified; //수정 여부
 
     public CommunityResponse(Community community,boolean isModified) {
@@ -44,19 +43,9 @@ public class CommunityResponse {
 
         this.comment_cnt = community.getCommentList().size();
 
-        this.createdAt =  DatetimeUtil.timesAgo(community.getCreatedDate());
+        this.createdAt = community.getCreatedAt();
         this.isModified=isModified;
-
-        //수정된 값이 null x : 수정 함 ->  수정된 값으로 업데이트
-        if(isModified){
-            this.modifiedAt = DatetimeUtil.timesAgo(community.getUpdatedDate());
-            System.out.println(modifiedAt);
-            System.out.println(modifiedAt);
-        }
         //수정된 값이 null : 수정을 아직 안함 ->  수정된 값은 createdAt 업데이트
-        else {
-            this.modifiedAt = DatetimeUtil.timesAgo(community.getUpdatedDate() != null ? community.getUpdatedDate() : community.getCreatedDate());
-        }
 
         this.type=community.getBoardType();
     }
