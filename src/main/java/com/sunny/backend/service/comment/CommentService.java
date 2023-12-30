@@ -89,6 +89,7 @@ public class CommentService {
 			comment.setParent(parentComment);
 		}
 
+		//To do : setter 제외하고 도메인에서 함수로 처리
 		comment.setWriter(user.getName());
 		comment.setCommunity(community);
 		comment.setContent(commentRequestDTO.getContent());

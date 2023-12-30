@@ -68,8 +68,7 @@ public class Users extends BaseTime {
 	@OneToMany(mappedBy = "friend")
 	private List<Friends> friendsList = new ArrayList<>();
 
-	@OneToOne
-	@JoinColumn(name = "notification_id")
+	@OneToMany(mappedBy = "users")
 	private Notification notification;
 
 	public void addComment(Comment comment) {

@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.nimbusds.oauth2.sdk.util.StringUtils;
+import com.sunny.backend.common.DatetimeUtil;
 import com.sunny.backend.dto.response.ProfileResponse;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.entity.*;
@@ -116,6 +117,7 @@ public class CommunityService {
 			community.addPhoto(photoList);
 		}
 		communityRepository.save(community);
+		community.updateCreatedAt(DatetimeUtil.timesAgo(community.getCreatedDate()));
 		if (user.getCommunityList() == null) {
 			user.addCommunity(community);
 		}
@@ -154,6 +156,7 @@ public class CommunityService {
 		// To do 기존 photolist 값 null로 초기화 ??
 		community.getPhotoList().clear();
 		community.updateCommunity(communityRequest);
+		community.updateCreatedAt(DatetimeUtil.timesAgo(community.getUpdatedDate()));
 
 		if (files != null && !files.isEmpty()) {
 			List<Photo> existingPhotos = photoRepository.findByCommunityId(communityId);
