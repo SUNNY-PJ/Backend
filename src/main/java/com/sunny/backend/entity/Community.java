@@ -76,7 +76,12 @@ public class Community extends BaseTime {
         this.view_cnt++;
     }
 
+
+    public void updateCreatedAt(String createdAt) {
+        this.createdAt=createdAt;
+    }
     public void addPhoto(List<Photo> photoList) {
         this.photoList=photoList;
     }
+
 }
