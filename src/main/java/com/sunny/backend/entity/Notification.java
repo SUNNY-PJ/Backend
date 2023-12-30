@@ -20,7 +20,7 @@ public class Notification {
     @Column
     private String DeviceToken; //사용자 디바이스 토큰
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "users_id")
     private Users users;
 
