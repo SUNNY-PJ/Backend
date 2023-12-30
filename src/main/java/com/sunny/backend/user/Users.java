@@ -69,7 +69,7 @@ public class Users extends BaseTime {
 	private List<Friends> friendsList = new ArrayList<>();
 
 	@OneToMany(mappedBy = "users")
-	private Notification notification;
+	private List<Notification> notification;
 
 	public void addComment(Comment comment) {
 		this.commentList = new ArrayList<>();
