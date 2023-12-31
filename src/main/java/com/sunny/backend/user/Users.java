@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sunny.backend.entity.*;
@@ -31,7 +32,9 @@ public class Users extends BaseTime {
 	@Column
 	private String email;
 
-	@Column
+	@Size(min=2,max=10)
+
+	@Column(unique = true,nullable = false)
 	private String name;
 
 	@Column(nullable = false)
