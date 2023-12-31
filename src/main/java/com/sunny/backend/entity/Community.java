@@ -9,6 +9,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +42,6 @@ public class Community extends BaseTime {
     private String createdAt;
     @Column
     private String modifiedAt;
-
 
     //users 다대일 관계 매핑
     @ManyToOne(fetch = FetchType.LAZY)
@@ -77,8 +77,8 @@ public class Community extends BaseTime {
     }
 
 
-    public void updateCreatedAt(String createdAt) {
-        this.createdAt=createdAt;
+    public void updateModifiedAt(LocalDateTime updatedAt) {
+        this.setUpdatedDate(updatedAt);
     }
     public void addPhoto(List<Photo> photoList) {
         this.photoList=photoList;

@@ -117,7 +117,7 @@ public class CommunityService {
 			community.addPhoto(photoList);
 		}
 		communityRepository.save(community);
-		community.updateCreatedAt(DatetimeUtil.timesAgo(community.getCreatedDate()));
+
 		if (user.getCommunityList() == null) {
 			user.addCommunity(community);
 		}
@@ -127,7 +127,7 @@ public class CommunityService {
 
 
 	//게시판 조회
-	@Transactional
+	@Transactional(readOnly = true)
 	public Slice<CommunityResponse.PageResponse> getCommunityList(Pageable pageable) {
 		Slice<CommunityResponse.PageResponse> result = communityRepository.getCommunityList(pageable);
 		return result;
@@ -149,14 +149,14 @@ public class CommunityService {
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new NotFoundException("Community Post not found!"));
 		boolean ismodifieed=true;
-		System.out.println(community);
 		if (!checkCommunityLoginUser(user, community)) {
 			throw new CustomException(NO_USER_PERMISSION);
 		}
 		// To do 기존 photolist 값 null로 초기화 ??
 		community.getPhotoList().clear();
 		community.updateCommunity(communityRequest);
-		community.updateCreatedAt(DatetimeUtil.timesAgo(community.getUpdatedDate()));
+		community.updateModifiedAt(LocalDateTime.now());
+
 
 		if (files != null && !files.isEmpty()) {
 			List<Photo> existingPhotos = photoRepository.findByCommunityId(communityId);

@@ -8,6 +8,7 @@ import com.sunny.backend.entity.Community;
 import com.sunny.backend.entity.Photo;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -27,6 +28,7 @@ public class CommunityResponse {
 
     private String profileImg;
     private String createdAt; // 등록
+    private String modifiedAt; // 등록
     private boolean isModified; //수정 여부
 
     public CommunityResponse(Community community,boolean isModified) {
@@ -40,14 +42,17 @@ public class CommunityResponse {
                 .map(Photo::getFileUrl)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-
-
         this.comment_cnt = community.getCommentList().size();
         this.profileImg=community.getUsers().getProfile();
-        this.createdAt = community.getCreatedAt();
+        this.createdAt =DatetimeUtil.timesAgo(community.getCreatedDate());
         this.isModified=isModified;
         //수정된 값이 null : 수정을 아직 안함 ->  수정된 값은 createdAt 업데이트
-
+        if(isModified){
+            this.modifiedAt =DatetimeUtil.timesAgo(LocalDateTime.now());
+        }
+        else{
+            this.modifiedAt=DatetimeUtil.timesAgo(community.getUpdatedDate());
+        }
         this.type=community.getBoardType();
     }
 
