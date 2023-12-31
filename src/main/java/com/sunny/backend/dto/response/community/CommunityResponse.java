@@ -25,12 +25,13 @@ public class CommunityResponse {
     private int comment_cnt; //댓글 수
     private BoardType type;
 
+    private String profileImg;
     private String createdAt; // 등록
     private boolean isModified; //수정 여부
 
     public CommunityResponse(Community community,boolean isModified) {
         this.id=community.getId();
-        this.writer = community.getWriter();
+        this.writer = community.getUsers().getName();
         this.title = community.getTitle();
         this.contents = community.getContents();
         this.viewCount = community.getView_cnt();
@@ -42,7 +43,7 @@ public class CommunityResponse {
 
 
         this.comment_cnt = community.getCommentList().size();
-
+        this.profileImg=community.getUsers().getProfile();
         this.createdAt = community.getCreatedAt();
         this.isModified=isModified;
         //수정된 값이 null : 수정을 아직 안함 ->  수정된 값은 createdAt 업데이트
@@ -65,7 +66,7 @@ public class CommunityResponse {
         public PageResponse(Community community) {
             this.id=community.getId();
             this.title = community.getTitle();
-            this.writer = community.getWriter();
+            this.writer = community.getUsers().getName();
             this.view_cnt = community.getView_cnt();
             this.comment_cnt = community.getCommentList().size();
             this.createdAt = DatetimeUtil.timesAgo(community.getCreatedDate());
