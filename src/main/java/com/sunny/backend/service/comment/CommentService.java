@@ -100,7 +100,7 @@ public class CommentService {
 			user.addComment(comment);
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-				new CommentResponse(comment.getId(), comment.getContent(), comment.getWriter(), comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 등록했습니다.");
+				new CommentResponse(comment.getId(), comment.getWriter(), comment.getContent(), comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 등록했습니다.");
 	}
 
 	//댓글 삭제
