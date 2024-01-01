@@ -16,5 +16,5 @@ import lombok.Setter;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class FriendsApproveRequest {
 	private Long friendsSn;
-	private ApproveType approve;
+	private boolean approve;
 }

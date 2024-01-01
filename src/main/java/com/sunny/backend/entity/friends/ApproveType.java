@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ApproveType {
-	APPROVE("승인"), REFUSE("거절"), WAIT("대기");
+	APPROVE("승인"), WAIT("대기");
 
 	private final String status;
 }
