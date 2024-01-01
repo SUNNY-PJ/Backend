@@ -27,10 +27,19 @@ public class FriendsController {
         return friendsService.getFriendsList(customUserPrincipal, approveType);
     }
 
+    @ApiOperation(tags = "5. Friends", value = "친구인지 확인하기")
+    @GetMapping("/{friend_id}")
+    public ResponseEntity<CommonResponse.GeneralResponse> checkFriends(
+        @AuthUser CustomUserPrincipal customUserPrincipal,
+        @PathVariable(name = "friend_id") Long friendsId) {
+        return friendsService.checkFriends(customUserPrincipal, friendsId);
+    }
+
     @ApiOperation(tags = "5. Friends", value = "친구 추가하기")
     @PostMapping("/{user_id}")
-    public ResponseEntity<CommonResponse.GeneralResponse> addFriends(@AuthUser CustomUserPrincipal customUserPrincipal,
-                                                                     @PathVariable(name = "user_id") Long friendsId) {
+    public ResponseEntity<CommonResponse.GeneralResponse> addFriends(
+        @AuthUser CustomUserPrincipal customUserPrincipal,
+        @PathVariable(name = "user_id") Long friendsId) {
         return friendsService.addFriends(customUserPrincipal, friendsId);
     }
 

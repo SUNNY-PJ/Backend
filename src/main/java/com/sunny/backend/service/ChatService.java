@@ -50,6 +50,7 @@ public class ChatService {
 			list.add(ChatRoomResponse.builder()
 					.chatUserId(chatUser.getId())
 					.chatRoomId(chatUser.getChatRoom().getId())
+					.friendId(chatUser.getFriend().getId())
 					.friendName(chatUser.getFriend().getName())
 				.build());
 		}

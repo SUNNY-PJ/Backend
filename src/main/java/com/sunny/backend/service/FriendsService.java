@@ -2,6 +2,7 @@ package com.sunny.backend.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -81,5 +82,29 @@ public class FriendsService {
 		}
 		friendsRepository.deleteById(friendsId);
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "삭제 완료");
+	}
+
+	public ResponseEntity<CommonResponse.GeneralResponse> checkFriends(
+		CustomUserPrincipal customUserPrincipal, Long friendsId) {
+		Optional<Friends> friendsOptional = friendsRepository.findByUsers_IdAndFriendsSn(
+			customUserPrincipal.getUsers().getId(), friendsId);
+
+		if(friendsOptional.isPresent()) {
+			Friends friends = friendsOptional.get();
+			switch (friends.getApprove()) {
+				case WAIT -> {
+					return responseService.getGeneralResponse(HttpStatus.OK.value(), "대기중");
+				}
+				case APPROVE -> {
+					return responseService.getGeneralResponse(HttpStatus.OK.value(), "친구");
+				}
+				case REFUSE -> {
+					return responseService.getGeneralResponse(HttpStatus.OK.value(), "친구 아님");
+				}
+			}
+			return null;
+		} else {
+			return responseService.getGeneralResponse(HttpStatus.OK.value(), "친구 아님");
+		}
 	}
 }

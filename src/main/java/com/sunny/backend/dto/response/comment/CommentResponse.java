@@ -32,8 +32,8 @@ public class CommentResponse {
         this.content = content;
         this.createdDate=createdDate;
         this.updateDate=updateDate;
-
     }
+
     //삭제된 댓글로 댓글 내용 수정하기 위한 객체 생성
     public static CommentResponse convertCommentToDto(Comment comment) {
         return comment.getIsDeleted() ?

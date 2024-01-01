@@ -18,5 +18,6 @@ import lombok.Setter;
 public class ChatRoomResponse {
 	private Long chatUserId;
 	private Long chatRoomId;
+	private Long friendId;
 	private String friendName;
 }
