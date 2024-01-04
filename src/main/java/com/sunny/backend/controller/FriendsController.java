@@ -3,6 +3,7 @@ package com.sunny.backend.controller;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.config.AuthUser;
 import com.sunny.backend.dto.request.FriendsApproveRequest;
+import com.sunny.backend.dto.response.FriendsCheckResponse;
 import com.sunny.backend.dto.response.FriendsResponse;
 import com.sunny.backend.entity.friends.ApproveType;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
@@ -27,10 +28,19 @@ public class FriendsController {
         return friendsService.getFriendsList(customUserPrincipal, approveType);
     }
 
+    @ApiOperation(tags = "5. Friends", value = "친구인지 확인하기")
+    @GetMapping("/{friend_id}")
+    public ResponseEntity<FriendsCheckResponse> checkFriends(
+        @AuthUser CustomUserPrincipal customUserPrincipal,
+        @PathVariable(name = "friend_id") Long friendsId) {
+        return ResponseEntity.ok(friendsService.checkFriends(customUserPrincipal, friendsId));
+    }
+
     @ApiOperation(tags = "5. Friends", value = "친구 추가하기")
     @PostMapping("/{user_id}")
-    public ResponseEntity<CommonResponse.GeneralResponse> addFriends(@AuthUser CustomUserPrincipal customUserPrincipal,
-                                                                     @PathVariable(name = "user_id") Long friendsId) {
+    public ResponseEntity<CommonResponse.GeneralResponse> addFriends(
+        @AuthUser CustomUserPrincipal customUserPrincipal,
+        @PathVariable(name = "user_id") Long friendsId) {
         return friendsService.addFriends(customUserPrincipal, friendsId);
     }
 
