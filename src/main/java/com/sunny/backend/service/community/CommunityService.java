@@ -147,7 +147,7 @@ public class CommunityService {
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new NotFoundException("Community Post not found!"));
 		boolean isModified=true;
-		Community.validateCommunityByUser(user.getId(), community.getId());
+		community.validateCommunityByUser(user.getId(), community.getId());
 		community.getPhotoList().clear();
 		community.updateCommunity(communityRequest);
 		community.updateModifiedAt(LocalDateTime.now());
@@ -189,7 +189,7 @@ public class CommunityService {
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new NotFoundException("Community post  not found!"));
 		List<Photo> photoList = photoRepository.findByCommunityId(communityId);
-		Community.validateCommunityByUser(user.getId(), community.getId());
+		community.validateCommunityByUser(user.getId(), community.getId());
 		for (Photo existingFile : photoList) {
 			s3Service.deleteFile(existingFile.getFileUrl());
 		}
