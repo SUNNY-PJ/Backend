@@ -35,28 +35,31 @@ public class CommentService {
 	private final CommentRequestMapper commentRequestMapper;
 	private final ResponseService responseService;
 
-	//댓글 조회
+
 	private CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
 		boolean isPrivate = comment.getIsPrivated();
+		CommentResponse commentResponse;
 
 		// 비밀 댓글 체크 -> isPrivate 가 true라면 & 댓글 작성자 & 게시글 작성자만 보이도록
 		if (isPrivate && !(currentUser.getId() == comment.getUsers().getId() || currentUser.getId() == comment.getCommunity().getUsers().getId())) {
-			System.out.println(currentUser);
-			System.out.println(comment.getUsers());
-			System.out.println(comment.getCommunity().getUsers());
-			return new CommentResponse(comment.getId(),comment.getWriter(), "비밀 댓글입니다.",comment.getCreatedDate(),
-					comment.getUpdatedDate());
+			commentResponse = new CommentResponse(comment.getId(), comment.getWriter(), "비밀 댓글입니다.", comment.getCreatedDate(), comment.getUpdatedDate());
 		} else {
-			return new CommentResponse(
+			commentResponse = new CommentResponse(
 					comment.getId(),
 					comment.getWriter(),
 					comment.getContent(),
 					comment.getCreatedDate(),
 					comment.getUpdatedDate()
 			);
-		}
-	}
 
+		}
+		commentResponse.setChildren(comment.getChildren()
+				.stream()
+				.map(childComment -> mapCommentToResponse(childComment, currentUser))
+				.collect(Collectors.toList())
+		);
+		return commentResponse;
+	}
 	@Transactional
 	public ResponseEntity<CommonResponse.ListResponse<CommentResponse>> getCommentList(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
