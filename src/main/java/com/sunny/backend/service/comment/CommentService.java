@@ -39,8 +39,11 @@ public class CommentService {
 	private CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
 		boolean isPrivate = comment.getIsPrivated();
 
-		// 비밀 댓글 체크 -> isPrivate 여부 & 댓글 작성자 & 게시글 작성자만 보이도록
-		if (isPrivate && !(currentUser.equals(comment.getUsers()) || currentUser.equals(comment.getCommunity().getUsers()))) {
+		// 비밀 댓글 체크 -> isPrivate 가 true라면 & 댓글 작성자 & 게시글 작성자만 보이도록
+		if (isPrivate && !(currentUser.getId() == comment.getUsers().getId() || currentUser.getId() == comment.getCommunity().getUsers().getId())) {
+			System.out.println(currentUser);
+			System.out.println(comment.getUsers());
+			System.out.println(comment.getCommunity().getUsers());
 			return new CommentResponse(comment.getId(),comment.getWriter(), "비밀 댓글입니다.",comment.getCreatedDate(),
 					comment.getUpdatedDate());
 		} else {
@@ -95,7 +98,6 @@ public class CommentService {
 		comment.setUsers(user);
 
 		boolean isPrivate = commentRequestDTO.getIsPrivated();
-		System.out.println(isPrivate);
 		comment.setIsPrivated(isPrivate);
 
 		Comment saveComment = commentRepository.save(comment);
@@ -142,6 +144,9 @@ public class CommentService {
 			.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
 		if (checkCommentLoginUser(customUserPrincipal, comment)) {
 			comment.setContent(commentRequestDTO.getContent());
+
+			boolean isPrivate = commentRequestDTO.getIsPrivated();
+			comment.setIsPrivated(isPrivate);
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 			new CommentResponse(comment.getId(), comment.getWriter(), comment.getContent(),comment.getCreatedDate(),comment.getUpdatedDate()), "댓글을 수정했습니다.");
