@@ -15,8 +15,10 @@ public class CommentRequest {
     private Long parentId;
     private String content;
 
+    private Boolean isPrivated;
     public CommentRequest(String content) {
         this.content = content;
+
     }
 
 }
