@@ -39,13 +39,11 @@ public class CommentService {
 	private CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
 		boolean isPrivate = comment.getIsPrivated();
 
-		// Check if the comment is private and the current user is not the author or creator
+		// 비밀 댓글 체크 -> isPrivate 여부 & 댓글 작성자 & 게시글 작성자만 보이도록
 		if (isPrivate && !(currentUser.equals(comment.getUsers()) || currentUser.equals(comment.getCommunity().getUsers()))) {
-			// Return a response indicating that the comment is private
 			return new CommentResponse(comment.getId(),comment.getWriter(), "비밀 댓글입니다.",comment.getCreatedDate(),
 					comment.getUpdatedDate());
 		} else {
-			// Return a response with the comment details
 			return new CommentResponse(
 					comment.getId(),
 					comment.getWriter(),
@@ -106,7 +104,7 @@ public class CommentService {
 		}
 
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-				new CommentResponse(comment.getId(), comment.getContent(), comment.getWriter(), comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 등록했습니다.");
+				new CommentResponse(comment.getId(), comment.getWriter(), comment.getContent(), comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 등록했습니다.");
 
 	}
 

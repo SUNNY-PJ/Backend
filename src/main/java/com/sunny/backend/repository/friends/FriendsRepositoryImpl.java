@@ -39,9 +39,6 @@ public class FriendsRepositoryImpl extends QuerydslRepositorySupport implements 
 			case APPROVE -> {
 				return friends.approve.eq(ApproveType.APPROVE);
 			}
-			case REFUSE -> {
-				return friends.approve.eq(ApproveType.REFUSE);
-			}
 			case WAIT -> {
 				return friends.approve.eq(ApproveType.WAIT);
 			}
