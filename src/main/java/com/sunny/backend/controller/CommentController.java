@@ -24,18 +24,14 @@ public class CommentController {
 
 	private final CommentService commentService;
 
-	//댓글 등록
-
 	@ApiOperation(tags = "1. Comment", value = "댓글 생성")
 	@PostMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> createComment(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId,
 		@RequestBody CommentRequest commentRequestDTO) {
 		return commentService.createComment(customUserPrincipal, communityId, commentRequestDTO);
-
 	}
 
-	//댓글 조회
 	@ApiOperation(tags = "1. Comment", value = "댓글 조회")
 	@GetMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.ListResponse<CommentResponse>> createComment(
@@ -43,7 +39,6 @@ public class CommentController {
 		return commentService.getCommentList(customUserPrincipal, communityId);
 	}
 
-	//댓글 수정
 	@ApiOperation(tags = "1. Comment", value = "댓글 수정")
 	@PutMapping("/{commentId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> updateComment(
@@ -53,7 +48,6 @@ public class CommentController {
 
 	}
 
-	//댓글 삭제
 	@ApiOperation(tags = "1. Comment", value = "댓글 삭제")
 	@DeleteMapping("/{commentId}")
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteComment(

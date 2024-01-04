@@ -41,8 +41,7 @@ public class FriendsService {
 	public ResponseEntity<CommonResponse.GeneralResponse> addFriends(CustomUserPrincipal customUserPrincipal,
 		Long friendsUserId) {
 		Users user = customUserPrincipal.getUsers();
-		Users friend = userRepository.findById(friendsUserId)
-			.orElseThrow(() -> new IllegalArgumentException("친구가 존재하지 않습니다."));
+		Users friend = userRepository.getById(friendsUserId);
 
 		Friends userFriend = Friends.builder()
 			.users(friend)
