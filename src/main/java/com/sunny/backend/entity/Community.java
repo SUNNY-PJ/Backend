@@ -2,6 +2,9 @@ package com.sunny.backend.entity;
 
 
 
+import static com.sunny.backend.common.ErrorCode.*;
+
+import com.sunny.backend.common.CustomException;
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.user.Users;
 import lombok.*;
@@ -84,4 +87,9 @@ public class Community extends BaseTime {
         this.photoList=photoList;
     }
 
+    public static void validateCommunityByUser(Long userId, Long communityId) {
+        if(!userId.equals(communityId)) {
+            throw new CustomException(NO_USER_PERMISSION);
+        }
+    }
 }
