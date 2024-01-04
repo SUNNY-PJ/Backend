@@ -36,6 +36,24 @@ public class CommentService {
 	private final ResponseService responseService;
 
 	//댓글 조회
+	private CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
+		boolean isPrivate = comment.getIsPrivated();
+
+		// 비밀 댓글 체크 -> isPrivate 여부 & 댓글 작성자 & 게시글 작성자만 보이도록
+		if (isPrivate && !(currentUser.equals(comment.getUsers()) || currentUser.equals(comment.getCommunity().getUsers()))) {
+			return new CommentResponse(comment.getId(),comment.getWriter(), "비밀 댓글입니다.",comment.getCreatedDate(),
+					comment.getUpdatedDate());
+		} else {
+			return new CommentResponse(
+					comment.getId(),
+					comment.getWriter(),
+					comment.getContent(),
+					comment.getCreatedDate(),
+					comment.getUpdatedDate()
+			);
+		}
+	}
+
 	@Transactional
 	public ResponseEntity<CommonResponse.ListResponse<CommentResponse>> getCommentList(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
@@ -45,28 +63,9 @@ public class CommentService {
 		List<Comment> comments = commentRepository.findAllByCommunity_Id(communityId);
 		List<CommentResponse> commentResponses = comments.stream()
 				.filter(comment -> comment.getParent() == null)
-				.map(this::mapCommentToResponse)
+				.map(comment -> mapCommentToResponse(comment, user))
 				.collect(Collectors.toList());
 		return responseService.getListResponse(HttpStatus.OK.value(), commentResponses, "댓글을 조회했습니다.");
-	}
-
-	private CommentResponse mapCommentToResponse(Comment comment) {
-		CommentResponse commentResponse = new CommentResponse(
-				comment.getId(),
-				comment.getWriter(),
-				comment.getContent(),
-				comment.getCreatedDate(),
-				comment.getUpdatedDate()
-		);
-
-		commentResponse.setChildren(comment.getChildren()
-				.stream()
-				.map(this::mapCommentToResponse)
-				.collect(Collectors.toList())
-		);
-
-		return commentResponse;
-
 	}
 	//댓글 등록
 	@Transactional
@@ -95,12 +94,18 @@ public class CommentService {
 		comment.setContent(commentRequestDTO.getContent());
 		comment.setUsers(user);
 
+		boolean isPrivate = commentRequestDTO.getIsPrivated();
+		System.out.println(isPrivate);
+		comment.setIsPrivated(isPrivate);
+
 		Comment saveComment = commentRepository.save(comment);
 		if (user.getCommentList() == null) {
 			user.addComment(comment);
 		}
+
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(), comment.getWriter(), comment.getContent(), comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 등록했습니다.");
+
 	}
 
 	//댓글 삭제
@@ -116,7 +121,7 @@ public class CommentService {
 				commentRepository.delete(getDeletableAncestorComment(comment));
 			}
 		}
-		return responseService.getGeneralResponse(HttpStatus.OK.value(), "댓글을 삭제 하였습니다..");
+		return responseService.getGeneralResponse(HttpStatus.OK.value(), "댓글을 삭제 하였습니다.");
 	}
 
 
