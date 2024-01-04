@@ -49,9 +49,16 @@ public class MyPageService {
     private final CommentRepository commentRepository;
     private final ResponseService responseService;
     private final ScrapRepository scrapRepository;
-    private final PhotoRepository photoRepository;
     private final S3Service s3Service;
 
+
+    // 마이페이지 조회
+    @Transactional
+    public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> getMypage (CustomUserPrincipal customUserPrincipal) {
+        Users user = customUserPrincipal.getUsers();
+
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new ProfileResponse(user.getId(),user.getName(), user.getProfile()), "프로필 조회 성공");
+    }
     // 내가 쓴 글
     @Transactional
     public ResponseEntity<CommonResponse.ListResponse<CommunityResponse.PageResponse>> getMyCommunity (CustomUserPrincipal customUserPrincipal) {

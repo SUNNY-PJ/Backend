@@ -19,9 +19,9 @@ public class CommentResponse {
     private Long id;
     private String content;
     private String writer;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime createdDate;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime updateDate;
     private List<CommentResponse> children = new ArrayList<>();
 
@@ -40,6 +40,13 @@ public class CommentResponse {
                 new CommentResponse(comment.getId(), "삭제된 댓글입니다.", null,null,null) :
                 new CommentResponse(comment.getId(), comment.getContent(), comment.getUsers().getName(),comment.getCreatedDate(),comment.getUpdatedDate());
     }
+
+    public static CommentResponse convertPrivateCommentToDto(Comment comment) {
+        return comment.getIsDeleted() ?
+                new CommentResponse(comment.getId(), "비밅 댓글입니다.", null,null,null) :
+                new CommentResponse(comment.getId(), comment.getContent(), comment.getUsers().getName(),comment.getCreatedDate(),comment.getUpdatedDate());
+    }
+
 
     @Getter
     public static class Mycomment {

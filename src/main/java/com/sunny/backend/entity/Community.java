@@ -56,7 +56,7 @@ public class Community extends BaseTime {
     @Enumerated(EnumType.STRING)
     private BoardType boardType;
 
-    @OneToMany(mappedBy = "community")
+    @OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<Comment> commentList=new ArrayList<>();
 
