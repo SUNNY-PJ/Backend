@@ -62,7 +62,6 @@ public class CommunityService {
 				.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
 
 		String viewCount = redisUtil.getData(String.valueOf(users.getId()));
-		System.out.println("View Count: " + viewCount);
 
 		if (StringUtils.isBlank(viewCount)) {
 			redisUtil.setDateExpire(String.valueOf(users.getId()), communityId + "_", calculateTimeUntilMidnight());
@@ -144,15 +143,11 @@ public class CommunityService {
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> updateCommunity(
 			CustomUserPrincipal customUserPrincipal, Long communityId,
 			CommunityRequest communityRequest, List<MultipartFile> files) {
-		//To do : error 처리
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new NotFoundException("Community Post not found!"));
-		boolean ismodifieed=true;
-		if (!checkCommunityLoginUser(user, community)) {
-			throw new CustomException(NO_USER_PERMISSION);
-		}
-		// To do 기존 photolist 값 null로 초기화 ??
+		boolean isModified=true;
+		Community.validateCommunityByUser(user.getId(), community.getId());
 		community.getPhotoList().clear();
 		community.updateCommunity(communityRequest);
 		community.updateModifiedAt(LocalDateTime.now());
@@ -180,7 +175,7 @@ public class CommunityService {
 			photoRepository.saveAll(photoList);
 			community.addPhoto(photoList);
 		}
-		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community,ismodifieed),
+		return responseService.getSingleResponse(HttpStatus.OK.value(), new CommunityResponse(community,isModified),
 				"게시글 수정을 완료했습니다.");
 	}
 
@@ -194,9 +189,7 @@ public class CommunityService {
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new NotFoundException("Community post  not found!"));
 		List<Photo> photoList = photoRepository.findByCommunityId(communityId);
-		if (!checkCommunityLoginUser(user, community)) {
-			throw new CustomException(NO_USER_PERMISSION);
-		}
+		Community.validateCommunityByUser(user.getId(), community.getId());
 		for (Photo existingFile : photoList) {
 			s3Service.deleteFile(existingFile.getFileUrl());
 		}
@@ -207,13 +200,4 @@ public class CommunityService {
 				"게시글을 삭제했습니다.");
 	}
 
-	//수정 및 삭제 권한 체크 (도메인에서 처리)
-	private boolean checkCommunityLoginUser(Users users, Community community) {
-		if (!Objects.equals(users.getId(), community.getUsers().getId())){
-			System.out.println(users.getId());
-			System.out.println(community.getId());
-			return false;
-		}
-		return true;
-	}
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.FriendsApproveRequest;
+import com.sunny.backend.dto.response.FriendsCheckResponse;
 import com.sunny.backend.dto.response.FriendsResponse;
 import com.sunny.backend.entity.friends.ApproveType;
 import com.sunny.backend.entity.friends.Friends;
@@ -40,8 +41,7 @@ public class FriendsService {
 	public ResponseEntity<CommonResponse.GeneralResponse> addFriends(CustomUserPrincipal customUserPrincipal,
 		Long friendsUserId) {
 		Users user = customUserPrincipal.getUsers();
-		Users friend = userRepository.findById(friendsUserId)
-			.orElseThrow(() -> new IllegalArgumentException("친구가 존재하지 않습니다."));
+		Users friend = userRepository.getById(friendsUserId);
 
 		Friends userFriend = Friends.builder()
 			.users(friend)
@@ -91,7 +91,7 @@ public class FriendsService {
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "삭제 완료");
 	}
 
-	public ResponseEntity<CommonResponse.GeneralResponse> checkFriends(
+	public FriendsCheckResponse checkFriends(
 		CustomUserPrincipal customUserPrincipal, Long friendsId) {
 		Optional<Friends> friendsOptional = friendsRepository.findByUsers_IdAndFriendsSn(
 			customUserPrincipal.getUsers().getId(), friendsId);
@@ -100,15 +100,13 @@ public class FriendsService {
 			Friends friends = friendsOptional.get();
 			switch (friends.getApprove()) {
 				case WAIT -> {
-					return responseService.getGeneralResponse(HttpStatus.OK.value(), "false");
+					return new FriendsCheckResponse(false, ApproveType.WAIT);
 				}
 				case APPROVE -> {
-					return responseService.getGeneralResponse(HttpStatus.OK.value(), "true");
+					return new FriendsCheckResponse(true, ApproveType.APPROVE);
 				}
 			}
-			return null;
-		} else {
-			return responseService.getGeneralResponse(HttpStatus.OK.value(), "true");
 		}
+		return new FriendsCheckResponse(false, null);
 	}
 }

@@ -1,19 +1,17 @@
 package com.sunny.backend.dto.response;
 
-import com.sunny.backend.entity.Consumption;
-import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
+import com.sunny.backend.user.Users;
 
-@Getter
-public class ProfileResponse {
-    private Long id;
-    private String nickname;
-    private String profile;
-
-    public ProfileResponse(Long id,String nickname, String profile) {
-        this.id=id;
-        this.nickname = nickname;
-        this.profile = profile;
+public record ProfileResponse (
+    Long id,
+    String name,
+    String profile
+) {
+    public static ProfileResponse of(Users users) {
+        return new ProfileResponse(
+            users.getId(),
+            users.getName(),
+            users.getProfile()
+        );
     }
-
 }

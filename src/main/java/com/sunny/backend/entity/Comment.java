@@ -29,6 +29,11 @@ public class Comment extends BaseTime {
     @Column(nullable = false)
     private Boolean isDeleted; //댓글 삭제 여부
 
+    @ColumnDefault("FALSE")
+    @Column(nullable = false)
+    private Boolean isPrivated; //비밀 댓글 여부
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="community_id")
     private Community community; //게시글 아이디

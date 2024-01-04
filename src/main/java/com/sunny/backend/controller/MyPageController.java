@@ -34,8 +34,15 @@ import java.util.Optional;
 public class MyPageController {
 
     private final MyPageService myPageService;
-    @ApiOperation(tags = "8. MyPage", value = "작성 글 가져오기")
+
+    @ApiOperation(tags = "8. MyPage", value = "프로필 조회")
     @GetMapping("")
+    public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> getMypage(
+            @AuthUser CustomUserPrincipal customUserPrincipal){
+        return myPageService.getMypage(customUserPrincipal);
+    }
+    @ApiOperation(tags = "8. MyPage", value = "작성 글 가져오기")
+    @GetMapping("/mycommunity")
     public ResponseEntity<CommonResponse.ListResponse<CommunityResponse.PageResponse>> getCommunityList(@AuthUser CustomUserPrincipal customUserPrincipal) {
         return myPageService.getMyCommunity(customUserPrincipal);
     }
