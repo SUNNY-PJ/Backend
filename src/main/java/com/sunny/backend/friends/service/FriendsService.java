@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import com.sunny.backend.user.Users;
 import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +33,7 @@ public class FriendsService {
 	private final UserRepository userRepository;
 
 	public ResponseEntity<CommonResponse.ListResponse<FriendsResponse>> getFriendsList(
-		CustomUserPrincipal customUserPrincipal, FriendStatus friendStatus) {
+		CustomUserPrincipal customUserPrincipal, @Valid FriendStatus friendStatus) {
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
 		List<FriendsResponse> friendsResponses =
 			friendsRepository.findByUsers_IdAndStatus(tokenUserId, friendStatus)
@@ -59,8 +61,8 @@ public class FriendsService {
 
 	@Transactional
 	public ResponseEntity<CommonResponse.GeneralResponse> approveFriends(
-		CustomUserPrincipal customUserPrincipal, FriendsApproveRequest request) {
-		Friends friends = friendsRepository.getById(request.friendsSn());
+		CustomUserPrincipal customUserPrincipal, Long friendsSn, @Valid FriendsApproveRequest request) {
+		Friends friends = friendsRepository.getById(friendsSn);
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
 		friends.validateFriendsByUser(friends.getUsers().getId(), tokenUserId);
 
