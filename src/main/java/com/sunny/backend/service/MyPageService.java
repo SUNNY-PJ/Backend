@@ -88,11 +88,11 @@ public class MyPageService {
     }
 
     public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
-        CustomUserPrincipal customUserPrincipal, String nickname, MultipartFile profile) {
+        CustomUserPrincipal customUserPrincipal, String name, MultipartFile profile) {
         Users user = customUserPrincipal.getUsers();
 
-        if (nickname != null) {
-            user.setName(nickname);
+        if (name != null) {
+            user.setName(name);
         }
         if (!profile.isEmpty()) {
             user.setProfile(s3Service.upload(profile));
