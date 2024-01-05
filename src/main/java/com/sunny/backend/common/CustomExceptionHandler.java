@@ -16,6 +16,11 @@ import lombok.RequiredArgsConstructor;
 public class CustomExceptionHandler {
 	private final ResponseService responseService;
 
+	@ExceptionHandler(CommonCustomException.class)
+	protected ResponseEntity<ErrorResponseEntity> handleCommonCustomException(CommonCustomException e) {
+		return ErrorResponseEntity.toResponseEntity(e.getCommonErrorCode());
+	}
+
 	@ExceptionHandler(CustomException.class)
 	protected ResponseEntity<ErrorResponseEntity> handleCustomException(CustomException e) {
 		return ErrorResponseEntity.toResponseEntity(e.getErrorCode());

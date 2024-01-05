@@ -1,6 +1,6 @@
 package com.sunny.backend.dto.response;
 
-import com.sunny.backend.friends.domain.Friends;
+import com.sunny.backend.friends.domain.Friend;
 
 public record FriendsResponse (
 	Long friendsSn,
@@ -8,12 +8,12 @@ public record FriendsResponse (
 	String name,
 	String profile
 ) {
-	public static FriendsResponse from(Friends friends) {
+	public static FriendsResponse from(Friend friend) {
 		return new FriendsResponse(
-			friends.getFriendsSn(),
-			friends.getFriend().getId(),
-			friends.getFriend().getName(),
-			friends.getFriend().getProfile()
+			friend.getId(),
+			friend.getUserFriend().getId(),
+			friend.getUserFriend().getName(),
+			friend.getUserFriend().getProfile()
 		);
 	}
 }

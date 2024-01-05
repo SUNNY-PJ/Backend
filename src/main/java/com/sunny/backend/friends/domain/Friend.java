@@ -10,8 +10,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.sunny.backend.common.CommonCustomException;
+import com.sunny.backend.common.CommonErrorCode;
 import com.sunny.backend.common.CustomException;
-import com.sunny.backend.common.ErrorCode;
+import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.user.Users;
 
 import lombok.AllArgsConstructor;
@@ -24,18 +26,18 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Friends {
+public class Friend {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long friendsSn;
+	private Long id;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private Users users;
 
 	@ManyToOne
-	@JoinColumn(name = "friends_id")
-	private Users friend;
+	@JoinColumn(name = "user_friends_id")
+	private Users userFriend;
 
 	@Column
 	@Enumerated(value = EnumType.STRING)
@@ -45,9 +47,18 @@ public class Friends {
 		status = FriendStatus.APPROVE;
 	}
 
+	public void switchStatus() {
+		if(status.equals(FriendStatus.WAIT)) {
+			throw new CustomException(FriendErrorCode.FRIEND_NOT_APPROVE);
+		}
+		if(status.equals(FriendStatus.APPROVE)) {
+			throw new CustomException(FriendErrorCode.FRIEND_EXIST);
+		}
+	}
+
 	public void validateFriendsByUser(Long userId, Long tokenUserId) {
 		if(!userId.equals(tokenUserId)) {
-			throw new CustomException(ErrorCode.TOKEN_INVALID);
+			throw new CommonCustomException(CommonErrorCode.TOKEN_INVALID);
 		}
 	}
 }

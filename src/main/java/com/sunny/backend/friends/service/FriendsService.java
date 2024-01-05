@@ -15,15 +15,14 @@ import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.FriendsApproveRequest;
 import com.sunny.backend.dto.response.FriendsCheckResponse;
 import com.sunny.backend.dto.response.FriendsResponse;
+import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.FriendStatus;
-import com.sunny.backend.friends.domain.Friends;
 import com.sunny.backend.friends.repository.FriendsRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
 import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 
 @Service
 @RequiredArgsConstructor
@@ -35,89 +34,94 @@ public class FriendsService {
 	public ResponseEntity<CommonResponse.ListResponse<FriendsResponse>> getFriendsList(
 		CustomUserPrincipal customUserPrincipal, @Valid FriendStatus friendStatus) {
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
+
 		List<FriendsResponse> friendsResponses =
 			friendsRepository.findByUsers_IdAndStatus(tokenUserId, friendStatus)
 				.stream()
 				.map(FriendsResponse::from)
 				.toList();
+
 		return responseService.getListResponse(HttpStatus.OK.value(), friendsResponses, "친구 목록 가져오기");
 	}
 
 	public ResponseEntity<CommonResponse.GeneralResponse> addFriends(
 		CustomUserPrincipal customUserPrincipal, Long friendsId) {
 		Users user = customUserPrincipal.getUsers();
-		Users friend = userRepository.getById(friendsId);
+		Users userFriend = userRepository.getById(friendsId);
 
-		Friends friends = Friends.builder()
-			.users(friend)
-			.friend(user)
-			.status(FriendStatus.WAIT)
-			.build();
-		friendsRepository.save(friends);
+		getByUserAndUserFriend(user, userFriend, FriendStatus.WAIT);
 
 		return responseService.getGeneralResponse(HttpStatus.OK.value(),
-			user.getName() + "이 " + friend.getName() + "에게 친구 신청했습니다.");
+			user.getName() + "이 " + userFriend.getName() + "에게 친구 신청했습니다.");
 	}
 
 	@Transactional
 	public ResponseEntity<CommonResponse.GeneralResponse> approveFriends(
 		CustomUserPrincipal customUserPrincipal, Long friendsSn, @Valid FriendsApproveRequest request) {
-		Friends friends = friendsRepository.getById(friendsSn);
+		Friend friend = friendsRepository.getById(friendsSn);
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
-		friends.validateFriendsByUser(friends.getUsers().getId(), tokenUserId);
+		friend.validateFriendsByUser(friend.getUsers().getId(), tokenUserId);
 
 		if(request.approve()) {
-			friends.approveStatus();
-			Friends friendsUser = Friends.builder()
-				.users(friends.getFriend())
-				.friend(friends.getUsers())
-				.status(FriendStatus.APPROVE)
-				.build();
-			friendsRepository.save(friendsUser);
+			friend.approveStatus();
+			getByUserAndUserFriend(friend.getUsers(), friend.getUserFriend(), FriendStatus.APPROVE);
 			return responseService.getGeneralResponse(HttpStatus.OK.value(), "승인 되었습니다.");
 		} else {
-			friendsRepository.deleteById(friends.getFriendsSn());
+			friendsRepository.deleteById(friend.getId());
 			return responseService.getGeneralResponse(HttpStatus.OK.value(), "거절 되었습니다.");
+		}
+	}
+
+	private void getByUserAndUserFriend(Users user, Users userFriend, FriendStatus status) {
+		Optional<Friend> optionalFriend = friendsRepository
+			.findByUsers_IdAndUserFriend_Id(userFriend.getId(), user.getId());
+
+		if(optionalFriend.isEmpty()) {
+			Friend friends = Friend.builder()
+				.users(userFriend)
+				.userFriend(user)
+				.status(status)
+				.build();
+			friendsRepository.save(friends);
+		} else {
+			Friend friend = optionalFriend.get();
+			friend.switchStatus();
 		}
 	}
 
 	@Transactional
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteFriends(
 		CustomUserPrincipal customUserPrincipal, Long friendsSn) {
-		Friends friends = friendsRepository.getById(friendsSn);
-		friends.validateFriendsByUser(friends.getUsers().getId(), customUserPrincipal.getUsers().getId());
+		Friend friend = friendsRepository.getById(friendsSn);
+		friend.validateFriendsByUser(friend.getUsers().getId(), customUserPrincipal.getUsers().getId());
+
 		friendsRepository.deleteById(friendsSn);
+
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "삭제 완료");
 	}
 
 	public ResponseEntity<CommonResponse.SingleResponse<FriendsCheckResponse>> checkFriends(
 		CustomUserPrincipal customUserPrincipal, Long friendsId) {
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
-		Optional<Friends> friendsOptional = friendsRepository.findByUsers_IdAndFriend_Id(friendsId, tokenUserId);
+		Optional<Friend> friendsOptional = friendsRepository.findByUsers_IdAndUserFriend_Id(friendsId, tokenUserId);
+
+		boolean isFriend = false;
+		FriendStatus status = null;
+		String msg = "친구가 아닙니다.";
 
 		if(friendsOptional.isPresent()) {
-			Friends friends = friendsOptional.get();
-			switch (friends.getStatus()) {
-				case WAIT -> {
-					return responseService.getSingleResponse(
-						HttpStatus.OK.value(),
-						new FriendsCheckResponse(false, FriendStatus.WAIT),
-						"승인 대기중"
-					);
-				}
-				case APPROVE -> {
-					return responseService.getSingleResponse(
-						HttpStatus.OK.value(),
-						new FriendsCheckResponse(true, FriendStatus.APPROVE),
-						"친구 입니다."
-					);
-				}
+			Friend friend = friendsOptional.get();
+			status = friend.getStatus();
+			if(friend.getStatus().equals(FriendStatus.WAIT)) {
+				msg = "승인 대기중";
+			}
+			if(friend.getStatus().equals(FriendStatus.WAIT)) {
+				msg = "친구 입니다.";
 			}
 		}
+
 		return responseService.getSingleResponse(
-			HttpStatus.OK.value(),
-			new FriendsCheckResponse(false, null),
-			"친구가 아닙니다."
+			HttpStatus.OK.value(), new FriendsCheckResponse(isFriend, status), msg
 		);
 	}
 }

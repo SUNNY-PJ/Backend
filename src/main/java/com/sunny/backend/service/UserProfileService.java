@@ -1,7 +1,7 @@
 package com.sunny.backend.service;
 
 import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.CustomException;
+import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.response.ProfileResponse;
 import com.sunny.backend.dto.response.comment.CommentResponse;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.sunny.backend.common.ErrorCode.COMMUNITY_NOT_FOUND;
+import static com.sunny.backend.common.CommonErrorCode.COMMUNITY_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +34,7 @@ public class UserProfileService {
     public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> getUserProfile(
             CustomUserPrincipal customUserPrincipal, Long communityId) {
         Community community = communityRepository.findById(communityId)
-                .orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
+                .orElseThrow(() -> new CommonCustomException(COMMUNITY_NOT_FOUND));
 
         return responseService.getSingleResponse(
                 HttpStatus.OK.value(), new ProfileResponse(community.getUsers().getId(),community.getUsers().getName(),community.getUsers().getProfile()),
@@ -44,7 +44,7 @@ public class UserProfileService {
     @Transactional
     public ResponseEntity<CommonResponse.ListResponse<CommunityResponse.PageResponse>> getFriendsCommunity (CustomUserPrincipal customUserPrincipal, Long communityId) {
         Community community = communityRepository.findById(communityId)
-                .orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
+                .orElseThrow(() -> new CommonCustomException(COMMUNITY_NOT_FOUND));
 
         List<Community> communityList = communityRepository.findAllByUsers_Id(community.getUsers().getId());
         List<CommunityResponse.PageResponse> communityRes = new ArrayList<>();
@@ -57,7 +57,7 @@ public class UserProfileService {
 
     public ResponseEntity<CommonResponse.ListResponse<CommentResponse.Mycomment>> getCommentByFriendsId(CustomUserPrincipal customUserPrincipal, Long communityId) {
         Community community = communityRepository.findById(communityId)
-                .orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
+                .orElseThrow(() -> new CommonCustomException(COMMUNITY_NOT_FOUND));
         List<Comment> commentList = commentRepository.findAllByUsers_Id(community.getUsers().getId());
         List<CommentResponse.Mycomment> commentDTOList =
                 commentList.stream()
