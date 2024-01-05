@@ -34,7 +34,7 @@ public class FriendsService {
 		CustomUserPrincipal customUserPrincipal, FriendStatus friendStatus) {
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
 		List<FriendsResponse> friendsResponses =
-			friendsRepository.findByUsers_IdAndApprove(tokenUserId, friendStatus)
+			friendsRepository.findByUsers_IdAndStatus(tokenUserId, friendStatus)
 				.stream()
 				.map(FriendsResponse::from)
 				.toList();
@@ -79,11 +79,12 @@ public class FriendsService {
 		}
 	}
 
+	@Transactional
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteFriends(
-		CustomUserPrincipal customUserPrincipal, Long friendsId) {
-		Friends friends = friendsRepository.getById(friendsId);
+		CustomUserPrincipal customUserPrincipal, Long friendsSn) {
+		Friends friends = friendsRepository.getById(friendsSn);
 		friends.validateFriendsByUser(friends.getUsers().getId(), customUserPrincipal.getUsers().getId());
-		friendsRepository.deleteById(friendsId);
+		friendsRepository.deleteById(friendsSn);
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "삭제 완료");
 	}
 
