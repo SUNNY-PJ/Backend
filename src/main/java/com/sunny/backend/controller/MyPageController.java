@@ -63,9 +63,9 @@ public class MyPageController {
     @PostMapping("/profile")
     public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
             @AuthUser CustomUserPrincipal customUserPrincipal,
-            @RequestPart(required = false) String nickname,
+            @RequestPart(value = "name",required = false) String name,
             @RequestPart(value = "profile",required = false) MultipartFile profile){
-        return myPageService.updateProfile(customUserPrincipal,nickname,profile);
+        return myPageService.updateProfile(customUserPrincipal,name,profile);
     }
 
 
