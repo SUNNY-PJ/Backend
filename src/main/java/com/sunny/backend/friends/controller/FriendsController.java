@@ -1,5 +1,8 @@
 package com.sunny.backend.friends.controller;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.config.AuthUser;
 import com.sunny.backend.dto.request.FriendsApproveRequest;
@@ -24,7 +27,9 @@ public class FriendsController {
     @ApiOperation(tags = "5. Friends", value = "친구 목록 가져오기")
     @GetMapping("")
     public ResponseEntity<CommonResponse.ListResponse<FriendsResponse>> getFriendsList(
-            @AuthUser CustomUserPrincipal customUserPrincipal, @RequestParam(name = "friendStatus") FriendStatus friendStatus) {
+        @AuthUser CustomUserPrincipal customUserPrincipal,
+        @NotBlank(message = "친구 상태가 입력되지 않았습니다.")
+        @RequestParam(name = "friendStatus") FriendStatus friendStatus) {
         return friendsService.getFriendsList(customUserPrincipal, friendStatus);
     }
 
@@ -45,17 +50,18 @@ public class FriendsController {
     }
 
     @ApiOperation(tags = "5. Friends", value = "친구 승인하기")
-    @PostMapping("/approve")
+    @PostMapping("/approve/{friendsSn}")
     public ResponseEntity<CommonResponse.GeneralResponse> approveFriends(
-            @AuthUser CustomUserPrincipal customUserPrincipal,
-            @RequestBody FriendsApproveRequest friendsApproveRequest) {
-        return friendsService.approveFriends(customUserPrincipal, friendsApproveRequest);
+        @AuthUser CustomUserPrincipal customUserPrincipal,
+        @PathVariable(name = "friendsSn") Long friendsSn,
+        @Valid @RequestBody FriendsApproveRequest friendsApproveRequest) {
+        return friendsService.approveFriends(customUserPrincipal, friendsSn, friendsApproveRequest);
     }
 
     @ApiOperation(tags = "5. Friends", value = "친구 끊기")
     @DeleteMapping("/{friendsSn}")
     public ResponseEntity<CommonResponse.GeneralResponse> deleteFriends(
-            @AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable(name = "friendsSn") Long friendsSn) {
+        @AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable(name = "friendsSn") Long friendsSn) {
         return friendsService.deleteFriends(customUserPrincipal, friendsSn);
     }
 
