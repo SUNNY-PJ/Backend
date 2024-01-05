@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.JSONParser;
 import com.nimbusds.jose.shaded.json.parser.ParseException;
-import com.sunny.backend.common.CustomException;
+import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.entity.OAuthToken;
 import com.sunny.backend.security.dto.AuthDto;
 import com.sunny.backend.security.jwt.TokenProvider;
@@ -27,12 +27,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
-import static com.sunny.backend.common.ErrorCode.COMMUNITY_NOT_FOUND;
-import static com.sunny.backend.common.ErrorCode.NicknameAlreadyInUse;
+import static com.sunny.backend.common.CommonErrorCode.NicknameAlreadyInUse;
 
 @Service
 @RequiredArgsConstructor
@@ -143,7 +140,7 @@ public class KaKaoService {
         Users user = customUserPrincipal.getUsers();
         Users existingUser = userRepository.findByName(name);
         if (existingUser != null && !existingUser.getId().equals(user.getId())) {
-            throw new  CustomException(NicknameAlreadyInUse);
+            throw new CommonCustomException(NicknameAlreadyInUse);
         }
         user.setName(name);
         userRepository.save(user);

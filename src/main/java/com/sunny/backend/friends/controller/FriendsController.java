@@ -42,10 +42,10 @@ public class FriendsController {
     }
 
     @ApiOperation(tags = "5. Friends", value = "친구 신청하기")
-    @PostMapping("/{user_id}")
+    @PostMapping("/{userId}")
     public ResponseEntity<CommonResponse.GeneralResponse> addFriends(
         @AuthUser CustomUserPrincipal customUserPrincipal,
-        @PathVariable(name = "user_id") Long friendsId) {
+        @PathVariable(name = "userId") Long friendsId) {
         return friendsService.addFriends(customUserPrincipal, friendsId);
     }
 
