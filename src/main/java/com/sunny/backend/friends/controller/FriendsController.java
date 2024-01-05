@@ -36,7 +36,7 @@ public class FriendsController {
         return friendsService.checkFriends(customUserPrincipal, friendsId);
     }
 
-    @ApiOperation(tags = "5. Friends", value = "친구 추가하기")
+    @ApiOperation(tags = "5. Friends", value = "친구 신청하기")
     @PostMapping("/{user_id}")
     public ResponseEntity<CommonResponse.GeneralResponse> addFriends(
         @AuthUser CustomUserPrincipal customUserPrincipal,
@@ -52,11 +52,11 @@ public class FriendsController {
         return friendsService.approveFriends(customUserPrincipal, friendsApproveRequest);
     }
 
-    @ApiOperation(tags = "5. Friends", value = "친구 삭제하기")
-    @DeleteMapping("/{friends_id}")
+    @ApiOperation(tags = "5. Friends", value = "친구 끊기")
+    @DeleteMapping("/{friendsSn}")
     public ResponseEntity<CommonResponse.GeneralResponse> deleteFriends(
-            @AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable(name = "friends_id") Long friendsId) {
-        return friendsService.deleteFriends(customUserPrincipal, friendsId);
+            @AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable(name = "friendsSn") Long friendsSn) {
+        return friendsService.deleteFriends(customUserPrincipal, friendsSn);
     }
 
 }

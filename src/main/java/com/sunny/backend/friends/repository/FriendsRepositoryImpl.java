@@ -1,6 +1,6 @@
 package com.sunny.backend.friends.repository;
 
-import static com.sunny.backend.entity.friends.QFriends.*;
+import static com.sunny.backend.friends.domain.QFriends.*;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class FriendsRepositoryImpl extends QuerydslRepositorySupport implements 
 	public List<FriendsResponse> getFindUserIdAndApproveType(Long userId, FriendStatus friendStatus) {
 		return queryFactory.select(
 				Projections.constructor(FriendsResponse.class, friends.friendsSn, friends.friend.id.as("friendsId"),
-					friends.friend.name, friends.friend.profile, friends.approve.as("approveType")))
+					friends.friend.name, friends.friend.profile, friends.status.as("status")))
 			.from(friends)
 			.where(friends.users.id.eq(userId), eqApproveType(friendStatus))
 			.fetch();
@@ -37,10 +37,10 @@ public class FriendsRepositoryImpl extends QuerydslRepositorySupport implements 
 		}
 		switch (friendStatus) {
 			case APPROVE -> {
-				return friends.approve.eq(FriendStatus.APPROVE);
+				return friends.status.eq(FriendStatus.APPROVE);
 			}
 			case WAIT -> {
-				return friends.approve.eq(FriendStatus.WAIT);
+				return friends.status.eq(FriendStatus.WAIT);
 			}
 		}
 		return null;
