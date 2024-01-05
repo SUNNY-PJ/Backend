@@ -1,4 +1,4 @@
-package com.sunny.backend.repository.friends;
+package com.sunny.backend.friends.repository;
 
 import static com.sunny.backend.entity.friends.QFriends.*;
 
@@ -10,8 +10,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sunny.backend.dto.response.FriendsResponse;
-import com.sunny.backend.entity.friends.ApproveType;
-import com.sunny.backend.entity.friends.Friends;
+import com.sunny.backend.friends.domain.FriendStatus;
+import com.sunny.backend.friends.domain.Friends;
 
 public class FriendsRepositoryImpl extends QuerydslRepositorySupport implements FriendsRepositoryCustom {
 	private JPAQueryFactory queryFactory;
@@ -22,25 +22,25 @@ public class FriendsRepositoryImpl extends QuerydslRepositorySupport implements 
 	}
 
 	@Override
-	public List<FriendsResponse> getFindUserIdAndApproveType(Long userId, ApproveType approveType) {
+	public List<FriendsResponse> getFindUserIdAndApproveType(Long userId, FriendStatus friendStatus) {
 		return queryFactory.select(
 				Projections.constructor(FriendsResponse.class, friends.friendsSn, friends.friend.id.as("friendsId"),
 					friends.friend.name, friends.friend.profile, friends.approve.as("approveType")))
 			.from(friends)
-			.where(friends.users.id.eq(userId), eqApproveType(approveType))
+			.where(friends.users.id.eq(userId), eqApproveType(friendStatus))
 			.fetch();
 	}
 
-	private BooleanExpression eqApproveType(ApproveType approveType) {
-		if (approveType == null) {
+	private BooleanExpression eqApproveType(FriendStatus friendStatus) {
+		if (friendStatus == null) {
 			return null;
 		}
-		switch (approveType) {
+		switch (friendStatus) {
 			case APPROVE -> {
-				return friends.approve.eq(ApproveType.APPROVE);
+				return friends.approve.eq(FriendStatus.APPROVE);
 			}
 			case WAIT -> {
-				return friends.approve.eq(ApproveType.WAIT);
+				return friends.approve.eq(FriendStatus.WAIT);
 			}
 		}
 		return null;

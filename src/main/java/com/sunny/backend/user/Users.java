@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sunny.backend.entity.*;
-import com.sunny.backend.entity.friends.Friends;
+import com.sunny.backend.friends.domain.Friends;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

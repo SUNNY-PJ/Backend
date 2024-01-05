@@ -1,13 +1,13 @@
-package com.sunny.backend.controller;
+package com.sunny.backend.friends.controller;
 
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.config.AuthUser;
 import com.sunny.backend.dto.request.FriendsApproveRequest;
 import com.sunny.backend.dto.response.FriendsCheckResponse;
 import com.sunny.backend.dto.response.FriendsResponse;
-import com.sunny.backend.entity.friends.ApproveType;
+import com.sunny.backend.friends.domain.FriendStatus;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.service.FriendsService;
+import com.sunny.backend.friends.service.FriendsService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,16 +24,16 @@ public class FriendsController {
     @ApiOperation(tags = "5. Friends", value = "친구 목록 가져오기")
     @GetMapping("")
     public ResponseEntity<CommonResponse.ListResponse<FriendsResponse>> getFriendsList(
-            @AuthUser CustomUserPrincipal customUserPrincipal, @RequestParam(name = "type") ApproveType approveType) {
-        return friendsService.getFriendsList(customUserPrincipal, approveType);
+            @AuthUser CustomUserPrincipal customUserPrincipal, @RequestParam(name = "friendStatus") FriendStatus friendStatus) {
+        return friendsService.getFriendsList(customUserPrincipal, friendStatus);
     }
 
     @ApiOperation(tags = "5. Friends", value = "친구인지 확인하기")
-    @GetMapping("/{friend_id}")
-    public ResponseEntity<FriendsCheckResponse> checkFriends(
+    @GetMapping("/{userId}")
+    public ResponseEntity<CommonResponse.SingleResponse<FriendsCheckResponse>> checkFriends(
         @AuthUser CustomUserPrincipal customUserPrincipal,
-        @PathVariable(name = "friend_id") Long friendsId) {
-        return ResponseEntity.ok(friendsService.checkFriends(customUserPrincipal, friendsId));
+        @PathVariable(name = "userId") Long friendsId) {
+        return friendsService.checkFriends(customUserPrincipal, friendsId);
     }
 
     @ApiOperation(tags = "5. Friends", value = "친구 추가하기")

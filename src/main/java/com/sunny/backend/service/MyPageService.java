@@ -45,7 +45,7 @@ public class MyPageService {
     public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> getMypage (
         CustomUserPrincipal customUserPrincipal) {
         Users user = customUserPrincipal.getUsers();
-        ProfileResponse profileResponse = ProfileResponse.of(user);
+        ProfileResponse profileResponse = ProfileResponse.from(user);
         return responseService.getSingleResponse(HttpStatus.OK.value(), profileResponse, "프로필 조회 성공");
     }
     // 내가 쓴 글
