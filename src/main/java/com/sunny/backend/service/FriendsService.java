@@ -95,7 +95,6 @@ public class FriendsService {
 		CustomUserPrincipal customUserPrincipal, Long friendsId) {
 		Optional<Friends> friendsOptional = friendsRepository.findByUsers_IdAndFriendsSn(
 			customUserPrincipal.getUsers().getId(), friendsId);
-
 		if(friendsOptional.isPresent()) {
 			Friends friends = friendsOptional.get();
 			switch (friends.getApprove()) {
