@@ -70,7 +70,7 @@ public class ConsumptionController {
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "지출 내역 삭제")
-	@PutMapping("/{consumptionId}")
+	@DeleteMapping("/{consumptionId}")
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteConsumption(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@PathVariable Long consumptionId) {
