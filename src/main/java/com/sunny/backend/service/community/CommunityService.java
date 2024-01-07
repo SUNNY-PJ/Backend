@@ -147,7 +147,7 @@ public class CommunityService {
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new NotFoundException("Community Post not found!"));
 		boolean isModified=true;
-		Community.validateCommunityByUser(user.getId(), community.getId());
+		Community.validateCommunityByUser(user.getId(), community.getUsers().getId());
 		community.getPhotoList().clear();
 		community.updateCommunity(communityRequest);
 		community.updateModifiedAt(LocalDateTime.now());
