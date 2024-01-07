@@ -101,16 +101,19 @@ public class MyPageService {
             String uploadedProfileUrl = s3Service.upload(profile);
             user.setProfile(uploadedProfileUrl);
         }
-
         else if (profile==null){
             user.setProfile("https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png");
         }
-
-
-
         ProfileResponse profileResponse = ProfileResponse.of(user);
         userRepository.save(user);
 
-        return responseService.getSingleResponse(HttpStatus.OK.value(), profileResponse, "Profile change successful");
+        return responseService.getSingleResponse(HttpStatus.OK.value(), profileResponse, "프로필 변경 완료");
+    }
+
+    public ResponseEntity<CommonResponse.GeneralResponse> deleteAccount(
+            CustomUserPrincipal customUserPrincipal) {
+        Users user = customUserPrincipal.getUsers();
+        userRepository.deleteById(user.getId());
+        return responseService.getGeneralResponse(HttpStatus.OK.value(), "성공적으로 탈퇴 되었습니다.");
     }
 }
