@@ -1,11 +1,15 @@
 package com.sunny.backend.service.consumption;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
+import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.dto.response.consumption.ConsumptionResponse;
 import com.sunny.backend.dto.response.consumption.SpendTypeStatisticsResponse;
+import com.sunny.backend.entity.Community;
 import com.sunny.backend.entity.Consumption;
+import com.sunny.backend.entity.Photo;
 import com.sunny.backend.repository.consumption.ConsumptionRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
@@ -60,6 +64,16 @@ public class ConsumptionService {
     }
 
     @Transactional
+    public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> updateConsumption(
+            CustomUserPrincipal customUserPrincipal, ConsumptionRequest consumptionRequest,Long consumptionId) {
+        Users user = customUserPrincipal.getUsers();
+        Consumption consumption=consumptionRepository.getById(consumptionId);
+        Consumption.validateConsumptionByUser(user.getId(), consumption.getUsers().getId());
+        consumptionRepository.save(consumption);
+        return responseService.getSingleResponse(HttpStatus.OK.value(), new ConsumptionResponse(consumption),
+                "지출을 수정했습니다.");
+    }
+    @Transactional
     //지출 통계
     public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>> getSpendTypeStatistics() {
         List<SpendTypeStatisticsResponse> statistics = consumptionRepository.getSpendTypeStatistics();
@@ -77,5 +91,18 @@ public class ConsumptionService {
         return responseService.getListResponse(HttpStatus.OK.value(),
                 detailConsumptions, datefield + " 에 맞는 지출 내역을 불러왔습니다.");
     }
+    @Transactional
+    public ResponseEntity<CommonResponse.GeneralResponse> deleteConsumption(
+            CustomUserPrincipal customUserPrincipal, Long consumptionId) {
+
+        Users user = customUserPrincipal.getUsers();
+        Consumption consumption = consumptionRepository.getById(consumptionId);
+        Consumption.validateConsumptionByUser(user.getId(), consumption.getUsers().getId());
+        consumptionRepository.deleteById(consumptionId);
+
+        return responseService.getGeneralResponse(HttpStatus.OK.value(),
+                "지출 내역을 삭제했습니다.");
+    }
+
 
 }
