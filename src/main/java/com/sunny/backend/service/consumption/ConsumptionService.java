@@ -37,20 +37,20 @@ public class ConsumptionService {
             CustomUserPrincipal customUserPrincipal, ConsumptionRequest consumptionRequest) {
         Users user = customUserPrincipal.getUsers();
         Consumption consumption = Consumption.builder()
-                .name(user.getName())
-                .category(consumptionRequest.getCategory())
-                .money(consumptionRequest.getMoney())
-                .dateField(consumptionRequest.getDateField())
-                .users(user)
-                .build();
+            .name(user.getName())
+            .category(consumptionRequest.getCategory())
+            .money(consumptionRequest.getMoney())
+            .dateField(consumptionRequest.getDateField())
+            .users(user)
+            .build();
 
         consumptionRepository.save(consumption);
 
         if (user.getConsumptionList() == null) {
             user.addConsumption(consumption);
         }
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new ConsumptionResponse(consumption),
-                "지출을 등록했습니다.");
+        return responseService.getSingleResponse(HttpStatus.OK.value(),
+            new ConsumptionResponse(consumption), "지출을 등록했습니다.");
     }
 
     @Transactional
@@ -68,6 +68,7 @@ public class ConsumptionService {
             CustomUserPrincipal customUserPrincipal, ConsumptionRequest consumptionRequest,Long consumptionId) {
         Users user = customUserPrincipal.getUsers();
         Consumption consumption=consumptionRepository.getById(consumptionId);
+        consumption.updateConsumption(consumptionRequest);
         Consumption.validateConsumptionByUser(user.getId(), consumption.getUsers().getId());
         consumptionRepository.save(consumption);
         return responseService.getSingleResponse(HttpStatus.OK.value(), new ConsumptionResponse(consumption),
