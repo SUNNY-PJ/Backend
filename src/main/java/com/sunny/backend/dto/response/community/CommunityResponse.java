@@ -14,8 +14,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 
+@Getter
 public class CommunityResponse {
-    //제목, 작성자, 등록일 , 등록 시간, 조회수 , 내용 , 댓글 리스트, 비밀 댓글
 
     private Long id;
     private String title;
@@ -39,8 +39,8 @@ public class CommunityResponse {
         this.photoList = community.getPhotoList()
             .stream()
             .map(Photo::getFileUrl)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
         this.comment_cnt = community.getCommentList().size();
         this.profileImg=community.getUsers().getProfile();
         this.createdAt =DatetimeUtil.timesAgo(community.getCreatedDate());
@@ -48,8 +48,7 @@ public class CommunityResponse {
         //수정된 값이 null : 수정을 아직 안함 ->  수정된 값은 createdAt 업데이트
         if(isModified){
             this.modifiedAt =DatetimeUtil.timesAgo(LocalDateTime.now());
-        }
-        else{
+        } else{
             this.modifiedAt=DatetimeUtil.timesAgo(community.getUpdatedDate());
         }
         this.type=community.getBoardType();
@@ -57,6 +56,7 @@ public class CommunityResponse {
 
     @Getter
     public static class PageResponse {
+
         private Long id;
         //제목, 작성자, 조회수 , 댓글수
         private String title; //제목
