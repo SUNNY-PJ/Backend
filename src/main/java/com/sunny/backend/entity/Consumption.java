@@ -24,6 +24,7 @@ import static com.sunny.backend.common.ErrorCode.NO_USER_PERMISSION;
 @AllArgsConstructor
 
 public class Consumption {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,20 +34,18 @@ public class Consumption {
 
     @Column
     @NotNull
-    private String name; //지출명
+    private String name;
 
     @Column
     @NotNull
-    private Long money; //지출 금액
+    private Long money;
 
     @Column
     @NotNull
     private LocalDate dateField;
-
-
-    //users 다대일 관계 매핑
+    
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name= "users_id")
+    @JoinColumn(name = "users_id")
     private Users users;
 
     public void updateConsumption(ConsumptionRequest consumptionRequest){

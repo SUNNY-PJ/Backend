@@ -13,33 +13,32 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Getter
+
 public class CommunityResponse {
     //제목, 작성자, 등록일 , 등록 시간, 조회수 , 내용 , 댓글 리스트, 비밀 댓글
 
     private Long id;
-    private String title; //제목
-    private String contents; //내용
-    private String writer; //작성자
-    private int viewCount; // 조회수
-    private List<String> photoList; // 이미지 리스트
-    private int comment_cnt; //댓글 수
+    private String title;
+    private String contents;
+    private String writer;
+    private int viewCount;
+    private List<String> photoList;
+    private int comment_cnt;
     private BoardType type;
-
     private String profileImg;
-    private String createdAt; // 등록
-    private String modifiedAt; // 등록
-    private boolean isModified; //수정 여부
+    private String createdAt;
+    private String modifiedAt;
+    private boolean isModified;
 
-    public CommunityResponse(Community community,boolean isModified) {
-        this.id=community.getId();
+    public CommunityResponse(Community community, boolean isModified) {
+        this.id = community.getId();
         this.writer = community.getUsers().getName();
         this.title = community.getTitle();
         this.contents = community.getContents();
         this.viewCount = community.getView_cnt();
         this.photoList = community.getPhotoList()
-                .stream()
-                .map(Photo::getFileUrl)
+            .stream()
+            .map(Photo::getFileUrl)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         this.comment_cnt = community.getCommentList().size();
@@ -55,7 +54,6 @@ public class CommunityResponse {
         }
         this.type=community.getBoardType();
     }
-
 
     @Getter
     public static class PageResponse {
@@ -79,7 +77,4 @@ public class CommunityResponse {
 
         }
     }
-
-
-
 }
