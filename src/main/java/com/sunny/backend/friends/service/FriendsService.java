@@ -85,7 +85,7 @@ public class FriendsService {
 			friendsRepository.save(friends);
 		} else {
 			Friend friend = optionalFriend.get();
-			friend.switchStatus();
+			friend.validateStatus();
 		}
 	}
 
@@ -107,21 +107,15 @@ public class FriendsService {
 
 		boolean isFriend = false;
 		FriendStatus status = null;
-		String msg = "친구가 아닙니다.";
 
 		if(friendsOptional.isPresent()) {
 			Friend friend = friendsOptional.get();
 			status = friend.getStatus();
-			if(friend.getStatus().equals(FriendStatus.WAIT)) {
-				msg = "승인 대기중";
-			}
-			if(friend.getStatus().equals(FriendStatus.WAIT)) {
-				msg = "친구 입니다.";
-			}
 		}
 
 		return responseService.getSingleResponse(
-			HttpStatus.OK.value(), new FriendsCheckResponse(isFriend, status), msg
+			HttpStatus.OK.value(), new FriendsCheckResponse(isFriend, status)
+			, status != null ? status.getStatus() : null
 		);
 	}
 }
