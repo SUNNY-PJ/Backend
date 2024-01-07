@@ -39,10 +39,10 @@ public class CommentService {
 	private CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
 		boolean isPrivate = comment.getIsPrivated();
 		CommentResponse commentResponse;
-
-		// 비밀 댓글 체크 -> isPrivate 가 true라면 & 댓글 작성자 & 게시글 작성자만 보이도록
-		if (isPrivate && !(currentUser.getId() == comment.getUsers().getId() || currentUser.getId() == comment.getCommunity().getUsers().getId())) {
-			commentResponse = new CommentResponse(comment.getId(), comment.getWriter(), "비밀 댓글입니다.", comment.getCreatedDate(), comment.getUpdatedDate());
+		if (isPrivate && !(currentUser.getId() == comment.getUsers().getId() ||
+				currentUser.getId() == comment.getCommunity().getUsers().getId())) {
+			commentResponse = new CommentResponse(comment.getId(), comment.getWriter(),
+					"비밀 댓글입니다.", comment.getCreatedDate(), comment.getUpdatedDate());
 		} else {
 			commentResponse = new CommentResponse(
 					comment.getId(),
@@ -51,7 +51,6 @@ public class CommentService {
 					comment.getCreatedDate(),
 					comment.getUpdatedDate()
 			);
-
 		}
 		commentResponse.setChildren(comment.getChildren()
 				.stream()
@@ -109,16 +108,17 @@ public class CommentService {
 		}
 
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-				new CommentResponse(comment.getId(), comment.getWriter(), comment.getContent(), comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 등록했습니다.");
+				new CommentResponse(comment.getId(), comment.getWriter(), comment.getContent(),
+						comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 등록했습니다.");
 
 	}
 
 	//댓글 삭제
 	@Transactional
-	public ResponseEntity<CommonResponse.GeneralResponse> deleteComment(CustomUserPrincipal customUserPrincipal,
-		Long commentId) {
+	public ResponseEntity<CommonResponse.GeneralResponse> deleteComment(
+			CustomUserPrincipal customUserPrincipal, Long commentId) {
 		Comment comment = commentRepository.findCommentByIdWithParent(commentId)
-			.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
+				.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
 		if (checkCommentLoginUser(customUserPrincipal, comment)) {
 			if (comment.getChildren().size() != 0) { // 자식이 있으면 상태만 변경
 				comment.changeIsDeleted(true);
@@ -152,7 +152,8 @@ public class CommentService {
 			comment.setIsPrivated(isPrivate);
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-			new CommentResponse(comment.getId(), comment.getWriter(), comment.getContent(),comment.getCreatedDate(),comment.getUpdatedDate()), "댓글을 수정했습니다.");
+				new CommentResponse(comment.getId(), comment.getWriter(), comment.getContent(),
+						comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 수정했습니다.");
 	}
 
 	//수정 및 삭제 권한 체크
