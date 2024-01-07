@@ -189,7 +189,7 @@ public class CommunityService {
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new NotFoundException("Community post  not found!"));
 		List<Photo> photoList = photoRepository.findByCommunityId(communityId);
-		Community.validateCommunityByUser(user.getId(), community.getId());
+		Community.validateCommunityByUser(community.getUsers().getId(), user.getId());
 		for (Photo existingFile : photoList) {
 			s3Service.deleteFile(existingFile.getFileUrl());
 		}
