@@ -1,4 +1,4 @@
-package com.sunny.backend.repository.community;
+package com.sunny.backend.community.repository;
 
 import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.entity.BoardType;

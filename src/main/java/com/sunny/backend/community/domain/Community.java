@@ -1,11 +1,14 @@
-package com.sunny.backend.entity;
-
+package com.sunny.backend.community.domain;
 
 
 import static com.sunny.backend.common.ErrorCode.*;
 
 import com.sunny.backend.common.CustomException;
 import com.sunny.backend.dto.request.community.CommunityRequest;
+import com.sunny.backend.entity.BaseTime;
+import com.sunny.backend.entity.BoardType;
+import com.sunny.backend.entity.Comment;
+import com.sunny.backend.entity.Photo;
 import com.sunny.backend.user.Users;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;

@@ -1,7 +1,6 @@
-package com.sunny.backend.repository.community;
+package com.sunny.backend.community.repository;
 
-import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.entity.Community;
+import com.sunny.backend.community.domain.Community;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

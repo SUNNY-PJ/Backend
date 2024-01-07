@@ -1,10 +1,8 @@
 package com.sunny.backend.dto.response.community;
 
 import com.sunny.backend.common.DatetimeUtil;
-import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.entity.BoardType;
-import com.sunny.backend.entity.Comment;
-import com.sunny.backend.entity.Community;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.entity.Photo;
 import lombok.Getter;
 
@@ -15,7 +13,6 @@ import java.util.stream.Collectors;
 
 
 public class CommunityResponse {
-    //제목, 작성자, 등록일 , 등록 시간, 조회수 , 내용 , 댓글 리스트, 비밀 댓글
 
     private Long id;
     private String title;

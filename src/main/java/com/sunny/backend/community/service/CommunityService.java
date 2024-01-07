@@ -1,24 +1,16 @@
-package com.sunny.backend.service.community;
+package com.sunny.backend.community.service;
 
 import static com.sunny.backend.common.ErrorCode.*;
 
-import java.time.Instant;
+import com.sunny.backend.community.domain.Community;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import com.nimbusds.oauth2.sdk.util.StringUtils;
-import com.sunny.backend.common.DatetimeUtil;
-import com.sunny.backend.dto.response.ProfileResponse;
-import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.entity.*;
-import com.sunny.backend.repository.comment.CommentRepository;
-import com.sunny.backend.user.repository.UserRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -33,7 +25,7 @@ import com.sunny.backend.common.CustomException;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.repository.community.CommunityRepository;
+import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.repository.photo.PhotoRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.service.S3Service;
