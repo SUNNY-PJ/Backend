@@ -1,20 +1,9 @@
 package com.sunny.backend.dto.request;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.sunny.backend.entity.friends.ApproveType;
+import javax.validation.constraints.NotNull;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class FriendsApproveRequest {
-	private Long friendsSn;
-	private boolean approve;
+public record FriendsApproveRequest (
+	@NotNull(message = "승인에 대한 true/false가 입력되지 않았습니다.")
+	Boolean approve
+) {
 }

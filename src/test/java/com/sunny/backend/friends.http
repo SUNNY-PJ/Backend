@@ -1,15 +1,15 @@
 ### 친구 가져오기
-GET http://localhost:8080/api/v1/friends
+GET http://localhost:8080/api/v1/friend
 Content-Type: application/json
 Authorization: Bearer eyJyZWdEYXRlIjoxNjkxMzMyNDAyNTc0LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJlbWFpbCI6InRrZmRrc2thcmw1NkBkYXVtLm5ldCIsImF1dGhvcml0aWVzIjoiUk9MRV9VU0VSIiwic3ViIjoiYWNjZXNzVG9rZW4iLCJleHAiOjE2OTEzMzQyMDJ9.2l6RH1tF8Xy008nGv_BcHaIbAK6upWBfoo0LKsXh95T8Om7IXfXS5JZsC6m7rClZnRn_NAW5Ep2V2sLoNQ2gdg
 
 ### 친구 추가
-POST http://localhost:8080/api/v1/friends/2
+POST http://localhost:8080/api/v1/friend/2
 Content-Type: application/json
 Authorization: Bearer eyJyZWdEYXRlIjoxNjkxMzMyNDAyNTc0LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJlbWFpbCI6InRrZmRrc2thcmw1NkBkYXVtLm5ldCIsImF1dGhvcml0aWVzIjoiUk9MRV9VU0VSIiwic3ViIjoiYWNjZXNzVG9rZW4iLCJleHAiOjE2OTEzMzQyMDJ9.2l6RH1tF8Xy008nGv_BcHaIbAK6upWBfoo0LKsXh95T8Om7IXfXS5JZsC6m7rClZnRn_NAW5Ep2V2sLoNQ2gdg
 
 ### 친구 승인
-POST http://localhost:8080/api/v1/friends/approve
+POST http://localhost:8080/api/v1/friend/approve
 Content-Type: application/json
 Authorization: Bearer eyJyZWdEYXRlIjoxNjkxMzMyNDAyNTc0LCJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJlbWFpbCI6InRrZmRrc2thcmw1NkBkYXVtLm5ldCIsImF1dGhvcml0aWVzIjoiUk9MRV9VU0VSIiwic3ViIjoiYWNjZXNzVG9rZW4iLCJleHAiOjE2OTEzMzQyMDJ9.2l6RH1tF8Xy008nGv_BcHaIbAK6upWBfoo0LKsXh95T8Om7IXfXS5JZsC6m7rClZnRn_NAW5Ep2V2sLoNQ2gdg
 

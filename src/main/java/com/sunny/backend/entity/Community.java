@@ -2,16 +2,16 @@ package com.sunny.backend.entity;
 
 
 
-import static com.sunny.backend.common.ErrorCode.*;
+import static com.sunny.backend.common.CommonErrorCode.*;
 
-import com.sunny.backend.common.CustomException;
+import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.user.Users;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
-import java.time.Instant;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,9 +87,9 @@ public class Community extends BaseTime {
         this.photoList=photoList;
     }
 
-    public static void validateCommunityByUser(Long userId, Long tokenUserid) {
-        if(!userId.equals(tokenUserid)) {
-            throw new CustomException(NO_USER_PERMISSION);
+    public static void validateCommunityByUser(Long userId, Long tokenUserId) {
+        if(!userId.equals(tokenUserId)) {
+            throw new CommonCustomException(NO_USER_PERMISSION);
         }
     }
 }

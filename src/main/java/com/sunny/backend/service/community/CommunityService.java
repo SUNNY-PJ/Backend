@@ -1,24 +1,16 @@
 package com.sunny.backend.service.community;
 
-import static com.sunny.backend.common.ErrorCode.*;
+import static com.sunny.backend.common.CommonErrorCode.*;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import com.nimbusds.oauth2.sdk.util.StringUtils;
-import com.sunny.backend.common.DatetimeUtil;
-import com.sunny.backend.dto.response.ProfileResponse;
-import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.entity.*;
-import com.sunny.backend.repository.comment.CommentRepository;
-import com.sunny.backend.user.repository.UserRepository;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -29,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.kms.model.NotFoundException;
 import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.CustomException;
+import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.dto.response.community.CommunityResponse;
@@ -59,7 +51,7 @@ public class CommunityService {
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
 		Users users = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
-				.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
+				.orElseThrow(() -> new CommonCustomException(COMMUNITY_NOT_FOUND));
 
 		String viewCount = redisUtil.getData(String.valueOf(users.getId()));
 
@@ -147,7 +139,7 @@ public class CommunityService {
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new NotFoundException("Community Post not found!"));
 		boolean isModified=true;
-		Community.validateCommunityByUser(user.getId(), community.getUsers().getId());
+		Community.validateCommunityByUser(community.getUsers().getId(), user.getId());
 		community.getPhotoList().clear();
 		community.updateCommunity(communityRequest);
 		community.updateModifiedAt(LocalDateTime.now());

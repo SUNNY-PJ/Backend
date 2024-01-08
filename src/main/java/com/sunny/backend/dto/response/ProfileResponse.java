@@ -7,7 +7,7 @@ public record ProfileResponse (
     String name,
     String profile
 ) {
-    public static ProfileResponse of(Users users) {
+    public static ProfileResponse from(Users users) {
         return new ProfileResponse(
             users.getId(),
             users.getName(),

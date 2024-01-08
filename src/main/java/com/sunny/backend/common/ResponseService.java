@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ResponseService extends RuntimeException {
-	public CommonResponse.ErrorResponse getErrorResponse(int status, ErrorCode errorCode) {
-		return new CommonResponse.ErrorResponse(status, errorCode);
+	public CommonResponse.ErrorResponse getErrorResponse(int status, CommonErrorCode commonErrorCode) {
+		return new CommonResponse.ErrorResponse(status, commonErrorCode);
 	}
 	public CommonResponse.GeneralErrorResponse getGeneralErrorResponse(int status, String msg) {
 		return new CommonResponse.GeneralErrorResponse(status, msg);
