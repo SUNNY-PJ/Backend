@@ -87,8 +87,8 @@ public class Community extends BaseTime {
         this.photoList=photoList;
     }
 
-    public void validateCommunityByUser(Long userId, Long communityId) {
-        if(!userId.equals(communityId)) {
+    public static void validateCommunityByUser(Long userId, Long tokenUserId) {
+        if(!userId.equals(tokenUserId)) {
             throw new CommonCustomException(NO_USER_PERMISSION);
         }
     }

@@ -11,20 +11,18 @@ import java.util.stream.Collectors;
 @Getter
 public class ConsumptionResponse {
 
-    private String name; //지출명
-    private SpendType category; // 카테고리
-
-    private Long money; //지출 금액
-
-    private LocalDate dateField; //지출 일자
+    private Long id;
+    private String name;
+    private SpendType category;
+    private Long money;
+    private LocalDate dateField;
 
     public ConsumptionResponse(Consumption consumption) {
-
+        this.id = consumption.getId();
         this.name = consumption.getName();
         this.category = consumption.getCategory();
-        this.money=consumption.getMoney();
-        this.dateField=consumption.getDateField();
-
+        this.money = consumption.getMoney();
+        this.dateField = consumption.getDateField();
     }
 
     public static List<ConsumptionResponse> fromConsumptions(List<Consumption> consumptions) {
@@ -35,21 +33,21 @@ public class ConsumptionResponse {
 
     @Getter
     public static class DetailConsumption {
-        private String name; //지출명
-        private Long money; //지출 금액
+
+        private String name;
+        private Long money;
 
         public DetailConsumption(Consumption consumption) {
-            this.name=consumption.getName();
+            this.name = consumption.getName();
             this.money = consumption.getMoney();
         }
 
-        public static List<ConsumptionResponse.DetailConsumption> fromDetailConsumptions(List<Consumption> consumptions) {
+        public static List<ConsumptionResponse.DetailConsumption> fromDetailConsumptions(
+            List<Consumption> consumptions) {
             return consumptions.stream()
-                    .map(ConsumptionResponse.DetailConsumption::new)
-                    .collect(Collectors.toList());
+                .map(ConsumptionResponse.DetailConsumption::new)
+                .collect(Collectors.toList());
         }
     }
-
-
 }
 

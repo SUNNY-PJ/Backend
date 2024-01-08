@@ -63,12 +63,10 @@ public class MyPageController {
     @PostMapping("/profile")
     public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
             @AuthUser CustomUserPrincipal customUserPrincipal,
-            @RequestPart(required = false) String nickname,
+            @RequestPart(value = "name",required = false) String name,
             @RequestPart(value = "profile",required = false) MultipartFile profile){
-        return myPageService.updateProfile(customUserPrincipal,nickname,profile);
+        return myPageService.updateProfile(customUserPrincipal,name,profile);
     }
-
-
     //이거 일단 임시 테스트임
     @ApiOperation(tags = "8. MyPage", value = "로그아웃")
     @GetMapping("/auth/kakao/logout")
@@ -76,5 +74,11 @@ public class MyPageController {
                                     @RequestParam(name = "logout_redirect_uri") String logoutRedirectUri) {
         CommonResponse.GeneralResponse response = new CommonResponse.GeneralResponse(HttpStatus.OK.value(), "Logout 성공");
         return ResponseEntity.ok().body(response);
+    }
+    @ApiOperation(tags = "8. MyPage", value = "탈퇴")
+    @GetMapping("/auth/leave")
+    public ResponseEntity<CommonResponse.GeneralResponse> deleteAccount(
+            @AuthUser CustomUserPrincipal customUserPrincipal) {
+        return myPageService.deleteAccount(customUserPrincipal);
     }
 }

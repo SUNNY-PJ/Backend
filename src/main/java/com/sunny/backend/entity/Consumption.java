@@ -1,5 +1,10 @@
 package com.sunny.backend.entity;
 
+import static com.sunny.backend.common.CommonErrorCode.*;
+
+import com.sunny.backend.common.CommonCustomException;
+import com.sunny.backend.common.CustomException;
+import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
 import com.sunny.backend.user.Users;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +15,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Builder
@@ -19,6 +23,7 @@ import java.util.Date;
 @AllArgsConstructor
 
 public class Consumption {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,20 +33,31 @@ public class Consumption {
 
     @Column
     @NotNull
-    private String name; //지출명
+    private String name;
 
     @Column
     @NotNull
-    private Long money; //지출 금액
+    private Long money;
 
     @Column
     @NotNull
     private LocalDate dateField;
-
-
-    //users 다대일 관계 매핑
+    
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name= "users_id")
+    @JoinColumn(name = "users_id")
     private Users users;
+
+    public void updateConsumption(ConsumptionRequest consumptionRequest){
+        this.category=consumptionRequest.getCategory();
+        this.name=consumptionRequest.getName();
+        this.money=consumptionRequest.getMoney();
+        this.dateField=consumptionRequest.getDateField();
+
+    }
+    public static void validateConsumptionByUser(Long userId, Long consumptionUserId) {
+        if(!userId.equals(consumptionUserId)) {
+            throw new CommonCustomException(NO_USER_PERMISSION);
+        }
+    }
 
 }

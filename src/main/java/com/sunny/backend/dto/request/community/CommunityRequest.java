@@ -8,8 +8,9 @@ import lombok.Getter;
 @Getter
 @JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class CommunityRequest {
-    private String title; //제목
-    private String contents; //내용
+
+    private String title;
+    private String contents;
     private BoardType type;
 
 }
