@@ -4,12 +4,7 @@ import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.config.AuthUser;
@@ -62,5 +57,23 @@ public class ConsumptionController {
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@RequestParam("datefield") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate datefield) {
 		return consumptionService.getDetailConsumption(customUserPrincipal, datefield);
+	}
+
+	//지출 내역
+	@ApiOperation(tags = "4. Consumption", value = "지출 내역 수정")
+	@PutMapping("/{consumptionId}")
+	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> updateConsumption(
+			@AuthUser CustomUserPrincipal customUserPrincipal,
+			@RequestBody ConsumptionRequest consumtionRequest,
+			@PathVariable Long consumptionId) {
+		return consumptionService.updateConsumption(customUserPrincipal, consumtionRequest,consumptionId);
+	}
+
+	@ApiOperation(tags = "4. Consumption", value = "지출 내역 삭제")
+	@DeleteMapping("/{consumptionId}")
+	public ResponseEntity<CommonResponse.GeneralResponse> deleteConsumption(
+			@AuthUser CustomUserPrincipal customUserPrincipal,
+			@PathVariable Long consumptionId) {
+		return consumptionService.deleteConsumption(customUserPrincipal,consumptionId);
 	}
 }

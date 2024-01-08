@@ -29,7 +29,7 @@ public class Users extends BaseTime {
 	@Column(name = "user_id")
 	private Long id;
 
-	@Column
+	@Column(unique = true)
 	private String email;
 
 	@Size(min=2,max=10)
@@ -44,13 +44,13 @@ public class Users extends BaseTime {
 	@Column
 	@Enumerated(value = EnumType.STRING)
 	private AuthProvider authProvider;
-	@OneToMany(mappedBy = "users")
+	@OneToMany(mappedBy = "users",cascade = CascadeType.REMOVE)
 	private List<Community> communityList;
 
-	@OneToMany(mappedBy = "users")
+	@OneToMany(mappedBy = "users",cascade = CascadeType.REMOVE)
 	private List<Consumption> consumptionList;
 
-	@OneToMany(mappedBy = "users")
+	@OneToMany(mappedBy = "users",cascade = CascadeType.REMOVE)
 	@JsonIgnore
 	private  List<Comment> commentList;
 	@OneToOne(mappedBy = "users")
@@ -65,10 +65,10 @@ public class Users extends BaseTime {
 	@Column
 	private String profile;
 
-	@OneToMany(mappedBy = "users")
+	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private List<Friend> friends = new ArrayList<>();
 
-	@OneToMany(mappedBy = "users")
+	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private List<Notification> notification;
 
 	public void addComment(Comment comment) {

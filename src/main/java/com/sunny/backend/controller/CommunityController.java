@@ -52,7 +52,6 @@ public class CommunityController {
 			responseDTO = communityService.getCommunityList(pageable);
 		} else {
 			responseDTO = communityService.getPageListWithSearch(sort, boardType, search, pageable);
-
 		}
 		return ResponseEntity.ok().body(responseDTO);
 	}
@@ -80,11 +79,9 @@ public class CommunityController {
 			@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId,
 			@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
 			@RequestPart(required = false) List<MultipartFile> files) {
-
 		return communityService.updateCommunity(customUserPrincipal, communityId, communityRequest, files);
 	}
 
-	//게시글 삭제
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 삭제")
 	@DeleteMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> deleteCommunity(

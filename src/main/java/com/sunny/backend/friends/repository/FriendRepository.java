@@ -10,7 +10,7 @@ import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.FriendStatus;
 
 @Repository
-public interface FriendsRepository extends JpaRepository<Friend, Long> {
+public interface FriendRepository extends JpaRepository<Friend, Long> {
 	Optional<Friend> findByUsers_IdAndUserFriend_Id(Long userId, Long userFriendId);
 
 	List<Friend> findByUsers_IdAndStatus(Long userId, FriendStatus friendStatus);
