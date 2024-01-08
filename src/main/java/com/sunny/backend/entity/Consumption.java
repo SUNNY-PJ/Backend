@@ -1,7 +1,9 @@
 package com.sunny.backend.entity;
 
+import static com.sunny.backend.common.CommonErrorCode.*;
+
+import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.CustomException;
-import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
 import com.sunny.backend.user.Users;
 import lombok.AllArgsConstructor;
@@ -13,9 +15,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 import java.time.LocalDate;
-import java.util.Date;
-
-import static com.sunny.backend.common.ErrorCode.NO_USER_PERMISSION;
 
 @Entity
 @Builder
@@ -57,7 +56,7 @@ public class Consumption {
     }
     public static void validateConsumptionByUser(Long userId, Long consumptionUserId) {
         if(!userId.equals(consumptionUserId)) {
-            throw new CustomException(NO_USER_PERMISSION);
+            throw new CommonCustomException(NO_USER_PERMISSION);
         }
     }
 

@@ -45,7 +45,7 @@ public class MyPageService {
     public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> getMypage(
             CustomUserPrincipal customUserPrincipal) {
         Users user = customUserPrincipal.getUsers();
-        ProfileResponse profileResponse = ProfileResponse.of(user);
+        ProfileResponse profileResponse = ProfileResponse.from(user);
         return responseService.getSingleResponse(HttpStatus.OK.value(), profileResponse, "프로필 조회 성공");
     }
 
@@ -104,7 +104,7 @@ public class MyPageService {
         else if (profile==null){
             user.setProfile("https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png");
         }
-        ProfileResponse profileResponse = ProfileResponse.of(user);
+        ProfileResponse profileResponse = ProfileResponse.from(user);
         userRepository.save(user);
 
         return responseService.getSingleResponse(HttpStatus.OK.value(), profileResponse, "프로필 변경 완료");

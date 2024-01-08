@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sunny.backend.entity.*;
-import com.sunny.backend.entity.friends.Friends;
+import com.sunny.backend.friends.domain.Friend;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -66,10 +66,7 @@ public class Users extends BaseTime {
 	private String profile;
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
-	private List<Friends> userList = new ArrayList<>();
-
-	@OneToMany(mappedBy = "friend",cascade = CascadeType.REMOVE)
-	private List<Friends> friendsList = new ArrayList<>();
+	private List<Friend> friends = new ArrayList<>();
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private List<Notification> notification;
@@ -82,7 +79,6 @@ public class Users extends BaseTime {
 	public void addCommunity(Community community) {
 			this.communityList = new ArrayList<>();
 			this.communityList.add(community);
-
 	}
 
 	public void addConsumption(Consumption consumption) {

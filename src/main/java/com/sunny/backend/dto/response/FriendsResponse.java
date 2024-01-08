@@ -1,25 +1,19 @@
 package com.sunny.backend.dto.response;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.sunny.backend.entity.friends.ApproveType;
+import com.sunny.backend.friends.domain.Friend;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class FriendsResponse {
-	private Long friendsSn;
-	private Long friendsId;
-	private String name;
-	private String profile;
-	private ApproveType approveType;
+public record FriendsResponse (
+	Long friendsSn,
+	Long friendsId,
+	String name,
+	String profile
+) {
+	public static FriendsResponse from(Friend friend) {
+		return new FriendsResponse(
+			friend.getId(),
+			friend.getUserFriend().getId(),
+			friend.getUserFriend().getName(),
+			friend.getUserFriend().getProfile()
+		);
+	}
 }

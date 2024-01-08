@@ -1,6 +1,6 @@
 package com.sunny.backend.service.comment;
 
-import static com.sunny.backend.common.ErrorCode.*;
+import static com.sunny.backend.common.CommonErrorCode.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.CustomException;
+import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.comment.CommentRequest;
 import com.sunny.backend.dto.request.comment.CommentRequestMapper;
@@ -64,7 +64,7 @@ public class CommentService {
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
-				.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
+				.orElseThrow(() -> new CommonCustomException(COMMUNITY_NOT_FOUND));
 		List<Comment> comments = commentRepository.findAllByCommunity_Id(communityId);
 		List<CommentResponse> commentResponses = comments.stream()
 				.filter(comment -> comment.getParent() == null)
@@ -78,17 +78,17 @@ public class CommentService {
 			CustomUserPrincipal customUserPrincipal, Long communityId, CommentRequest commentRequestDTO) {
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
-				.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
+				.orElseThrow(() -> new CommonCustomException(COMMUNITY_NOT_FOUND));
 
 		Comment comment = commentRequestMapper.toEntity(commentRequestDTO);
 
 		Comment parentComment = null;
 		if (commentRequestDTO.getParentId() != null) {
 			parentComment = commentRepository.findById(commentRequestDTO.getParentId())
-					.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
+					.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
 
 			if (parentComment.getParent() != null) {
-				throw new CustomException(REPLYING_NOT_ALLOWED);
+				throw new CommonCustomException(REPLYING_NOT_ALLOWED);
 			}
 			comment.setParent(parentComment);
 		}
@@ -118,7 +118,7 @@ public class CommentService {
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteComment(
 			CustomUserPrincipal customUserPrincipal, Long commentId) {
 		Comment comment = commentRepository.findCommentByIdWithParent(commentId)
-				.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
+			.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
 		if (checkCommentLoginUser(customUserPrincipal, comment)) {
 			if (comment.getChildren().size() != 0) { // 자식이 있으면 상태만 변경
 				comment.changeIsDeleted(true);
@@ -144,7 +144,7 @@ public class CommentService {
 		CustomUserPrincipal customUserPrincipal, Long commentId, CommentRequest commentRequestDTO) {
 
 		Comment comment = commentRepository.findById(commentId)
-			.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
+			.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
 		if (checkCommentLoginUser(customUserPrincipal, comment)) {
 			comment.setContent(commentRequestDTO.getContent());
 
