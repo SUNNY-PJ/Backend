@@ -47,6 +47,10 @@ public class Friend {
 		status = FriendStatus.APPROVE;
 	}
 
+	public boolean isApproveStatus() {
+		return status.equals(FriendStatus.APPROVE);
+	}
+
 	public void validateStatus() {
 		if(status.equals(FriendStatus.WAIT)) {
 			throw new CustomException(FriendErrorCode.FRIEND_NOT_APPROVE);
