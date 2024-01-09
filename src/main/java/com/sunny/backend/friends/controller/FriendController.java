@@ -2,14 +2,13 @@ package com.sunny.backend.friends.controller;
 
 import java.util.List;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.config.AuthUser;
-import com.sunny.backend.dto.response.FriendsCheckResponse;
-import com.sunny.backend.dto.response.FriendsResponse;
+import com.sunny.backend.dto.response.FriendCheckResponse;
+import com.sunny.backend.dto.response.FriendResponse;
 import com.sunny.backend.friends.domain.FriendStatus;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.friends.service.FriendService;
@@ -31,55 +30,56 @@ public class FriendController {
 
     @ApiOperation(tags = "5. Friends", value = "친구 목록 가져오기")
     @GetMapping("")
-    public ResponseEntity<CommonResponse.ListResponse<FriendsResponse>> getFriends(
+    public ResponseEntity<CommonResponse.ListResponse<FriendResponse>> getFriends(
         @AuthUser CustomUserPrincipal customUserPrincipal,
         @NotBlank(message = "친구 상태가 입력되지 않았습니다.")
         @RequestParam(name = "friendStatus") FriendStatus friendStatus) {
-        List<FriendsResponse> friendsResponses = friendService.getFriends(customUserPrincipal, friendStatus);
-        return responseService.getListResponse(HttpStatus.OK.value(), friendsResponses, "친구 목록 가져오기");
+        List<FriendResponse> friendRespons = friendService.getFriends(customUserPrincipal, friendStatus);
+        return responseService.getListResponse(HttpStatus.OK.value(), friendRespons, "친구 목록 가져오기");
     }
 
     @ApiOperation(tags = "5. Friends", value = "친구인지 확인하기")
     @GetMapping("/{userId}")
-    public ResponseEntity<CommonResponse.SingleResponse<FriendsCheckResponse>> checkFriend(
+    public ResponseEntity<CommonResponse.SingleResponse<FriendCheckResponse>> checkFriend(
         @AuthUser CustomUserPrincipal customUserPrincipal,
-        @PathVariable(name = "userId") Long friendsId) {
-        FriendsCheckResponse friendsCheckResponse = friendService.checkFriend(customUserPrincipal, friendsId);
-        return responseService.getSingleResponse(HttpStatus.OK.value(), friendsCheckResponse, "");
+        @PathVariable(name = "userId") Long userFriendId) {
+        FriendCheckResponse friendCheckResponse = friendService.checkFriend(customUserPrincipal, userFriendId);
+        return responseService.getSingleResponse(HttpStatus.OK.value(), friendCheckResponse, "");
     }
 
     @ApiOperation(tags = "5. Friends", value = "친구 신청하기")
     @PostMapping("/{userId}")
     public ResponseEntity<CommonResponse.GeneralResponse> addFriend(
         @AuthUser CustomUserPrincipal customUserPrincipal,
-        @PathVariable(name = "userId") Long friendsId) {
-        friendService.addFriend(customUserPrincipal, friendsId);
+        @PathVariable(name = "userId") Long userFriendId) {
+        friendService.addFriend(customUserPrincipal, userFriendId);
         return responseService.getGeneralResponse(HttpStatus.OK.value(), "친구 신청 성공");
     }
 
     @ApiOperation(tags = "5. Friends", value = "친구 승인하기")
-    @PostMapping("/approve/{friendsSn}")
+    @PostMapping("/approve/{friendId}")
     public ResponseEntity<CommonResponse.GeneralResponse> approveFriend(
         @AuthUser CustomUserPrincipal customUserPrincipal,
-        @PathVariable(name = "friendsSn") Long friendsSn) {
-        friendService.approveFriend(customUserPrincipal, friendsSn);
+        @PathVariable(name = "friendId") Long friendId) {
+        friendService.approveFriend(customUserPrincipal, friendId);
         return responseService.getGeneralResponse(HttpStatus.OK.value(), "승인 되었습니다.");
     }
 
     @ApiOperation(tags = "5. Friends", value = "친구 거절하기")
-    @DeleteMapping("/approve/{friendsSn}")
+    @DeleteMapping("/approve/{friendId}")
     public ResponseEntity<CommonResponse.GeneralResponse> refuseFriend(
         @AuthUser CustomUserPrincipal customUserPrincipal,
-        @PathVariable(name = "friendsSn") Long friendsSn) {
-        friendService.refuseFriend(customUserPrincipal, friendsSn);
+        @PathVariable(name = "friendId") Long friendId) {
+        friendService.refuseFriend(customUserPrincipal, friendId);
         return responseService.getGeneralResponse(HttpStatus.OK.value(), "거절 되었습니다.");
     }
 
     @ApiOperation(tags = "5. Friends", value = "친구 끊기")
-    @DeleteMapping("/{friendsSn}")
+    @DeleteMapping("/{friendId}")
     public ResponseEntity<CommonResponse.GeneralResponse> deleteFriends(
-        @AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable(name = "friendsSn") Long friendsSn) {
-        friendService.deleteFriends(customUserPrincipal, friendsSn);
+        @AuthUser CustomUserPrincipal customUserPrincipal,
+        @PathVariable(name = "friendId") Long friendId) {
+        friendService.deleteFriends(customUserPrincipal, friendId);
         return responseService.getGeneralResponse(HttpStatus.OK.value(), "친구를 끊었습니다.");
     }
 
