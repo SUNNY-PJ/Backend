@@ -1,11 +1,11 @@
-package com.sunny.backend.repository.community;
+package com.sunny.backend.community.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sunny.backend.dto.response.community.CommunityResponse;
+import com.sunny.backend.community.dto.CommunityResponse;
 import com.sunny.backend.entity.BoardType;
-import com.sunny.backend.entity.Community;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.entity.SortType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

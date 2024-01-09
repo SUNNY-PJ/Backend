@@ -2,7 +2,7 @@ package com.sunny.backend.dto.response.comment;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sunny.backend.entity.Comment;
-import com.sunny.backend.entity.Community;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

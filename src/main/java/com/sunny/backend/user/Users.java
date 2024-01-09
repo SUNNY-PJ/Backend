@@ -7,6 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.entity.*;
 import com.sunny.backend.friends.domain.Friend;
 

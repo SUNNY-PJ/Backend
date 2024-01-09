@@ -1,6 +1,4 @@
-package com.sunny.backend.service.community;
-
-import static com.sunny.backend.common.CommonErrorCode.*;
+package com.sunny.backend.community.service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -9,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.nimbusds.oauth2.sdk.util.StringUtils;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.entity.*;
 
 import org.springframework.data.domain.Pageable;
@@ -21,11 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.kms.model.NotFoundException;
 import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.ResponseService;
-import com.sunny.backend.dto.request.community.CommunityRequest;
-import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.repository.community.CommunityRepository;
+import com.sunny.backend.community.dto.CommunityRequest;
+import com.sunny.backend.community.dto.CommunityResponse;
+import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.repository.photo.PhotoRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.service.S3Service;
@@ -35,9 +33,9 @@ import com.sunny.backend.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class CommunityService {
 
 	private final CommunityRepository communityRepository;
@@ -50,8 +48,7 @@ public class CommunityService {
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> findCommunity(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
 		Users users = customUserPrincipal.getUsers();
-		Community community = communityRepository.findById(communityId)
-				.orElseThrow(() -> new CommonCustomException(COMMUNITY_NOT_FOUND));
+		Community community = communityRepository.getById(communityId);
 
 		String viewCount = redisUtil.getData(String.valueOf(users.getId()));
 

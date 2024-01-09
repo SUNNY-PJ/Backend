@@ -1,9 +1,7 @@
-package com.sunny.backend.controller;
+package com.sunny.backend.community.controller;
 
 import java.util.List;
 
-import com.sunny.backend.dto.response.ProfileResponse;
-import com.sunny.backend.dto.response.comment.CommentResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +18,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.config.AuthUser;
-import com.sunny.backend.dto.request.community.CommunityRequest;
-import com.sunny.backend.dto.response.community.CommunityResponse;
+import com.sunny.backend.community.dto.CommunityRequest;
+import com.sunny.backend.community.dto.CommunityResponse;
 import com.sunny.backend.entity.BoardType;
 import com.sunny.backend.entity.SortType;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.service.community.CommunityService;
+import com.sunny.backend.community.service.CommunityService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;

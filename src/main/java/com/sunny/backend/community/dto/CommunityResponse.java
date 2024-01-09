@@ -1,10 +1,8 @@
-package com.sunny.backend.dto.response.community;
+package com.sunny.backend.community.dto;
 
 import com.sunny.backend.common.DatetimeUtil;
-import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.entity.BoardType;
-import com.sunny.backend.entity.Comment;
-import com.sunny.backend.entity.Community;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.entity.Photo;
 import lombok.Getter;
 

@@ -18,9 +18,9 @@ import com.sunny.backend.dto.request.comment.CommentRequest;
 import com.sunny.backend.dto.request.comment.CommentRequestMapper;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.entity.Comment;
-import com.sunny.backend.entity.Community;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.repository.comment.CommentRepository;
-import com.sunny.backend.repository.community.CommunityRepository;
+import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
 

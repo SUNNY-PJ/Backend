@@ -1,15 +1,11 @@
 package com.sunny.backend.service.consumption;
 
-import com.amazonaws.services.kms.model.NotFoundException;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
-import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.dto.response.consumption.ConsumptionResponse;
 import com.sunny.backend.dto.response.consumption.SpendTypeStatisticsResponse;
-import com.sunny.backend.entity.Community;
 import com.sunny.backend.entity.Consumption;
-import com.sunny.backend.entity.Photo;
 import com.sunny.backend.repository.consumption.ConsumptionRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
