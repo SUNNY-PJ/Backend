@@ -6,12 +6,8 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.response.FriendsCheckResponse;
 import com.sunny.backend.dto.response.FriendsResponse;
 import com.sunny.backend.friends.domain.Friend;
@@ -26,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class FriendService {
-	private final ResponseService responseService;
 	private final FriendRepository friendRepository;
 	private final UserRepository userRepository;
 
@@ -40,15 +35,11 @@ public class FriendService {
 				.toList();
 	}
 
-	public ResponseEntity<CommonResponse.GeneralResponse> addFriend(
-		CustomUserPrincipal customUserPrincipal, Long friendsId) {
+	public void addFriend(CustomUserPrincipal customUserPrincipal, Long friendsId) {
 		Users user = customUserPrincipal.getUsers();
 		Users userFriend = userRepository.getById(friendsId);
 
 		getByUserAndUserFriend(user, userFriend, FriendStatus.WAIT);
-
-		return responseService.getGeneralResponse(HttpStatus.OK.value(),
-			user.getName() + "이 " + userFriend.getName() + "에게 친구 신청했습니다.");
 	}
 
 	@Transactional
@@ -88,17 +79,15 @@ public class FriendService {
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.GeneralResponse> deleteFriends(
+	public void deleteFriends(
 		CustomUserPrincipal customUserPrincipal, Long friendsSn) {
 		Friend friend = friendRepository.getById(friendsSn);
 		friend.validateFriendsByUser(friend.getUsers().getId(), customUserPrincipal.getUsers().getId());
 
 		friendRepository.deleteById(friendsSn);
-
-		return responseService.getGeneralResponse(HttpStatus.OK.value(), "삭제 완료");
 	}
 
-	public ResponseEntity<CommonResponse.SingleResponse<FriendsCheckResponse>> checkFriend(
+	public FriendsCheckResponse checkFriend(
 		CustomUserPrincipal customUserPrincipal, Long friendsId) {
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
 		Optional<Friend> friendsOptional = friendRepository.findByUsers_IdAndUserFriend_Id(friendsId, tokenUserId);
@@ -111,9 +100,6 @@ public class FriendService {
 			status = friend.getStatus();
 		}
 
-		return responseService.getSingleResponse(
-			HttpStatus.OK.value(), new FriendsCheckResponse(isFriend, status)
-			, status != null ? status.getStatus() : null
-		);
+		return new FriendsCheckResponse(isFriend, status);
 	}
 }

@@ -7,6 +7,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -55,7 +56,7 @@ class FriendServiceTest {
 	CustomUserPrincipal customUserPrincipal;
 
 	MockMvc mockMvc;
-	Users users;
+	Users user;
 	Users userFriend;
 	@BeforeEach
 	void setUp() {
@@ -71,8 +72,8 @@ class FriendServiceTest {
 		@Test
 		void 승인된_친구_목록_가져오기() {
 			// given
-			Friend friend = createFriend(users, userFriend, FriendStatus.APPROVE);
-			createFriend(userFriend, users, FriendStatus.APPROVE);
+			Friend friend = createFriend(user, userFriend, FriendStatus.APPROVE);
+			createFriend(userFriend, user, FriendStatus.APPROVE);
 
 			List<FriendsResponse> expected = new ArrayList<>();
 			expected.add(FriendsResponse.from(friend));
@@ -91,7 +92,7 @@ class FriendServiceTest {
 		@Test
 		void 대기중인_친구_목록_가져오기() {
 			// given
-			Friend friend = createFriend(users, userFriend, FriendStatus.WAIT);
+			Friend friend = createFriend(user, userFriend, FriendStatus.WAIT);
 
 			List<FriendsResponse> expected = new ArrayList<>();
 			expected.add(FriendsResponse.from(friend));
@@ -108,13 +109,46 @@ class FriendServiceTest {
 		}
 	}
 
+	@Nested
+	class 친구_신청_테스트 {
+		@Test
+		void 친구_신청_성공() {
+			// given
+
+			// when
+			friendService.addFriend(customUserPrincipal, userFriend.getId());
+			Optional<Friend> optionalFriend = friendRepository
+				.findByUsers_IdAndUserFriend_Id(userFriend.getId(), user.getId());
+			Friend friend = optionalFriend.get();
+
+			// then
+			assertThat(friend.getUserFriend().getId()).isEqualTo(user.getId());
+			assertThat(friend.getStatus()).isEqualTo(FriendStatus.WAIT);
+		}
+
+		@Test
+		void 신청한_친구한테_한번_더_신청하기() {
+			// given
+			friendService.addFriend(customUserPrincipal, userFriend.getId());
+			// when
+			friendService.addFriend(customUserPrincipal, userFriend.getId());
+			// Optional<Friend> optionalFriend = friendRepository
+			// 	.findByUsers_IdAndUserFriend_Id(userFriend.getId(), user.getId());
+			// Friend friend = optionalFriend.get();
+
+			// then
+			// assertThat(friend.getUserFriend().getId()).isEqualTo(user.getId());
+			// assertThat(friend.getStatus()).isEqualTo(FriendStatus.WAIT);
+		}
+	}
+
 	private void setTestUsersAndIssueToken() {
 		String userName = "유저이름";
 		String userEmail = "user@naver.com";
 		String friendName = "친구이름";
 		String friendEmail = "UserFriend@naver.com";
 
-		users = createUser(userName, userEmail);
+		user = createUser(userName, userEmail);
 		userFriend = createUser(friendName, friendEmail);
 
 		// testUser의 토큰 반환
@@ -139,8 +173,8 @@ class FriendServiceTest {
 		return friendRepository.save(saveFriend);
 	}
 
-	private void setFriend() {
-		createFriend(users, userFriend, FriendStatus.APPROVE);
-		createFriend(userFriend, users, FriendStatus.APPROVE);
-	}
+	// private void setFriend() {
+	// 	createFriend(user, userFriend, FriendStatus.APPROVE);
+	// 	createFriend(userFriend, user, FriendStatus.APPROVE);
+	// }
 }

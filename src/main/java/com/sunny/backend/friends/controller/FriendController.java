@@ -44,7 +44,8 @@ public class FriendController {
     public ResponseEntity<CommonResponse.SingleResponse<FriendsCheckResponse>> checkFriend(
         @AuthUser CustomUserPrincipal customUserPrincipal,
         @PathVariable(name = "userId") Long friendsId) {
-        return friendService.checkFriend(customUserPrincipal, friendsId);
+        FriendsCheckResponse friendsCheckResponse = friendService.checkFriend(customUserPrincipal, friendsId);
+        return responseService.getSingleResponse(HttpStatus.OK.value(), friendsCheckResponse, "");
     }
 
     @ApiOperation(tags = "5. Friends", value = "친구 신청하기")
@@ -52,7 +53,8 @@ public class FriendController {
     public ResponseEntity<CommonResponse.GeneralResponse> addFriend(
         @AuthUser CustomUserPrincipal customUserPrincipal,
         @PathVariable(name = "userId") Long friendsId) {
-        return friendService.addFriend(customUserPrincipal, friendsId);
+        friendService.addFriend(customUserPrincipal, friendsId);
+        return responseService.getGeneralResponse(HttpStatus.OK.value(), "친구 신청 성공");
     }
 
     @ApiOperation(tags = "5. Friends", value = "친구 승인하기")
@@ -77,7 +79,8 @@ public class FriendController {
     @DeleteMapping("/{friendsSn}")
     public ResponseEntity<CommonResponse.GeneralResponse> deleteFriends(
         @AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable(name = "friendsSn") Long friendsSn) {
-        return friendService.deleteFriends(customUserPrincipal, friendsSn);
+        friendService.deleteFriends(customUserPrincipal, friendsSn);
+        return responseService.getGeneralResponse(HttpStatus.OK.value(), "친구를 끊었습니다.");
     }
 
 }
