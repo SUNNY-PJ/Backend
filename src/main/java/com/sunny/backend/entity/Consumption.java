@@ -5,7 +5,7 @@ import static com.sunny.backend.common.CommonErrorCode.*;
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.CustomException;
 import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
-import com.sunny.backend.entity.friends.ApproveType;
+
 import com.sunny.backend.user.Users;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

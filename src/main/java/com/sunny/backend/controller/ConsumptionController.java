@@ -1,5 +1,8 @@
 package com.sunny.backend.controller;
 
+import com.sunny.backend.dto.response.consumption.ConsumptionResponse.DetailConsumption;
+import com.sunny.backend.entity.BoardType;
+import com.sunny.backend.entity.SpendType;
 import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -66,7 +69,8 @@ public class ConsumptionController {
 			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@RequestBody ConsumptionRequest consumtionRequest,
 			@PathVariable Long consumptionId) {
-		return consumptionService.updateConsumption(customUserPrincipal, consumtionRequest,consumptionId);
+		return consumptionService.updateConsumption(customUserPrincipal, consumtionRequest,
+				consumptionId);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "지출 내역 삭제")
@@ -74,6 +78,14 @@ public class ConsumptionController {
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteConsumption(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@PathVariable Long consumptionId) {
-		return consumptionService.deleteConsumption(customUserPrincipal,consumptionId);
+		return consumptionService.deleteConsumption(customUserPrincipal, consumptionId);
+	}
+
+	@ApiOperation(tags = "4. Consumption", value = "카테고리별 지출 내역 조회")
+	@GetMapping("/category")
+	public ResponseEntity<CommonResponse.ListResponse<DetailConsumption>> getConsumptionByCategory(
+			@AuthUser CustomUserPrincipal customUserPrincipal,
+			@RequestParam(required = false) SpendType spendType) {
+		return consumptionService.getConsumptionByCategory(customUserPrincipal, spendType);
 	}
 }
