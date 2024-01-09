@@ -10,6 +10,7 @@ import com.sunny.backend.dto.response.consumption.SpendTypeStatisticsResponse;
 import com.sunny.backend.entity.Community;
 import com.sunny.backend.entity.Consumption;
 import com.sunny.backend.entity.Photo;
+import com.sunny.backend.entity.SpendType;
 import com.sunny.backend.repository.consumption.ConsumptionRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
@@ -102,8 +103,20 @@ public class ConsumptionService {
         consumptionRepository.deleteById(consumptionId);
 
         return responseService.getGeneralResponse(HttpStatus.OK.value(),
-                "지출 내역을 삭제했습니다.");
+            "지출 내역을 삭제했습니다.");
     }
 
+    @Transactional
+    //지출 내역 조회
+    public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumption>> getConsumptionByCategory(
+        CustomUserPrincipal customUserPrincipal, SpendType spendType) {
+        List<Consumption> detailConsumption =
+            consumptionRepository.findByUsersIdAndCategory(customUserPrincipal.getUsers().getId(),
+                spendType);
+        List<ConsumptionResponse.DetailConsumption> detailConsumptions =
+            ConsumptionResponse.DetailConsumption.fromDetailConsumptions(detailConsumption);
+        return responseService.getListResponse(HttpStatus.OK.value(),
+            detailConsumptions, spendType + " 에 맞는 지출 내역을 불러왔습니다.");
+    }
 
 }

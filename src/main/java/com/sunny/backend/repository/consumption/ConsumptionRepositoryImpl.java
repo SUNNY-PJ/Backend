@@ -53,7 +53,7 @@ public class ConsumptionRepositoryImpl  extends QuerydslRepositorySupport implem
                   double percentage = (double) totalMoney / totalSpending * 100.0;
 
                   return new SpendTypeStatisticsResponse(category, totalCount, totalMoney,
-                      (long) percentage); //반올림 처리
+                      (double) Math.round(percentage * 100) / 100); //반올림 처리
                 })
                 .collect(Collectors.toList());
     }
