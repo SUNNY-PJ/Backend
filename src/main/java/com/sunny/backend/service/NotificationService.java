@@ -1,7 +1,7 @@
 package com.sunny.backend.service;
 
 import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.CustomException;
+import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.NotificationRequestDto;
 import com.sunny.backend.dto.request.PushRequestDto;
@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
-import static com.sunny.backend.common.ErrorCode.NOTIFICATIONS_NOT_SENT;
+import static com.sunny.backend.common.CommonErrorCode.NOTIFICATIONS_NOT_SENT;
 
 @Service
 @RequiredArgsConstructor
@@ -108,7 +108,7 @@ public class NotificationService {
             return responseService.getSingleResponse(HttpStatus.OK.value(), notificationResponse, "알림 성공");
         }
         else {
-            throw new CustomException(NOTIFICATIONS_NOT_SENT);
+            throw new CommonCustomException(NOTIFICATIONS_NOT_SENT);
         }
     }
 }

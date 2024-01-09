@@ -3,13 +3,11 @@ package com.sunny.backend.repository.chat;
 import static com.querydsl.core.group.GroupBy.*;
 import static com.sunny.backend.entity.chat.QChatMessage.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import com.querydsl.core.types.ConstantImpl;
-import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
