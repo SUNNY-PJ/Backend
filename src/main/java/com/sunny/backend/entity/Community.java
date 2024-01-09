@@ -67,7 +67,6 @@ public class Community extends BaseTime {
         this.title=communityRequest.getTitle();
         this.contents=communityRequest.getContents();
         this.boardType=communityRequest.getType();
-
     }
 
     public void increaseView() {
