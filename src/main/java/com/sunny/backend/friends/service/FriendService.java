@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
-import com.sunny.backend.dto.request.FriendsApproveRequest;
 import com.sunny.backend.dto.response.FriendsCheckResponse;
 import com.sunny.backend.dto.response.FriendsResponse;
 import com.sunny.backend.friends.domain.Friend;
@@ -31,20 +30,17 @@ public class FriendService {
 	private final FriendRepository friendRepository;
 	private final UserRepository userRepository;
 
-	public ResponseEntity<CommonResponse.ListResponse<FriendsResponse>> getFriendsList(
+	public List<FriendsResponse> getFriends(
 		CustomUserPrincipal customUserPrincipal, @Valid FriendStatus friendStatus) {
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
 
-		List<FriendsResponse> friendsResponses =
-			friendRepository.findByUsers_IdAndStatus(tokenUserId, friendStatus)
+		return friendRepository.findByUsers_IdAndStatus(tokenUserId, friendStatus)
 				.stream()
 				.map(FriendsResponse::from)
 				.toList();
-
-		return responseService.getListResponse(HttpStatus.OK.value(), friendsResponses, "친구 목록 가져오기");
 	}
 
-	public ResponseEntity<CommonResponse.GeneralResponse> addFriends(
+	public ResponseEntity<CommonResponse.GeneralResponse> addFriend(
 		CustomUserPrincipal customUserPrincipal, Long friendsId) {
 		Users user = customUserPrincipal.getUsers();
 		Users userFriend = userRepository.getById(friendsId);
@@ -56,20 +52,22 @@ public class FriendService {
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.GeneralResponse> approveFriends(
-		CustomUserPrincipal customUserPrincipal, Long friendsSn, @Valid FriendsApproveRequest request) {
+	public void approveFriend(CustomUserPrincipal customUserPrincipal, Long friendsSn) {
 		Friend friend = friendRepository.getById(friendsSn);
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
 		friend.validateFriendsByUser(friend.getUsers().getId(), tokenUserId);
 
-		if(request.approve()) {
-			friend.approveStatus();
-			getByUserAndUserFriend(friend.getUsers(), friend.getUserFriend(), FriendStatus.APPROVE);
-			return responseService.getGeneralResponse(HttpStatus.OK.value(), "승인 되었습니다.");
-		} else {
-			friendRepository.deleteById(friend.getId());
-			return responseService.getGeneralResponse(HttpStatus.OK.value(), "거절 되었습니다.");
-		}
+		friend.approveStatus();
+		getByUserAndUserFriend(friend.getUsers(), friend.getUserFriend(), FriendStatus.APPROVE);
+	}
+
+	@Transactional
+	public void refuseFriend(CustomUserPrincipal customUserPrincipal, Long friendsSn) {
+		Friend friend = friendRepository.getById(friendsSn);
+		Long tokenUserId = customUserPrincipal.getUsers().getId();
+		friend.validateFriendsByUser(friend.getUsers().getId(), tokenUserId);
+
+		friendRepository.deleteById(friend.getId());
 	}
 
 	private void getByUserAndUserFriend(Users user, Users userFriend, FriendStatus status) {
@@ -100,7 +98,7 @@ public class FriendService {
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "삭제 완료");
 	}
 
-	public ResponseEntity<CommonResponse.SingleResponse<FriendsCheckResponse>> checkFriends(
+	public ResponseEntity<CommonResponse.SingleResponse<FriendsCheckResponse>> checkFriend(
 		CustomUserPrincipal customUserPrincipal, Long friendsId) {
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
 		Optional<Friend> friendsOptional = friendRepository.findByUsers_IdAndUserFriend_Id(friendsId, tokenUserId);
