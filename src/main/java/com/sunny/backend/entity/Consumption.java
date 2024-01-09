@@ -3,7 +3,9 @@ package com.sunny.backend.entity;
 import com.sunny.backend.common.CustomException;
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
+import com.sunny.backend.entity.friends.ApproveType;
 import com.sunny.backend.user.Users;
+import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,21 +31,22 @@ public class Consumption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
+    @Column
+    @Enumerated(value = EnumType.STRING)
     private SpendType category;
 
     @Column
-    @NotNull
+    @NotBlank(message = "지출 이름은 필수 입력값입니다.")
     private String name;
 
     @Column
-    @NotNull
+    @NotNull(message = "지출 금액은 필수 입력값입니다.")
     private Long money;
 
     @Column
-    @NotNull
+    @NotNull(message = "지출 날짜는 필수 입력값입니다.")
     private LocalDate dateField;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "users_id")
     private Users users;
@@ -60,5 +63,4 @@ public class Consumption {
             throw new CustomException(NO_USER_PERMISSION);
         }
     }
-
 }

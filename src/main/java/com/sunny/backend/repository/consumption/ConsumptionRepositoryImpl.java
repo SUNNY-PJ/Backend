@@ -47,17 +47,16 @@ public class ConsumptionRepositoryImpl  extends QuerydslRepositorySupport implem
         // 각 카테고리별로 계산
         return tuples.stream()
                 .map(tuple -> {
-                    SpendType category = tuple.get(consumption.category);
-                    long totalCount = tuple.get(consumption.name.count());
-                    long totalMoney = tuple.get(consumption.money.sum());
-                    double percentage = (double) totalMoney / totalSpending * 100.0;
+                  SpendType category = tuple.get(consumption.category);
+                  long totalCount = tuple.get(consumption.name.count());
+                  long totalMoney = tuple.get(consumption.money.sum());
+                  double percentage = (double) totalMoney / totalSpending * 100.0;
 
-                    // Map the results to SpendTypeStatisticsResponse object
-                    return new SpendTypeStatisticsResponse(category, totalCount, totalMoney, percentage);
+                  return new SpendTypeStatisticsResponse(category, totalCount, totalMoney,
+                      (long) percentage); //반올림 처리
                 })
                 .collect(Collectors.toList());
     }
-
     @Override
     public Long getComsumptionMoney(Long id, LocalDate startDate, LocalDate endDate) {
         return queryFactory.select(consumption.money.sum())

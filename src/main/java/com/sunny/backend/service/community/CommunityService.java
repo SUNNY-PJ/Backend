@@ -96,7 +96,6 @@ public class CommunityService {
 		Community community = Community.builder()
 				.title(communityRequest.getTitle())
 				.contents(communityRequest.getContents())
-				.writer(user.getName())
 				.boardType(communityRequest.getType())
 				.users(user)
 				.build();

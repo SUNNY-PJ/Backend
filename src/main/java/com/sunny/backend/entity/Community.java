@@ -7,6 +7,7 @@ import static com.sunny.backend.common.ErrorCode.*;
 import com.sunny.backend.common.CustomException;
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.user.Users;
+import javax.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -28,14 +29,12 @@ public class Community extends BaseTime {
     private Long id;
 
     @Column
+    @NotBlank(message = "제목은 필수 입력값입니다.")
     private String title; //제목
 
     @Column
+    @NotBlank(message = "내용은 필수 입력값입니다.")
     private String contents; //내용
-
-    @Column
-    private String writer; //작성자
-
     //기본값 0으로 세팅
     @ColumnDefault("0")
     @Column

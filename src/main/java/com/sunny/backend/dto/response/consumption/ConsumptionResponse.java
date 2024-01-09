@@ -19,7 +19,7 @@ public class ConsumptionResponse {
 
     public ConsumptionResponse(Consumption consumption) {
         this.id = consumption.getId();
-        this.name = consumption.getName();
+        this.name = consumption.getUsers().getName();
         this.category = consumption.getCategory();
         this.money = consumption.getMoney();
         this.dateField = consumption.getDateField();
@@ -38,7 +38,7 @@ public class ConsumptionResponse {
         private Long money;
 
         public DetailConsumption(Consumption consumption) {
-            this.name = consumption.getName();
+            this.name = consumption.getUsers().getName();
             this.money = consumption.getMoney();
         }
 

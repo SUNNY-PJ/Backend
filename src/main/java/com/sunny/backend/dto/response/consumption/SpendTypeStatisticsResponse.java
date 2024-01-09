@@ -13,6 +13,6 @@ public class SpendTypeStatisticsResponse {
     private SpendType category;
     private long totalCount;
     private long totalMoney;
-    private double percentage;
+    private long percentage;
 
 }
