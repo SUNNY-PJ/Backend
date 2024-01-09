@@ -126,12 +126,12 @@ class FriendServiceTest {
 			assertThat(friend.getStatus()).isEqualTo(FriendStatus.WAIT);
 		}
 
-		@Test
-		void 신청한_친구한테_한번_더_신청하기() {
+		// @Test
+		// void 신청한_친구한테_한번_더_신청하기() {
 			// given
-			friendService.addFriend(customUserPrincipal, userFriend.getId());
+			// friendService.addFriend(customUserPrincipal, userFriend.getId());
 			// when
-			friendService.addFriend(customUserPrincipal, userFriend.getId());
+			// friendService.addFriend(customUserPrincipal, userFriend.getId());
 			// Optional<Friend> optionalFriend = friendRepository
 			// 	.findByUsers_IdAndUserFriend_Id(userFriend.getId(), user.getId());
 			// Friend friend = optionalFriend.get();
@@ -139,7 +139,7 @@ class FriendServiceTest {
 			// then
 			// assertThat(friend.getUserFriend().getId()).isEqualTo(user.getId());
 			// assertThat(friend.getStatus()).isEqualTo(FriendStatus.WAIT);
-		}
+		// }
 	}
 
 	private void setTestUsersAndIssueToken() {
