@@ -9,9 +9,10 @@ import java.util.Date;
 @Getter
 @JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class SaveRequest {
+
     private Long cost;
     private String saveContent;
-    private Date startDate;
-    private Date endDate;
+    private String startDate;
+    private String endDate;
 }
 

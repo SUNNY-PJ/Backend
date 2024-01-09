@@ -9,20 +9,21 @@ import java.util.Date;
 
 @Getter
 public class SaveResponse {
+
+    private Long id;
     private Long cost;
     private String saveContent;
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date startDate;
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date endDate;
+    private String startDate;
+
+    private String endDate;
 
 
-
-    public SaveResponse(Save save){
-        this.cost=save.getCost();
-        this.saveContent=save.getSaveContent();
-        this.startDate=save.getStartDate();
-        this.endDate=save.getEndDate();
+    public SaveResponse(Save save) {
+        this.id = save.getId();
+        this.cost = save.getCost();
+        this.saveContent = save.getSaveContent();
+        this.startDate = save.getStartDate();
+        this.endDate = save.getEndDate();
 
     }
 }

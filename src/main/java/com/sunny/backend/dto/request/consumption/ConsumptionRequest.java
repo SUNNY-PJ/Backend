@@ -10,8 +10,9 @@ import java.time.LocalDate;
 @Getter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ConsumptionRequest {
-    private String name; //지출명
-    private SpendType category; //지출 장소
-    private Long money; //지출 금액
-    private LocalDate dateField; // 지출 일자
+
+    private String name;
+    private SpendType category;
+    private Long money;
+    private LocalDate dateField;
 }

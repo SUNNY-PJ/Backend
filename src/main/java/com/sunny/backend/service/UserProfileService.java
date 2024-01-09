@@ -61,7 +61,9 @@ public class UserProfileService {
         List<Comment> commentList = commentRepository.findAllByUsers_Id(community.getUsers().getId());
         List<CommentResponse.Mycomment> commentDTOList =
                 commentList.stream()
-                        .map(comment -> new CommentResponse.Mycomment(comment.getCommunity().getId(),comment.getId(), comment.getContent(), comment.getWriter(),comment.getCreatedDate(),comment.getUpdatedDate()))
+                    .map(comment -> new CommentResponse.Mycomment(comment.getCommunity().getId(),
+                        comment.getId(), comment.getContent(), comment.getUsers().getName(),
+                        comment.getCreatedDate(), comment.getUpdatedDate()))
                         .collect(Collectors.toList());
 
         return responseService.getListResponse(HttpStatus.OK.value(), commentDTOList, "친구가 쓴 댓글 조회");

@@ -80,8 +80,8 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
     private BooleanExpression eqSearchText(String searchText) {
         if (!searchText.isEmpty()) {
             return community.title.contains(searchText)
-                    .or(community.contents.contains(searchText))
-                    .or(community.writer.contains(searchText));
+                .or(community.contents.contains(searchText))
+                .or(community.users.name.contains(searchText));
         }
         return null;
     }
