@@ -216,6 +216,7 @@ class FriendServiceTest {
 			assertThat(friendsCheckResponse.isFriend()).isFalse();
 			assertThat(friendsCheckResponse.status()).isNull();
 		}
+
 	}
 
 	private void setTestUsersAndIssueToken() {
