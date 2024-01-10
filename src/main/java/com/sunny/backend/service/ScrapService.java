@@ -11,13 +11,12 @@ import com.amazonaws.services.kms.model.NotFoundException;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.entity.Community;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.entity.Scrap;
 import com.sunny.backend.repository.ScrapRepository;
-import com.sunny.backend.repository.community.CommunityRepository;
+import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
-import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +34,7 @@ public class ScrapService {
 		List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId()); //user id 이용해서 전체 스크랩 조회
 
 		List<CommunityResponse> communityResponseList = scrapList.stream()
-			.map(scrap -> new CommunityResponse(scrap.getCommunity(),false))
+				.map(scrap -> CommunityResponse.of(scrap.getCommunity(), false))
 			.collect(Collectors.toList());
 
 		return responseService.getListResponse(HttpStatus.OK.value(), communityResponseList, "");
@@ -45,13 +44,11 @@ public class ScrapService {
 	public ResponseEntity<CommonResponse.GeneralResponse> addScrapToCommunity(CustomUserPrincipal customUserPrincipal,
 		Long communityId) {
 		Users user = customUserPrincipal.getUsers();
-
-		Community community = communityRepository.findById(communityId)
-			.orElseThrow(() -> new NotFoundException("could not found community"));
+		Community community = communityRepository.getById(communityId);
 		Scrap scrap = Scrap.builder()
-			.community(community)
-			.users(user)
-			.build();
+				.community(community)
+				.users(user)
+				.build();
 		scrapRepository.save(scrap);
 
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "스크랩하였습니다.");
@@ -64,9 +61,7 @@ public class ScrapService {
 
 		try {
 			Users user = customUserPrincipal.getUsers();
-			Community community = communityRepository.findById(communityId)
-				.orElseThrow(() -> new NotFoundException("could not found community"));
-
+			Community community = communityRepository.getById(communityId);
 			Scrap deleteScrap = scrapRepository.findByUsersAndCommunity(user, community);
 			if (deleteScrap != null) {
 				scrapRepository.delete(deleteScrap);

@@ -36,6 +36,7 @@ public class SaveService {
 				.users(user)
 				.build();
 		saveRepository.save(save);
+		user.addSave(save);
 		SaveResponse saveResponse = SaveResponse.from(save);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), saveResponse, "절약 목표를 등록했습니다.");
 

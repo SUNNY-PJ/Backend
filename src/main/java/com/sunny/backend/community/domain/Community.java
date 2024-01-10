@@ -1,11 +1,13 @@
-package com.sunny.backend.entity;
-
+package com.sunny.backend.community.domain;
 
 
 import static com.sunny.backend.common.CommonErrorCode.*;
 
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.dto.request.community.CommunityRequest;
+import com.sunny.backend.entity.BaseTime;
+import com.sunny.backend.entity.Comment;
+import com.sunny.backend.entity.Photo;
 import com.sunny.backend.user.Users;
 import javax.validation.constraints.NotBlank;
 import lombok.*;

@@ -1,8 +1,8 @@
-package com.sunny.backend.repository.community;
+package com.sunny.backend.community.repository;
 
 import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.entity.BoardType;
-import com.sunny.backend.entity.SortType;
+import com.sunny.backend.community.domain.BoardType;
+import com.sunny.backend.community.domain.SortType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

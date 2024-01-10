@@ -31,7 +31,8 @@ public class Save {
 
     @Column
     private LocalDate endDate;
-    @OneToOne(mappedBy = "save", fetch = FetchType.LAZY)
+    @OneToOne
+    @JoinColumn(name = "user_id")
     private Users users;
 
     public void updateSave(SaveRequest saveRequest) {
