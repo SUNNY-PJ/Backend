@@ -18,35 +18,33 @@ import java.util.stream.Collectors;
 import static com.sunny.backend.entity.QCommunity.community;
 
 public class CommunityRepositoryImpl extends QuerydslRepositorySupport implements CommunityRepositoryCustom {
-    private JPAQueryFactory queryFactory;
+    private final JPAQueryFactory queryFactory;
 
     public CommunityRepositoryImpl(JPAQueryFactory jpaQueryFactory) {
         super(Community.class);
         this.queryFactory = jpaQueryFactory;
     }
 
-
     @Override
     public Slice<CommunityResponse.PageResponse> getCommunityList(Pageable pageable) {
         List<Community> results = queryFactory
-                .selectFrom(community)
-                .orderBy(community.createdDate.desc()) // 기본 정렬은 최신순
-                .offset(pageable.getOffset()) //시작점
-                .limit(pageable.getPageSize()+1) //limit보다 데이터를 1개 더 갖고와서, 해당 데이터가 있다면 hasNext 변수에 true 값 넣어줌
-                .fetch();
+            .selectFrom(community)
+            .orderBy(community.createdDate.desc())
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize() + 1)
+            .fetch();
 
         List<CommunityResponse.PageResponse> dtoList = results.stream()
-                .map(CommunityResponse.PageResponse::new)
-                .collect(Collectors.toList());
+            .map(CommunityResponse.PageResponse::from)
+            .collect(Collectors.toList());
 
         boolean hasNext = false;
-        if (dtoList.size() > pageable.getPageSize()) {
+        if (!dtoList.isEmpty() && dtoList.size() > pageable.getPageSize()) {
             dtoList.remove(pageable.getPageSize());
             hasNext = true;
         }
         return new SliceImpl<>(dtoList, pageable, hasNext);
     }
-
     @Override
     public Slice<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType, BoardType boardType, String searchText, Pageable pageable) {
         JPAQuery<Community> query = queryFactory.selectFrom(community)
@@ -60,11 +58,10 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
         if (boardType != null) {
             query.where(eqBoardType(boardType));
         }
-
         List<Community> results = query.fetch();
 
         List<CommunityResponse.PageResponse> dtoList = results.stream()
-                .map(CommunityResponse.PageResponse::new)
+            .map(CommunityResponse.PageResponse::from)
                 .collect(Collectors.toList());
 
         boolean hasNext = results.size() > pageable.getPageSize();
@@ -76,7 +73,6 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
     }
 
 
-    //제목 + 내용에 필요한 동적 쿼리문
     private BooleanExpression eqSearchText(String searchText) {
         if (!searchText.isEmpty()) {
             return community.title.contains(searchText)

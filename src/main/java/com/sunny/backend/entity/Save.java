@@ -2,6 +2,7 @@ package com.sunny.backend.entity;
 
 import com.sunny.backend.dto.request.save.SaveRequest;
 import com.sunny.backend.user.Users;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,18 +27,17 @@ public class Save {
     private String saveContent;
 
     @Column
-    private String startDate;
+    private LocalDate startDate;
 
     @Column
-    private String endDate;
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    private LocalDate endDate;
+    @OneToOne(mappedBy = "save", fetch = FetchType.LAZY)
     private Users users;
 
-    public void updateSave(SaveRequest saveRequest){
-        this.cost=saveRequest.getCost();
-        this.saveContent=saveRequest.getSaveContent();
-        this.startDate=saveRequest.getStartDate();
-        this.endDate=saveRequest.getEndDate();
+    public void updateSave(SaveRequest saveRequest) {
+        this.cost = saveRequest.getCost();
+        this.saveContent = saveRequest.getSaveContent();
+        this.startDate = saveRequest.getStartDate();
+        this.endDate = saveRequest.getEndDate();
     }
 }

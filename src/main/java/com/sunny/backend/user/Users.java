@@ -44,16 +44,17 @@ public class Users extends BaseTime {
 	@Column
 	@Enumerated(value = EnumType.STRING)
 	private AuthProvider authProvider;
-	@OneToMany(mappedBy = "users",cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private List<Community> communityList;
 
-	@OneToMany(mappedBy = "users",cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private List<Consumption> consumptionList;
 
-	@OneToMany(mappedBy = "users",cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	@JsonIgnore
-	private  List<Comment> commentList;
-	@OneToOne(mappedBy = "users")
+	private List<Comment> commentList;
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "save_id")
 	private Save save;
 
 	@OneToMany(mappedBy = "users")
@@ -85,4 +86,5 @@ public class Users extends BaseTime {
 		this.consumptionList = new ArrayList<>();
 		this.consumptionList.add(consumption);
 	}
+
 }

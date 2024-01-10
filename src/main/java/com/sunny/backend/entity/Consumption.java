@@ -44,7 +44,7 @@ public class Consumption {
 
     @Column
     @NotNull(message = "지출 날짜는 필수 입력값입니다.")
-    private LocalDate dateField;
+    private LocalDate dateField; //consumption date -> 바꿀까
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "users_id")
