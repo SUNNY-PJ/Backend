@@ -10,7 +10,6 @@ import java.util.List;
 
 public interface ConsumptionRepository extends JpaRepository<Consumption, Long>,
     ConsumptionCustomRepository {
-
     List<Consumption> findByUsersId(Long userId);
 
     List<Consumption> findByUsersIdAndDateField(Long userId, LocalDate datefield);

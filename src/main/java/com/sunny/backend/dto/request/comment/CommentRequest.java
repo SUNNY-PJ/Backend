@@ -19,7 +19,5 @@ public class CommentRequest {
     private Boolean isPrivated;
     public CommentRequest(String content) {
         this.content = content;
-
     }
-
 }

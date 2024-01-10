@@ -23,11 +23,10 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "6. Save", description = "Save API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/save") //To do : saving 으로 변경?
+@RequestMapping("/save")
 public class SaveController {
 	private final SaveService saveService;
 
-	//절약 목표 설정
 	@ApiOperation(tags = "6. Save", value = "절약 목표 등록")
 	@PostMapping("")
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> createSaveGoal(
@@ -36,7 +35,6 @@ public class SaveController {
 	}
 
 	@ApiOperation(tags = "6. Save", value = "절약 목표 수정")
-	//절약 목표 수정
 	@PutMapping("/{savedId}")
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> updateSaveGoal(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long savedId,
@@ -44,7 +42,6 @@ public class SaveController {
 		return saveService.updateSaveGoal(customUserPrincipal, savedId, saveRequest);
 	}
 
-	//절약 목표 조회
 	@ApiOperation(tags = "6. Save", value = "절약 목표 조회")
 	@GetMapping("/{savedId}")
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> getSaveGaol(

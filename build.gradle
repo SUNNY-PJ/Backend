@@ -27,8 +27,8 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.projectlombok:lombok:1.18.22'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
 	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 	//JPA
@@ -40,6 +40,8 @@ dependencies {
 	//lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
 
 	//Mysql
 	implementation 'mysql:mysql-connector-java'
@@ -69,7 +71,8 @@ dependencies {
 	// querydsl
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
-
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.3'
+	// Use the latest version available
 	//Firebase
 	implementation 'com.google.firebase:firebase-admin:9.1.1'
 	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
@@ -79,7 +82,6 @@ dependencies {
 	implementation 'org.webjars:webjars-locator-core'
 	implementation 'org.webjars:sockjs-client:1.0.2'
 	implementation 'org.webjars:stomp-websocket:2.3.3'
-	testImplementation 'org.springframework.security:spring-security-test'
 
 }
 

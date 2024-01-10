@@ -1,15 +1,13 @@
 package com.sunny.backend.service.consumption;
 
-import com.amazonaws.services.kms.model.NotFoundException;
+
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
-import com.sunny.backend.dto.response.community.CommunityResponse;
+import com.sunny.backend.dto.response.ProfileResponse;
 import com.sunny.backend.dto.response.consumption.ConsumptionResponse;
 import com.sunny.backend.dto.response.consumption.SpendTypeStatisticsResponse;
-import com.sunny.backend.entity.Community;
 import com.sunny.backend.entity.Consumption;
-import com.sunny.backend.entity.Photo;
 import com.sunny.backend.entity.SpendType;
 import com.sunny.backend.repository.consumption.ConsumptionRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
@@ -32,13 +30,12 @@ public class ConsumptionService {
     private final ConsumptionRepository consumptionRepository;
     private final ResponseService responseService;
 
-    //지출 등록
     @Transactional
     public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> createConsumption(
             CustomUserPrincipal customUserPrincipal, ConsumptionRequest consumptionRequest) {
         Users user = customUserPrincipal.getUsers();
         Consumption consumption = Consumption.builder()
-            .name(user.getName())
+            .name(consumptionRequest.getName())
             .category(consumptionRequest.getCategory())
             .money(consumptionRequest.getMoney())
             .dateField(consumptionRequest.getDateField())
@@ -46,77 +43,79 @@ public class ConsumptionService {
             .build();
 
         consumptionRepository.save(consumption);
-
         if (user.getConsumptionList() == null) {
             user.addConsumption(consumption);
         }
+        ProfileResponse profileResponse = ProfileResponse.from(user);
+        ConsumptionResponse consumptionResponse = ConsumptionResponse.from(consumption);
         return responseService.getSingleResponse(HttpStatus.OK.value(),
-            new ConsumptionResponse(consumption), "지출을 등록했습니다.");
+            consumptionResponse, "지출을 등록했습니다.");
     }
 
     @Transactional
-    //지출 조회
     public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse>> getConsumptionList(
             CustomUserPrincipal customUserPrincipal) {
-        //유저 id 기준으로 지출 내역 조회
-        List<Consumption> consumptions = consumptionRepository.findByUsersId(customUserPrincipal.getUsers().getId());
-        List<ConsumptionResponse> consumptionResponses = ConsumptionResponse.fromConsumptions(consumptions);
-        return responseService.getListResponse(HttpStatus.OK.value(), consumptionResponses, "지출 내역을 불러왔습니다.");
+        List<Consumption> consumptions = consumptionRepository.findByUsersId(
+            customUserPrincipal.getUsers().getId());
+        List<ConsumptionResponse> consumptionResponses = ConsumptionResponse.listFrom(consumptions);
+        return responseService.getListResponse(HttpStatus.OK.value(),
+            consumptionResponses, "지출 내역을 불러왔습니다.");
     }
 
     @Transactional
     public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> updateConsumption(
-            CustomUserPrincipal customUserPrincipal, ConsumptionRequest consumptionRequest,Long consumptionId) {
+        CustomUserPrincipal customUserPrincipal,
+        ConsumptionRequest consumptionRequest, Long consumptionId) {
         Users user = customUserPrincipal.getUsers();
-        Consumption consumption=consumptionRepository.getById(consumptionId);
+        Consumption consumption = consumptionRepository.getById(consumptionId);
         consumption.updateConsumption(consumptionRequest);
         Consumption.validateConsumptionByUser(user.getId(), consumption.getUsers().getId());
         consumptionRepository.save(consumption);
-        return responseService.getSingleResponse(HttpStatus.OK.value(), new ConsumptionResponse(consumption),
-                "지출을 수정했습니다.");
-    }
-    @Transactional
-    //지출 통계
-    public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>> getSpendTypeStatistics() {
-        List<SpendTypeStatisticsResponse> statistics = consumptionRepository.getSpendTypeStatistics();
-        return responseService.getListResponse(HttpStatus.OK.value(), statistics, "지출 통계 내역을 불러왔습니다.");
+        ConsumptionResponse consumptionResponse = ConsumptionResponse.from(consumption);
+        return responseService.getSingleResponse(HttpStatus.OK.value(),
+            consumptionResponse, "지출을 수정했습니다.");
     }
 
     @Transactional
-    //지출 내역 조회
-    public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumption>> getDetailConsumption(
-            CustomUserPrincipal customUserPrincipal, LocalDate datefield) {
-        List<Consumption> detailConsumption =
-                consumptionRepository.findByUsersIdAndDateField(customUserPrincipal.getUsers().getId(), datefield);
-        List<ConsumptionResponse.DetailConsumption> detailConsumptions =
-                ConsumptionResponse.DetailConsumption.fromDetailConsumptions(detailConsumption);
+    public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>> getSpendTypeStatistics() {
+        List<SpendTypeStatisticsResponse> statistics = consumptionRepository.getSpendTypeStatistics();
         return responseService.getListResponse(HttpStatus.OK.value(),
-                detailConsumptions, datefield + " 에 맞는 지출 내역을 불러왔습니다.");
+            statistics, "지출 통계 내역을 불러왔습니다.");
     }
+
+    @Transactional
+    public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumptionResponse>>
+    getDetailConsumption(CustomUserPrincipal customUserPrincipal, LocalDate datefield) {
+        List<Consumption> detailConsumption =
+            consumptionRepository.findByUsersIdAndDateField(customUserPrincipal.getUsers().getId(),
+                datefield);
+        List<ConsumptionResponse.DetailConsumptionResponse> detailConsumptions =
+            ConsumptionResponse.DetailConsumptionResponse.listFrom(detailConsumption);
+        return responseService.getListResponse(HttpStatus.OK.value(),
+            detailConsumptions, datefield + "에 맞는 지출 내역을 불러왔습니다.");
+    }
+
     @Transactional
     public ResponseEntity<CommonResponse.GeneralResponse> deleteConsumption(
-            CustomUserPrincipal customUserPrincipal, Long consumptionId) {
+        CustomUserPrincipal customUserPrincipal, Long consumptionId) {
 
         Users user = customUserPrincipal.getUsers();
         Consumption consumption = consumptionRepository.getById(consumptionId);
         Consumption.validateConsumptionByUser(user.getId(), consumption.getUsers().getId());
         consumptionRepository.deleteById(consumptionId);
-
         return responseService.getGeneralResponse(HttpStatus.OK.value(),
             "지출 내역을 삭제했습니다.");
     }
 
     @Transactional
-    //지출 내역 조회
-    public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumption>> getConsumptionByCategory(
-        CustomUserPrincipal customUserPrincipal, SpendType spendType) {
+    public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumptionResponse>>
+    getConsumptionByCategory(CustomUserPrincipal customUserPrincipal, SpendType spendType) {
         List<Consumption> detailConsumption =
             consumptionRepository.findByUsersIdAndCategory(customUserPrincipal.getUsers().getId(),
                 spendType);
-        List<ConsumptionResponse.DetailConsumption> detailConsumptions =
-            ConsumptionResponse.DetailConsumption.fromDetailConsumptions(detailConsumption);
+        List<ConsumptionResponse.DetailConsumptionResponse> detailConsumptions =
+            ConsumptionResponse.DetailConsumptionResponse.listFrom(detailConsumption);
         return responseService.getListResponse(HttpStatus.OK.value(),
-            detailConsumptions, spendType + " 에 맞는 지출 내역을 불러왔습니다.");
+            detailConsumptions, spendType + "에 맞는 지출 내역을 불러왔습니다.");
     }
-
 }

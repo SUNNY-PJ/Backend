@@ -1,29 +1,24 @@
 package com.sunny.backend.dto.response.save;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sunny.backend.entity.Save;
-import lombok.Builder;
-import lombok.Getter;
+import java.time.LocalDate;
 
-import java.util.Date;
+public record SaveResponse(
 
-@Getter
-public class SaveResponse {
+    Long id,
+    Long cost,
+    String saveContent,
+    LocalDate startDate,
+    LocalDate endDate
+) {
 
-    private Long id;
-    private Long cost;
-    private String saveContent;
-    private String startDate;
-
-    private String endDate;
-
-
-    public SaveResponse(Save save) {
-        this.id = save.getId();
-        this.cost = save.getCost();
-        this.saveContent = save.getSaveContent();
-        this.startDate = save.getStartDate();
-        this.endDate = save.getEndDate();
-
+    public static SaveResponse from(Save save) {
+        return new SaveResponse(
+            save.getId(),
+            save.getCost(),
+            save.getSaveContent(),
+            save.getStartDate(),
+            save.getEndDate()
+        );
     }
 }

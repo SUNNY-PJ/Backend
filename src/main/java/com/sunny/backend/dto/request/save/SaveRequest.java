@@ -1,7 +1,9 @@
 package com.sunny.backend.dto.request.save;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.time.LocalDate;
 import lombok.Getter;
 
 import java.util.Date;
@@ -12,7 +14,9 @@ public class SaveRequest {
 
     private Long cost;
     private String saveContent;
-    private String startDate;
-    private String endDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate endDate;
 }
 
