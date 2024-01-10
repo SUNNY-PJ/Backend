@@ -6,11 +6,11 @@ import com.sunny.backend.dto.response.ProfileResponse;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.entity.Comment;
-import com.sunny.backend.entity.Community;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.entity.Scrap;
 import com.sunny.backend.repository.ScrapRepository;
 import com.sunny.backend.repository.comment.CommentRepository;
-import com.sunny.backend.repository.community.CommunityRepository;
+import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
 import com.sunny.backend.user.repository.UserRepository;
@@ -55,9 +55,8 @@ public class MyPageService {
         Users user = customUserPrincipal.getUsers();
         List<Community> communityList = communityRepository.findAllByUsers_Id(user.getId());
         List<CommunityResponse.PageResponse> communityRes = new ArrayList<>();
-
         for (Community community : communityList) {
-            communityRes.add(new CommunityResponse.PageResponse(community));
+            communityRes.add(CommunityResponse.PageResponse.from(community));
         }
         return responseService.getListResponse(HttpStatus.OK.value(), communityRes, "내가 쓴 작성글 조회");
     }
@@ -83,7 +82,7 @@ public class MyPageService {
         List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId());
 
         List<CommunityResponse> ScrapByCommunity = scrapList.stream()
-                .map(scrap -> new CommunityResponse(scrap.getCommunity(), false))
+            .map(scrap -> CommunityResponse.of(scrap.getCommunity(), false))
                 .collect(Collectors.toList());
 
 

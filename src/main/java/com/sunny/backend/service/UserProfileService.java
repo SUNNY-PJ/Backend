@@ -7,9 +7,9 @@ import com.sunny.backend.dto.response.ProfileResponse;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.entity.Comment;
-import com.sunny.backend.entity.Community;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.repository.comment.CommentRepository;
-import com.sunny.backend.repository.community.CommunityRepository;
+import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -50,7 +50,7 @@ public class UserProfileService {
         List<CommunityResponse.PageResponse> communityRes = new ArrayList<>();
 
         for (Community communities : communityList) {
-            communityRes.add(new CommunityResponse.PageResponse(communities));
+            communityRes.add(CommunityResponse.PageResponse.from(communities));
         }
         return responseService.getListResponse(HttpStatus.OK.value(), communityRes, "친구가 쓴 작성글 조회");
     }

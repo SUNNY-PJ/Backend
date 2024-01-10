@@ -1,11 +1,11 @@
 package com.sunny.backend.entity;
 
+import com.sunny.backend.community.domain.Community;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 @Entity
 @Getter

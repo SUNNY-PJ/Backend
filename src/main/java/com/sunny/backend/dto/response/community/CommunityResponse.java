@@ -1,15 +1,13 @@
 package com.sunny.backend.dto.response.community;
 
 import com.sunny.backend.common.DatetimeUtil;
-import com.sunny.backend.entity.BoardType;
-import com.sunny.backend.entity.Community;
+import com.sunny.backend.community.domain.BoardType;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.entity.Photo;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import lombok.Getter;
 
 
 public record CommunityResponse(

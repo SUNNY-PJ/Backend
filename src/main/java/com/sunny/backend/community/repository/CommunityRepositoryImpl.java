@@ -1,12 +1,14 @@
-package com.sunny.backend.repository.community;
+package com.sunny.backend.community.repository;
+
+import static com.sunny.backend.community.domain.QCommunity.community;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.entity.BoardType;
-import com.sunny.backend.entity.Community;
-import com.sunny.backend.entity.SortType;
+import com.sunny.backend.community.domain.BoardType;
+import com.sunny.backend.community.domain.Community;
+import com.sunny.backend.community.domain.SortType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -15,9 +17,10 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.sunny.backend.entity.QCommunity.community;
+
 
 public class CommunityRepositoryImpl extends QuerydslRepositorySupport implements CommunityRepositoryCustom {
+
     private final JPAQueryFactory queryFactory;
 
     public CommunityRepositoryImpl(JPAQueryFactory jpaQueryFactory) {
@@ -45,12 +48,15 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
         }
         return new SliceImpl<>(dtoList, pageable, hasNext);
     }
+
     @Override
-    public Slice<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType, BoardType boardType, String searchText, Pageable pageable) {
+    public Slice<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType,
+        BoardType boardType, String searchText, Pageable pageable) {
         JPAQuery<Community> query = queryFactory.selectFrom(community)
-                .orderBy(sortType == SortType.조회순 ? community.view_cnt.desc() : community.createdDate.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1);
+            .orderBy(sortType == SortType.조회순 ? community.view_cnt.desc()
+                : community.createdDate.desc())
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize() + 1);
 
         if (searchText != null) {
             query.where(eqSearchText(searchText));
@@ -62,7 +68,7 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
 
         List<CommunityResponse.PageResponse> dtoList = results.stream()
             .map(CommunityResponse.PageResponse::from)
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
 
         boolean hasNext = results.size() > pageable.getPageSize();
         if (hasNext) {
@@ -83,12 +89,11 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
     }
 
     private BooleanExpression eqBoardType(BoardType boardType) {
-        if (boardType == BoardType.꿀팁) {
-            return community.boardType.eq(BoardType.꿀팁);
-        } else if (boardType == BoardType.자유) {
-            return community.boardType.eq(BoardType.자유);
+        if (boardType == BoardType.TIP) {
+            return community.boardType.eq(BoardType.TIP);
+        } else if (boardType == BoardType.FREE) {
+            return community.boardType.eq(BoardType.FREE);
         }
         return null;
     }
 }
-

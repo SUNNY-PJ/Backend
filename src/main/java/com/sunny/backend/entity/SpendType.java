@@ -7,5 +7,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SpendType {
   FOOD("식생활"), SHELTER("주거"), CLOTHING("의류"), OTHERS("기타");
-  private final String type;
+  private final String spendType;
 }

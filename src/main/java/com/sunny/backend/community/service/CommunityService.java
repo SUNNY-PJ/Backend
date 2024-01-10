@@ -1,6 +1,9 @@
-package com.sunny.backend.service.community;
+package com.sunny.backend.community.service;
 
 
+import com.sunny.backend.community.domain.BoardType;
+import com.sunny.backend.community.domain.Community;
+import com.sunny.backend.community.domain.SortType;
 import com.sunny.backend.dto.response.community.CommunityResponse.PageResponse;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -23,7 +26,7 @@ import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.repository.community.CommunityRepository;
+import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.repository.photo.PhotoRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.service.S3Service;
