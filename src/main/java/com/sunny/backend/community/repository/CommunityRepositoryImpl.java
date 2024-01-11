@@ -1,5 +1,6 @@
 package com.sunny.backend.community.repository;
 
+
 import static com.sunny.backend.community.domain.QCommunity.community;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -53,7 +54,7 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
     public Slice<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType,
         BoardType boardType, String searchText, Pageable pageable) {
         JPAQuery<Community> query = queryFactory.selectFrom(community)
-            .orderBy(sortType == SortType.조회순 ? community.view_cnt.desc()
+            .orderBy(sortType == SortType.VIEW ? community.view_cnt.desc()
                 : community.createdDate.desc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize() + 1);
