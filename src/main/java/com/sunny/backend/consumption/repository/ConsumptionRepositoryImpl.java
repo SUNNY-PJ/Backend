@@ -51,9 +51,6 @@ public class ConsumptionRepositoryImpl extends QuerydslRepositorySupport impleme
 
           totalCount = totalCount != null ? totalCount : 0L;
           totalMoney = totalMoney != null ? totalMoney : 0L;
-          System.out.println(totalCount);
-          System.out.println(totalMoney);
-
           double percentage = totalSpending != 0 ? (double) totalMoney / totalSpending * 100 : 0.0;
           BigDecimal percentageBigDecimal = new BigDecimal(percentage);
 
