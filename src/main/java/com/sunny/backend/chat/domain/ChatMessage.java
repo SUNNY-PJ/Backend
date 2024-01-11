@@ -1,5 +1,6 @@
-package com.sunny.backend.entity.chat;
+package com.sunny.backend.chat.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,29 +17,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-public class ChatUser extends BaseTime {
+public class ChatMessage extends BaseTime {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	@Column
+	private String message;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private Users users;
 
 	@ManyToOne
-	@JoinColumn(name = "friends_id")
-	private Users friend;
-
-	@ManyToOne
 	@JoinColumn(name = "chat_room_id")
 	private ChatRoom chatRoom;
 
-	public ChatUser(Users users, Users friend, ChatRoom chatRoom) {
+	public ChatMessage(String message, Users users, ChatRoom chatRoom) {
+		this.message = message;
 		this.users = users;
-		this.friend = friend;
 		this.chatRoom = chatRoom;
 	}
 }

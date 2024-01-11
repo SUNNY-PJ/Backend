@@ -1,4 +1,4 @@
-package com.sunny.backend.repository.chat;
+package com.sunny.backend.chat.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,13 +6,18 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.sunny.backend.entity.chat.ChatUser;
+import com.sunny.backend.chat.domain.ChatUser;
+import com.sunny.backend.chat.exception.ChatErrorCode;
+import com.sunny.backend.common.CustomException;
 
 @Repository
 public interface ChatUserRepository extends JpaRepository<ChatUser, Long> {
 	Long countByChatRoom_Id(Long id);
-	boolean existsByUsers_IdAndFriend_Id(Long userId, Long friendId);
-	boolean existsByFriend_IdAndUsers_Id(Long friendId, Long userId);
 	Optional<ChatUser> findByFriend_IdAndUsers_Id(Long friendId, Long userId);
 	List<ChatUser> findByUsers_Id(Long userId);
+
+	default ChatUser getById(Long id) {
+		return findById(id)
+			.orElseThrow(() -> new CustomException(ChatErrorCode.CHAT_USER_NOT_FOUND));
+	}
 }

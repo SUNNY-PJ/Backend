@@ -1,4 +1,4 @@
-package com.sunny.backend.entity.chat;
+package com.sunny.backend.chat.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
