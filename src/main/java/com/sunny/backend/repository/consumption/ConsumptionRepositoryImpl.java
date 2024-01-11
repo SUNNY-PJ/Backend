@@ -65,7 +65,8 @@ public class ConsumptionRepositoryImpl extends QuerydslRepositorySupport impleme
         .fetchOne();
   }
 
-  private long getTotalSpending() {
+
+  private Long getTotalSpending() {
     QConsumption consumption = QConsumption.consumption;
     Long totalSpending = queryFactory
         .select(consumption.money.sum())
