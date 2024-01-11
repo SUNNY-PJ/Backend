@@ -10,6 +10,7 @@ import com.sunny.backend.entity.Comment;
 import com.sunny.backend.entity.Photo;
 import com.sunny.backend.user.Users;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -47,13 +48,13 @@ public class Community extends BaseTime {
     @Column
     private String modifiedAt;
 
-    //users 다대일 관계 매핑
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "users_id")
     private Users users;
 
-    //photo 일대다 관계 매핑
     @OneToMany(mappedBy = "community")
+    @NotNull(message = "올바른 카테고리 값을 입력해야합니다.")
     @Builder.Default
     private List<Photo> photoList = new ArrayList<>();
 
