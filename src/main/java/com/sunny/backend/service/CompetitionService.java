@@ -15,7 +15,7 @@ import com.sunny.backend.dto.request.CompetitionRequestDto;
 import com.sunny.backend.dto.response.CompetitionResponseDto;
 import com.sunny.backend.entity.Competition;
 import com.sunny.backend.repository.CompetitionRepository;
-import com.sunny.backend.repository.consumption.ConsumptionRepository;
+import com.sunny.backend.consumption.repository.ConsumptionRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
 import com.sunny.backend.user.repository.UserRepository;

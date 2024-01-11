@@ -1,9 +1,9 @@
-package com.sunny.backend.controller;
+package com.sunny.backend.consumption.controller;
 
 import com.sunny.backend.dto.response.consumption.ConsumptionResponse.DetailConsumptionResponse;
-import com.sunny.backend.entity.SpendType;
+import com.sunny.backend.consumption.domain.SpendType;
 import java.time.LocalDate;
-import org.springframework.format.annotation.DateTimeFormat;
+import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.sunny.backend.common.CommonResponse;
@@ -12,7 +12,7 @@ import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
 import com.sunny.backend.dto.response.consumption.ConsumptionResponse;
 import com.sunny.backend.dto.response.consumption.SpendTypeStatisticsResponse;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.service.consumption.ConsumptionService;
+import com.sunny.backend.consumption.service.ConsumptionService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -36,14 +36,15 @@ public class ConsumptionController {
 	@PostMapping("")
 	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> createConsumption(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@RequestBody ConsumptionRequest consumtionRequest) {
+			@Valid @RequestBody ConsumptionRequest consumtionRequest) {
 		return consumptionService.createConsumption(customUserPrincipal, consumtionRequest);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "지출 통계")
 	@GetMapping("/spendTypeStatistics")
-	public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>> getSpendTypeStatistics() {
-		return consumptionService.getSpendTypeStatistics();
+	public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>>
+	getSpendTypeStatistics(@AuthUser CustomUserPrincipal customUserPrincipal) {
+		return consumptionService.getSpendTypeStatistics(customUserPrincipal);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "날짜에 맞는 지출 내역 조회")
@@ -58,7 +59,7 @@ public class ConsumptionController {
 	@PutMapping("/{consumptionId}")
 	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> updateConsumption(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@RequestBody ConsumptionRequest consumtionRequest,
+			@Valid @RequestBody ConsumptionRequest consumtionRequest,
 			@PathVariable Long consumptionId) {
 		return consumptionService.updateConsumption(customUserPrincipal, consumtionRequest,
 				consumptionId);
@@ -76,7 +77,7 @@ public class ConsumptionController {
 	@GetMapping("/category")
 	public ResponseEntity<CommonResponse.ListResponse<DetailConsumptionResponse>> getConsumptionByCategory(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@RequestParam(required = false) SpendType spendType) {
+			@Valid @RequestParam(required = false) SpendType spendType) {
 		return consumptionService.getConsumptionByCategory(customUserPrincipal, spendType);
 	}
 }

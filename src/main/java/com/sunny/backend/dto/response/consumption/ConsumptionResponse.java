@@ -1,7 +1,8 @@
 package com.sunny.backend.dto.response.consumption;
 
 
-import com.sunny.backend.entity.*;
+import com.sunny.backend.consumption.domain.Consumption;
+import com.sunny.backend.consumption.domain.SpendType;
 import java.time.LocalDate;
 import java.util.List;
 
