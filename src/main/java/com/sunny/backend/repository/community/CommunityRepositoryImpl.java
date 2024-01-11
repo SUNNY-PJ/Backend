@@ -48,7 +48,8 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
     @Override
     public Slice<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType, BoardType boardType, String searchText, Pageable pageable) {
         JPAQuery<Community> query = queryFactory.selectFrom(community)
-                .orderBy(sortType == SortType.조회순 ? community.view_cnt.desc() : community.createdDate.desc())
+            .orderBy(sortType == SortType.VIEW ? community.view_cnt.desc()
+                : community.createdDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1);
 
@@ -83,10 +84,10 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
     }
 
     private BooleanExpression eqBoardType(BoardType boardType) {
-        if (boardType == BoardType.꿀팁) {
-            return community.boardType.eq(BoardType.꿀팁);
-        } else if (boardType == BoardType.자유) {
-            return community.boardType.eq(BoardType.자유);
+        if (boardType == BoardType.TIP) {
+            return community.boardType.eq(BoardType.TIP);
+        } else if (boardType == BoardType.FREE) {
+            return community.boardType.eq(BoardType.FREE);
         }
         return null;
     }

@@ -57,7 +57,7 @@ public class MyPageService {
         List<CommunityResponse.PageResponse> communityRes = new ArrayList<>();
 
         for (Community community : communityList) {
-            communityRes.add(new CommunityResponse.PageResponse(community));
+            communityRes.add(CommunityResponse.PageResponse.from(community));
         }
         return responseService.getListResponse(HttpStatus.OK.value(), communityRes, "내가 쓴 작성글 조회");
     }
@@ -83,7 +83,7 @@ public class MyPageService {
         List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId());
 
         List<CommunityResponse> ScrapByCommunity = scrapList.stream()
-                .map(scrap -> new CommunityResponse(scrap.getCommunity(), false))
+            .map(scrap -> CommunityResponse.of(scrap.getCommunity(), false))
                 .collect(Collectors.toList());
 
 

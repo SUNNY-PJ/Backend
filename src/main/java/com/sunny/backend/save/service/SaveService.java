@@ -1,16 +1,17 @@
-package com.sunny.backend.service.save;
+package com.sunny.backend.save.service;
 
+
+import com.sunny.backend.repository.consumption.ConsumptionRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.amazonaws.services.kms.model.NotFoundException;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.save.SaveRequest;
 import com.sunny.backend.dto.response.save.SaveResponse;
-import com.sunny.backend.entity.Save;
-import com.sunny.backend.repository.save.SaveRepository;
+import com.sunny.backend.save.domain.Save;
+import com.sunny.backend.save.repository.SaveRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
 
@@ -21,55 +22,56 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class SaveService {
+
 	private final SaveRepository saveRepository;
 	private final ResponseService responseService;
+	private final ConsumptionRepository consumptionRepository;
 
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> createSaveGoal(
-		CustomUserPrincipal customUserPrincipal,
-		SaveRequest saveRequest) {
+			CustomUserPrincipal customUserPrincipal,
+			SaveRequest saveRequest) {
 		Users user = customUserPrincipal.getUsers();
 		Save save = Save.builder()
 				.cost(saveRequest.getCost())
-				.saveContent(saveRequest.getSaveContent())
 				.startDate(saveRequest.getStartDate())
 				.endDate(saveRequest.getEndDate())
 				.users(user)
 				.build();
+		user.addSave(save);
 		saveRepository.save(save);
 		SaveResponse saveResponse = SaveResponse.from(save);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), saveResponse, "절약 목표를 등록했습니다.");
-
 	}
 
-	//절약 목표 수정
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> updateSaveGoal(
-		CustomUserPrincipal customUserPrincipal,
-		Long savedId,
-		SaveRequest saveRequest) {
+			CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
 		Users user = customUserPrincipal.getUsers();
-		// To do : save 명칭 변경
-		Save save = saveRepository.getById(savedId);
+		Save save = saveRepository.findByUsers_Id(user.getId());
 		save.updateSave(saveRequest);
 		SaveResponse saveResponse = SaveResponse.from(save);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), saveResponse, "절약 목표를 수정했습니다.");
 	}
 
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> getSaveGoal(
-		CustomUserPrincipal customUserPrincipal,
-		Long savedId) {
+			CustomUserPrincipal customUserPrincipal) {
 		Users user = customUserPrincipal.getUsers();
-		// To do : save 명칭 변경
-		Save save = saveRepository.getById(savedId);
+		Save save = saveRepository.findByUsers_Id(user.getId());
 		SaveResponse saveResponse = SaveResponse.from(save);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), saveResponse,
 				"절약 목표를 성공적으로 조회했습니다.");
 	}
 
-	//절약 현황 (현재까지의 지출 금액 / 목표 금액)
-    /*
-    사용자는 절약 목표 알림을 받을 수 있다.
-    [절약 목표 금액 < 소비 금액]
-    -소비 금액이 절약 목표 금액 보다 근접&초과(기준 : 30% , 60%, 80%) 시 앱 자체에서 알림을 준다.
-    **/
-
+	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse.DetailSaveResponse>>
+	getDetailSaveGoal(CustomUserPrincipal customUserPrincipal) {
+		Users user = customUserPrincipal.getUsers();
+		Save save = saveRepository.findByUsers_Id(user.getId());
+		long remainingDays = save.calculateRemainingDays(save);
+		Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(),
+				save.getEndDate());
+		double percentageUsed = save.calculateSavePercentage(userMoney, save);
+		SaveResponse.DetailSaveResponse saveResponse = SaveResponse.DetailSaveResponse.of(remainingDays,
+				percentageUsed);
+		return responseService.getSingleResponse(HttpStatus.OK.value(), saveResponse,
+				"절약 목표를 성공적으로 조회했습니다.");
+	}
 }

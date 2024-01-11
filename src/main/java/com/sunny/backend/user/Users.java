@@ -1,5 +1,6 @@
 package com.sunny.backend.user;
 
+import com.sunny.backend.save.domain.Save;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Users extends BaseTime {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")
@@ -53,10 +55,8 @@ public class Users extends BaseTime {
 	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	@JsonIgnore
 	private List<Comment> commentList;
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "save_id")
+	@OneToOne(mappedBy = "users")
 	private Save save;
-
 	@OneToMany(mappedBy = "users")
 	private List<Scrap> scrapList;
 
@@ -78,8 +78,8 @@ public class Users extends BaseTime {
 	}
 
 	public void addCommunity(Community community) {
-			this.communityList = new ArrayList<>();
-			this.communityList.add(community);
+		this.communityList = new ArrayList<>();
+		this.communityList.add(community);
 	}
 
 	public void addConsumption(Consumption consumption) {
@@ -87,4 +87,15 @@ public class Users extends BaseTime {
 		this.consumptionList.add(consumption);
 	}
 
+	public void addSave(Save save) {
+		if (save == null) {
+			return;
+		}
+		if (this.save != null) {
+
+			throw new IllegalStateException("이미 절약 목표가 존재합니다.");
+		} else {
+			this.save = save;
+		}
+	}
 }

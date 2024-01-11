@@ -50,7 +50,7 @@ public class UserProfileService {
         List<CommunityResponse.PageResponse> communityRes = new ArrayList<>();
 
         for (Community communities : communityList) {
-            communityRes.add(new CommunityResponse.PageResponse(communities));
+            communityRes.add(CommunityResponse.PageResponse.from(communities));
         }
         return responseService.getListResponse(HttpStatus.OK.value(), communityRes, "친구가 쓴 작성글 조회");
     }
