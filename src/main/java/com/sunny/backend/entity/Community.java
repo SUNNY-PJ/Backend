@@ -35,7 +35,7 @@ public class Community extends BaseTime {
     @Column
     @NotBlank(message = "내용은 필수 입력값입니다.")
     private String contents; //내용
-    //기본값 0으로 세팅
+
     @ColumnDefault("0")
     @Column
     private int view_cnt; //조회수
@@ -45,12 +45,12 @@ public class Community extends BaseTime {
     @Column
     private String modifiedAt;
 
-    //users 다대일 관계 매핑
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "users_id")
     private Users users;
 
-    //photo 일대다 관계 매핑
+
     @OneToMany(mappedBy = "community")
     @Builder.Default
     private List<Photo> photoList = new ArrayList<>();

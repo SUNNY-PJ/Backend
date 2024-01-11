@@ -1,15 +1,18 @@
-package com.sunny.backend.repository.consumption;
+package com.sunny.backend.consumption.repository;
 
-import static com.sunny.backend.entity.QConsumption.*;
+
+import static com.sunny.backend.consumption.domain.QConsumption.consumption;
 import static com.sunny.backend.user.QUsers.*;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import com.sunny.backend.consumption.domain.QConsumption;
 import com.sunny.backend.dto.response.consumption.SpendTypeStatisticsResponse;
-import com.sunny.backend.entity.Consumption;
-import com.sunny.backend.entity.QConsumption;
-import com.sunny.backend.entity.SpendType;
+import com.sunny.backend.consumption.domain.Consumption;
+import com.sunny.backend.consumption.domain.SpendType;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.time.LocalDate;
@@ -26,7 +29,7 @@ public class ConsumptionRepositoryImpl extends QuerydslRepositorySupport impleme
   }
 
   @Override
-  public List<SpendTypeStatisticsResponse> getSpendTypeStatistics() {
+  public List<SpendTypeStatisticsResponse> getSpendTypeStatistics(Long userId) {
     QConsumption consumption = QConsumption.consumption;
     List<Tuple> tuples = queryFactory
         .select(
@@ -35,10 +38,11 @@ public class ConsumptionRepositoryImpl extends QuerydslRepositorySupport impleme
             consumption.money.sum()
         )
         .from(consumption)
+        .where(consumption.users.id.eq(userId))
         .groupBy(consumption.category)
         .fetch();
 
-    long totalSpending = getTotalSpending();
+    long totalSpending = getTotalSpending(userId);
     return tuples.stream()
         .map(tuple -> {
           SpendType category = tuple.get(consumption.category);
@@ -47,11 +51,14 @@ public class ConsumptionRepositoryImpl extends QuerydslRepositorySupport impleme
 
           totalCount = totalCount != null ? totalCount : 0L;
           totalMoney = totalMoney != null ? totalMoney : 0L;
+          System.out.println(totalCount);
+          System.out.println(totalMoney);
 
-          double percentage =
-              totalSpending != 0 ? (double) totalMoney / totalSpending * 100.0 : 0.0;
+          double percentage = totalSpending != 0 ? (double) totalMoney / totalSpending * 100 : 0.0;
+          BigDecimal percentageBigDecimal = new BigDecimal(percentage);
+
           return new SpendTypeStatisticsResponse(category, totalCount, totalMoney,
-              (double) Math.round(percentage * 100) / 100);
+              percentageBigDecimal.setScale(1, RoundingMode.HALF_UP).doubleValue());
         })
         .toList();
   }
@@ -66,11 +73,12 @@ public class ConsumptionRepositoryImpl extends QuerydslRepositorySupport impleme
   }
 
 
-  private Long getTotalSpending() {
+  private Long getTotalSpending(Long userId) {
     QConsumption consumption = QConsumption.consumption;
     Long totalSpending = queryFactory
         .select(consumption.money.sum())
         .from(consumption)
+        .where(consumption.users.id.eq(userId))
         .fetchOne();
     return totalSpending != null ? totalSpending : 0L;
   }

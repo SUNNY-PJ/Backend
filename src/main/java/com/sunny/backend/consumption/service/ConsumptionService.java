@@ -1,15 +1,18 @@
-package com.sunny.backend.service.consumption;
+package com.sunny.backend.consumption.service;
 
 
+import static com.sunny.backend.common.CommonErrorCode.INVALID_FUTURE_DATE;
+import static com.sunny.backend.consumption.domain.Consumption.isDateValid;
+
+import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
-import com.sunny.backend.dto.response.ProfileResponse;
 import com.sunny.backend.dto.response.consumption.ConsumptionResponse;
 import com.sunny.backend.dto.response.consumption.SpendTypeStatisticsResponse;
-import com.sunny.backend.entity.Consumption;
-import com.sunny.backend.entity.SpendType;
-import com.sunny.backend.repository.consumption.ConsumptionRepository;
+import com.sunny.backend.consumption.domain.Consumption;
+import com.sunny.backend.consumption.domain.SpendType;
+import com.sunny.backend.consumption.repository.ConsumptionRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +37,9 @@ public class ConsumptionService {
     public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> createConsumption(
             CustomUserPrincipal customUserPrincipal, ConsumptionRequest consumptionRequest) {
         Users user = customUserPrincipal.getUsers();
+        if (isDateValid(consumptionRequest.getDateField())) {
+            throw new CommonCustomException(INVALID_FUTURE_DATE);
+        }
         Consumption consumption = Consumption.builder()
             .name(consumptionRequest.getName())
             .category(consumptionRequest.getCategory())
@@ -46,7 +52,6 @@ public class ConsumptionService {
         if (user.getConsumptionList() == null) {
             user.addConsumption(consumption);
         }
-        ProfileResponse profileResponse = ProfileResponse.from(user);
         ConsumptionResponse consumptionResponse = ConsumptionResponse.from(consumption);
         return responseService.getSingleResponse(HttpStatus.OK.value(),
             consumptionResponse, "지출을 등록했습니다.");
@@ -68,17 +73,19 @@ public class ConsumptionService {
         ConsumptionRequest consumptionRequest, Long consumptionId) {
         Users user = customUserPrincipal.getUsers();
         Consumption consumption = consumptionRepository.getById(consumptionId);
-        consumption.updateConsumption(consumptionRequest);
         Consumption.validateConsumptionByUser(user.getId(), consumption.getUsers().getId());
-        consumptionRepository.save(consumption);
+        consumption.updateConsumption(consumptionRequest);
         ConsumptionResponse consumptionResponse = ConsumptionResponse.from(consumption);
         return responseService.getSingleResponse(HttpStatus.OK.value(),
             consumptionResponse, "지출을 수정했습니다.");
     }
 
     @Transactional
-    public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>> getSpendTypeStatistics() {
-        List<SpendTypeStatisticsResponse> statistics = consumptionRepository.getSpendTypeStatistics();
+    public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>> getSpendTypeStatistics(
+        CustomUserPrincipal customUserPrincipal) {
+        Users user = customUserPrincipal.getUsers();
+        List<SpendTypeStatisticsResponse> statistics = consumptionRepository.getSpendTypeStatistics(
+            user.getId());
         return responseService.getListResponse(HttpStatus.OK.value(),
             statistics, "지출 통계 내역을 불러왔습니다.");
     }

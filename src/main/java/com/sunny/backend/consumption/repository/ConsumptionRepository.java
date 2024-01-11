@@ -1,8 +1,7 @@
-package com.sunny.backend.repository.consumption;
+package com.sunny.backend.consumption.repository;
 
-import com.sunny.backend.entity.Consumption;
-import com.sunny.backend.entity.SpendType;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.consumption.domain.Consumption;
+import com.sunny.backend.consumption.domain.SpendType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
