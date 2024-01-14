@@ -1,9 +1,11 @@
 package com.sunny.backend.consumption.controller;
 
+
 import com.sunny.backend.dto.response.consumption.ConsumptionResponse.DetailConsumptionResponse;
 import com.sunny.backend.consumption.domain.SpendType;
 import java.time.LocalDate;
 import javax.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.sunny.backend.common.CommonResponse;
@@ -51,7 +53,7 @@ public class ConsumptionController {
 	@GetMapping("/date")
 	public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumptionResponse>> getDetailConsumption(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@RequestParam("datefield") LocalDate datefield) {
+			@RequestParam("datefield") @DateTimeFormat(pattern = "yyyy.MM.dd") LocalDate datefield) {
 		return consumptionService.getDetailConsumption(customUserPrincipal, datefield);
 	}
 
