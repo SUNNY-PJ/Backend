@@ -1,6 +1,7 @@
 package com.sunny.backend.dto.response.consumption;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.consumption.domain.SpendType;
 import java.time.LocalDate;
@@ -12,6 +13,7 @@ public record ConsumptionResponse(
     String name,
     SpendType category,
     Long money,
+    @JsonFormat(pattern = "yyyy.MM.dd")
     LocalDate dateField
 ) {
 

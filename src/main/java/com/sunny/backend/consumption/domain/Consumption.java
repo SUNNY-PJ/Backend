@@ -2,6 +2,7 @@ package com.sunny.backend.consumption.domain;
 
 import static com.sunny.backend.common.CommonErrorCode.*;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
 
@@ -32,22 +33,17 @@ public class Consumption {
     private Long id;
 
     @Column
-    @NotNull(message = "카테고리는 필수 입력값입니다.")
     @Enumerated(value = EnumType.STRING)
     private SpendType category;
 
     @Column
-    @NotBlank(message = "지출 이름은 필수 입력값입니다.")
-    @Size(max = 30, message = "최대 글자 수는 30글자입니다.")
     private String name;
 
     @Column
     @PositiveOrZero
-    @NotNull(message = "지출 금액은 필수 입력값입니다.")
     private Long money;
 
     @Column
-    @NotNull(message = "지출 날짜는 필수 입력값입니다.")
     private LocalDate dateField;
 
     @ManyToOne(fetch = FetchType.LAZY)

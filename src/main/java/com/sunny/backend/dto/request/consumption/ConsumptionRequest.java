@@ -31,6 +31,6 @@ public class ConsumptionRequest {
     private Long money;
 
     @NotNull(message = "지출 날짜는 필수 입력값입니다.")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy.MM.dd")
     private LocalDate dateField;
 }
