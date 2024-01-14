@@ -1,5 +1,6 @@
 package com.sunny.backend.save.controller;
 
+import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +30,8 @@ public class SaveController {
 	@ApiOperation(tags = "6. Save", value = "절약 목표 등록")
 	@PostMapping("")
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> createSaveGoal(
-		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody SaveRequest saveRequest) {
+			@AuthUser CustomUserPrincipal customUserPrincipal,
+			@Valid @RequestBody SaveRequest saveRequest) {
 		return saveService.createSaveGoal(customUserPrincipal, saveRequest);
 	}
 
@@ -37,7 +39,7 @@ public class SaveController {
 	@PutMapping("")
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> updateSaveGoal(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@RequestBody SaveRequest saveRequest) {
+			@Valid @RequestBody SaveRequest saveRequest) {
 		return saveService.updateSaveGoal(customUserPrincipal, saveRequest);
 	}
 
@@ -54,5 +56,4 @@ public class SaveController {
 			@AuthUser CustomUserPrincipal customUserPrincipal) {
 		return saveService.getDetailSaveGoal(customUserPrincipal);
 	}
-
 }

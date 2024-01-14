@@ -29,7 +29,7 @@ public class Save {
 
     @Column
     @PositiveOrZero
-    @NotNull(message = "금액은 필수 입력값입니다.")
+    @NotNull(message = "지출 금액은 필수 입력값입니다.")
     private Long cost;
 
     @Column
@@ -58,6 +58,6 @@ public class Save {
 
     public double calculateSavePercentage(Long userMoney, Save save) {
         return userMoney != null ?
-            ((double) userMoney / (double) save.getCost()) * 100.0 : 0.0;
+            100.0 - (((double) userMoney / (double) save.getCost()) * 100.0) : 100.0;
     }
 }
