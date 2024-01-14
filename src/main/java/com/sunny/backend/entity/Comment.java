@@ -25,7 +25,7 @@ public class Comment extends BaseTime {
 
     @NotBlank(message = "댓글 내용은 필수 입력값입니다.")
     @Column(name = "text", nullable = false)
-    private String content; //댓글 내용 , 글자 수 제한 없는지? , notnull 설정
+    private String content;
 
     @ColumnDefault("FALSE")
     @Column(nullable = false)

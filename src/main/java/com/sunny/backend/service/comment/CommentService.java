@@ -2,6 +2,7 @@ package com.sunny.backend.service.comment;
 
 import static com.sunny.backend.common.CommonErrorCode.*;
 
+import com.sunny.backend.community.repository.CommunityRepository;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -18,12 +19,11 @@ import com.sunny.backend.dto.request.comment.CommentRequest;
 import com.sunny.backend.dto.request.comment.CommentRequestMapper;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.entity.Comment;
-import com.sunny.backend.community.domain.Community;
+
 import com.sunny.backend.repository.comment.CommentRepository;
-import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
-
+import com.sunny.backend.community.domain.Community;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -94,6 +94,7 @@ public class CommentService {
 		}
 
 		//To do : setter 제외하고 도메인에서 함수로 처리
+
 		comment.setCommunity(community);
 		comment.setContent(commentRequestDTO.getContent());
 		comment.setUsers(user);
@@ -117,7 +118,7 @@ public class CommentService {
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteComment(
 			CustomUserPrincipal customUserPrincipal, Long commentId) {
 		Comment comment = commentRepository.findCommentByIdWithParent(commentId)
-			.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
+				.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
 		if (checkCommentLoginUser(customUserPrincipal, comment)) {
 			if (comment.getChildren().size() != 0) { // 자식이 있으면 상태만 변경
 				comment.changeIsDeleted(true);
@@ -140,10 +141,10 @@ public class CommentService {
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> updateComment(
-		CustomUserPrincipal customUserPrincipal, Long commentId, CommentRequest commentRequestDTO) {
+			CustomUserPrincipal customUserPrincipal, Long commentId, CommentRequest commentRequestDTO) {
 
 		Comment comment = commentRepository.findById(commentId)
-			.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
+				.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
 		if (checkCommentLoginUser(customUserPrincipal, comment)) {
 			comment.setContent(commentRequestDTO.getContent());
 
