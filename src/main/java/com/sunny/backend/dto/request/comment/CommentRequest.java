@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CommentRequest {
     private Long parentId;
+    @NotBlank(message = "댓글 내용은 필수 입력 값입니다.")
     private String content;
 
     private Boolean isPrivated;
