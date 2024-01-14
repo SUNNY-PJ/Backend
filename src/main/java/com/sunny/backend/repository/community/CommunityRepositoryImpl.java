@@ -1,5 +1,7 @@
 package com.sunny.backend.repository.community;
 
+import static com.sunny.backend.entity.QCommunity.community;
+
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -15,7 +17,6 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.sunny.backend.entity.QCommunity.community;
 
 public class CommunityRepositoryImpl extends QuerydslRepositorySupport implements CommunityRepositoryCustom {
     private final JPAQueryFactory queryFactory;

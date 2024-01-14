@@ -1,7 +1,8 @@
 package com.sunny.backend.repository.chat;
 
 import static com.querydsl.core.group.GroupBy.*;
-import static com.sunny.backend.entity.chat.QChatMessage.*;
+import static com.sunny.backend.entity.chat.QChatMessage.chatMessage;
+
 
 import java.util.List;
 

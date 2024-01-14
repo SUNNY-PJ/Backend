@@ -1,7 +1,8 @@
 package com.sunny.backend.repository.consumption;
 
-import static com.sunny.backend.entity.QConsumption.*;
-import static com.sunny.backend.user.QUsers.*;
+
+import static com.sunny.backend.entity.QConsumption.consumption;
+import static com.sunny.backend.user.QUsers.users;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
