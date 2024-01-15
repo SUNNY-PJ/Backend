@@ -1,9 +1,8 @@
-package com.sunny.backend.controller;
+package com.sunny.backend.community.controller;
 
 import java.util.List;
 
-import com.sunny.backend.dto.response.ProfileResponse;
-import com.sunny.backend.dto.response.comment.CommentResponse;
+import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +21,10 @@ import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.config.AuthUser;
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.entity.BoardType;
-import com.sunny.backend.entity.SortType;
+import com.sunny.backend.community.domain.BoardType;
+import com.sunny.backend.community.domain.SortType;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.service.community.CommunityService;
+import com.sunny.backend.community.service.CommunityService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,20 +39,16 @@ public class CommunityController {
 	private final CommunityService communityService;
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시판 목록 조회")
-	@GetMapping("")
-	public ResponseEntity<Slice<CommunityResponse.PageResponse>> getCommunityList(
-			@RequestParam(required = false) SortType sort,
+	@GetMapping("/board/{communityId}")
+	public ResponseEntity<CommonResponse.SingleResponse<List<CommunityResponse.PageResponse>>> getCommunityList(
+			@PathVariable("communityId") Long communityId,
+			@RequestParam(required = false) SortType sortType,
+			@RequestParam int pageSize,
 			@RequestParam(required = false) BoardType boardType,
-			@RequestParam(required = false) String search,
-			Pageable pageable) {
-		Slice<CommunityResponse.PageResponse> responseDTO;
-		//검색조건 중 모든 내용을 입력하지 않고 요청을 보냈을 때 일반 목록 페이지 출력
-		if (search == null && boardType == null && sort == null) {
-			responseDTO = communityService.getCommunityList(pageable);
-		} else {
-			responseDTO = communityService.getPageListWithSearch(sort, boardType, search, pageable);
-		}
-		return ResponseEntity.ok().body(responseDTO);
+			@RequestParam(required = false) String search) {
+
+		return communityService.paginationNoOffsetBuilder(communityId, sortType, boardType, search,
+				pageSize);
 	}
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 상세 조회")
@@ -68,7 +63,7 @@ public class CommunityController {
 	@PostMapping("")
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> createCommunity(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
+			@Valid @RequestPart(value = "communityRequest") CommunityRequest communityRequest,
 			@RequestPart(value = "files", required = false) List<MultipartFile> files) {
 		return communityService.createCommunity(customUserPrincipal, communityRequest, files);
 	}
@@ -77,7 +72,7 @@ public class CommunityController {
 	@PutMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> updateCommunity(
 			@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId,
-			@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
+			@Valid @RequestPart(value = "communityRequest") CommunityRequest communityRequest,
 			@RequestPart(required = false) List<MultipartFile> files) {
 		return communityService.updateCommunity(customUserPrincipal, communityId, communityRequest, files);
 	}

@@ -6,11 +6,11 @@ import com.sunny.backend.dto.response.ProfileResponse;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.entity.Comment;
-import com.sunny.backend.entity.Community;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.entity.Scrap;
 import com.sunny.backend.repository.ScrapRepository;
 import com.sunny.backend.repository.comment.CommentRepository;
-import com.sunny.backend.repository.community.CommunityRepository;
+import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
 import com.sunny.backend.user.repository.UserRepository;
@@ -55,7 +55,6 @@ public class MyPageService {
         Users user = customUserPrincipal.getUsers();
         List<Community> communityList = communityRepository.findAllByUsers_Id(user.getId());
         List<CommunityResponse.PageResponse> communityRes = new ArrayList<>();
-
         for (Community community : communityList) {
             communityRes.add(CommunityResponse.PageResponse.from(community));
         }
@@ -81,13 +80,16 @@ public class MyPageService {
     public ResponseEntity<CommonResponse.ListResponse<CommunityResponse>> getScrapByUserId(CustomUserPrincipal customUserPrincipal) {
         Users user = customUserPrincipal.getUsers();
         List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId());
+        List<CommunityResponse> scrapByCommunity = scrapList.stream()
+            .map(scrap -> {
+                scrap = scrapRepository.findByUsersAndCommunity(user, scrap.getCommunity());
+                boolean isScrapedByCurrentUser = (scrap != null);
+                return CommunityResponse.of(scrap.getCommunity(), false, isScrapedByCurrentUser);
+            })
+            .toList();
 
-        List<CommunityResponse> ScrapByCommunity = scrapList.stream()
-            .map(scrap -> CommunityResponse.of(scrap.getCommunity(), false))
-                .collect(Collectors.toList());
-
-
-        return responseService.getListResponse(HttpStatus.OK.value(), ScrapByCommunity, "내가 등록한 스크랩 조회");
+        return responseService.getListResponse(HttpStatus.OK.value(), scrapByCommunity,
+            "내가 등록한 스크랩 조회");
     }
 
     public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
