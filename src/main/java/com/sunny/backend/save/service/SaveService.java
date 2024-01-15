@@ -4,6 +4,7 @@ package com.sunny.backend.save.service;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.sunny.backend.common.CommonResponse;
@@ -19,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class SaveService {
 
@@ -27,6 +27,7 @@ public class SaveService {
 	private final ResponseService responseService;
 	private final ConsumptionRepository consumptionRepository;
 
+	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> createSaveGoal(
 			CustomUserPrincipal customUserPrincipal,
 			SaveRequest saveRequest) {
@@ -37,12 +38,14 @@ public class SaveService {
 				.endDate(saveRequest.getEndDate())
 				.users(user)
 				.build();
-		user.addSave(save);
 		saveRepository.save(save);
+		user.addSave(save);
+
 		SaveResponse saveResponse = SaveResponse.from(save);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), saveResponse, "절약 목표를 등록했습니다.");
 	}
 
+	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> updateSaveGoal(
 			CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
 		Users user = customUserPrincipal.getUsers();
@@ -52,6 +55,7 @@ public class SaveService {
 		return responseService.getSingleResponse(HttpStatus.OK.value(), saveResponse, "절약 목표를 수정했습니다.");
 	}
 
+	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> getSaveGoal(
 			CustomUserPrincipal customUserPrincipal) {
 		Users user = customUserPrincipal.getUsers();
@@ -61,6 +65,7 @@ public class SaveService {
 				"절약 목표를 성공적으로 조회했습니다.");
 	}
 
+	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse.DetailSaveResponse>>
 	getDetailSaveGoal(CustomUserPrincipal customUserPrincipal) {
 		Users user = customUserPrincipal.getUsers();
@@ -74,4 +79,6 @@ public class SaveService {
 		return responseService.getSingleResponse(HttpStatus.OK.value(), saveResponse,
 				"절약 목표를 성공적으로 조회했습니다.");
 	}
+
+
 }

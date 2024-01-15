@@ -1,5 +1,6 @@
 package com.sunny.backend.dto.response.save;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sunny.backend.save.domain.Save;
 import java.time.LocalDate;
 
@@ -7,7 +8,9 @@ public record SaveResponse(
 
     Long id,
     Long cost,
+    @JsonFormat(pattern = "yyyy.MM.dd")
     LocalDate startDate,
+    @JsonFormat(pattern = "yyyy.MM.dd")
     LocalDate endDate
 ) {
 
