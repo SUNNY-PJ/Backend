@@ -32,11 +32,9 @@ public class Community extends BaseTime {
     private Long id;
 
     @Column
-    @NotBlank(message = "제목은 필수 입력값입니다.")
     private String title;
 
     @Column
-    @NotBlank(message = "내용은 필수 입력값입니다.")
     private String contents;
 
     @ColumnDefault("0")
@@ -54,11 +52,11 @@ public class Community extends BaseTime {
     private Users users;
 
     @OneToMany(mappedBy = "community")
-    @NotNull(message = "올바른 카테고리 값을 입력해야합니다.")
     @Builder.Default
     private List<Photo> photoList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "올바른 카테고리 값을 입력해야합니다.")
     private BoardType boardType;
 
     @OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE)

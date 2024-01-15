@@ -38,20 +38,16 @@ public class CommunityController {
 	private final CommunityService communityService;
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시판 목록 조회")
-	@GetMapping("")
-	public ResponseEntity<Slice<CommunityResponse.PageResponse>> getCommunityList(
-			@RequestParam(required = false) SortType sort,
+	@GetMapping("/board/{communityId}")
+	public ResponseEntity<CommonResponse.SingleResponse<List<CommunityResponse.PageResponse>>> getCommunityList(
+			@PathVariable("communityId") Long communityId,
+			@RequestParam(required = false) SortType sortType,
+			@RequestParam int pageSize,
 			@RequestParam(required = false) BoardType boardType,
-			@RequestParam(required = false) String search,
-			Pageable pageable) {
-		Slice<CommunityResponse.PageResponse> responseDTO;
-	
-		if (search == null && boardType == null && sort == null) {
-			responseDTO = communityService.getCommunityList(pageable);
-		} else {
-			responseDTO = communityService.getPageListWithSearch(sort, boardType, search, pageable);
-		}
-		return ResponseEntity.ok().body(responseDTO);
+			@RequestParam(required = false) String search) {
+
+		return communityService.paginationNoOffsetBuilder(communityId, sortType, boardType, search,
+				pageSize);
 	}
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 상세 조회")

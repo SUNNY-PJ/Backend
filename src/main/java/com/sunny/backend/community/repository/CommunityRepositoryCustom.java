@@ -4,14 +4,14 @@ import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.SortType;
 
+import com.sunny.backend.dto.response.community.CommunityResponse.PageResponse;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 
 public interface CommunityRepositoryCustom {
 
-
-    Slice<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType, BoardType boardType, String searchText, Pageable pageable);
-
-    Slice<CommunityResponse.PageResponse> getCommunityList(Pageable pageable);
+    List<PageResponse> paginationNoOffsetBuilder(Long communityId,
+        SortType sortType, BoardType boardType, String searchText, int pageSize);
 }
