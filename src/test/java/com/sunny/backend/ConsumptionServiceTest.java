@@ -111,7 +111,7 @@ class ConsumptionTest {
       // given
       ConsumptionRequest consumptionRequest = new ConsumptionRequest();
       consumptionRequest.setName("집");
-      consumptionRequest.setCategory(SpendType.주거);
+      consumptionRequest.setCategory(SpendType.SHELTER);
       consumptionRequest.setMoney(10000000L);
 
       consumptionRequest.setDateField(LocalDate.now());
@@ -134,7 +134,7 @@ class ConsumptionTest {
       ConsumptionResponse actual = responseBody.getData();
       assertThat(actual)
           .extracting("name", "category", "money", "dateField")
-          .containsExactly("집", SpendType.주거, 10000000L, LocalDate.now());
+          .containsExactly("집", SpendType.SHELTER, 10000000L, LocalDate.now());
     }
 
 //    @Test
