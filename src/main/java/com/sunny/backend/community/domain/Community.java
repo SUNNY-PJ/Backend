@@ -33,15 +33,15 @@ public class Community extends BaseTime {
 
     @Column
     @NotBlank(message = "제목은 필수 입력값입니다.")
-    private String title; //제목
+    private String title;
 
     @Column
     @NotBlank(message = "내용은 필수 입력값입니다.")
-    private String contents; //내용
-    //기본값 0으로 세팅
+    private String contents;
+
     @ColumnDefault("0")
     @Column
-    private int view_cnt; //조회수
+    private int view_cnt;
 
     @Column
     private String createdAt;

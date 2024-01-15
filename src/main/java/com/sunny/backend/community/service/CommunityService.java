@@ -5,6 +5,7 @@ import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.domain.SortType;
 import com.sunny.backend.dto.response.community.CommunityResponse.PageResponse;
+import com.sunny.backend.repository.ScrapRepository;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class CommunityService {
 
 	private final CommunityRepository communityRepository;
 	private final PhotoRepository photoRepository;
+	private final ScrapRepository scrapRepository;
 	private final ResponseService responseService;
 	private final S3Service s3Service;
 	private final RedisUtil redisUtil;
@@ -50,12 +52,13 @@ public class CommunityService {
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> findCommunity(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
-		Users users = customUserPrincipal.getUsers();
+		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.getById(communityId);
-		String viewCount = redisUtil.getData(String.valueOf(users.getId()));
+		String viewCount = redisUtil.getData(String.valueOf(user.getId()));
 
 		if (StringUtils.isBlank(viewCount)) {
-			redisUtil.setDateExpire(String.valueOf(users.getId()), communityId + "_", calculateTimeUntilMidnight());
+			redisUtil.setDateExpire(String.valueOf(user.getId()), communityId + "_",
+					calculateTimeUntilMidnight());
 			community.increaseView();
 		} else {
 			List<String> redisBoardList = Arrays.asList(viewCount.split("_"));
@@ -63,11 +66,16 @@ public class CommunityService {
 
 			if (!isViewed) {
 				viewCount += communityId + "_";
-				redisUtil.setDateExpire(String.valueOf(users.getId()), viewCount, calculateTimeUntilMidnight());
+				redisUtil.setDateExpire(String.valueOf(user.getId()), viewCount,
+						calculateTimeUntilMidnight());
 				community.updateView();
 			}
 		}
-		CommunityResponse communityResponse = CommunityResponse.of(community, false);
+		Scrap scrap = scrapRepository.findByUsersAndCommunity(user, community);
+
+		boolean isScrapedByCurrentUser = (scrap != null);
+		CommunityResponse communityResponse = CommunityResponse.of(community, false,
+				isScrapedByCurrentUser);
 		return responseService.getSingleResponse(
 				HttpStatus.OK.value(), communityResponse, "게시글을 성공적으로 불러왔습니다.");
 	}
@@ -108,7 +116,7 @@ public class CommunityService {
 		if (user.getCommunityList() == null) {
 			user.addCommunity(community);
 		}
-		CommunityResponse communityResponse = CommunityResponse.of(community, false);
+		CommunityResponse communityResponse = CommunityResponse.of(community, false, false);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
 				"게시글을 성공적으로 작성했습니다.");
 	}
@@ -120,6 +128,7 @@ public class CommunityService {
 		return result;
 	}
 
+	@Transactional(readOnly = true)
 	//검색 조건 추가해서 조회
 	public Slice<CommunityResponse.PageResponse> getPageListWithSearch(SortType sortType,
 			BoardType boardType, String searchText, Pageable pageable) {
@@ -160,7 +169,10 @@ public class CommunityService {
 			photoRepository.saveAll(photoList);
 			community.addPhoto(photoList);
 		}
-		CommunityResponse communityResponse = CommunityResponse.of(community, isModified);
+		Scrap scrap = scrapRepository.findByUsersAndCommunity(user, community);
+		boolean isScrapedByCurrentUser = (scrap != null);
+		CommunityResponse communityResponse = CommunityResponse.of(community, isModified,
+				isScrapedByCurrentUser);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
 				"게시글 수정을 완료했습니다.");
 	}
@@ -179,7 +191,10 @@ public class CommunityService {
 		}
 		photoRepository.deleteByCommunityId(communityId);
 		communityRepository.deleteById(communityId);
-		CommunityResponse communityResponse = CommunityResponse.of(community, false);
+		Scrap scrap = scrapRepository.findByUsersAndCommunity(user, community);
+		boolean isScrapedByCurrentUser = (scrap != null);
+		CommunityResponse communityResponse = CommunityResponse.of(community, false,
+				isScrapedByCurrentUser);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
 				"게시글을 삭제했습니다.");
 	}

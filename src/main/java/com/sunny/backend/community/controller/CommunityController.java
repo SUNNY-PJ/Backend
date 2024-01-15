@@ -45,7 +45,7 @@ public class CommunityController {
 			@RequestParam(required = false) String search,
 			Pageable pageable) {
 		Slice<CommunityResponse.PageResponse> responseDTO;
-		//검색조건 중 모든 내용을 입력하지 않고 요청을 보냈을 때 일반 목록 페이지 출력
+	
 		if (search == null && boardType == null && sort == null) {
 			responseDTO = communityService.getCommunityList(pageable);
 		} else {
