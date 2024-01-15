@@ -34,12 +34,14 @@ public record ConsumptionResponse(
     }
 
     public record DetailConsumptionResponse(
+        Long id,
         String name,
         Long money
     ) {
 
         public static DetailConsumptionResponse from(Consumption consumption) {
             return new DetailConsumptionResponse(
+                consumption.getId(),
                 consumption.getName(),
                 consumption.getMoney()
             );
