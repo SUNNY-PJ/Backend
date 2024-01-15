@@ -1,10 +1,11 @@
-package com.sunny.backend.service;
+package com.sunny.backend.scrap.service;
+
 import static com.sunny.backend.common.CommonErrorCode.ALREADY_SCRAP;
+import static com.sunny.backend.common.CommonErrorCode.NOT_FOUND_SCRAP;
 
 
 import com.sunny.backend.common.CommonCustomException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +15,8 @@ import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.entity.Community;
-import com.sunny.backend.entity.Scrap;
-import com.sunny.backend.repository.ScrapRepository;
+import com.sunny.backend.scrap.domain.Scrap;
+import com.sunny.backend.scrap.repository.ScrapRepository;
 import com.sunny.backend.repository.community.CommunityRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
@@ -37,7 +38,7 @@ public class ScrapService {
 
 		List<CommunityResponse> communityResponseList = scrapList.stream()
 				.map(scrap -> CommunityResponse.of(scrap.getCommunity(), false))
-			.collect(Collectors.toList());
+				.toList();
 
 		return responseService.getListResponse(HttpStatus.OK.value(), communityResponseList, "");
 	}
@@ -69,8 +70,7 @@ public class ScrapService {
 			scrapRepository.delete(deleteScrap);
 			return responseService.getGeneralResponse(HttpStatus.OK.value(), "스크랩 게시글이 삭제 되었습니다.");
 		} else {
-			return responseService.getGeneralResponse(HttpStatus.NOT_FOUND.value(),
-					"스크랩 게시글을 찾을 수 없습니다.");
+			throw new CommonCustomException(NOT_FOUND_SCRAP);
 		}
 	}
 }

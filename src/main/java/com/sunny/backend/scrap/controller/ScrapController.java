@@ -1,4 +1,4 @@
-package com.sunny.backend.controller;
+package com.sunny.backend.scrap.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,7 +12,7 @@ import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.config.AuthUser;
 import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.service.ScrapService;
+import com.sunny.backend.scrap.service.ScrapService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
