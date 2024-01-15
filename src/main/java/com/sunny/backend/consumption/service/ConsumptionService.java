@@ -1,10 +1,7 @@
 package com.sunny.backend.consumption.service;
 
 
-import static com.sunny.backend.common.CommonErrorCode.INVALID_FUTURE_DATE;
-import static com.sunny.backend.consumption.domain.Consumption.isDateValid;
 
-import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
@@ -37,9 +34,6 @@ public class ConsumptionService {
     public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> createConsumption(
             CustomUserPrincipal customUserPrincipal, ConsumptionRequest consumptionRequest) {
         Users user = customUserPrincipal.getUsers();
-        if (isDateValid(consumptionRequest.getDateField())) {
-            throw new CommonCustomException(INVALID_FUTURE_DATE);
-        }
         Consumption consumption = Consumption.builder()
             .name(consumptionRequest.getName())
             .category(consumptionRequest.getCategory())

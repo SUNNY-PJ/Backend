@@ -8,6 +8,7 @@ import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
 
 import com.sunny.backend.user.Users;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -44,6 +45,7 @@ public class Consumption {
     private Long money;
 
     @Column
+    @PastOrPresent
     private LocalDate dateField;
 
     @ManyToOne(fetch = FetchType.LAZY)
