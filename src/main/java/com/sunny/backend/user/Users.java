@@ -1,6 +1,10 @@
 package com.sunny.backend.user;
 
+
 import com.sunny.backend.community.domain.Community;
+
+import com.sunny.backend.consumption.domain.Consumption;
+import com.sunny.backend.save.domain.Save;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +29,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Users extends BaseTime {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")
@@ -97,3 +102,4 @@ public class Users extends BaseTime {
 		}
 	}
 }
+

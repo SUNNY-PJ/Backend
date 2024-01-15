@@ -51,7 +51,7 @@ public class SecurityConfig {
 		//Spring Seucrity 로직을 수행하지 않고 아래 요청에 접근
 		return (web) -> web.ignoring().
 			antMatchers("/images/**", "/js/**", "/webjars/**", "/swagger-ui/**",
-				"/swagger-resources/**", "/v3/api-docs", "/favicon**");
+				"/swagger-resources/**", "/v3/api-docs", "/favicon**", "/auth/**");
 	}
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

@@ -1,19 +1,22 @@
 package com.sunny.backend.dto.response;
 
 import com.sunny.backend.friends.domain.Friend;
+import com.sunny.backend.friends.domain.FriendStatus;
 
 public record FriendResponse(
-	Long friendsSn,
 	Long friendsId,
+	Long userFriendId,
 	String name,
-	String profile
+	String profile,
+	FriendStatus friendStatus
 ) {
 	public static FriendResponse from(Friend friend) {
 		return new FriendResponse(
 			friend.getId(),
 			friend.getUserFriend().getId(),
 			friend.getUserFriend().getName(),
-			friend.getUserFriend().getProfile()
+			friend.getUserFriend().getProfile(),
+			friend.getStatus()
 		);
 	}
 }

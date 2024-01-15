@@ -25,11 +25,10 @@ public class FriendService {
 	private final FriendRepository friendRepository;
 	private final UserRepository userRepository;
 
-	public List<FriendResponse> getFriends(
-		CustomUserPrincipal customUserPrincipal, @Valid FriendStatus friendStatus) {
+	public List<FriendResponse> getFriends(CustomUserPrincipal customUserPrincipal) {
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
 
-		return friendRepository.findByUsers_IdAndStatus(tokenUserId, friendStatus)
+		return friendRepository.findByUsers_Id(tokenUserId)
 				.stream()
 				.map(FriendResponse::from)
 				.toList();
