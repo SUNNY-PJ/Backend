@@ -1,5 +1,7 @@
 package com.sunny.backend.user;
 
+import com.sunny.backend.consumption.domain.Consumption;
+import com.sunny.backend.save.domain.Save;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +26,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Users extends BaseTime {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")
@@ -44,18 +47,17 @@ public class Users extends BaseTime {
 	@Column
 	@Enumerated(value = EnumType.STRING)
 	private AuthProvider authProvider;
-	@OneToMany(mappedBy = "users",cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private List<Community> communityList;
 
-	@OneToMany(mappedBy = "users",cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private List<Consumption> consumptionList;
 
-	@OneToMany(mappedBy = "users",cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	@JsonIgnore
-	private  List<Comment> commentList;
+	private List<Comment> commentList;
 	@OneToOne(mappedBy = "users")
 	private Save save;
-
 	@OneToMany(mappedBy = "users")
 	private List<Scrap> scrapList;
 
@@ -77,12 +79,24 @@ public class Users extends BaseTime {
 	}
 
 	public void addCommunity(Community community) {
-			this.communityList = new ArrayList<>();
-			this.communityList.add(community);
+		this.communityList = new ArrayList<>();
+		this.communityList.add(community);
 	}
 
 	public void addConsumption(Consumption consumption) {
 		this.consumptionList = new ArrayList<>();
 		this.consumptionList.add(consumption);
+	}
+
+	public void addSave(Save save) {
+		if (save == null) {
+			return;
+		}
+		if (this.save != null) {
+
+			throw new IllegalStateException("이미 절약 목표가 존재합니다.");
+		} else {
+			this.save = save;
+		}
 	}
 }

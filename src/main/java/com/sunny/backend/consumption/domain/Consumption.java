@@ -1,11 +1,16 @@
-package com.sunny.backend.entity;
+package com.sunny.backend.consumption.domain;
 
 import static com.sunny.backend.common.CommonErrorCode.*;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sunny.backend.common.CommonCustomException;
-import com.sunny.backend.common.CustomException;
 import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
+
 import com.sunny.backend.user.Users;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,36 +33,41 @@ public class Consumption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
+    @Column
+    @Enumerated(value = EnumType.STRING)
     private SpendType category;
 
     @Column
-    @NotNull
     private String name;
 
     @Column
-    @NotNull
+    @PositiveOrZero
     private Long money;
 
     @Column
-    @NotNull
+    @PastOrPresent
     private LocalDate dateField;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "users_id")
     private Users users;
 
-    public void updateConsumption(ConsumptionRequest consumptionRequest){
-        this.category=consumptionRequest.getCategory();
-        this.name=consumptionRequest.getName();
-        this.money=consumptionRequest.getMoney();
-        this.dateField=consumptionRequest.getDateField();
+    public void updateConsumption(ConsumptionRequest consumptionRequest) {
+        this.category = consumptionRequest.getCategory();
+        this.name = consumptionRequest.getName();
+        this.money = consumptionRequest.getMoney();
+        this.dateField = consumptionRequest.getDateField();
 
     }
+
     public static void validateConsumptionByUser(Long userId, Long consumptionUserId) {
-        if(!userId.equals(consumptionUserId)) {
+        if (!userId.equals(consumptionUserId)) {
             throw new CommonCustomException(NO_USER_PERMISSION);
         }
     }
 
+    public static boolean isDateValid(LocalDate dateField) {
+        LocalDate today = LocalDate.now();
+        return dateField.isAfter(today);
+    }
 }
