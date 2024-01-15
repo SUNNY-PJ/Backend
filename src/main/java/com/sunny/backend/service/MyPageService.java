@@ -80,7 +80,6 @@ public class MyPageService {
     public ResponseEntity<CommonResponse.ListResponse<CommunityResponse>> getScrapByUserId(CustomUserPrincipal customUserPrincipal) {
         Users user = customUserPrincipal.getUsers();
         List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId());
-
         List<CommunityResponse> scrapByCommunity = scrapList.stream()
             .map(scrap -> {
                 scrap = scrapRepository.findByUsersAndCommunity(user, scrap.getCommunity());

@@ -27,8 +27,8 @@ public class Scrap {
     private Users users;
 
 
-    @ManyToOne(fetch = FetchType.LAZY) //default 값이 EAGER (즉시로딩)이므로 LAZY(지연로딩)으로 설정
-    @JoinColumn(name= "community_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "community_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Community community;
 

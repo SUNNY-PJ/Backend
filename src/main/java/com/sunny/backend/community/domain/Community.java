@@ -35,8 +35,8 @@ public class Community extends BaseTime {
     private String title;
 
     @Column
-    private String contents;
 
+    private String contents;
     @ColumnDefault("0")
     @Column
     private int view_cnt;
@@ -50,6 +50,7 @@ public class Community extends BaseTime {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "users_id")
     private Users users;
+
 
     @OneToMany(mappedBy = "community")
     @Builder.Default

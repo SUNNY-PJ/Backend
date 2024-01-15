@@ -14,9 +14,9 @@ public class SaveRequest {
 
     private Long cost;
     private String saveContent;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy.MM.dd")
     private LocalDate startDate;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy.MM.dd")
     private LocalDate endDate;
 }
 

@@ -71,7 +71,7 @@ class FriendServiceTest {
 	@Nested
 	class 친구_목록_테스트 {
 		@Test
-		void 승인된_친구_목록_가져오기() {
+		void 친구_목록_가져오기() {
 			// given
 			Friend friend = createFriend(user, userFriend, FriendStatus.APPROVE);
 			createFriend(userFriend, user, FriendStatus.APPROVE);
@@ -80,26 +80,7 @@ class FriendServiceTest {
 			expected.add(FriendResponse.from(friend));
 
 			// when
-			List<FriendResponse> actual = friendService.getFriends(customUserPrincipal, FriendStatus.APPROVE);
-
-			// then
-			log.info(actual.toString());
-			log.info(expected.toString());
-			assertThat(actual.get(0))
-				.extracting("friendsId", "name")
-				.containsExactly(expected.get(0).friendsId(), expected.get(0).name());
-		}
-
-		@Test
-		void 대기중인_친구_목록_가져오기() {
-			// given
-			Friend friend = createFriend(user, userFriend, FriendStatus.WAIT);
-
-			List<FriendResponse> expected = new ArrayList<>();
-			expected.add(FriendResponse.from(friend));
-
-			// when
-			List<FriendResponse> actual = friendService.getFriends(customUserPrincipal, FriendStatus.WAIT);
+			List<FriendResponse> actual = friendService.getFriends(customUserPrincipal);
 
 			// then
 			log.info(actual.toString());

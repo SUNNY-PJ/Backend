@@ -35,7 +35,7 @@ public class ScrapService {
 
 		List<CommunityResponse> communityResponseList = scrapList.stream()
 				.map(scrap -> CommunityResponse.of(scrap.getCommunity(), false, true))
-			.collect(Collectors.toList());
+				.toList();
 
 		return responseService.getListResponse(HttpStatus.OK.value(), communityResponseList, "");
 	}
