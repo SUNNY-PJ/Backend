@@ -13,6 +13,8 @@ import com.sunny.backend.friends.domain.FriendStatus;
 public interface FriendRepository extends JpaRepository<Friend, Long> {
 	Optional<Friend> findByUsers_IdAndUserFriend_Id(Long userId, Long userFriendId);
 
+	List<Friend> findByUsers_Id(Long userId);
+
 	List<Friend> findByUsers_IdAndStatus(Long userId, FriendStatus friendStatus);
 
 	default Friend getById(Long id) {

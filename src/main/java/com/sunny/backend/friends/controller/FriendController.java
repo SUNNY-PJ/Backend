@@ -31,27 +31,25 @@ public class FriendController {
     @ApiOperation(tags = "5. Friends", value = "친구 목록 가져오기")
     @GetMapping("")
     public ResponseEntity<CommonResponse.ListResponse<FriendResponse>> getFriends(
-        @AuthUser CustomUserPrincipal customUserPrincipal,
-        @NotBlank(message = "친구 상태가 입력되지 않았습니다.")
-        @RequestParam(name = "friendStatus") FriendStatus friendStatus) {
-        List<FriendResponse> friendRespons = friendService.getFriends(customUserPrincipal, friendStatus);
+        @AuthUser CustomUserPrincipal customUserPrincipal) {
+        List<FriendResponse> friendRespons = friendService.getFriends(customUserPrincipal);
         return responseService.getListResponse(HttpStatus.OK.value(), friendRespons, "친구 목록 가져오기");
     }
 
     @ApiOperation(tags = "5. Friends", value = "친구인지 확인하기")
-    @GetMapping("/{userId}")
+    @GetMapping("/{userFriendId}")
     public ResponseEntity<CommonResponse.SingleResponse<FriendCheckResponse>> checkFriend(
         @AuthUser CustomUserPrincipal customUserPrincipal,
-        @PathVariable(name = "userId") Long userFriendId) {
+        @PathVariable(name = "userFriendId") Long userFriendId) {
         FriendCheckResponse friendCheckResponse = friendService.checkFriend(customUserPrincipal, userFriendId);
         return responseService.getSingleResponse(HttpStatus.OK.value(), friendCheckResponse, "");
     }
 
     @ApiOperation(tags = "5. Friends", value = "친구 신청하기")
-    @PostMapping("/{userId}")
+    @PostMapping("/{userFriendId}")
     public ResponseEntity<CommonResponse.GeneralResponse> addFriend(
         @AuthUser CustomUserPrincipal customUserPrincipal,
-        @PathVariable(name = "userId") Long userFriendId) {
+        @PathVariable(name = "userFriendId") Long userFriendId) {
         friendService.addFriend(customUserPrincipal, userFriendId);
         return responseService.getGeneralResponse(HttpStatus.OK.value(), "친구 신청 성공");
     }
