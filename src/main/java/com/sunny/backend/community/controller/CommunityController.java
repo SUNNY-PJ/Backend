@@ -2,6 +2,7 @@ package com.sunny.backend.community.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
@@ -62,7 +63,7 @@ public class CommunityController {
 	@PostMapping("")
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> createCommunity(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
+			@Valid @RequestPart(value = "communityRequest") CommunityRequest communityRequest,
 			@RequestPart(value = "files", required = false) List<MultipartFile> files) {
 		return communityService.createCommunity(customUserPrincipal, communityRequest, files);
 	}
@@ -71,7 +72,7 @@ public class CommunityController {
 	@PutMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> updateCommunity(
 			@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId,
-			@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
+			@Valid @RequestPart(value = "communityRequest") CommunityRequest communityRequest,
 			@RequestPart(required = false) List<MultipartFile> files) {
 		return communityService.updateCommunity(customUserPrincipal, communityId, communityRequest, files);
 	}
