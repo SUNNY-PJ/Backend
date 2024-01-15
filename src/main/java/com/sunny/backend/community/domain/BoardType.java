@@ -8,19 +8,27 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 public enum BoardType {
+	TIP("절약 꿀팁"), FREE("자유 게시판");
 
-	FREE("free"),
-
-	TIP("tip");
 	private final String value;
 
+	BoardType(String value) {
+		this.value = value;
+	}
+
+	@JsonValue
+	public String getValue() {
+		return value;
+	}
+
 	@JsonCreator
-	public static BoardType parsing(String inputValue) {
-		return Stream.of(BoardType.values())
-				.filter(category -> category.toString().equalsIgnoreCase(inputValue))
-				.findFirst()
-				.orElse(null);
+	public static BoardType fromValue(String value) {
+		for (BoardType type : BoardType.values()) {
+			if (type.getValue().equals(value)) {
+				return type;
+			}
+		}
+		return null;
 	}
 }

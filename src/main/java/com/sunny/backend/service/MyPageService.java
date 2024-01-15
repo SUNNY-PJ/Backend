@@ -81,12 +81,16 @@ public class MyPageService {
         Users user = customUserPrincipal.getUsers();
         List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId());
 
-        List<CommunityResponse> ScrapByCommunity = scrapList.stream()
-            .map(scrap -> CommunityResponse.of(scrap.getCommunity(), false))
-                .collect(Collectors.toList());
+        List<CommunityResponse> scrapByCommunity = scrapList.stream()
+            .map(scrap -> {
+                scrap = scrapRepository.findByUsersAndCommunity(user, scrap.getCommunity());
+                boolean isScrapedByCurrentUser = (scrap != null);
+                return CommunityResponse.of(scrap.getCommunity(), false, isScrapedByCurrentUser);
+            })
+            .toList();
 
-
-        return responseService.getListResponse(HttpStatus.OK.value(), ScrapByCommunity, "내가 등록한 스크랩 조회");
+        return responseService.getListResponse(HttpStatus.OK.value(), scrapByCommunity,
+            "내가 등록한 스크랩 조회");
     }
 
     public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
