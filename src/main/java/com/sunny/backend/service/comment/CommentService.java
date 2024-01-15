@@ -41,12 +41,12 @@ public class CommentService {
 		CommentResponse commentResponse;
 		if (isPrivate && !(currentUser.getId() == comment.getUsers().getId() ||
 				currentUser.getId() == comment.getCommunity().getUsers().getId())) {
-			commentResponse = new CommentResponse(comment.getId(), comment.getWriter(),
+			commentResponse = new CommentResponse(comment.getId(), comment.getUsers().getName(),
 					"비밀 댓글입니다.", comment.getCreatedDate(), comment.getUpdatedDate());
 		} else {
 			commentResponse = new CommentResponse(
 					comment.getId(),
-					comment.getWriter(),
+					comment.getUsers().getName(),
 					comment.getContent(),
 					comment.getCreatedDate(),
 					comment.getUpdatedDate()
@@ -94,7 +94,6 @@ public class CommentService {
 		}
 
 		//To do : setter 제외하고 도메인에서 함수로 처리
-		comment.setWriter(user.getName());
 		comment.setCommunity(community);
 		comment.setContent(commentRequestDTO.getContent());
 		comment.setUsers(user);
@@ -108,7 +107,7 @@ public class CommentService {
 		}
 
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-				new CommentResponse(comment.getId(), comment.getWriter(), comment.getContent(),
+				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),
 						comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 등록했습니다.");
 
 	}
@@ -152,7 +151,7 @@ public class CommentService {
 			comment.setIsPrivated(isPrivate);
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-				new CommentResponse(comment.getId(), comment.getWriter(), comment.getContent(),
+				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),
 						comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 수정했습니다.");
 	}
 

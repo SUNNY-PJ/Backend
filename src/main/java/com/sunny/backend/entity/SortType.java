@@ -1,5 +1,11 @@
 package com.sunny.backend.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum SortType {
-    조회순,최신순
+    VIEW("view"), LATEST("latest");
+    private final String sortType;
 }
