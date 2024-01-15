@@ -1,4 +1,4 @@
-package com.sunny.backend.controller;
+package com.sunny.backend.mypage.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,18 +14,14 @@ import com.sunny.backend.dto.response.ProfileResponse;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.service.MyPageService;
+import com.sunny.backend.mypage.service.MyPageService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Optional;
 
 @RestController
 @Tag(name = "8. MyPage", description = "My Page API")
@@ -71,7 +67,7 @@ public class MyPageController {
     return myPageService.updateProfile(customUserPrincipal, profile);
   }
 
-  //이거 일단 임시 테스트임
+
   @ApiOperation(tags = "8. MyPage", value = "로그아웃")
   @GetMapping("/auth/kakao/logout")
   public ResponseEntity<CommonResponse.GeneralResponse> handleKakaoLogout(

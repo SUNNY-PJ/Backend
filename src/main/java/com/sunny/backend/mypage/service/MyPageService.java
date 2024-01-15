@@ -1,4 +1,4 @@
-package com.sunny.backend.service;
+package com.sunny.backend.mypage.service;
 
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
@@ -12,6 +12,7 @@ import com.sunny.backend.repository.ScrapRepository;
 import com.sunny.backend.repository.comment.CommentRepository;
 import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
+import com.sunny.backend.service.S3Service;
 import com.sunny.backend.user.Users;
 import com.sunny.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +28,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-
-/**
- * TODO
- * 회원탈퇴
- * */
 @Transactional
 public class MyPageService {
     private final UserRepository userRepository;
@@ -41,7 +37,7 @@ public class MyPageService {
     private final ScrapRepository scrapRepository;
     private final S3Service s3Service;
 
-    // 마이페이지 조회
+
     public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> getMypage(
             CustomUserPrincipal customUserPrincipal) {
         Users user = customUserPrincipal.getUsers();
@@ -49,7 +45,7 @@ public class MyPageService {
         return responseService.getSingleResponse(HttpStatus.OK.value(), profileResponse, "프로필 조회 성공");
     }
 
-    // 내가 쓴 글
+
     public ResponseEntity<CommonResponse.ListResponse<CommunityResponse.PageResponse>> getMyCommunity(
             CustomUserPrincipal customUserPrincipal) {
         Users user = customUserPrincipal.getUsers();
@@ -76,7 +72,7 @@ public class MyPageService {
         return responseService.getListResponse(HttpStatus.OK.value(), commentDTOList, "내가 쓴 댓글 조회");
     }
 
-    //스크랩 한 글
+
     public ResponseEntity<CommonResponse.ListResponse<CommunityResponse>> getScrapByUserId(CustomUserPrincipal customUserPrincipal) {
         Users user = customUserPrincipal.getUsers();
         List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId());
