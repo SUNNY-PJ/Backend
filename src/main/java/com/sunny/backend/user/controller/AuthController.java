@@ -1,5 +1,6 @@
 package com.sunny.backend.user.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,11 +38,13 @@ public class AuthController {
 
 	@ApiOperation(tags = "0. User", value = "카카오 로그인 callback")
 	@GetMapping("/auth/kakao/callback")
-	public ResponseEntity<CommonResponse.SingleResponse<AuthDto.TokenDto>> kakaoCallback(String code) throws
-		Exception { // Data를 리턴해주는 컨트롤러 함수
-		AuthDto.TokenDto tokenDto = kaKaoService.getAccessToken(code);
+	public ResponseEntity<Void> kakaoCallback(String code) throws Exception { // Data를 리턴해주는 컨트롤러 함수
 
-		return responseService.getSingleResponse(HttpStatus.OK.value(), tokenDto, "카카오 로그인 성공");
+		AuthDto.TokenDto tokenDto = kaKaoService.getAccessToken(code);
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.add("Authorization", tokenDto.getAccessToken());
+		return ResponseEntity.ok().headers(httpHeaders).build();
+		//return responseService.getSingleResponse(HttpStatus.OK.value(), tokenDto, "카카오 로그인 성공");
 	}
 
 	@ApiOperation(tags = "0. User", value = "닉네임 변경")
