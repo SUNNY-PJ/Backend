@@ -1,5 +1,9 @@
 package com.sunny.backend.service;
+import static com.sunny.backend.common.CommonErrorCode.ALREADY_SCRAP;
+import static com.sunny.backend.common.CommonErrorCode.INVALID_FUTURE_DATE;
 
+import com.sunny.backend.common.CommonCustomException;
+import com.sunny.backend.common.CustomException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,14 +49,19 @@ public class ScrapService {
 	public ResponseEntity<CommonResponse.GeneralResponse> addScrapToCommunity(CustomUserPrincipal customUserPrincipal,
 		Long communityId) {
 		Users user = customUserPrincipal.getUsers();
+		Community community = communityRepository.getById(communityId);
 
-		Community community = communityRepository.findById(communityId)
-			.orElseThrow(() -> new NotFoundException("could not found community"));
-		Scrap scrap = Scrap.builder()
-			.community(community)
-			.users(user)
-			.build();
-		scrapRepository.save(scrap);
+		Scrap scrap = scrapRepository.findByUsersAndCommunity(user, community);
+		if (scrap == null) {
+			scrap = Scrap.builder()
+					.community(community)
+					.users(user)
+					.build();
+			scrapRepository.save(scrap);
+		} else {
+			throw new CommonCustomException(ALREADY_SCRAP);
+
+		}
 
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "스크랩하였습니다.");
 	}
@@ -64,8 +73,7 @@ public class ScrapService {
 
 		try {
 			Users user = customUserPrincipal.getUsers();
-			Community community = communityRepository.findById(communityId)
-				.orElseThrow(() -> new NotFoundException("could not found community"));
+			Community community = communityRepository.getById(communityId);
 
 			Scrap deleteScrap = scrapRepository.findByUsersAndCommunity(user, community);
 			if (deleteScrap != null) {
