@@ -1,5 +1,12 @@
 package com.sunny.backend.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum BoardType {
-	자유, 꿀팁, 절약
+	FREE("free"), TIP("tip");
+	private final String boardType;
+
 }

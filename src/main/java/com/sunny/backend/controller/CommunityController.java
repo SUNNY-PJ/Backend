@@ -2,6 +2,8 @@ package com.sunny.backend.controller;
 
 import java.util.List;
 
+import com.sunny.backend.dto.response.ProfileResponse;
+import com.sunny.backend.dto.response.comment.CommentResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
@@ -40,17 +42,16 @@ public class CommunityController {
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시판 목록 조회")
 	@GetMapping("")
 	public ResponseEntity<Slice<CommunityResponse.PageResponse>> getCommunityList(
-		@RequestParam(required = false) SortType sort,
-		@RequestParam(required = false) BoardType boardType,
-		@RequestParam(required = false) String search,
-		Pageable pageable) {
+			@RequestParam(required = false) SortType sort,
+			@RequestParam(required = false) BoardType boardType,
+			@RequestParam(required = false) String search,
+			Pageable pageable) {
 		Slice<CommunityResponse.PageResponse> responseDTO;
 		//검색조건 중 모든 내용을 입력하지 않고 요청을 보냈을 때 일반 목록 페이지 출력
 		if (search == null && boardType == null && sort == null) {
 			responseDTO = communityService.getCommunityList(pageable);
 		} else {
 			responseDTO = communityService.getPageListWithSearch(sort, boardType, search, pageable);
-
 		}
 		return ResponseEntity.ok().body(responseDTO);
 	}
@@ -58,36 +59,34 @@ public class CommunityController {
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 상세 조회")
 	@GetMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> getCommunity(
-		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@PathVariable Long communityId) {
+			@AuthUser CustomUserPrincipal customUserPrincipal,
+			@PathVariable Long communityId) {
 		return communityService.findCommunity(customUserPrincipal, communityId);
 	}
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 등록")
 	@PostMapping("")
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> createCommunity(
-		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
-		@RequestPart(value = "files",required = false) List<MultipartFile> files) {
+			@AuthUser CustomUserPrincipal customUserPrincipal,
+			@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
+			@RequestPart(value = "files", required = false) List<MultipartFile> files) {
 		return communityService.createCommunity(customUserPrincipal, communityRequest, files);
 	}
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 수정")
 	@PutMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> updateCommunity(
-		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId,
-		@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
-		@RequestPart(required = false) List<MultipartFile> files) {
-
+			@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId,
+			@RequestPart(value = "communityRequest") CommunityRequest communityRequest,
+			@RequestPart(required = false) List<MultipartFile> files) {
 		return communityService.updateCommunity(customUserPrincipal, communityId, communityRequest, files);
 	}
 
-	//게시글 삭제
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 삭제")
 	@DeleteMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> deleteCommunity(
-		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId) {
+			@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId) {
 		return communityService.deleteCommunity(customUserPrincipal, communityId);
 	}
-}
 
+}

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.JSONParser;
 import com.nimbusds.jose.shaded.json.parser.ParseException;
-import com.sunny.backend.common.CustomException;
+import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.entity.OAuthToken;
 import com.sunny.backend.security.dto.AuthDto;
 import com.sunny.backend.security.jwt.TokenProvider;
@@ -27,12 +27,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
-import static com.sunny.backend.common.ErrorCode.COMMUNITY_NOT_FOUND;
-import static com.sunny.backend.common.ErrorCode.NicknameAlreadyInUse;
+import static com.sunny.backend.common.CommonErrorCode.NicknameAlreadyInUse;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +64,7 @@ public class KaKaoService {
 
         // POST 방식으로 Http 요청한다. 그리고 response 변수의 응답 받는다.
         ResponseEntity<String> response = rt.exchange(
-                "https://kauth.kakao.com/oauth/token", // https://{요청할 서버 주소}
+                "https://kauth.kakao.com/oauth/token",
                 HttpMethod.POST, // 요청할 방식
                 kakaoTokenRequest, // 요청할 때 보낼 데이터
                 String.class // 요청 시 반환되는 데이터 타입
@@ -80,8 +77,6 @@ public class KaKaoService {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-
-
         AuthDto.TokenDto tokenDto = tokenProvider.createToken(getEmailForUserInfo(oAuthToken.getAccess_token()), "ROLE_USER");
         if(tokenDto==null) {
             throw new Exception("로그인 실패");
@@ -94,7 +89,6 @@ public class KaKaoService {
         String host = "https://kapi.kakao.com/v2/user/me";
         try {
             URL url = new URL(host);
-
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestProperty("Authorization", "Bearer " + accessToken);
             urlConnection.setRequestMethod("GET");
@@ -114,14 +108,21 @@ public class KaKaoService {
             JSONObject kakao_account = (JSONObject) obj.get("kakao_account");
             JSONObject properties = (JSONObject) obj.get("properties");
 
+
             String email = kakao_account.get("email").toString();
             String nickname = properties.get("nickname").toString();
-
+            String profileImg = properties.get("profile_image").toString();
+            System.out.println(profileImg);
+            String defaultImageUrl = "http://k.kakaocdn.net/dn/1G9kp/btsAot8liOn/8CWudi3uy07rvFNUkk3ER0/img_640x640.jpg";
+            if (profileImg.equals(defaultImageUrl)) {
+                 profileImg="https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png";
+            }
             Optional<Users> usersOptional = userRepository.findByEmail(email);
             if(usersOptional.isEmpty()) {
                 Users users = Users.builder()
                         .email(email)
                         .name(nickname)
+                        .profile(profileImg)
                         .role(Role.USER)
                         .build();
                 userRepository.save(users);
@@ -139,7 +140,7 @@ public class KaKaoService {
         Users user = customUserPrincipal.getUsers();
         Users existingUser = userRepository.findByName(name);
         if (existingUser != null && !existingUser.getId().equals(user.getId())) {
-            throw new  CustomException(NicknameAlreadyInUse);
+            throw new CommonCustomException(NicknameAlreadyInUse);
         }
         user.setName(name);
         userRepository.save(user);

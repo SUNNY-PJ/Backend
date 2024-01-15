@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ScrapService {
-	private final UserRepository userRepository;
 	private final ScrapRepository scrapRepository;
 	private final CommunityRepository communityRepository;
 	private final ResponseService responseService;
@@ -36,7 +35,7 @@ public class ScrapService {
 		List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId()); //user id 이용해서 전체 스크랩 조회
 
 		List<CommunityResponse> communityResponseList = scrapList.stream()
-			.map(scrap -> new CommunityResponse(scrap.getCommunity(),false))
+				.map(scrap -> CommunityResponse.of(scrap.getCommunity(), false))
 			.collect(Collectors.toList());
 
 		return responseService.getListResponse(HttpStatus.OK.value(), communityResponseList, "");
@@ -56,7 +55,6 @@ public class ScrapService {
 		scrapRepository.save(scrap);
 
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "스크랩하였습니다.");
-
 	}
 
 	//스크랩 취소

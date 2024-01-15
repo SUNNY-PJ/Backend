@@ -19,6 +19,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+import javax.validation.constraints.Size;
+
 @Tag(name = "0. User", description = "User API")
 @RestController
 @RequiredArgsConstructor
@@ -30,27 +32,31 @@ public class AuthController {
 	@ApiOperation(tags = "0. User", value = "카카오 로그인")
 	@GetMapping("/auth/token")
 	public ResponseEntity<CommonResponse.SingleResponse<AuthDto.TokenDto>> getKakaoAccount(
-		@RequestParam("accessToken") String accessToken, @RequestParam("refreshToken") String refreshToken) {
+			@RequestParam("accessToken") String accessToken,
+			@RequestParam("refreshToken") String refreshToken) {
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-			new AuthDto.TokenDto(accessToken, refreshToken), "카카오 로그인 성공");
+				new AuthDto.TokenDto(accessToken, refreshToken), "카카오 로그인 성공");
 
 	}
 
 	@ApiOperation(tags = "0. User", value = "카카오 로그인 callback")
 	@GetMapping("/auth/kakao/callback")
+
 	public ResponseEntity<Void> kakaoCallback(String code) throws Exception { // Data를 리턴해주는 컨트롤러 함수
 
 		AuthDto.TokenDto tokenDto = kaKaoService.getAccessToken(code);
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.add("Authorization", tokenDto.getAccessToken());
 		return ResponseEntity.ok().headers(httpHeaders).build();
-		//return responseService.getSingleResponse(HttpStatus.OK.value(), tokenDto, "카카오 로그인 성공");
+
+
 	}
 
 	@ApiOperation(tags = "0. User", value = "닉네임 변경")
 	@PostMapping("/auth/nickname")
 	public ResponseEntity<CommonResponse.SingleResponse<AuthDto.UserDto>> changeNickname(
-		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestParam("name") String name) {
+			@AuthUser CustomUserPrincipal customUserPrincipal, @RequestParam("name")
+	@Size(min = 2, max = 10, message = "2~10자 이내로 입력해야 합니다.") String name) {
 		AuthDto.UserDto userDto = kaKaoService.changeNickname(customUserPrincipal, name);
 
 		return responseService.getSingleResponse(HttpStatus.OK.value(), userDto, "닉네임 변경 성공");
