@@ -50,7 +50,7 @@ public class UserProfileService {
         List<CommunityResponse.PageResponse> communityRes = new ArrayList<>();
 
         for (Community communities : communityList) {
-            communityRes.add(new CommunityResponse.PageResponse(communities));
+            communityRes.add(CommunityResponse.PageResponse.from(communities));
         }
         return responseService.getListResponse(HttpStatus.OK.value(), communityRes, "친구가 쓴 작성글 조회");
     }
@@ -61,7 +61,9 @@ public class UserProfileService {
         List<Comment> commentList = commentRepository.findAllByUsers_Id(community.getUsers().getId());
         List<CommentResponse.Mycomment> commentDTOList =
                 commentList.stream()
-                        .map(comment -> new CommentResponse.Mycomment(comment.getCommunity().getId(),comment.getId(), comment.getContent(), comment.getWriter(),comment.getCreatedDate(),comment.getUpdatedDate()))
+                    .map(comment -> new CommentResponse.Mycomment(comment.getCommunity().getId(),
+                        comment.getId(), comment.getContent(), comment.getUsers().getName(),
+                        comment.getCreatedDate(), comment.getUpdatedDate()))
                         .collect(Collectors.toList());
 
         return responseService.getListResponse(HttpStatus.OK.value(), commentDTOList, "친구가 쓴 댓글 조회");

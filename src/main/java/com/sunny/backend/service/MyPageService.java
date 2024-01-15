@@ -57,7 +57,7 @@ public class MyPageService {
         List<CommunityResponse.PageResponse> communityRes = new ArrayList<>();
 
         for (Community community : communityList) {
-            communityRes.add(new CommunityResponse.PageResponse(community));
+            communityRes.add(CommunityResponse.PageResponse.from(community));
         }
         return responseService.getListResponse(HttpStatus.OK.value(), communityRes, "내가 쓴 작성글 조회");
     }
@@ -69,7 +69,9 @@ public class MyPageService {
         List<Comment> commentList = commentRepository.findAllByUsers_Id(user.getId());
         List<CommentResponse.Mycomment> commentDTOList =
                 commentList.stream()
-                        .map(comment -> new CommentResponse.Mycomment(comment.getCommunity().getId(), comment.getId(), comment.getContent(), comment.getWriter(), comment.getCreatedDate(), comment.getUpdatedDate()))
+                    .map(comment -> new CommentResponse.Mycomment(comment.getCommunity().getId(),
+                        comment.getId(), comment.getContent(), comment.getUsers().getName(),
+                        comment.getCreatedDate(), comment.getUpdatedDate()))
                         .collect(Collectors.toList());
 
         return responseService.getListResponse(HttpStatus.OK.value(), commentDTOList, "내가 쓴 댓글 조회");
@@ -81,7 +83,7 @@ public class MyPageService {
         List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId());
 
         List<CommunityResponse> ScrapByCommunity = scrapList.stream()
-                .map(scrap -> new CommunityResponse(scrap.getCommunity(), false))
+            .map(scrap -> CommunityResponse.of(scrap.getCommunity(), false))
                 .collect(Collectors.toList());
 
 
@@ -89,19 +91,14 @@ public class MyPageService {
     }
 
     public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
-            CustomUserPrincipal customUserPrincipal, String name, MultipartFile profile) {
+        CustomUserPrincipal customUserPrincipal, MultipartFile profile) {
 
         Users user = customUserPrincipal.getUsers();
-
-        if (name != null) {
-            user.setName(name);
-        }
         // 새 프로필 업로드
         if (profile != null && !profile.isEmpty()) {
             String uploadedProfileUrl = s3Service.upload(profile);
             user.setProfile(uploadedProfileUrl);
-        }
-        else if (profile==null){
+        } else if (profile == null) {
             user.setProfile("https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png");
         }
         ProfileResponse profileResponse = ProfileResponse.from(user);
