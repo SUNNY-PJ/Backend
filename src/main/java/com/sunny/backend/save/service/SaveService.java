@@ -1,7 +1,7 @@
 package com.sunny.backend.save.service;
 
 
-import com.sunny.backend.repository.consumption.ConsumptionRepository;
+import com.sunny.backend.consumption.repository.ConsumptionRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;

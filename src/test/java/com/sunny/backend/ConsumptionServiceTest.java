@@ -4,7 +4,6 @@ package com.sunny.backend;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -13,21 +12,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.CommonResponse.SingleResponse;
-import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
 import com.sunny.backend.dto.response.consumption.ConsumptionResponse;
-import com.sunny.backend.dto.response.consumption.SpendTypeStatisticsResponse;
-import com.sunny.backend.entity.Consumption;
-import com.sunny.backend.entity.SpendType;
-import com.sunny.backend.repository.consumption.ConsumptionRepository;
-import com.sunny.backend.service.consumption.ConsumptionService;
+import com.sunny.backend.consumption.domain.Consumption;
+import com.sunny.backend.consumption.domain.SpendType;
+import com.sunny.backend.consumption.repository.ConsumptionRepository;
+import com.sunny.backend.consumption.service.ConsumptionService;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.transaction.Transactional;
 
@@ -119,7 +111,7 @@ class ConsumptionTest {
       // given
       ConsumptionRequest consumptionRequest = new ConsumptionRequest();
       consumptionRequest.setName("집");
-      consumptionRequest.setCategory(SpendType.주거);
+      consumptionRequest.setCategory(SpendType.SHELTER);
       consumptionRequest.setMoney(10000000L);
 
       consumptionRequest.setDateField(LocalDate.now());
@@ -142,7 +134,7 @@ class ConsumptionTest {
       ConsumptionResponse actual = responseBody.getData();
       assertThat(actual)
           .extracting("name", "category", "money", "dateField")
-          .containsExactly("집", SpendType.주거, 10000000L, LocalDate.now());
+          .containsExactly("집", SpendType.SHELTER, 10000000L, LocalDate.now());
     }
 
 //    @Test
