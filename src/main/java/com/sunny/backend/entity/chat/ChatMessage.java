@@ -34,7 +34,7 @@ public class ChatMessage extends BaseTime {
 	@JoinColumn(name = "user_id")
 	private Users users;
 
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "chat_room_id")
 	private ChatRoom chatRoom;
 

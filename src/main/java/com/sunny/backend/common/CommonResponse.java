@@ -5,7 +5,6 @@ import java.util.List;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 @AllArgsConstructor
@@ -16,11 +15,11 @@ public class CommonResponse {
 	@Getter
 	public static class ErrorResponse extends CommonResponse {
 		@ApiModelProperty(value = "응답 코드")
-		private ErrorCode errorCode;
+		private CommonErrorCode commonErrorCode;
 
-		public ErrorResponse(int status, ErrorCode errorCode) {
+		public ErrorResponse(int status, CommonErrorCode commonErrorCode) {
 			super(status);
-			this.errorCode = errorCode;
+			this.commonErrorCode = commonErrorCode;
 		}
 	}
 
