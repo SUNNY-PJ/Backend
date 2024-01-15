@@ -1,5 +1,6 @@
 package com.sunny.backend.entity;
 
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.user.Users;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

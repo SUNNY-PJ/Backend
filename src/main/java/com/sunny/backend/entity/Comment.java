@@ -1,9 +1,9 @@
 package com.sunny.backend.entity;
 
 
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.user.Users;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
