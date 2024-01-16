@@ -1,9 +1,9 @@
 package com.sunny.backend.dto.response;
 
-import com.sunny.backend.friends.domain.FriendStatus;
+import com.sunny.backend.friends.domain.Status;
 
 public record FriendCheckResponse(
 	boolean isFriend,
-	FriendStatus status
+	Status status
 ) {
 }

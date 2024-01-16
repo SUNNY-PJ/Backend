@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum FriendStatus {
+public enum Status {
 	APPROVE("승인"), WAIT("대기");
 
 	private final String status;

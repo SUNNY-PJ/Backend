@@ -36,26 +36,26 @@ public class Friend {
 	private Users users;
 
 	@ManyToOne
-	@JoinColumn(name = "user_friends_id")
+	@JoinColumn(name = "user_friend_id")
 	private Users userFriend;
 
 	@Column
 	@Enumerated(value = EnumType.STRING)
-	private FriendStatus status;
+	private Status status;
 
 	public void approveStatus() {
-		status = FriendStatus.APPROVE;
+		status = Status.APPROVE;
 	}
 
 	public boolean isApproveStatus() {
-		return status.equals(FriendStatus.APPROVE);
+		return status.equals(Status.APPROVE);
 	}
 
 	public void validateStatus() {
-		if(status.equals(FriendStatus.WAIT)) {
+		if(status.equals(Status.WAIT)) {
 			throw new CustomException(FriendErrorCode.FRIEND_NOT_APPROVE);
 		}
-		if(status.equals(FriendStatus.APPROVE)) {
+		if(status.equals(Status.APPROVE)) {
 			throw new CustomException(FriendErrorCode.FRIEND_EXIST);
 		}
 	}
