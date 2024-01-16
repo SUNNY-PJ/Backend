@@ -2,14 +2,11 @@ package com.sunny.backend.friends.controller;
 
 import java.util.List;
 
-import javax.validation.constraints.NotBlank;
-
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.config.AuthUser;
 import com.sunny.backend.dto.response.FriendCheckResponse;
 import com.sunny.backend.dto.response.FriendResponse;
-import com.sunny.backend.friends.domain.FriendStatus;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.friends.service.FriendService;
 import io.swagger.annotations.ApiOperation;

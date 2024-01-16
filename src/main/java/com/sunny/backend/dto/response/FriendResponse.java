@@ -1,14 +1,14 @@
 package com.sunny.backend.dto.response;
 
 import com.sunny.backend.friends.domain.Friend;
-import com.sunny.backend.friends.domain.FriendStatus;
+import com.sunny.backend.friends.domain.Status;
 
 public record FriendResponse(
 	Long friendsId,
 	Long userFriendId,
 	String name,
 	String profile,
-	FriendStatus friendStatus
+	Status status
 ) {
 	public static FriendResponse from(Friend friend) {
 		return new FriendResponse(
