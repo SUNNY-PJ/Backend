@@ -15,15 +15,13 @@ public record CompetitionRequest(
 	LocalDate endDate
 ) {
 
-	public Competition of(Users user, Users userFriend) {
+	public Competition toEntity() {
 		return Competition.builder()
 			.message(message)
 			.price(price)
 			.compensation(compensation)
 			.startDate(startDate)
 			.endDate(endDate)
-			.users(user)
-			.userFriend(userFriend)
 			.status(Status.WAIT)
 			.build();
 	}

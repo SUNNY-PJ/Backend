@@ -3,7 +3,10 @@ package com.sunny.backend.competition.domain;
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.CommonErrorCode;
 import com.sunny.backend.common.CustomException;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.competition.exception.CompetitionErrorCode;
+import com.sunny.backend.entity.Comment;
+import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.Status;
 import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.user.Users;
@@ -15,6 +18,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -48,13 +53,12 @@ public class Competition {
     @Enumerated(value = EnumType.STRING)
     private Status status;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Users users;
+    @OneToMany(mappedBy = "competition")
+    private final List<Friend> friends = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "user_friend_id")
-    private Users userFriend;
+    public void addFriend(Friend friend) {
+        this.friends.add(friend);
+    }
 
     public void approveStatus() {
         status = Status.APPROVE;
@@ -69,9 +73,12 @@ public class Competition {
         }
     }
 
-    public void validateCompetitionByUser(Long userId, Long tokenUserId) {
-        if(!userId.equals(tokenUserId)) {
-            throw new CommonCustomException(CommonErrorCode.TOKEN_INVALID);
+    public void validateCompetitionByUser(Long tokenUserId) {
+        for (Friend friend : friends) {
+            if(friend.getUsers().getId().equals(tokenUserId)) {
+                return;
+            }
         }
+        throw new CommonCustomException(CommonErrorCode.TOKEN_INVALID);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.sunny.backend.common.CommonResponse;
+import com.sunny.backend.common.CustomException;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.competition.dto.request.CompetitionRequest;
 import com.sunny.backend.competition.dto.request.CompetitionRequestDto;
@@ -20,6 +21,8 @@ import com.sunny.backend.competition.repository.CompetitionRepository;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.Status;
+import com.sunny.backend.friends.exception.FriendErrorCode;
+import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
 import com.sunny.backend.user.repository.UserRepository;
@@ -32,15 +35,20 @@ public class CompetitionService {
 	private final ResponseService responseService;
 	private final CompetitionRepository competitionRepository;
 	private final UserRepository userRepository;
+	private final FriendRepository friendRepository;
 	private final ConsumptionRepository consumptionRepository;
 
 	public ResponseEntity<CommonResponse.GeneralResponse> applyCompetition(CustomUserPrincipal customUserPrincipal,
 		CompetitionRequest competitionRequest) {
 		Users userFriend = userRepository.getById(competitionRequest.friendsId());
+		Friend friend = friendRepository
+			.findByUsers_IdAndUserFriend_Id(userFriend.getId(), customUserPrincipal.getUsers().getId())
+			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
 
-		Competition competition = competitionRequest.of(userFriend, customUserPrincipal.getUsers());
-
+		Competition competition = competitionRequest.toEntity();
+		competition.addFriend(friend);
 		competitionRepository.save(competition);
+
 		//  신청후 알람을 보내는 행위
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "대결 신청이 됐습니다.");
 	}
@@ -49,50 +57,42 @@ public class CompetitionService {
 	public void acceptCompetition(CustomUserPrincipal customUserPrincipal, Long competitionId) {
 		Competition competition = competitionRepository.getById(competitionId);
 
-		competition.validateCompetitionByUser(competition.getUsers().getId(), customUserPrincipal.getUsers().getId());
-		competition.approveStatus();
+		competition.validateCompetitionByUser(customUserPrincipal.getUsers().getId());
 
-		getByUserAndUserFriendAndCreateCompetition(competition.getUsers(), competition.getUserFriend(), competition);
+		getByUserAndUserFriendAndCreateCompetition(competition);
 	}
 
 	@Transactional
 	public void refuseFriend(CustomUserPrincipal customUserPrincipal, Long competitionId) {
 		Competition competition = competitionRepository.getById(competitionId);
 
-		competition.validateCompetitionByUser(competition.getUsers().getId(), customUserPrincipal.getUsers().getId());
+		competition.validateCompetitionByUser(customUserPrincipal.getUsers().getId());
 		competitionRepository.deleteById(competitionId);
 	}
 
-	public void getByUserAndUserFriendAndCreateCompetition(Users users, Users userFriend, Competition competition) {
-		Optional<Competition> optionalCompetition = competitionRepository
-			.findByUsers_IdAndUserFriend_Id(userFriend.getId(), users.getId());
+	public void getByUserAndUserFriendAndCreateCompetition(Competition competition) {
+		Friend friend = competition.getFriends().get(0);
 
-		if(optionalCompetition.isEmpty()) {
-			Competition saveCompetition = Competition.builder()
-				.message(competition.getMessage())
-				.price(competition.getPrice())
-				.compensation(competition.getCompensation())
-				.startDate(competition.getStartDate())
-				.endDate(competition.getEndDate())
-				.users(userFriend)
-				.userFriend(users)
-				.status(Status.APPROVE)
-				.build();
-			competitionRepository.save(saveCompetition);
-		} else {
-			Competition getCompetition = optionalCompetition.get();
-			getCompetition.validateStatus();
-		}
+		Friend friendUser = friendRepository
+			.findByUsers_IdAndUserFriend_Id(friend.getUserFriend().getId(), friend.getUsers().getId())
+			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
+
+		competition.approveStatus();
+		competition.addFriend(friendUser);
 	}
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CompetitionResponseDto.CompetitionStatus>> getCompetitionStatus(
 		CustomUserPrincipal customUserPrincipal, Long competitionId) {
-		Competition competition = competitionRepository.findById(competitionId)
-			.orElseThrow(() -> new IllegalArgumentException("Not Found Id" + competitionId));
+		Competition competition = competitionRepository.getById(competitionId);
 		Users user = customUserPrincipal.getUsers();
-		Users friends = userRepository.findById(competition.getUserFriend().getId())
-			.orElseThrow(() -> new IllegalArgumentException("Not Found Id" + competition.getUserFriend().getId()));
+
+		Users userFriend = competition.getFriends().stream()
+			.map(Friend::getUserFriend)
+			.findFirst()
+			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
+
+
 		Duration diff = Duration.between(LocalDate.now(), competition.getEndDate());
 
 		// 날짜 간의 소비 금액 구하기 로직
@@ -117,13 +117,12 @@ public class CompetitionService {
 			.endDate(competition.getEndDate())
 			.dDay(diff.toMinutes() / 60)
 			.username(user.getName())
-			.friendName(friends.getName())
+			.friendName(userFriend.getName())
 			.userPercent(userMoney / competition.getPrice())
 			.friendsPercent(friendsMoney / competition.getPrice())
 			.result(result)
 			.build();
 		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionStatus, "결과 조회");
 	}
-
 
 }

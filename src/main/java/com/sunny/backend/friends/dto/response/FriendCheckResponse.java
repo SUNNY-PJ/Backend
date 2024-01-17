@@ -1,4 +1,4 @@
-package com.sunny.backend.dto.response;
+package com.sunny.backend.friends.dto.response;
 
 import com.sunny.backend.friends.domain.Status;
 

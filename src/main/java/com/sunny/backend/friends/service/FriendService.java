@@ -7,10 +7,11 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import com.sunny.backend.dto.response.FriendCheckResponse;
-import com.sunny.backend.dto.response.FriendResponse;
+import com.sunny.backend.friends.dto.response.FriendCheckResponse;
+import com.sunny.backend.friends.dto.response.FriendResponse;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.Status;
+import com.sunny.backend.friends.dto.response.FriendStatusResponse;
 import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
@@ -24,13 +25,10 @@ public class FriendService {
 	private final FriendRepository friendRepository;
 	private final UserRepository userRepository;
 
-	public List<FriendResponse> getFriends(CustomUserPrincipal customUserPrincipal) {
+	public FriendStatusResponse getFriends(CustomUserPrincipal customUserPrincipal) {
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
-
-		return friendRepository.findByUsers_Id(tokenUserId)
-				.stream()
-				.map(FriendResponse::from)
-				.toList();
+		List<FriendResponse> friendResponses = friendRepository.getFriendResponse(tokenUserId);
+		return FriendStatusResponse.of(friendResponses, friendResponses);
 	}
 
 	public void addFriend(CustomUserPrincipal customUserPrincipal, Long userFriendId) {
