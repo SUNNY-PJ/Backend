@@ -43,27 +43,27 @@ public class CompetitionController {
 	}
 
 	@ApiOperation(tags = "3. Competition", value = "대결 승인하기")
-	@PostMapping("/approve/{competitionId}")
+	@PostMapping("/approve/{friendId}")
 	public ResponseEntity<CommonResponse.GeneralResponse> acceptCompetition(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@PathVariable(name = "competitionId") Long competitionId) {
-		competitionService.acceptCompetition(customUserPrincipal, competitionId);
+		@PathVariable(name = "friendId") Long friendId) {
+		competitionService.acceptCompetition(customUserPrincipal, friendId);
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "승인 되었습니다.");
 	}
 
 	@ApiOperation(tags = "3. Competition", value = "대결 거절하기")
-	@DeleteMapping("/approve/{competitionId}")
+	@DeleteMapping("/approve/{friendId}")
 	public ResponseEntity<CommonResponse.GeneralResponse> refuseCompetition(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@PathVariable(name = "competitionId") Long competitionId) {
-		competitionService.refuseFriend(customUserPrincipal, competitionId);
+		@PathVariable(name = "friendId") Long friendId) {
+		competitionService.refuseFriend(customUserPrincipal, friendId);
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "거절 되었습니다.");
 	}
 
 	@ApiOperation(tags = "3. Competition", value = "대결 상태 가져오기")
-	@GetMapping("/status/{competition_id}")
+	@GetMapping("/status/{friendId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CompetitionResponseDto.CompetitionStatus>> getCompetitionStatus(
-		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable(name = "competition_id") Long id) {
-		return competitionService.getCompetitionStatus(customUserPrincipal, id);
+		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable(name = "friendId") Long friendId) {
+		return competitionService.getCompetitionStatus(customUserPrincipal, friendId);
 	}
 }
