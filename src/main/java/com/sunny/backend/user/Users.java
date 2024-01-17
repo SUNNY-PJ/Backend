@@ -50,6 +50,7 @@ public class Users extends BaseTime {
 	@Column
 	@Enumerated(value = EnumType.STRING)
 	private AuthProvider authProvider;
+
 	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private List<Community> communityList;
 

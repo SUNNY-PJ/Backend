@@ -1,7 +1,8 @@
-package com.sunny.backend.service;
+package com.sunny.backend.competition.service;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -10,12 +11,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.sunny.backend.common.CommonResponse;
+import com.sunny.backend.common.CustomException;
 import com.sunny.backend.common.ResponseService;
-import com.sunny.backend.dto.request.CompetitionRequestDto;
-import com.sunny.backend.dto.response.CompetitionResponseDto;
-import com.sunny.backend.entity.Competition;
-import com.sunny.backend.repository.CompetitionRepository;
+import com.sunny.backend.competition.dto.request.CompetitionRequest;
+import com.sunny.backend.competition.dto.request.CompetitionRequestDto;
+import com.sunny.backend.competition.dto.response.CompetitionResponseDto;
+import com.sunny.backend.competition.domain.Competition;
+import com.sunny.backend.competition.repository.CompetitionRepository;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;
+import com.sunny.backend.friends.domain.Friend;
+import com.sunny.backend.friends.domain.Status;
+import com.sunny.backend.friends.exception.FriendErrorCode;
+import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
 import com.sunny.backend.user.repository.UserRepository;
@@ -28,55 +35,64 @@ public class CompetitionService {
 	private final ResponseService responseService;
 	private final CompetitionRepository competitionRepository;
 	private final UserRepository userRepository;
+	private final FriendRepository friendRepository;
 	private final ConsumptionRepository consumptionRepository;
 
 	public ResponseEntity<CommonResponse.GeneralResponse> applyCompetition(CustomUserPrincipal customUserPrincipal,
-		CompetitionRequestDto.CompetitionApply competitionApply) {
-		Users friends = userRepository.findById(competitionApply.getFriendsId())
-			.orElseThrow(() -> new IllegalArgumentException("Not Found Id" + competitionApply.getFriendsId()));
-		Competition competition = Competition.builder()
-			.message(competitionApply.getMessage())
-			.price(competitionApply.getPrice())
-			.compensation(competitionApply.getCompensation())
-			.startDate(competitionApply.getStartDate())
-			.endDate(competitionApply.getEndDate())
-			.users(customUserPrincipal.getUsers())
-			.friends(friends)
-			.build();
+		CompetitionRequest competitionRequest) {
+		Users userFriend = userRepository.getById(competitionRequest.friendsId());
+		Friend friend = friendRepository
+			.findByUsers_IdAndUserFriend_Id(userFriend.getId(), customUserPrincipal.getUsers().getId())
+			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
+
+		Competition competition = competitionRequest.toEntity();
+		competition.addFriend(friend);
 		competitionRepository.save(competition);
+
 		//  신청후 알람을 보내는 행위
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "대결 신청이 됐습니다.");
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.GeneralResponse> acceptCompetition(CustomUserPrincipal customUserPrincipal,
-		CompetitionRequestDto.CompetitionAccept competitionAccept) {
-		Competition competition = competitionRepository.findById(competitionAccept.getCompetitionId())
-			.orElseThrow(() -> new IllegalArgumentException("Not Found Id" + competitionAccept.getCompetitionId()));
+	public void acceptCompetition(CustomUserPrincipal customUserPrincipal, Long competitionId) {
+		Competition competition = competitionRepository.getById(competitionId);
 
-		if (competition.getFriends().getId().equals(customUserPrincipal.getUsers().getId())) {
-			competition.setApprove(competitionAccept.getApprove());
-			if (competition.getApprove().equals('Y')) {
-				return responseService.getGeneralResponse(HttpStatus.OK.value(),
-					customUserPrincipal.getUsers().getName() + "님이 대결 신청을 승낙했어요 :)");
-			} else {
-				return responseService.getGeneralResponse(HttpStatus.OK.value(),
-					customUserPrincipal.getUsers().getName() + "님이 대결 신청을 거절했어요 :(");
-			}
+		competition.validateCompetitionByUser(customUserPrincipal.getUsers().getId());
 
-			// 위 로직 제거하고 알람만?
-		}
-		return responseService.getGeneralResponse(HttpStatus.OK.value(), "잘못된 사용자입니다.");
+		getByUserAndUserFriendAndCreateCompetition(competition);
+	}
+
+	@Transactional
+	public void refuseFriend(CustomUserPrincipal customUserPrincipal, Long competitionId) {
+		Competition competition = competitionRepository.getById(competitionId);
+
+		competition.validateCompetitionByUser(customUserPrincipal.getUsers().getId());
+		competitionRepository.deleteById(competitionId);
+	}
+
+	public void getByUserAndUserFriendAndCreateCompetition(Competition competition) {
+		Friend friend = competition.getFriends().get(0);
+
+		Friend friendUser = friendRepository
+			.findByUsers_IdAndUserFriend_Id(friend.getUserFriend().getId(), friend.getUsers().getId())
+			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
+
+		competition.approveStatus();
+		competition.addFriend(friendUser);
 	}
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CompetitionResponseDto.CompetitionStatus>> getCompetitionStatus(
 		CustomUserPrincipal customUserPrincipal, Long competitionId) {
-		Competition competition = competitionRepository.findById(competitionId)
-			.orElseThrow(() -> new IllegalArgumentException("Not Found Id" + competitionId));
+		Competition competition = competitionRepository.getById(competitionId);
 		Users user = customUserPrincipal.getUsers();
-		Users friends = userRepository.findById(competition.getFriends().getId())
-			.orElseThrow(() -> new IllegalArgumentException("Not Found Id" + competition.getFriends().getId()));
+
+		Users userFriend = competition.getFriends().stream()
+			.map(Friend::getUserFriend)
+			.findFirst()
+			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
+
+
 		Duration diff = Duration.between(LocalDate.now(), competition.getEndDate());
 
 		// 날짜 간의 소비 금액 구하기 로직
@@ -101,11 +117,12 @@ public class CompetitionService {
 			.endDate(competition.getEndDate())
 			.dDay(diff.toMinutes() / 60)
 			.username(user.getName())
-			.friendName(friends.getName())
+			.friendName(userFriend.getName())
 			.userPercent(userMoney / competition.getPrice())
 			.friendsPercent(friendsMoney / competition.getPrice())
 			.result(result)
 			.build();
 		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionStatus, "결과 조회");
 	}
+
 }
