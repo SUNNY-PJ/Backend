@@ -38,59 +38,57 @@ public class CompetitionService {
 	private final FriendRepository friendRepository;
 	private final ConsumptionRepository consumptionRepository;
 
+	@Transactional
 	public ResponseEntity<CommonResponse.GeneralResponse> applyCompetition(CustomUserPrincipal customUserPrincipal,
 		CompetitionRequest competitionRequest) {
-		Users userFriend = userRepository.getById(competitionRequest.friendsId());
-		Friend friend = friendRepository
-			.findByUsers_IdAndUserFriend_Id(userFriend.getId(), customUserPrincipal.getUsers().getId())
+		Friend friendWithUser = friendRepository.getById(competitionRequest.friendsId());
+		friendWithUser.validateFriendsByUser(friendWithUser.getUsers().getId(), customUserPrincipal.getUsers().getId());
+
+		Friend friendWithUserFriend = friendRepository
+			.findByUsers_IdAndUserFriend_Id(friendWithUser.getUserFriend().getId(), friendWithUser.getUsers().getId())
 			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
 
 		Competition competition = competitionRequest.toEntity();
-		competition.addFriend(friend);
 		competitionRepository.save(competition);
+		friendWithUserFriend.addCompetition(competition);
 
 		//  신청후 알람을 보내는 행위
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "대결 신청이 됐습니다.");
 	}
 
 	@Transactional
-	public void acceptCompetition(CustomUserPrincipal customUserPrincipal, Long competitionId) {
-		Competition competition = competitionRepository.getById(competitionId);
+	public void acceptCompetition(CustomUserPrincipal customUserPrincipal, Long friendId) {
+		Friend friendWithUser = friendRepository.getById(friendId);
+		friendWithUser.validateFriendsByUser(friendWithUser.getUsers().getId(), customUserPrincipal.getUsers().getId());
 
-		competition.validateCompetitionByUser(customUserPrincipal.getUsers().getId());
-
-		getByUserAndUserFriendAndCreateCompetition(competition);
+		Competition competition = competitionRepository.getById(friendWithUser.getCompetition().getId());
+		competition.approveStatus();
+		Friend friendWithUserFriend = friendRepository
+			.findByUsers_IdAndUserFriend_Id(friendWithUser.getUserFriend().getId(), friendWithUser.getUsers().getId())
+			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
+		friendWithUserFriend.addCompetition(competition);
 	}
 
 	@Transactional
-	public void refuseFriend(CustomUserPrincipal customUserPrincipal, Long competitionId) {
-		Competition competition = competitionRepository.getById(competitionId);
+	public void refuseFriend(CustomUserPrincipal customUserPrincipal, Long friendId) {
+		Friend friendWithUser = friendRepository.getById(friendId);
+		friendWithUser.validateFriendsByUser(friendWithUser.getUsers().getId(), customUserPrincipal.getUsers().getId());
 
-		competition.validateCompetitionByUser(customUserPrincipal.getUsers().getId());
-		competitionRepository.deleteById(competitionId);
-	}
-
-	public void getByUserAndUserFriendAndCreateCompetition(Competition competition) {
-		Friend friend = competition.getFriends().get(0);
-
-		Friend friendUser = friendRepository
-			.findByUsers_IdAndUserFriend_Id(friend.getUserFriend().getId(), friend.getUsers().getId())
-			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
-
-		competition.approveStatus();
-		competition.addFriend(friendUser);
+		Competition competition = competitionRepository.getById(friendWithUser.getCompetition().getId());
+		competitionRepository.deleteById(competition.getId());
+		friendWithUser.addCompetition(null);
 	}
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CompetitionResponseDto.CompetitionStatus>> getCompetitionStatus(
-		CustomUserPrincipal customUserPrincipal, Long competitionId) {
-		Competition competition = competitionRepository.getById(competitionId);
-		Users user = customUserPrincipal.getUsers();
+		CustomUserPrincipal customUserPrincipal, Long friendId) {
+		Friend friendWithUser = friendRepository.getById(friendId);
+		friendWithUser.validateFriendsByUser(friendWithUser.getUsers().getId(), customUserPrincipal.getUsers().getId());
 
-		Users userFriend = competition.getFriends().stream()
-			.map(Friend::getUserFriend)
-			.findFirst()
-			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
+		Competition competition = competitionRepository.getById(friendWithUser.getCompetition().getId());
+
+		Users user = friendWithUser.getUsers();
+		Users userFriend = friendWithUser.getUserFriend();
 
 
 		Duration diff = Duration.between(LocalDate.now(), competition.getEndDate());
@@ -111,7 +109,7 @@ public class CompetitionService {
 		}
 
 		CompetitionResponseDto.CompetitionStatus competitionStatus = CompetitionResponseDto.CompetitionStatus.builder()
-			.competitionId(competitionId)
+			.competitionId(competition.getId())
 			.price(competition.getPrice())
 			.compensation(competition.getCompensation())
 			.endDate(competition.getEndDate())

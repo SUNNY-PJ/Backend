@@ -48,6 +48,11 @@ public class Friend {
 	@JoinColumn(name = "competition_id")
 	private Competition competition;
 
+	public void addCompetition(Competition competition) {
+		this.competition = competition;
+	}
+
+
 	public void approveStatus() {
 		status = Status.APPROVE;
 	}
