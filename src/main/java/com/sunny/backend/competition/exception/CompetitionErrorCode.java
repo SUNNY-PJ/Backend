@@ -1,14 +1,15 @@
-package com.sunny.backend.friends.exception;
+package com.sunny.backend.competition.exception;
 
 import org.springframework.http.HttpStatus;
+
 import com.sunny.backend.common.ErrorCode;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public enum FriendErrorCode implements ErrorCode {
-	FRIEND_NOT_APPROVE(HttpStatus.BAD_REQUEST, "이미 친구 신청을 했고, 친구 승인 대기 상태입니다."),
-	FRIEND_EXIST(HttpStatus.CONFLICT, "이미 친구입니다."),
-	FRIEND_NOT_FOUND(HttpStatus.NOT_FOUND, "친구가 아닙니다.");
+public enum CompetitionErrorCode implements ErrorCode {
+	COMPETITION_NOT_APPROVE(HttpStatus.BAD_REQUEST, "이미 대결 신청을 했고, 대결 승인 대기 상태입니다."),
+	COMPETITION_EXIST(HttpStatus.CONFLICT, "이미 대결중입니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;
