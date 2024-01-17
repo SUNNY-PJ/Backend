@@ -15,6 +15,7 @@ import com.sunny.backend.common.CustomException;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.competition.dto.request.CompetitionRequest;
 import com.sunny.backend.competition.dto.request.CompetitionRequestDto;
+import com.sunny.backend.competition.dto.response.CompetitionApplyResponse;
 import com.sunny.backend.competition.dto.response.CompetitionResponseDto;
 import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.competition.repository.CompetitionRepository;
@@ -34,12 +35,11 @@ import lombok.RequiredArgsConstructor;
 public class CompetitionService {
 	private final ResponseService responseService;
 	private final CompetitionRepository competitionRepository;
-	private final UserRepository userRepository;
 	private final FriendRepository friendRepository;
 	private final ConsumptionRepository consumptionRepository;
 
 	@Transactional
-	public ResponseEntity<CommonResponse.GeneralResponse> applyCompetition(CustomUserPrincipal customUserPrincipal,
+	public ResponseEntity<CommonResponse.SingleResponse<CompetitionApplyResponse>> applyCompetition(CustomUserPrincipal customUserPrincipal,
 		CompetitionRequest competitionRequest) {
 		Friend friendWithUser = friendRepository.getById(competitionRequest.friendsId());
 		friendWithUser.validateFriendsByUser(friendWithUser.getUsers().getId(), customUserPrincipal.getUsers().getId());
@@ -52,8 +52,10 @@ public class CompetitionService {
 		competitionRepository.save(competition);
 		friendWithUserFriend.addCompetition(competition);
 
+		CompetitionApplyResponse competitionApplyResponse =  CompetitionApplyResponse.of(friendWithUserFriend.getId(),
+			friendWithUserFriend.getUsers().getName(), competition);
 		//  신청후 알람을 보내는 행위
-		return responseService.getGeneralResponse(HttpStatus.OK.value(), "대결 신청이 됐습니다.");
+		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionApplyResponse, "대결 신청이 됐습니다.");
 	}
 
 	@Transactional
