@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.CommonErrorCode;
 import com.sunny.backend.common.CustomException;
+import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.user.Users;
 
@@ -42,6 +43,10 @@ public class Friend {
 	@Column
 	@Enumerated(value = EnumType.STRING)
 	private Status status;
+
+	@ManyToOne
+	@JoinColumn(name = "competition_id")
+	private Competition competition;
 
 	public void approveStatus() {
 		status = Status.APPROVE;
