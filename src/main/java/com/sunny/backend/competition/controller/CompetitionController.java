@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.competition.dto.request.CompetitionRequest;
+import com.sunny.backend.competition.dto.response.CompetitionApplyResponse;
 import com.sunny.backend.config.AuthUser;
 import com.sunny.backend.competition.dto.request.CompetitionRequestDto;
 import com.sunny.backend.competition.dto.response.CompetitionResponseDto;
@@ -36,7 +37,7 @@ public class CompetitionController {
 
 	@ApiOperation(tags = "3. Competition", value = "친구에게 대결 신청")
 	@PostMapping("")
-	public ResponseEntity<CommonResponse.GeneralResponse> applyCompetition(
+	public ResponseEntity<CommonResponse.SingleResponse<CompetitionApplyResponse>> applyCompetition(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@Valid @RequestBody CompetitionRequest competitionRequest) {
 		return competitionService.applyCompetition(customUserPrincipal, competitionRequest);
