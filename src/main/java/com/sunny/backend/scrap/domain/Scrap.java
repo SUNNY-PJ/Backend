@@ -1,4 +1,5 @@
-package com.sunny.backend.entity;
+package com.sunny.backend.scrap.domain;
+
 
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.user.Users;
