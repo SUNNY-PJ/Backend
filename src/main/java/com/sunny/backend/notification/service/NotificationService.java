@@ -1,4 +1,4 @@
-package com.sunny.backend.service;
+package com.sunny.backend.notification.service;
 
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.CommonCustomException;
@@ -6,10 +6,11 @@ import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.request.NotificationRequestDto;
 import com.sunny.backend.dto.request.PushRequestDto;
 import com.sunny.backend.dto.response.NotificationResponse;
-import com.sunny.backend.entity.Notification;
-import com.sunny.backend.repository.NotificationRepository;
+import com.sunny.backend.notification.domain.Notification;
+import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class NotificationService {
     private String expoPushNotificationUrl = "https://exp.host/--/api/v2/push/send";
     public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(CustomUserPrincipal customUserPrincipal, NotificationRequestDto notificationRequestDto) {
         Users user = customUserPrincipal.getUsers();
-
+        System.out.println(notificationRequestDto.getTargetToken());
         Notification notification = Notification.builder()
                 .DeviceToken(notificationRequestDto.getTargetToken())
                 .users(user)
@@ -75,39 +76,40 @@ public class NotificationService {
 
     public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(CustomUserPrincipal customUserPrincipal, PushRequestDto pushRequestDto) throws IOException {
 
-        Notification notification = notificationRepository.findByUsers_Id(pushRequestDto.getFriendsId());
-
-        if (notification != null) {
+        List<Notification> notifications = notificationRepository.findByUsers_Id(
+            pushRequestDto.getFriendsId());
+        if (notifications != null && !notifications.isEmpty()) {
             OkHttpClient client = new OkHttpClient();
 
             MediaType mediaType = MediaType.parse("application/json");
 
-            RequestBody body = RequestBody.create(mediaType,
+            for (Notification notification : notifications) {
+                RequestBody body = RequestBody.create(mediaType,
                     "{\n" +
-                            "  \"to\": \"" + notification.getDeviceToken() + "\",\n" +
-                            "  \"title\": \"" + pushRequestDto.getTitle() + "\",\n" +
-                            "  \"body\": \"" + pushRequestDto.getBody() + "\"\n" +
-                            "}");
+                        "  \"to\": \"" + notification.getDeviceToken() + "\",\n" +
+                        "  \"title\": \"" + pushRequestDto.getTitle() + "\",\n" +
+                        "  \"body\": \"" + pushRequestDto.getBody() + "\"\n" +
+                        "}");
 
-            Request request = new Request.Builder()
+                Request request = new Request.Builder()
                     .url(expoPushNotificationUrl)
                     .post(body)
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Accept", "application/json")
                     .build();
 
-            Response response = client.newCall(request).execute();
-            String responseBody = response.body().string();
+                Response response = client.newCall(request).execute();
+                String responseBody = response.body().string();
+            }
 
-            // 알림 응답 생성
             NotificationResponse notificationResponse = new NotificationResponse(
-                    pushRequestDto.getTitle(),
-                    pushRequestDto.getBody(),
-                    responseBody
+                pushRequestDto.getTitle(),
+                pushRequestDto.getBody(),
+                "알림을 성공적으로 전송했습니다."
             );
-            return responseService.getSingleResponse(HttpStatus.OK.value(), notificationResponse, "알림 성공");
-        }
-        else {
+            return responseService.getSingleResponse(HttpStatus.OK.value(), notificationResponse,
+                "알림 성공");
+        } else {
             throw new CommonCustomException(NOTIFICATIONS_NOT_SENT);
         }
     }

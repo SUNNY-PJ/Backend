@@ -54,8 +54,6 @@ public class SaveService {
 		return responseService.getSingleResponse(HttpStatus.OK.value(), saveResponse, "절약 목표를 수정했습니다.");
 	}
 
-
-
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse.DetailSaveResponse>>
 	getDetailSaveGoal(CustomUserPrincipal customUserPrincipal) {

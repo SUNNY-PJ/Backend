@@ -1,9 +1,7 @@
-package com.sunny.backend.entity;
+package com.sunny.backend.notification.domain;
 
 import com.sunny.backend.user.Users;
 import lombok.*;
-import org.checkerframework.checker.units.qual.N;
-import org.springframework.security.core.userdetails.User;
 
 import javax.persistence.*;
 
@@ -18,7 +16,7 @@ public class Notification {
     private Long id;
 
     @Column
-    private String DeviceToken; //사용자 디바이스 토큰
+    private String DeviceToken;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "users_id")
