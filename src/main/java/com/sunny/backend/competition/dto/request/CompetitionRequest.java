@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.friends.domain.Status;
-import com.sunny.backend.user.Users;
 
 public record CompetitionRequest(
 	Long friendsId,

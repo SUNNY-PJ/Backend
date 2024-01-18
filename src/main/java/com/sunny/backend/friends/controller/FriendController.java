@@ -1,14 +1,11 @@
 package com.sunny.backend.friends.controller;
 
-import java.util.List;
-
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.ResponseService;
-import com.sunny.backend.config.AuthUser;
+import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.common.response.ResponseService;
+import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.friends.dto.response.FriendCheckResponse;
-import com.sunny.backend.friends.dto.response.FriendResponse;
 import com.sunny.backend.friends.dto.response.FriendStatusResponse;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.friends.service.FriendService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;

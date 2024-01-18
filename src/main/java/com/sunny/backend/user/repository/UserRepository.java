@@ -3,7 +3,7 @@ package com.sunny.backend.user.repository;
 
 import java.util.Optional;
 
-import com.sunny.backend.user.Users;
+import com.sunny.backend.user.domain.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

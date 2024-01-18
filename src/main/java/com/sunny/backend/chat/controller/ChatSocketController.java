@@ -9,7 +9,7 @@ import org.springframework.util.StringUtils;
 
 import com.sunny.backend.chat.dto.request.ChatSendMessage;
 import com.sunny.backend.chat.service.ChatSocketService;
-import com.sunny.backend.security.jwt.TokenProvider;
+import com.sunny.backend.auth.jwt.TokenProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

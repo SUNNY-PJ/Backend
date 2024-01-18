@@ -13,13 +13,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.ResponseService;
+import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.scrap.domain.Scrap;
 import com.sunny.backend.scrap.repository.ScrapRepository;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.user.domain.Users;
 
 
 import lombok.RequiredArgsConstructor;

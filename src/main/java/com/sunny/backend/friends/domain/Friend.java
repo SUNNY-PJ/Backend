@@ -12,10 +12,10 @@ import javax.persistence.ManyToOne;
 
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.CommonErrorCode;
-import com.sunny.backend.common.CustomException;
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.friends.exception.FriendErrorCode;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.user.domain.Users;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

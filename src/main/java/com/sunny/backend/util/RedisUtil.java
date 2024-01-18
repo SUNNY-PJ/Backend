@@ -14,9 +14,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisUtil {
 
-
     private final StringRedisTemplate stringRedisTemplate;
-
     private final RedisTemplate<String, Object> redisTemplate;
     //로그아웃 유저 -> Access Token 블랙리스트 등록
     private final RedisTemplate<String, Object> redisBlackListTemplate;
@@ -70,5 +68,9 @@ public class RedisUtil {
 
     public boolean hasKeyBlackList(String key) {
         return Boolean.TRUE.equals(redisBlackListTemplate.hasKey(key));
+    }
+
+    public void setValuesWithTimeout(String key, String value, long timeout) {
+        redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.MILLISECONDS);
     }
 }

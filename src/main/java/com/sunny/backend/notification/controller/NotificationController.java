@@ -1,11 +1,11 @@
 package com.sunny.backend.notification.controller;
 
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.config.AuthUser;
+import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.dto.request.NotificationRequestDto;
 import com.sunny.backend.dto.request.PushRequestDto;
 import com.sunny.backend.dto.response.NotificationResponse;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.notification.service.NotificationService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;

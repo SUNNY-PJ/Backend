@@ -13,8 +13,8 @@ import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.Status;
 import com.sunny.backend.friends.dto.response.FriendStatusResponse;
 import com.sunny.backend.friends.repository.FriendRepository;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;

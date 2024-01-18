@@ -1,15 +1,15 @@
 package com.sunny.backend.notification.service;
 
-import com.sunny.backend.common.CommonResponse;
+import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.CommonCustomException;
-import com.sunny.backend.common.ResponseService;
+import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.dto.request.NotificationRequestDto;
 import com.sunny.backend.dto.request.PushRequestDto;
 import com.sunny.backend.dto.response.NotificationResponse;
 import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.notification.repository.NotificationRepository;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.user.domain.Users;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;

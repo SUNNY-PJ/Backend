@@ -1,6 +1,6 @@
 package com.sunny.backend.dto.response;
 
-import com.sunny.backend.user.Users;
+import com.sunny.backend.user.domain.Users;
 
 public record ProfileResponse (
     Long id,

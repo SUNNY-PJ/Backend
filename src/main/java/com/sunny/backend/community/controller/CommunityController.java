@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.config.AuthUser;
+import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.dto.request.community.CommunityRequest;
 import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.SortType;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.community.service.CommunityService;
 
 import io.swagger.annotations.ApiOperation;
