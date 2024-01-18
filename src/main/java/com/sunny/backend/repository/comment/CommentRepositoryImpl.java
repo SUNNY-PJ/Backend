@@ -1,5 +1,8 @@
 package com.sunny.backend.repository.comment;
 
+import static com.sunny.backend.comment.domain.QComment.comment;
+import static com.sunny.backend.dto.response.comment.CommentResponse.convertCommentToDto;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.comment.domain.Comment;
@@ -7,8 +10,7 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 
 import java.util.*;
 
-import static com.sunny.backend.dto.response.comment.CommentResponse.convertCommentToDto;
-import static com.sunny.backend.entity.QComment.comment;
+
 
 
 public class CommentRepositoryImpl extends QuerydslRepositorySupport implements CommentCustomRepository{

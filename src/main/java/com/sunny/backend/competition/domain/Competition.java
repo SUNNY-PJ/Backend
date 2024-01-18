@@ -1,17 +1,17 @@
-package com.sunny.backend.entity;
+package com.sunny.backend.competition.domain;
 
-import com.sunny.backend.user.Users;
+import com.sunny.backend.common.CustomException;
+import com.sunny.backend.competition.exception.CompetitionErrorCode;
+import com.sunny.backend.friends.domain.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
 @Getter
-@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -40,14 +40,20 @@ public class Competition {
     private String compensation; // 대결 보상
 
     @Column
-    private Character approve;
+    @Enumerated(value = EnumType.STRING)
+    private Status status;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Users users;
+    public void approveStatus() {
+        status = Status.APPROVE;
+    }
 
-    @ManyToOne
-    @JoinColumn(name = "friends_id")
-    private Users friends;
+    public void validateStatus() {
+        if(status.equals(Status.WAIT)) {
+            throw new CustomException(CompetitionErrorCode.COMPETITION_NOT_APPROVE);
+        }
+        if(status.equals(Status.APPROVE)) {
+            throw new CustomException(CompetitionErrorCode.COMPETITION_EXIST);
+        }
+    }
 
 }

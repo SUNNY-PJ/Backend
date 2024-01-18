@@ -1,4 +1,4 @@
-package com.sunny.backend.dto.response;
+package com.sunny.backend.competition.dto.response;
 
 import java.time.LocalDate;
 

@@ -1,7 +1,8 @@
-package com.sunny.backend.repository;
+package com.sunny.backend.scrap.repository;
 
+
+import com.sunny.backend.scrap.domain.Scrap;
 import com.sunny.backend.community.domain.Community;
-import com.sunny.backend.entity.Scrap;
 import com.sunny.backend.user.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
