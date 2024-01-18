@@ -1,6 +1,5 @@
 package com.sunny.backend.save.repository;
 
-import com.sunny.backend.entity.Notification;
 import com.sunny.backend.save.domain.Save;
 import java.time.LocalDate;
 import java.util.List;

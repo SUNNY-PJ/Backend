@@ -5,7 +5,9 @@ import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.community.domain.Community;
 
 import com.sunny.backend.consumption.domain.Consumption;
+import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.save.domain.Save;
+import com.sunny.backend.scrap.domain.Scrap;
 import java.util.ArrayList;
 import java.util.List;
 

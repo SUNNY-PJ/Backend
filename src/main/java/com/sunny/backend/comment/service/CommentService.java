@@ -5,8 +5,6 @@ import static com.sunny.backend.common.CommonErrorCode.*;
 
 import com.sunny.backend.community.repository.CommunityRepository;
 import java.util.List;
-import java.util.Objects;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,9 +19,9 @@ import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.comment.domain.Comment;
 
 import com.sunny.backend.comment.repository.CommentRepository;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
-import com.sunny.backend.community.domain.Community;
 import lombok.RequiredArgsConstructor;
 
 @Service
