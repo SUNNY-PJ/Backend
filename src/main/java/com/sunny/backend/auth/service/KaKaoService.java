@@ -59,7 +59,6 @@ public class KaKaoService {
         params.add("client_id", client_id);
         params.add("redirect_uri", redirect_uri);
         params.add("code", code);
-        System.out.println("params"+params);
 
         // 요청하기 위해 헤더(Header)와 데이터(Body)를 합친다.
         // kakaoTokenRequest는 데이터(Body)와 헤더(Header)를 Entity가 된다.
@@ -73,72 +72,52 @@ public class KaKaoService {
                 String.class // 요청 시 반환되는 데이터 타입
         );
         ObjectMapper objectMapper = new ObjectMapper();
-        OAuthToken oAuthToken = null;
+        OAuthToken oAuthToken = objectMapper.readValue(response.getBody(), OAuthToken.class);
+        String email = getEmailForUserInfo(oAuthToken.getAccess_token());
 
-        try {
-            oAuthToken = objectMapper.readValue(response.getBody(), OAuthToken.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        TokenResponse tokenResponse = tokenProvider.createToken(getEmailForUserInfo(oAuthToken.getAccess_token()), "ROLE_USER");
-        if(tokenResponse==null) {
-            throw new Exception("로그인 실패");
-        }
-
-        return tokenResponse;
+        return tokenProvider.createToken(email, "ROLE_USER");
     }
 
-    public String getEmailForUserInfo(String accessToken) {
+    public String getEmailForUserInfo(String accessToken) throws Exception {
         String host = "https://kapi.kakao.com/v2/user/me";
-        try {
-            URL url = new URL(host);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestProperty("Authorization", "Bearer " + accessToken);
-            urlConnection.setRequestMethod("GET");
+        URL url = new URL(host);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestProperty("Authorization", "Bearer " + accessToken);
+        urlConnection.setRequestMethod("GET");
 
-            int responseCode = urlConnection.getResponseCode();
-            System.out.println("responseCode = " + responseCode);
-
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+        String email;
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()))) {
             String line = "";
             String res = "";
             while ((line = br.readLine()) != null) {
                 res += line;
             }
             JSONParser parser = new JSONParser();
-            JSONObject obj = (JSONObject) parser.parse(res);
-            JSONObject kakao_account = (JSONObject) obj.get("kakao_account");
-            JSONObject properties = (JSONObject) obj.get("properties");
+            JSONObject obj = (JSONObject)parser.parse(res);
+            JSONObject kakao_account = (JSONObject)obj.get("kakao_account");
+            JSONObject properties = (JSONObject)obj.get("properties");
 
-
-            String email = kakao_account.get("email").toString();
+            email = kakao_account.get("email").toString();
             String nickname = properties.get("nickname").toString();
             String profileImg = properties.get("profile_image").toString();
-            System.out.println(profileImg);
             String defaultImageUrl = "http://k.kakaocdn.net/dn/1G9kp/btsAot8liOn/8CWudi3uy07rvFNUkk3ER0/img_640x640.jpg";
             if (profileImg.equals(defaultImageUrl)) {
-                 profileImg="https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png";
+                profileImg = "https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png";
             }
             Optional<Users> usersOptional = userRepository.findByEmail(email);
-            if(usersOptional.isEmpty()) {
+            if (usersOptional.isEmpty()) {
                 Users users = Users.builder()
-                        .email(email)
-                        .name(nickname)
-                        .profile(profileImg)
-                        .role(Role.USER)
-                        .build();
+                    .email(email)
+                    .name(nickname)
+                    .profile(profileImg)
+                    .role(Role.USER)
+                    .build();
                 userRepository.save(users);
             }
-            br.close();
-            return email;
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
         }
-        return null;
+        return email;
     }
+
     public UserNameResponse changeNickname(CustomUserPrincipal customUserPrincipal, String name){
         Users user = customUserPrincipal.getUsers();
         Users existingUser = userRepository.findByName(name);
