@@ -1,14 +1,14 @@
 package com.sunny.backend.comment.repository;
 
+import static com.sunny.backend.comment.domain.QComment.comment;
+import static com.sunny.backend.dto.response.comment.CommentResponse.convertCommentToDto;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.comment.domain.Comment;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.*;
-
-import static com.sunny.backend.comment.domain.QComment.comment;
-import static com.sunny.backend.dto.response.comment.CommentResponse.convertCommentToDto;
 
 
 
@@ -36,7 +36,7 @@ public class CommentRepositoryImpl extends QuerydslRepositorySupport implements 
         List<Comment> comments = queryFactory.selectFrom(comment)
                 .leftJoin(comment.parent).fetchJoin()
                 .where(comment.community.id.eq(id))
-                .orderBy(comment.parent.id.asc().nullsFirst(), //상위 댓글이 하위 댓글 앞에 오도록
+                .orderBy(comment.parent.id.asc().nullsFirst(),
                         comment.createdDate.asc())
                 .fetch();
 
