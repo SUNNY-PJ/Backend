@@ -5,7 +5,7 @@ import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.response.ProfileResponse;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.entity.Comment;
+import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.entity.Scrap;
 import com.sunny.backend.repository.ScrapRepository;

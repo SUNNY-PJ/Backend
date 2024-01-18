@@ -1,6 +1,7 @@
 package com.sunny.backend.user;
 
 
+import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.community.domain.Community;
 
 import com.sunny.backend.consumption.domain.Consumption;
