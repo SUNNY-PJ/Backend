@@ -1,8 +1,8 @@
-package com.sunny.backend.repository.comment;
+package com.sunny.backend.comment.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sunny.backend.dto.response.comment.CommentResponse;
-import com.sunny.backend.entity.Comment;
+import com.sunny.backend.comment.domain.Comment;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.*;
