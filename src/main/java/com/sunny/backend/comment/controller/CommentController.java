@@ -1,4 +1,4 @@
-package com.sunny.backend.controller;
+package com.sunny.backend.comment.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,7 +8,7 @@ import com.sunny.backend.config.AuthUser;
 import com.sunny.backend.dto.request.comment.CommentRequest;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.service.comment.CommentService;
+import com.sunny.backend.comment.service.CommentService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,5 +1,6 @@
 package com.sunny.backend.user;
 
+import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.community.domain.Community;
 import java.util.ArrayList;
 import java.util.List;
