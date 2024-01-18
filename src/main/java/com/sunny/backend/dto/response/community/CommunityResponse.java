@@ -1,15 +1,13 @@
 package com.sunny.backend.dto.response.community;
 
 import com.sunny.backend.common.DatetimeUtil;
-import com.sunny.backend.entity.BoardType;
-import com.sunny.backend.entity.Community;
+import com.sunny.backend.community.domain.BoardType;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.entity.Photo;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import lombok.Getter;
 
 
 public record CommunityResponse(
@@ -24,10 +22,11 @@ public record CommunityResponse(
     String profileImg,
     String createdAt,
     String modifiedAt,
-    boolean isModified
+    boolean isModified,
+    boolean isScraped
 ) {
 
-    public static CommunityResponse of(Community community, boolean isModified) {
+    public static CommunityResponse of(Community community, boolean isModified, boolean isScraped) {
         return new CommunityResponse(
             community.getId(),
             community.getUsers().getName(),
@@ -45,7 +44,8 @@ public record CommunityResponse(
             DatetimeUtil.timesAgo(community.getCreatedDate()),
             isModified ? DatetimeUtil.timesAgo(LocalDateTime.now())
                 : DatetimeUtil.timesAgo(community.getUpdatedDate()),
-            isModified
+            isModified,
+            isScraped
         );
     }
 

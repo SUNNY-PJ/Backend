@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.CommonErrorCode;
 import com.sunny.backend.common.CustomException;
+import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.user.Users;
 
@@ -36,22 +37,35 @@ public class Friend {
 	private Users users;
 
 	@ManyToOne
-	@JoinColumn(name = "user_friends_id")
+	@JoinColumn(name = "user_friend_id")
 	private Users userFriend;
 
 	@Column
 	@Enumerated(value = EnumType.STRING)
-	private FriendStatus status;
+	private Status status;
+
+	@ManyToOne
+	@JoinColumn(name = "competition_id")
+	private Competition competition;
+
+	public void addCompetition(Competition competition) {
+		this.competition = competition;
+	}
+
 
 	public void approveStatus() {
-		status = FriendStatus.APPROVE;
+		status = Status.APPROVE;
+	}
+
+	public boolean isApproveStatus() {
+		return status.equals(Status.APPROVE);
 	}
 
 	public void validateStatus() {
-		if(status.equals(FriendStatus.WAIT)) {
+		if(status.equals(Status.WAIT)) {
 			throw new CustomException(FriendErrorCode.FRIEND_NOT_APPROVE);
 		}
-		if(status.equals(FriendStatus.APPROVE)) {
+		if(status.equals(Status.APPROVE)) {
 			throw new CustomException(FriendErrorCode.FRIEND_EXIST);
 		}
 	}

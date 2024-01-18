@@ -1,6 +1,7 @@
 package com.sunny.backend.scrap.domain;
 
-import com.sunny.backend.entity.Community;
+
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.user.Users;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

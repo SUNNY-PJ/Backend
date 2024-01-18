@@ -10,6 +10,7 @@ import java.util.*;
 import static com.sunny.backend.dto.response.comment.CommentResponse.convertCommentToDto;
 import static com.sunny.backend.entity.QComment.comment;
 
+
 public class CommentRepositoryImpl extends QuerydslRepositorySupport implements CommentCustomRepository{
     private JPAQueryFactory queryFactory;
 

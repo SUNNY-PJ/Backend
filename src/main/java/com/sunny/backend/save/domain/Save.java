@@ -29,17 +29,14 @@ public class Save {
 
     @Column
     @PositiveOrZero
-    @NotNull(message = "금액은 필수 입력값입니다.")
     private Long cost;
 
     @Column
     @FutureOrPresent
-    @NotNull(message = "시작 날짜는 필수 입력값입니다.")
     private LocalDate startDate;
 
     @Column
     @FutureOrPresent
-    @NotNull(message = "종료 날짜는 필수 입력값입니다.")
     private LocalDate endDate;
     @OneToOne
     @JoinColumn(name = "user_id")
@@ -58,6 +55,6 @@ public class Save {
 
     public double calculateSavePercentage(Long userMoney, Save save) {
         return userMoney != null ?
-            ((double) userMoney / (double) save.getCost()) * 100.0 : 0.0;
+            100.0 - (((double) userMoney / (double) save.getCost()) * 100.0) : 100.0;
     }
 }

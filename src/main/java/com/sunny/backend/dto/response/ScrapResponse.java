@@ -1,6 +1,6 @@
 package com.sunny.backend.dto.response;
 
-import com.sunny.backend.entity.Community;
+import com.sunny.backend.community.domain.Community;
 import lombok.Getter;
 
 import java.util.List;

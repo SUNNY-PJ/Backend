@@ -5,6 +5,8 @@ import static com.sunny.backend.common.CommonErrorCode.NOT_FOUND_SCRAP;
 
 
 import com.sunny.backend.common.CommonCustomException;
+import com.sunny.backend.community.domain.Community;
+import com.sunny.backend.community.repository.CommunityRepository;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -14,10 +16,8 @@ import org.springframework.stereotype.Service;
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
 import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.entity.Community;
 import com.sunny.backend.scrap.domain.Scrap;
 import com.sunny.backend.scrap.repository.ScrapRepository;
-import com.sunny.backend.repository.community.CommunityRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
 
@@ -37,7 +37,7 @@ public class ScrapService {
 		List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId());
 
 		List<CommunityResponse> communityResponseList = scrapList.stream()
-				.map(scrap -> CommunityResponse.of(scrap.getCommunity(), false))
+				.map(scrap -> CommunityResponse.of(scrap.getCommunity(), false,true))
 				.toList();
 
 		return responseService.getListResponse(HttpStatus.OK.value(), communityResponseList, "");
