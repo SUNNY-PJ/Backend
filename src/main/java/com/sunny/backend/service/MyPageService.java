@@ -2,13 +2,14 @@ package com.sunny.backend.service;
 
 import com.sunny.backend.common.CommonResponse;
 import com.sunny.backend.common.ResponseService;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.dto.response.ProfileResponse;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.dto.response.community.CommunityResponse;
 import com.sunny.backend.entity.Comment;
-import com.sunny.backend.community.domain.Community;
-import com.sunny.backend.entity.Scrap;
-import com.sunny.backend.repository.ScrapRepository;
+import com.sunny.backend.scrap.domain.Scrap;
+import com.sunny.backend.scrap.repository.ScrapRepository;
+
 import com.sunny.backend.repository.comment.CommentRepository;
 import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
