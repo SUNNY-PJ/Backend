@@ -55,21 +55,18 @@ public class SaveService {
 		return responseService.getSingleResponse(HttpStatus.OK.value(), saveResponse, "절약 목표를 수정했습니다.");
 	}
 
-	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> getSaveGoal(
-			CustomUserPrincipal customUserPrincipal) {
-		Users user = customUserPrincipal.getUsers();
-		Save save = saveRepository.findByUsers_Id(user.getId());
-		SaveResponse saveResponse = SaveResponse.from(save);
-		return responseService.getSingleResponse(HttpStatus.OK.value(), saveResponse,
-				"절약 목표를 성공적으로 조회했습니다.");
-	}
+
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse.DetailSaveResponse>>
 	getDetailSaveGoal(CustomUserPrincipal customUserPrincipal) {
 		Users user = customUserPrincipal.getUsers();
 		Save save = saveRepository.findByUsers_Id(user.getId());
+		if(save==null){
+			return responseService.getSingleResponse(HttpStatus.OK.value(), null,
+					"아직 등록된 절약 목표가 없습니다.");
+
+		}
 		long remainingDays = save.calculateRemainingDays(save);
 		Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(),
 				save.getEndDate());
