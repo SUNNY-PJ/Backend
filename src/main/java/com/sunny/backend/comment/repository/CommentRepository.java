@@ -1,4 +1,4 @@
-package com.sunny.backend.repository.comment;
+package com.sunny.backend.comment.repository;
 
 import com.sunny.backend.comment.domain.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;

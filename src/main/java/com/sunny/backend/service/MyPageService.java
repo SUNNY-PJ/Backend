@@ -6,10 +6,12 @@ import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.dto.response.ProfileResponse;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.scrap.repository.ScrapRepository;
+
 import com.sunny.backend.comment.domain.Comment;
+import com.sunny.backend.comment.repository.CommentRepository;
+
+import com.sunny.backend.scrap.repository.ScrapRepository;
 import com.sunny.backend.scrap.domain.Scrap;
-import com.sunny.backend.repository.comment.CommentRepository;
 import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
