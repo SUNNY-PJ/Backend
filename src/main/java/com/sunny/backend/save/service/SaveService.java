@@ -74,5 +74,4 @@ public class SaveService {
 				"절약 목표를 성공적으로 조회했습니다.");
 	}
 
-
 }

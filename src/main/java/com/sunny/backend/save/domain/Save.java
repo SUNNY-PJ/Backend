@@ -2,7 +2,10 @@ package com.sunny.backend.save.domain;
 
 
 import com.sunny.backend.dto.request.save.SaveRequest;
+import com.sunny.backend.dto.response.consumption.SpendTypeStatisticsResponse;
 import com.sunny.backend.user.Users;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import javax.validation.constraints.FutureOrPresent;
@@ -54,7 +57,11 @@ public class Save {
     }
 
     public double calculateSavePercentage(Long userMoney, Save save) {
-        return userMoney != null ?
+        double percentage = userMoney != null ?
             100.0 - (((double) userMoney / (double) save.getCost()) * 100.0) : 100.0;
+        BigDecimal roundedPercentage = new BigDecimal(percentage).setScale(1, RoundingMode.HALF_UP);
+
+
+        return roundedPercentage.doubleValue();
     }
 }
