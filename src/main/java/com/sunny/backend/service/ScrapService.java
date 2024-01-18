@@ -34,8 +34,8 @@ public class ScrapService {
 		List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId()); //user id 이용해서 전체 스크랩 조회
 
 		List<CommunityResponse> communityResponseList = scrapList.stream()
-				.map(scrap -> CommunityResponse.of(scrap.getCommunity(), false))
-			.collect(Collectors.toList());
+				.map(scrap -> CommunityResponse.of(scrap.getCommunity(), false, true))
+				.toList();
 
 		return responseService.getListResponse(HttpStatus.OK.value(), communityResponseList, "");
 	}

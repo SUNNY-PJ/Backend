@@ -32,16 +32,14 @@ public class Community extends BaseTime {
     private Long id;
 
     @Column
-    @NotBlank(message = "제목은 필수 입력값입니다.")
-    private String title; //제목
+    private String title;
 
     @Column
-    @NotBlank(message = "내용은 필수 입력값입니다.")
-    private String contents; //내용
-    //기본값 0으로 세팅
+
+    private String contents;
     @ColumnDefault("0")
     @Column
-    private int view_cnt; //조회수
+    private int view_cnt;
 
     @Column
     private String createdAt;
@@ -53,12 +51,13 @@ public class Community extends BaseTime {
     @JoinColumn(name= "users_id")
     private Users users;
 
+
     @OneToMany(mappedBy = "community")
-    @NotNull(message = "올바른 카테고리 값을 입력해야합니다.")
     @Builder.Default
     private List<Photo> photoList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "올바른 카테고리 값을 입력해야합니다.")
     private BoardType boardType;
 
     @OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE)

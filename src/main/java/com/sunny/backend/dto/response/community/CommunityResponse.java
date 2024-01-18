@@ -22,10 +22,11 @@ public record CommunityResponse(
     String profileImg,
     String createdAt,
     String modifiedAt,
-    boolean isModified
+    boolean isModified,
+    boolean isScraped
 ) {
 
-    public static CommunityResponse of(Community community, boolean isModified) {
+    public static CommunityResponse of(Community community, boolean isModified, boolean isScraped) {
         return new CommunityResponse(
             community.getId(),
             community.getUsers().getName(),
@@ -43,7 +44,8 @@ public record CommunityResponse(
             DatetimeUtil.timesAgo(community.getCreatedDate()),
             isModified ? DatetimeUtil.timesAgo(LocalDateTime.now())
                 : DatetimeUtil.timesAgo(community.getUpdatedDate()),
-            isModified
+            isModified,
+            isScraped
         );
     }
 

@@ -1,11 +1,14 @@
 package com.sunny.backend.service;
 
+import static com.sunny.backend.common.CommonErrorCode.NICKNAME_IN_USE;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.JSONParser;
 import com.nimbusds.jose.shaded.json.parser.ParseException;
 import com.sunny.backend.common.CommonCustomException;
+import com.sunny.backend.common.CommonErrorCode;
 import com.sunny.backend.entity.OAuthToken;
 import com.sunny.backend.security.dto.AuthDto;
 import com.sunny.backend.security.jwt.TokenProvider;
@@ -29,7 +32,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Optional;
 
-import static com.sunny.backend.common.CommonErrorCode.NicknameAlreadyInUse;
+
 
 @Service
 @RequiredArgsConstructor
@@ -140,7 +143,7 @@ public class KaKaoService {
         Users user = customUserPrincipal.getUsers();
         Users existingUser = userRepository.findByName(name);
         if (existingUser != null && !existingUser.getId().equals(user.getId())) {
-            throw new CommonCustomException(NicknameAlreadyInUse);
+            throw new CommonCustomException(NICKNAME_IN_USE);
         }
         user.setName(name);
         userRepository.save(user);
