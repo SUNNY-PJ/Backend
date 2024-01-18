@@ -1,5 +1,8 @@
 package com.sunny.backend.user;
 
+
+import com.sunny.backend.community.domain.Community;
+
 import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.save.domain.Save;
 import com.sunny.backend.scrap.domain.Scrap;
@@ -48,6 +51,7 @@ public class Users extends BaseTime {
 	@Column
 	@Enumerated(value = EnumType.STRING)
 	private AuthProvider authProvider;
+
 	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private List<Community> communityList;
 
@@ -57,7 +61,7 @@ public class Users extends BaseTime {
 	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	@JsonIgnore
 	private List<Comment> commentList;
-	@OneToOne(mappedBy = "users")
+	@OneToOne(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private Save save;
 	@OneToMany(mappedBy = "users")
 	private List<Scrap> scrapList;
@@ -90,14 +94,11 @@ public class Users extends BaseTime {
 	}
 
 	public void addSave(Save save) {
-		if (save == null) {
-			return;
-		}
 		if (this.save != null) {
-
 			throw new IllegalStateException("이미 절약 목표가 존재합니다.");
 		} else {
 			this.save = save;
 		}
 	}
 }
+
