@@ -1,8 +1,8 @@
 package com.sunny.backend.service;
 
-import com.sunny.backend.common.CommonResponse;
+import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.CommonCustomException;
-import com.sunny.backend.common.ResponseService;
+import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.dto.response.ProfileResponse;
 import com.sunny.backend.dto.response.comment.CommentResponse;
 import com.sunny.backend.dto.response.community.CommunityResponse;
@@ -10,7 +10,7 @@ import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.comment.repository.CommentRepository;
 import com.sunny.backend.community.repository.CommunityRepository;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

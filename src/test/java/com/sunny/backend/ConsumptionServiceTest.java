@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.sunny.backend.common.CommonResponse.SingleResponse;
+import com.sunny.backend.common.response.CommonResponse.SingleResponse;
 import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
 import com.sunny.backend.dto.response.consumption.ConsumptionResponse;
 import com.sunny.backend.consumption.domain.Consumption;
@@ -37,10 +37,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.sunny.backend.security.service.CustomUserDetailsService;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.user.Role;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.auth.service.CustomUserDetailsService;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.user.domain.Role;
+import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;

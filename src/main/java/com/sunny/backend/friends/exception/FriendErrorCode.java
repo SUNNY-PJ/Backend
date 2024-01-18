@@ -1,7 +1,7 @@
 package com.sunny.backend.friends.exception;
 
 import org.springframework.http.HttpStatus;
-import com.sunny.backend.common.ErrorCode;
+import com.sunny.backend.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

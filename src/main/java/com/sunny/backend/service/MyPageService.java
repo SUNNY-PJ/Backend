@@ -1,7 +1,7 @@
 package com.sunny.backend.service;
 
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.ResponseService;
+import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.dto.response.ProfileResponse;
 import com.sunny.backend.dto.response.comment.CommentResponse;
@@ -13,9 +13,11 @@ import com.sunny.backend.comment.repository.CommentRepository;
 import com.sunny.backend.scrap.repository.ScrapRepository;
 import com.sunny.backend.scrap.domain.Scrap;
 import com.sunny.backend.community.repository.CommunityRepository;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
+import com.sunny.backend.util.S3Util;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +43,7 @@ public class MyPageService {
     private final CommentRepository commentRepository;
     private final ResponseService responseService;
     private final ScrapRepository scrapRepository;
-    private final S3Service s3Service;
+    private final S3Util s3Util;
 
     // 마이페이지 조회
     public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> getMypage(
@@ -100,7 +102,7 @@ public class MyPageService {
         Users user = customUserPrincipal.getUsers();
         // 새 프로필 업로드
         if (profile != null && !profile.isEmpty()) {
-            String uploadedProfileUrl = s3Service.upload(profile);
+            String uploadedProfileUrl = s3Util.upload(profile);
             user.setProfile(uploadedProfileUrl);
         } else if (profile == null) {
             user.setProfile("https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png");

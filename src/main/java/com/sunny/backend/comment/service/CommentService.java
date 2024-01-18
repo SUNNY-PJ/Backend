@@ -10,9 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sunny.backend.common.CommonResponse;
+import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.CommonCustomException;
-import com.sunny.backend.common.ResponseService;
+import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.dto.request.comment.CommentRequest;
 import com.sunny.backend.dto.request.comment.CommentRequestMapper;
 import com.sunny.backend.dto.response.comment.CommentResponse;
@@ -20,8 +20,8 @@ import com.sunny.backend.comment.domain.Comment;
 
 import com.sunny.backend.comment.repository.CommentRepository;
 import com.sunny.backend.community.domain.Community;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.user.domain.Users;
 import lombok.RequiredArgsConstructor;
 
 @Service

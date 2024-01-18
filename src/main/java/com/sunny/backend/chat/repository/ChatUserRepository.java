@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.sunny.backend.chat.domain.ChatUser;
 import com.sunny.backend.chat.exception.ChatErrorCode;
-import com.sunny.backend.common.CustomException;
+import com.sunny.backend.common.exception.CustomException;
 
 @Repository
 public interface ChatUserRepository extends JpaRepository<ChatUser, Long> {

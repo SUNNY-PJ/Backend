@@ -2,7 +2,6 @@ package com.sunny.backend.competition.service;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -10,23 +9,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.CustomException;
-import com.sunny.backend.common.ResponseService;
+import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.common.exception.CustomException;
+import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.competition.dto.request.CompetitionRequest;
-import com.sunny.backend.competition.dto.request.CompetitionRequestDto;
 import com.sunny.backend.competition.dto.response.CompetitionApplyResponse;
 import com.sunny.backend.competition.dto.response.CompetitionResponseDto;
 import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.competition.repository.CompetitionRepository;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;
 import com.sunny.backend.friends.domain.Friend;
-import com.sunny.backend.friends.domain.Status;
 import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.friends.repository.FriendRepository;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.user.Users;
-import com.sunny.backend.user.repository.UserRepository;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.user.domain.Users;
 
 import lombok.RequiredArgsConstructor;
 

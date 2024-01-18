@@ -3,8 +3,6 @@ package com.sunny.backend.friends.service;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -20,17 +18,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.sunny.backend.common.CustomException;
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.friends.dto.response.FriendCheckResponse;
-import com.sunny.backend.friends.dto.response.FriendResponse;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.Status;
 import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.friends.repository.FriendRepository;
-import com.sunny.backend.security.service.CustomUserDetailsService;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.user.Role;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.auth.service.CustomUserDetailsService;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.user.domain.Role;
+import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;
