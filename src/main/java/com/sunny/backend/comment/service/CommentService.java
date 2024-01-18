@@ -1,5 +1,6 @@
 package com.sunny.backend.comment.service;
 
+import static com.sunny.backend.comment.domain.Comment.validateCommentByUser;
 import static com.sunny.backend.common.CommonErrorCode.*;
 
 import com.sunny.backend.community.repository.CommunityRepository;
@@ -71,7 +72,6 @@ public class CommentService {
 				.toList();
 		return responseService.getListResponse(HttpStatus.OK.value(), commentResponses, "댓글을 조회했습니다.");
 	}
-	//댓글 등록
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> createComment(
 			CustomUserPrincipal customUserPrincipal, Long communityId, CommentRequest commentRequestDTO) {
@@ -96,7 +96,7 @@ public class CommentService {
 
 		boolean isPrivate = commentRequestDTO.getIsPrivated();
 		comment.setIsPrivated(isPrivate);
-
+		commentRepository.save(comment);
 		user.addComment(comment);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),
@@ -109,18 +109,17 @@ public class CommentService {
 			CustomUserPrincipal customUserPrincipal, Long commentId) {
 		Comment comment = commentRepository.findCommentByIdWithParent(commentId)
 				.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
-		if (checkCommentLoginUser(customUserPrincipal, comment)) {
+		validateCommentByUser(customUserPrincipal.getUsers().getId(),comment.getUsers().getId());
 			if (comment.getChildren().size() != 0) {
 				comment.changeIsDeleted(true);
 			} else {
 				commentRepository.delete(getDeletableAncestorComment(comment));
-			}
 		}
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "댓글을 삭제 하였습니다.");
 	}
 
 	private Comment getDeletableAncestorComment(Comment comment) {
-		Comment parent = comment.getParent(); // 현재 댓글의 부모를 구함
+		Comment parent = comment.getParent();
 		if (parent != null && parent.getChildren().size() == 1 && parent.getIsDeleted())
 			return getDeletableAncestorComment(parent);
 		return comment;
@@ -132,21 +131,11 @@ public class CommentService {
 
 		Comment comment = commentRepository.findById(commentId)
 				.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
-		if (checkCommentLoginUser(customUserPrincipal, comment)) {
-			comment.setContent(commentRequestDTO.getContent());
-
-			boolean isPrivate = commentRequestDTO.getIsPrivated();
-			comment.setIsPrivated(isPrivate);
-		}
+		validateCommentByUser(customUserPrincipal.getUsers().getId(),comment.getUsers().getId());
+		boolean isPrivate = commentRequestDTO.getIsPrivated();
+		comment.setIsPrivated(isPrivate);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),
 						comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 수정했습니다.");
-	}
-
-	private boolean checkCommentLoginUser(CustomUserPrincipal customUserPrincipal, Comment comment) {
-		if (!Objects.equals(comment.getUsers().getName(), customUserPrincipal.getName())) {
-			return false;
-		}
-		return true;
 	}
 }
