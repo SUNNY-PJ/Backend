@@ -1,6 +1,9 @@
 package com.sunny.backend.comment.domain;
 
 
+import static com.sunny.backend.common.CommonErrorCode.NO_USER_PERMISSION;
+
+import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.entity.BaseTime;
 import com.sunny.backend.user.Users;
@@ -26,7 +29,7 @@ public class Comment extends BaseTime {
 
     @NotBlank(message = "댓글 내용은 필수 입력값입니다.")
     @Column(name = "text", nullable = false)
-    private String content; //댓글 내용 , 글자 수 제한 없는지? , notnull 설정
+    private String content;
 
     @ColumnDefault("FALSE")
     @Column(nullable = false)
@@ -62,5 +65,11 @@ public class Comment extends BaseTime {
 
     public void setContent(String content) {
         this.content=content;
+    }
+
+    public static void validateCommentByUser(Long userId, Long commentId) {
+        if(!userId.equals(commentId)) {
+            throw new CommonCustomException(NO_USER_PERMISSION);
+        }
     }
 }
