@@ -7,6 +7,7 @@ import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.save.domain.Save;
+import com.sunny.backend.scrap.domain.Scrap;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +53,7 @@ public class Users extends BaseTime {
 	@Column
 	@Enumerated(value = EnumType.STRING)
 	private AuthProvider authProvider;
+
 	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private List<Community> communityList;
 

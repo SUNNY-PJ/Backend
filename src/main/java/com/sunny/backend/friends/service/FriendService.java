@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
 
 import org.springframework.stereotype.Service;
 
-import com.sunny.backend.dto.response.FriendCheckResponse;
-import com.sunny.backend.dto.response.FriendResponse;
+import com.sunny.backend.friends.dto.response.FriendCheckResponse;
+import com.sunny.backend.friends.dto.response.FriendResponse;
 import com.sunny.backend.friends.domain.Friend;
-import com.sunny.backend.friends.domain.FriendStatus;
+import com.sunny.backend.friends.domain.Status;
+import com.sunny.backend.friends.dto.response.FriendStatusResponse;
 import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.security.userinfo.CustomUserPrincipal;
 import com.sunny.backend.user.Users;
@@ -25,20 +25,17 @@ public class FriendService {
 	private final FriendRepository friendRepository;
 	private final UserRepository userRepository;
 
-	public List<FriendResponse> getFriends(CustomUserPrincipal customUserPrincipal) {
+	public FriendStatusResponse getFriends(CustomUserPrincipal customUserPrincipal) {
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
-
-		return friendRepository.findByUsers_Id(tokenUserId)
-				.stream()
-				.map(FriendResponse::from)
-				.toList();
+		List<FriendResponse> friendResponses = friendRepository.getFriendResponse(tokenUserId);
+		return FriendStatusResponse.of(friendResponses, friendResponses);
 	}
 
 	public void addFriend(CustomUserPrincipal customUserPrincipal, Long userFriendId) {
 		Users user = customUserPrincipal.getUsers();
 		Users userFriend = userRepository.getById(userFriendId);
 
-		getByUserAndUserFriend(user, userFriend, FriendStatus.WAIT);
+		getByUserAndUserFriend(user, userFriend, Status.WAIT);
 	}
 
 	@Transactional
@@ -48,7 +45,7 @@ public class FriendService {
 		friend.validateFriendsByUser(friend.getUsers().getId(), tokenUserId);
 
 		friend.approveStatus();
-		getByUserAndUserFriend(friend.getUsers(), friend.getUserFriend(), FriendStatus.APPROVE);
+		getByUserAndUserFriend(friend.getUsers(), friend.getUserFriend(), Status.APPROVE);
 	}
 
 	@Transactional
@@ -60,7 +57,7 @@ public class FriendService {
 		friendRepository.deleteById(friend.getId());
 	}
 
-	private void getByUserAndUserFriend(Users user, Users userFriend, FriendStatus status) {
+	public void getByUserAndUserFriend(Users user, Users userFriend, Status status) {
 		Optional<Friend> optionalFriend = friendRepository
 			.findByUsers_IdAndUserFriend_Id(userFriend.getId(), user.getId());
 
@@ -94,7 +91,7 @@ public class FriendService {
 		Optional<Friend> friendsOptional = friendRepository.findByUsers_IdAndUserFriend_Id(userFriendId, tokenUserId);
 
 		boolean isFriend = false;
-		FriendStatus status = null;
+		Status status = null;
 
 		if(friendsOptional.isPresent()) {
 			Friend friend = friendsOptional.get();
