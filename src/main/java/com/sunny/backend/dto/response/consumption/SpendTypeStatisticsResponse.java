@@ -1,9 +1,8 @@
 package com.sunny.backend.dto.response.consumption;
 
-import com.sunny.backend.entity.SpendType;
+import com.sunny.backend.consumption.domain.SpendType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
