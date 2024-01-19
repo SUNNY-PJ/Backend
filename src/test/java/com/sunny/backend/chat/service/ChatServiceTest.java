@@ -29,10 +29,10 @@ import com.sunny.backend.chat.dto.response.ChatRoomResponse;
 import com.sunny.backend.chat.repository.ChatMessageRepository;
 import com.sunny.backend.chat.repository.ChatRoomRepository;
 import com.sunny.backend.chat.repository.ChatUserRepository;
-import com.sunny.backend.security.service.CustomUserDetailsService;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.user.Role;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.auth.service.CustomUserDetailsService;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.user.domain.Role;
+import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;

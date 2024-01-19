@@ -1,9 +1,9 @@
 package com.sunny.backend.dto.response.community;
 
-import com.sunny.backend.common.DatetimeUtil;
+import com.sunny.backend.util.DatetimeUtil;
 import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.Community;
-import com.sunny.backend.entity.Photo;
+import com.sunny.backend.common.photo.Photo;
 
 import java.time.LocalDateTime;
 import java.util.List;

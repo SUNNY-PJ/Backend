@@ -1,6 +1,6 @@
 package com.sunny.backend.competition.domain;
 
-import com.sunny.backend.common.CustomException;
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.competition.exception.CompetitionErrorCode;
 import com.sunny.backend.friends.domain.Status;
 import lombok.AllArgsConstructor;

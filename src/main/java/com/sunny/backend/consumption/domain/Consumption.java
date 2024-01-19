@@ -2,22 +2,20 @@ package com.sunny.backend.consumption.domain;
 
 import static com.sunny.backend.common.CommonErrorCode.*;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
 
-import com.sunny.backend.user.Users;
-import javax.validation.constraints.NotBlank;
+import com.sunny.backend.user.domain.Users;
+
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.PositiveOrZero;
-import javax.validation.constraints.Size;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 

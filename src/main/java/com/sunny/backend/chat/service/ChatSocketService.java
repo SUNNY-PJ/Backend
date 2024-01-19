@@ -14,7 +14,7 @@ import com.sunny.backend.chat.dto.request.ChatSendMessage;
 import com.sunny.backend.chat.repository.ChatMessageRepository;
 import com.sunny.backend.chat.repository.ChatRoomRepository;
 import com.sunny.backend.chat.repository.ChatUserRepository;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;

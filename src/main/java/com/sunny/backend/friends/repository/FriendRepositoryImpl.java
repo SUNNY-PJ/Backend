@@ -2,7 +2,7 @@ package com.sunny.backend.friends.repository;
 
 import static com.sunny.backend.competition.domain.QCompetition.*;
 import static com.sunny.backend.friends.domain.QFriend.*;
-import static com.sunny.backend.user.QUsers.*;
+import static com.sunny.backend.user.domain.QUsers.users;
 
 import java.util.List;
 

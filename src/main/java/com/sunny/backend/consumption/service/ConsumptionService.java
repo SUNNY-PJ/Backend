@@ -2,16 +2,16 @@ package com.sunny.backend.consumption.service;
 
 
 
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.ResponseService;
+import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
 import com.sunny.backend.dto.response.consumption.ConsumptionResponse;
 import com.sunny.backend.dto.response.consumption.SpendTypeStatisticsResponse;
 import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.consumption.domain.SpendType;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.user.domain.Users;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

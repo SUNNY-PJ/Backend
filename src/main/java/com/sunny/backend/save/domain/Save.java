@@ -2,14 +2,12 @@ package com.sunny.backend.save.domain;
 
 
 import com.sunny.backend.dto.request.save.SaveRequest;
-import com.sunny.backend.dto.response.consumption.SpendTypeStatisticsResponse;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.user.domain.Users;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
