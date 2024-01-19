@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class MyPageService {
+public class UserService {
 	private final UserRepository userRepository;
 	private final CommunityRepository communityRepository;
 	private final CommentRepository commentRepository;
