@@ -21,12 +21,14 @@ public record CommunityResponse(
     BoardType type,
     String profileImg,
     String createdAt,
+
     boolean isModified,
     boolean isScraped
 ) {
 
     public static CommunityResponse of(Community community, boolean isScraped) {
         boolean isModified = community.hasNotBeenModified(community.getCreatedAt(), community.getModifiedAt());
+
         return new CommunityResponse(
             community.getId(),
             community.getUsers().getName(),
@@ -70,6 +72,19 @@ public record CommunityResponse(
                 community.getCommentList().size(),
                 DatetimeUtil.timesAgo(community.getCreatedAt()),
                 isModified
+
+            );
+        }
+    }
+    public record ViewAndCommentResponse(
+        int viewCount,
+        int commentCount
+
+    ) {
+        public static ViewAndCommentResponse from(Community community) {
+            return new ViewAndCommentResponse(
+                community.getView_cnt(),
+                community.getCommentList().size()
 
             );
         }

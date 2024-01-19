@@ -83,7 +83,7 @@ public class Community {
 
     public boolean hasNotBeenModified(LocalDateTime createdAt,LocalDateTime modifiedAt ) {
 
-        return createdAt.isEqual(modifiedAt);
+        return !createdAt.isEqual(modifiedAt);
     }
     public void updateModifiedAt(LocalDateTime modifiedAt ) {
 
