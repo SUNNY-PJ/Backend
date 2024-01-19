@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.config.AuthUser;
-import com.sunny.backend.dto.response.community.CommunityResponse;
+import com.sunny.backend.community.dto.response.CommunityResponse;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.scrap.service.ScrapService;
 

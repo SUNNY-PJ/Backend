@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
-import com.sunny.backend.dto.response.community.CommunityResponse;
+import com.sunny.backend.community.dto.response.CommunityResponse;
 import com.sunny.backend.scrap.domain.Scrap;
 import com.sunny.backend.scrap.repository.ScrapRepository;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
@@ -37,7 +37,7 @@ public class ScrapService {
 		List<Scrap> scrapList = scrapRepository.findAllByUsers_Id(user.getId());
 
 		List<CommunityResponse> communityResponseList = scrapList.stream()
-				.map(scrap -> CommunityResponse.of(scrap.getCommunity(), false,true))
+				.map(scrap -> CommunityResponse.of(scrap.getCommunity(), true))
 				.toList();
 
 		return responseService.getListResponse(HttpStatus.OK.value(), communityResponseList, "");

@@ -1,4 +1,4 @@
-package com.sunny.backend.dto.request.consumption;
+package com.sunny.backend.consumption.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;

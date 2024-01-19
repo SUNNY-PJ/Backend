@@ -1,4 +1,4 @@
-package com.sunny.backend.dto.response.save;
+package com.sunny.backend.save.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sunny.backend.save.domain.Save;

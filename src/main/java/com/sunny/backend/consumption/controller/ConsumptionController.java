@@ -1,7 +1,7 @@
 package com.sunny.backend.consumption.controller;
 
 
-import com.sunny.backend.dto.response.consumption.ConsumptionResponse.DetailConsumptionResponse;
+import com.sunny.backend.consumption.dto.response.ConsumptionResponse.DetailConsumptionResponse;
 import com.sunny.backend.consumption.domain.SpendType;
 import java.time.LocalDate;
 import javax.validation.Valid;
@@ -10,9 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.config.AuthUser;
-import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
-import com.sunny.backend.dto.response.consumption.ConsumptionResponse;
-import com.sunny.backend.dto.response.consumption.SpendTypeStatisticsResponse;
+import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
+import com.sunny.backend.consumption.dto.response.ConsumptionResponse;
+import com.sunny.backend.consumption.dto.response.SpendTypeStatisticsResponse;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.consumption.service.ConsumptionService;
 import io.swagger.annotations.ApiOperation;

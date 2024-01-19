@@ -1,4 +1,4 @@
-package com.sunny.backend.dto.response.comment;
+package com.sunny.backend.comment.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

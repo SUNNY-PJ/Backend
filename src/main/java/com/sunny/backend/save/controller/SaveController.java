@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.config.AuthUser;
-import com.sunny.backend.dto.request.save.SaveRequest;
-import com.sunny.backend.dto.response.save.SaveResponse;
+import com.sunny.backend.save.dto.request.SaveRequest;
+import com.sunny.backend.save.dto.response.SaveResponse;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.save.service.SaveService;
 

@@ -19,7 +19,7 @@ public record ScrapResponse(
 		return ScrapResponse.builder()
 			.title(community.getTitle())
 			.writer(community.getUsers().getName())
-			.createDate(community.getCreatedDate())
+			.createDate(community.getCreatedAt())
 			.view(community.getView_cnt())
 			.comment(community.getCommentList().size())
 			.build();

@@ -23,8 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
-import com.sunny.backend.dto.request.community.CommunityRequest;
-import com.sunny.backend.dto.response.community.CommunityResponse;
+import com.sunny.backend.community.dto.request.CommunityRequest;
+import com.sunny.backend.community.dto.response.CommunityResponse;
 import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.common.photo.PhotoRepository;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
@@ -72,7 +72,7 @@ public class CommunityService {
 		Scrap scrap = scrapRepository.findByUsersAndCommunity(user, community);
 
 		boolean isScrapedByCurrentUser = (scrap != null);
-		CommunityResponse communityResponse = CommunityResponse.of(community, false,
+		CommunityResponse communityResponse = CommunityResponse.of(community,
 				isScrapedByCurrentUser);
 		return responseService.getSingleResponse(
 				HttpStatus.OK.value(), communityResponse, "게시글을 성공적으로 불러왔습니다.");
@@ -93,6 +93,8 @@ public class CommunityService {
 				.title(communityRequest.getTitle())
 				.contents(communityRequest.getContents())
 				.boardType(communityRequest.getType())
+				.createdAt(LocalDateTime.now())
+				.modifiedAt(LocalDateTime.now())
 				.users(user)
 				.build();
 
@@ -114,7 +116,8 @@ public class CommunityService {
 		if (user.getCommunityList() == null) {
 			user.addCommunity(community);
 		}
-		CommunityResponse communityResponse = CommunityResponse.of(community, false, false);
+
+		CommunityResponse communityResponse = CommunityResponse.of(community,  false);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
 				"게시글을 성공적으로 작성했습니다.");
 	}
@@ -136,11 +139,11 @@ public class CommunityService {
 			CommunityRequest communityRequest, List<MultipartFile> files) {
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.getById(communityId);
-		boolean isModified = true;
 		Community.validateCommunityByUser(community.getUsers().getId(), user.getId());
 		community.getPhotoList().clear();
 		community.updateCommunity(communityRequest);
 		community.updateModifiedAt(LocalDateTime.now());
+
 
 		if (files != null && !files.isEmpty()) {
 			List<Photo> existingPhotos = photoRepository.findByCommunityId(communityId);
@@ -164,7 +167,8 @@ public class CommunityService {
 		}
 		Scrap scrap = scrapRepository.findByUsersAndCommunity(user, community);
 		boolean isScrapedByCurrentUser = (scrap != null);
-		CommunityResponse communityResponse = CommunityResponse.of(community, isModified,
+
+		CommunityResponse communityResponse = CommunityResponse.of(community,
 				isScrapedByCurrentUser);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
 				"게시글 수정을 완료했습니다.");
@@ -172,7 +176,7 @@ public class CommunityService {
 
 	//게시글 삭제
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> deleteCommunity(
+	public ResponseEntity<CommonResponse.GeneralResponse> deleteCommunity(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
 
 		Users user = customUserPrincipal.getUsers();
@@ -184,11 +188,8 @@ public class CommunityService {
 		}
 		photoRepository.deleteByCommunityId(communityId);
 		communityRepository.deleteById(communityId);
-		Scrap scrap = scrapRepository.findByUsersAndCommunity(user, community);
-		boolean isScrapedByCurrentUser = (scrap != null);
-		CommunityResponse communityResponse = CommunityResponse.of(community, false,
-				isScrapedByCurrentUser);
-		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
+
+		return responseService.getGeneralResponse(HttpStatus.OK.value(),
 				"게시글을 삭제했습니다.");
 	}
 

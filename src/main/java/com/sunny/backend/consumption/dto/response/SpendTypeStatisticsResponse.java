@@ -1,4 +1,4 @@
-package com.sunny.backend.dto.response.consumption;
+package com.sunny.backend.consumption.dto.response;
 
 import com.sunny.backend.consumption.domain.SpendType;
 import lombok.AllArgsConstructor;

@@ -2,19 +2,22 @@ package com.sunny.backend.community.repository;
 
 
 import static com.sunny.backend.community.domain.QCommunity.community;
+import static com.sunny.backend.user.domain.QUsers.users;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sunny.backend.dto.response.community.CommunityResponse;
+import com.sunny.backend.community.dto.response.CommunityResponse;
 import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.domain.SortType;
+import java.util.Optional;
+import javax.swing.text.html.Option;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+import org.springframework.lang.Nullable;
 
 
 public class CommunityRepositoryImpl extends QuerydslRepositorySupport implements
@@ -27,12 +30,38 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
     this.queryFactory = jpaQueryFactory;
   }
 
-  public List<CommunityResponse.PageResponse> paginationNoOffsetBuilder(Long communityId,
+//  public Optional<Community> getDetailCommunity(long id){
+//    Community result=queryFactory.selectFrom(community)
+//        .where(community.id.eq(id))
+//        .join(community.users,users)
+//        .fetchJoin()
+//        .distinct()
+//        .fetchOne();
+//    return Optional.ofNullable(result);
+//  }
+//
+//  public List<Community> getSliceOfCommunity(
+//      @Nullable
+//      Long id,
+//      int size,
+//      @Nullable
+//      String keyword
+//  ) {
+//    return queryFactory.selectFrom(community)
+//        .where(ltCommunityId(id), eqSearchText(keyword))
+//        .join(community.users,users)
+//        .fetchJoin()
+//        .orderBy(community.id.desc())
+//        .limit(size)
+//        .fetch();
+//  }
+
+  public List<CommunityResponse.PageResponse> paginationNoOffsetBuilder(@Nullable Long communityId,
       SortType sortType, BoardType boardType, String searchText, int pageSize) {
     JPAQuery<Community> query = queryFactory.selectFrom(community)
         .where(ltCommunityId(communityId))
         .orderBy(sortType == SortType.VIEW ? community.view_cnt.desc()
-            : community.createdDate.desc())
+            : community.createdAt.desc())
         .limit(pageSize);
 
     if (searchText != null) {
