@@ -2,9 +2,9 @@ package com.sunny.backend.notification.controller;
 
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.config.AuthUser;
-import com.sunny.backend.dto.request.NotificationRequestDto;
-import com.sunny.backend.dto.request.PushRequestDto;
-import com.sunny.backend.dto.response.NotificationResponse;
+import com.sunny.backend.notification.dto.request.NotificationRequest;
+import com.sunny.backend.notification.dto.request.NotificationPushReques;
+import com.sunny.backend.notification.dto.response.NotificationResponse;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.notification.service.NotificationService;
 import io.swagger.annotations.ApiOperation;
@@ -26,15 +26,16 @@ public class NotificationController {
     @PostMapping("/token")
     public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(
             @AuthUser CustomUserPrincipal customUserPrincipal,
-            @Valid @RequestBody NotificationRequestDto notificationRequestDto) {
-        return notificationService.allowNotification(customUserPrincipal,notificationRequestDto);
+            @Valid @RequestBody NotificationRequest notificationRequest) {
+        return notificationService.allowNotification(customUserPrincipal, notificationRequest);
     }
 
     @ApiOperation(tags = "9. Alarm", value = "알림 전송")
     @PostMapping("")
     public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(
             @AuthUser CustomUserPrincipal customUserPrincipal,
-            @Valid @RequestBody PushRequestDto pushRequestDto) throws IOException {
-        return notificationService.sendNotificationToFriends(customUserPrincipal,pushRequestDto);
+            @Valid @RequestBody NotificationPushReques notificationPushReques) throws IOException {
+        return notificationService.sendNotificationToFriends(customUserPrincipal,
+            notificationPushReques);
     }
 }

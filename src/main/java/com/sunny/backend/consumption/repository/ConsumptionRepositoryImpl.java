@@ -4,7 +4,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import com.sunny.backend.consumption.domain.QConsumption;
-import com.sunny.backend.dto.response.consumption.SpendTypeStatisticsResponse;
+import com.sunny.backend.consumption.dto.response.SpendTypeStatisticsResponse;
 import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.consumption.domain.SpendType;
 import java.math.BigDecimal;

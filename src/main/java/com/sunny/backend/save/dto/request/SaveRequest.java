@@ -1,4 +1,4 @@
-package com.sunny.backend.dto.request.save;
+package com.sunny.backend.save.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;

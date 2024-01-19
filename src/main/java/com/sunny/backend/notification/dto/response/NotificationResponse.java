@@ -1,4 +1,4 @@
-package com.sunny.backend.dto.response;
+package com.sunny.backend.notification.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

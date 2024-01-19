@@ -3,9 +3,9 @@ package com.sunny.backend.notification.service;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.response.ResponseService;
-import com.sunny.backend.dto.request.NotificationRequestDto;
-import com.sunny.backend.dto.request.PushRequestDto;
-import com.sunny.backend.dto.response.NotificationResponse;
+import com.sunny.backend.notification.dto.request.NotificationRequest;
+import com.sunny.backend.notification.dto.request.NotificationPushReques;
+import com.sunny.backend.notification.dto.response.NotificationResponse;
 import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
@@ -26,11 +26,11 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     private String expoPushNotificationUrl = "https://exp.host/--/api/v2/push/send";
-    public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(CustomUserPrincipal customUserPrincipal, NotificationRequestDto notificationRequestDto) {
+    public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(CustomUserPrincipal customUserPrincipal, NotificationRequest notificationRequest) {
         Users user = customUserPrincipal.getUsers();
-        System.out.println(notificationRequestDto.getTargetToken());
+        System.out.println(notificationRequest.getTargetToken());
         Notification notification = Notification.builder()
-                .DeviceToken(notificationRequestDto.getTargetToken())
+                .DeviceToken(notificationRequest.getTargetToken())
                 .users(user)
                 .build();
         notificationRepository.save(notification);
@@ -74,10 +74,10 @@ public class NotificationService {
 //        return responseService.getSingleResponse(HttpStatus.OK.value(), notificationResponse, "알림 성공");
 //    }
 
-    public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(CustomUserPrincipal customUserPrincipal, PushRequestDto pushRequestDto) throws IOException {
+    public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(CustomUserPrincipal customUserPrincipal, NotificationPushReques notificationPushReques) throws IOException {
 
         List<Notification> notifications = notificationRepository.findByUsers_Id(
-            pushRequestDto.getFriendsId());
+            notificationPushReques.getFriendsId());
         if (notifications != null && !notifications.isEmpty()) {
             OkHttpClient client = new OkHttpClient();
 
@@ -87,8 +87,8 @@ public class NotificationService {
                 RequestBody body = RequestBody.create(mediaType,
                     "{\n" +
                         "  \"to\": \"" + notification.getDeviceToken() + "\",\n" +
-                        "  \"title\": \"" + pushRequestDto.getTitle() + "\",\n" +
-                        "  \"body\": \"" + pushRequestDto.getBody() + "\"\n" +
+                        "  \"title\": \"" + notificationPushReques.getTitle() + "\",\n" +
+                        "  \"body\": \"" + notificationPushReques.getBody() + "\"\n" +
                         "}");
 
                 Request request = new Request.Builder()
@@ -103,8 +103,8 @@ public class NotificationService {
             }
 
             NotificationResponse notificationResponse = new NotificationResponse(
-                pushRequestDto.getTitle(),
-                pushRequestDto.getBody(),
+                notificationPushReques.getTitle(),
+                notificationPushReques.getBody(),
                 "알림을 성공적으로 전송했습니다."
             );
             return responseService.getSingleResponse(HttpStatus.OK.value(), notificationResponse,

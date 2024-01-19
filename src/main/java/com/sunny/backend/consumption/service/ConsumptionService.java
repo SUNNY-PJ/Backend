@@ -4,9 +4,9 @@ package com.sunny.backend.consumption.service;
 
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
-import com.sunny.backend.dto.request.consumption.ConsumptionRequest;
-import com.sunny.backend.dto.response.consumption.ConsumptionResponse;
-import com.sunny.backend.dto.response.consumption.SpendTypeStatisticsResponse;
+import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
+import com.sunny.backend.consumption.dto.response.ConsumptionResponse;
+import com.sunny.backend.consumption.dto.response.SpendTypeStatisticsResponse;
 import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.consumption.domain.SpendType;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;

@@ -1,4 +1,4 @@
-package com.sunny.backend.dto.response.community;
+package com.sunny.backend.community.dto.response;
 
 import com.sunny.backend.util.DatetimeUtil;
 import com.sunny.backend.community.domain.BoardType;
@@ -21,12 +21,12 @@ public record CommunityResponse(
     BoardType type,
     String profileImg,
     String createdAt,
-    String modifiedAt,
     boolean isModified,
     boolean isScraped
 ) {
 
-    public static CommunityResponse of(Community community, boolean isModified, boolean isScraped) {
+    public static CommunityResponse of(Community community, boolean isScraped) {
+        boolean isModified = community.hasNotBeenModified(community.getCreatedAt(), community.getModifiedAt());
         return new CommunityResponse(
             community.getId(),
             community.getUsers().getName(),
@@ -41,9 +41,7 @@ public record CommunityResponse(
             community.getCommentList().size(),
             community.getBoardType(),
             community.getUsers().getProfile(),
-            DatetimeUtil.timesAgo(community.getCreatedDate()),
-            isModified ? DatetimeUtil.timesAgo(LocalDateTime.now())
-                : DatetimeUtil.timesAgo(community.getUpdatedDate()),
+            DatetimeUtil.timesAgo(community.getCreatedAt()),
             isModified,
             isScraped
         );
@@ -57,20 +55,22 @@ public record CommunityResponse(
         int viewCount,
         int commentCount,
         String createdAt,
-        String modifiedAt
+        boolean isModified
+
+
     ) {
 
         public static PageResponse from(Community community) {
+            boolean isModified = community.hasNotBeenModified(community.getCreatedAt(), community.getModifiedAt());
             return new PageResponse(
                 community.getId(),
                 community.getTitle(),
                 community.getUsers().getName(),
-                community.getView_cnt(),  // Corrected method name
+                community.getView_cnt(),
                 community.getCommentList().size(),
-                DatetimeUtil.timesAgo(community.getCreatedDate()),
-                DatetimeUtil.timesAgo(
-                    community.getUpdatedDate() != null ? community.getUpdatedDate()
-                        : community.getCreatedDate())
+                DatetimeUtil.timesAgo(community.getCreatedAt()),
+                isModified
+
             );
         }
     }

@@ -1,10 +1,10 @@
 package com.sunny.backend.comment.repository;
 
 import static com.sunny.backend.comment.domain.QComment.comment;
-import static com.sunny.backend.dto.response.comment.CommentResponse.convertCommentToDto;
+import static com.sunny.backend.comment.dto.response.CommentResponse.convertCommentToDto;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sunny.backend.dto.response.comment.CommentResponse;
+import com.sunny.backend.comment.dto.response.CommentResponse;
 import com.sunny.backend.comment.domain.Comment;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 

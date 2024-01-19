@@ -1,4 +1,4 @@
-package com.sunny.backend.dto.request.comment;
+package com.sunny.backend.comment.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
