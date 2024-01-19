@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.ResponseService;
-import com.sunny.backend.config.AuthUser;
+import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.common.response.ResponseService;
+import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.chat.dto.response.ChatMessageResponse;
 import com.sunny.backend.chat.dto.response.ChatRoomResponse;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.chat.service.ChatService;
 
 import io.swagger.annotations.ApiOperation;

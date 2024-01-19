@@ -1,6 +1,6 @@
 package com.sunny.backend.notification.domain;
 
-import com.sunny.backend.user.Users;
+import com.sunny.backend.user.domain.Users;
 import lombok.*;
 
 import javax.persistence.*;

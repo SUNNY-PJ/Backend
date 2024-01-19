@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.config.AuthUser;
+import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.dto.response.community.CommunityResponse;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.scrap.service.ScrapService;
 
 import io.swagger.annotations.ApiOperation;

@@ -12,14 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sunny.backend.common.CommonResponse;
-import com.sunny.backend.common.ResponseService;
+import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.competition.dto.request.CompetitionRequest;
 import com.sunny.backend.competition.dto.response.CompetitionApplyResponse;
-import com.sunny.backend.config.AuthUser;
-import com.sunny.backend.competition.dto.request.CompetitionRequestDto;
+import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.competition.dto.response.CompetitionResponseDto;
-import com.sunny.backend.security.userinfo.CustomUserPrincipal;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.competition.service.CompetitionService;
 
 import io.swagger.annotations.ApiOperation;
