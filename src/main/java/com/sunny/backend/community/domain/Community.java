@@ -4,7 +4,7 @@ package com.sunny.backend.community.domain;
 import static com.sunny.backend.common.CommonErrorCode.*;
 
 import com.sunny.backend.common.CommonCustomException;
-import com.sunny.backend.dto.request.community.CommunityRequest;
+import com.sunny.backend.community.dto.request.CommunityRequest;
 import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.common.photo.Photo;
@@ -24,7 +24,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Community extends BaseTime {
+public class Community {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "community_id")
@@ -34,17 +34,19 @@ public class Community extends BaseTime {
     private String title;
 
     @Column
-
     private String contents;
     @ColumnDefault("0")
     @Column
     private int view_cnt;
 
-    @Column
-    private String createdAt;
-    @Column
-    private String modifiedAt;
+//    @Column
+//    @ColumnDefault("false")
+//    private boolean modified;
 
+    @Column
+    private LocalDateTime createdAt;
+    @Column
+    private LocalDateTime modifiedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "users_id")
@@ -79,9 +81,15 @@ public class Community extends BaseTime {
     }
 
 
-    public void updateModifiedAt(LocalDateTime updatedAt) {
-        this.setUpdatedDate(updatedAt);
+    public boolean hasNotBeenModified(LocalDateTime createdAt,LocalDateTime modifiedAt ) {
+
+        return createdAt.isEqual(modifiedAt);
     }
+    public void updateModifiedAt(LocalDateTime modifiedAt ) {
+
+        this.modifiedAt=modifiedAt;
+    }
+
     public void addPhoto(List<Photo> photoList) {
         this.photoList=photoList;
     }

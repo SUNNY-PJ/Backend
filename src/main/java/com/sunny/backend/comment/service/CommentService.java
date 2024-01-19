@@ -13,9 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.response.ResponseService;
-import com.sunny.backend.dto.request.comment.CommentRequest;
-import com.sunny.backend.dto.request.comment.CommentRequestMapper;
-import com.sunny.backend.dto.response.comment.CommentResponse;
+import com.sunny.backend.comment.dto.request.CommentRequest;
+import com.sunny.backend.comment.dto.request.CommentRequestMapper;
+import com.sunny.backend.comment.dto.response.CommentResponse;
 import com.sunny.backend.comment.domain.Comment;
 
 import com.sunny.backend.comment.repository.CommentRepository;

@@ -1,6 +1,6 @@
 package com.sunny.backend.comment.repository;
 
-import com.sunny.backend.dto.response.comment.CommentResponse;
+import com.sunny.backend.comment.dto.response.CommentResponse;
 import com.sunny.backend.comment.domain.Comment;
 
 import java.util.List;
