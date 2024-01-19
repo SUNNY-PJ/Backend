@@ -5,6 +5,7 @@ import com.sunny.backend.common.photo.Photo;
 import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.domain.SortType;
+import com.sunny.backend.community.dto.response.CommunityResponse.ViewAndCommentResponse;
 import com.sunny.backend.scrap.domain.Scrap;
 import com.sunny.backend.scrap.repository.ScrapRepository;
 import java.time.LocalDateTime;
@@ -94,7 +95,6 @@ public class CommunityService {
 				.contents(communityRequest.getContents())
 				.boardType(communityRequest.getType())
 				.createdAt(LocalDateTime.now())
-				.modifiedAt(LocalDateTime.now())
 				.users(user)
 				.build();
 
@@ -113,9 +113,17 @@ public class CommunityService {
 			community.addPhoto(photoList);
 		}
 		communityRepository.save(community);
+		community.updateModifiedAt(community.getCreatedAt());
 		if (user.getCommunityList() == null) {
 			user.addCommunity(community);
 		}
+
+		boolean isModified = community.hasNotBeenModified(community.getCreatedAt(), community.getModifiedAt());
+		System.out.println(isModified);
+		System.out.println(community.getModifiedAt());
+		System.out.println(community.getCreatedAt());
+
+
 
 		CommunityResponse communityResponse = CommunityResponse.of(community,  false);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
@@ -167,7 +175,10 @@ public class CommunityService {
 		}
 		Scrap scrap = scrapRepository.findByUsersAndCommunity(user, community);
 		boolean isScrapedByCurrentUser = (scrap != null);
-
+		boolean isModified = community.hasNotBeenModified(community.getCreatedAt(), community.getModifiedAt());
+		System.out.println(isModified);
+		System.out.println(community.getModifiedAt());
+		System.out.println(community.getCreatedAt());
 		CommunityResponse communityResponse = CommunityResponse.of(community,
 				isScrapedByCurrentUser);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
@@ -191,6 +202,17 @@ public class CommunityService {
 
 		return responseService.getGeneralResponse(HttpStatus.OK.value(),
 				"게시글을 삭제했습니다.");
+	}
+
+	@Transactional
+	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse.ViewAndCommentResponse>> getCommentAndViewByCommunity(
+			CustomUserPrincipal customUserPrincipal, Long communityId) {
+
+		Users user = customUserPrincipal.getUsers();
+		Community community = communityRepository.getById(communityId);
+		ViewAndCommentResponse viewAndCommentResponse = CommunityResponse.ViewAndCommentResponse.from(community);
+		return responseService.getSingleResponse(HttpStatus.OK.value(),viewAndCommentResponse,
+				"게시글 조회수와 댓글수를 불러왔습니다.");
 	}
 
 }

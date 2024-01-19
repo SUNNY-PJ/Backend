@@ -82,4 +82,11 @@ public class CommunityController {
 		return communityService.deleteCommunity(customUserPrincipal, communityId);
 	}
 
+	@ApiOperation(tags = "2. Community", value = "커뮤니티 조회수/댓글수 확인")
+	@GetMapping("/count/{communityId}")
+	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse.ViewAndCommentResponse>> getCommentAndViewByCommunity(
+			@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId) {
+		return communityService.getCommentAndViewByCommunity(customUserPrincipal, communityId);
+	}
+
 }
