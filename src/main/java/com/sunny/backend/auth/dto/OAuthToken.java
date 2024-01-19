@@ -1,14 +1,20 @@
 package com.sunny.backend.auth.dto;
 
-import lombok.Data;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-@Data
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OAuthToken {
-    private String id_token;
-    private String access_token;
-    private String token_type;
-    private String refresh_token;
-    private int expires_in;
-    private String scope;
-    private int refresh_token_expires_in;
+	private String idToken;
+	private String accessToken;
+	private String tokenType;
+	private String refreshToken;
+	private Integer expiresIn;
+	private String scope;
+	private Integer refreshTokenExpiresIn;
 }
