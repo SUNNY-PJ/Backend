@@ -25,7 +25,7 @@ public class DatetimeUtil {
         }else if (gap < 60 * 24){
             word = (gap/60) + "시간 전";
         }else {
-            word = dayBefore.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            word = dayBefore.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:MM"));
         }
         return word;
     }

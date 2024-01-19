@@ -1,7 +1,7 @@
 package com.sunny.backend.save.domain;
 
 
-import com.sunny.backend.dto.request.save.SaveRequest;
+import com.sunny.backend.save.dto.request.SaveRequest;
 import com.sunny.backend.user.domain.Users;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
