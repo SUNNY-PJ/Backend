@@ -17,7 +17,7 @@ import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.user.dto.ProfileResponse;
 import com.sunny.backend.comment.dto.response.CommentResponse;
 import com.sunny.backend.community.dto.response.CommunityResponse;
-import com.sunny.backend.user.dto.ScrapResponse;
+import com.sunny.backend.scrap.dto.response.ScrapResponse;
 import com.sunny.backend.user.service.UserService;
 
 import io.swagger.annotations.ApiOperation;

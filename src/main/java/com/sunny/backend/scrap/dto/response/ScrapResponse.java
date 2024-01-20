@@ -1,4 +1,4 @@
-package com.sunny.backend.user.dto;
+package com.sunny.backend.scrap.dto.response;
 
 import java.time.LocalDateTime;
 

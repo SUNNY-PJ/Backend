@@ -56,6 +56,7 @@ public record CommunityResponse(
         String writer,
         int viewCount,
         int commentCount,
+        BoardType type,
         String createdAt,
         boolean isModified
 
@@ -70,6 +71,7 @@ public record CommunityResponse(
                 community.getUsers().getName(),
                 community.getView_cnt(),
                 community.getCommentList().size(),
+                community.getBoardType(),
                 DatetimeUtil.timesAgo(community.getCreatedAt()),
                 isModified
 
