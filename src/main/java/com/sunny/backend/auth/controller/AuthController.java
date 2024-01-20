@@ -66,7 +66,8 @@ public class AuthController {
 	//이거 일단 임시 테스트임
 	@ApiOperation(tags = "0. Auth", value = "로그아웃")
 	@GetMapping("/kakao/logout")
-	public ResponseEntity<Void> handleKakaoLogout() {
+	public ResponseEntity<Void> handleKakaoLogout(@AuthUser CustomUserPrincipal customUserPrincipal) {
+		kakaoService.logout(customUserPrincipal);
 		return ResponseEntity.ok().build();
 	}
 
@@ -74,6 +75,13 @@ public class AuthController {
 	@GetMapping("/leave")
 	public ResponseEntity<Void> deleteAccount(@AuthUser CustomUserPrincipal customUserPrincipal) {
 		kakaoService.leave(customUserPrincipal);
+		return ResponseEntity.ok().build();
+	}
+
+	@ApiOperation(tags = "0. Auth", value = "refresh 토큰으로 access 토큰 발급")
+	@GetMapping("/reissue")
+	public ResponseEntity<Void> reissue(@RequestParam(name = "id") Long userId) {
+		kakaoService.reissue(userId);
 		return ResponseEntity.ok().build();
 	}
 }

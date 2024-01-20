@@ -42,9 +42,10 @@ public class Users extends BaseTime {
 	private String email;
 
 	@Size(min=2,max=10)
-
 	@Column(unique = true,nullable = false)
 	private String name;
+
+	private String oauthId;
 
 	@Column(nullable = false)
 	@Enumerated(value = EnumType.STRING)
