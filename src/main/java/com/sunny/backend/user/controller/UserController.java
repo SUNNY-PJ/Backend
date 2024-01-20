@@ -2,7 +2,6 @@ package com.sunny.backend.user.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +18,7 @@ import com.sunny.backend.user.dto.ProfileResponse;
 import com.sunny.backend.comment.dto.response.CommentResponse;
 import com.sunny.backend.community.dto.response.CommunityResponse;
 import com.sunny.backend.user.dto.ScrapResponse;
-import com.sunny.backend.user.service.MyPageService;
+import com.sunny.backend.user.service.UserService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,16 +28,16 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "0. User", description = "User API")
 @RequestMapping(value = "/users")
 @RequiredArgsConstructor
-public class MyPageController {
+public class UserController {
 
-	private final MyPageService myPageService;
+	private final UserService userService;
 
 	@ApiOperation(tags = "0. User", value = "프로필 조회")
 	@GetMapping("")
 	public ResponseEntity<ProfileResponse> getUserProfile(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@RequestParam(name = "userId", required = false) Long userId) {
-		ProfileResponse profileResponse = myPageService.getUserProfile(customUserPrincipal, userId);
+		ProfileResponse profileResponse = userService.getUserProfile(customUserPrincipal, userId);
 		return ResponseEntity.ok().body(profileResponse);
 	}
 
@@ -48,7 +47,7 @@ public class MyPageController {
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@RequestParam(name = "userId", required = false) Long userId) {
 		List<CommunityResponse.PageResponse> pageResponse =
-			myPageService.getUserCommunityList(customUserPrincipal, userId);
+			userService.getUserCommunityList(customUserPrincipal, userId);
 		return ResponseEntity.ok().body(pageResponse);
 	}
 
@@ -56,7 +55,7 @@ public class MyPageController {
 	@GetMapping("/scrap")
 	public ResponseEntity<List<ScrapResponse>> getScrapList(
 		@AuthUser CustomUserPrincipal customUserPrincipal) {
-		List<ScrapResponse> scrapResponses = myPageService.getScrapList(customUserPrincipal);
+		List<ScrapResponse> scrapResponses = userService.getScrapList(customUserPrincipal);
 		return ResponseEntity.ok().body(scrapResponses);
 	}
 
@@ -66,7 +65,7 @@ public class MyPageController {
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@RequestParam(name = "userId", required = false) Long userId) {
 		List<CommentResponse.MyComment> mycomments =
-			myPageService.getCommentByUserId(customUserPrincipal, userId);
+			userService.getCommentByUserId(customUserPrincipal, userId);
 		return ResponseEntity.ok().body(mycomments);
 	}
 
@@ -75,24 +74,7 @@ public class MyPageController {
 	public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@RequestPart(value = "profile", required = false) MultipartFile profile) {
-		return myPageService.updateProfile(customUserPrincipal, profile);
+		return userService.updateProfile(customUserPrincipal, profile);
 	}
 
-	//이거 일단 임시 테스트임
-	@ApiOperation(tags = "0. User", value = "로그아웃")
-	@GetMapping("/auth/kakao/logout")
-	public ResponseEntity<CommonResponse.GeneralResponse> handleKakaoLogout(
-		@RequestParam(name = "client_id") String clientId,
-		@RequestParam(name = "logout_redirect_uri") String logoutRedirectUri) {
-		CommonResponse.GeneralResponse response = new CommonResponse.GeneralResponse(
-			HttpStatus.OK.value(), "Logout 성공");
-		return ResponseEntity.ok().body(response);
-	}
-
-	@ApiOperation(tags = "0. User", value = "탈퇴")
-	@GetMapping("/auth/leave")
-	public ResponseEntity<CommonResponse.GeneralResponse> deleteAccount(
-		@AuthUser CustomUserPrincipal customUserPrincipal) {
-		return myPageService.deleteAccount(customUserPrincipal);
-	}
 }
