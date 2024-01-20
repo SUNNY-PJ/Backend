@@ -50,7 +50,7 @@ public class Save {
 
     public long calculateRemainingDays(Save save) {
         LocalDate currentDate = LocalDate.now();
-        return ChronoUnit.DAYS.between(currentDate, save.getEndDate())+1;
+        return ChronoUnit.DAYS.between(currentDate, save.getEndDate());
     }
 
     public double calculateSavePercentage(Long userMoney, Save save) {
