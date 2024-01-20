@@ -72,7 +72,7 @@ public class KakaoService {
                 kakaoTokenRequest, // 요청할 때 보낼 데이터
             OAuthToken.class // 요청 시 반환되는 데이터 타입
         );
-
+        System.out.println(response);
         return response.getBody().getAccessToken();
     }
 

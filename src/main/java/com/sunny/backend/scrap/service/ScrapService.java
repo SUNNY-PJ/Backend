@@ -30,7 +30,6 @@ public class ScrapService {
 	private final ScrapRepository scrapRepository;
 	private final CommunityRepository communityRepository;
 	private final ResponseService responseService;
-
 	public ResponseEntity<CommonResponse.ListResponse<CommunityResponse>> getScrapsByUserId(
 		CustomUserPrincipal customUserPrincipal) {
 		Users user = customUserPrincipal.getUsers();
