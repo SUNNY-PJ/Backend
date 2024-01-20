@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sunny.backend.auth.dto.TokenResponse;
 import com.sunny.backend.auth.dto.UserNameResponse;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.auth.service.AuthService;
 import com.sunny.backend.auth.service.KakaoService;
 import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
@@ -31,6 +32,7 @@ public class AuthController {
 
 	private final ResponseService responseService;
 	private final KakaoService kakaoService;
+	private final AuthService authService;
 
 	@ApiOperation(tags = "0. Auth", value = "카카오 로그인")
 	@GetMapping("/token")
@@ -80,8 +82,8 @@ public class AuthController {
 
 	@ApiOperation(tags = "0. Auth", value = "refresh 토큰으로 access 토큰 발급")
 	@GetMapping("/reissue")
-	public ResponseEntity<Void> reissue(@RequestParam(name = "id") Long userId) {
-		kakaoService.reissue(userId);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<TokenResponse> reissue(@RequestParam(name = "refreshToken") String refreshToken) {
+		TokenResponse tokenResponse = authService.reissue(refreshToken);
+		return ResponseEntity.ok().body(tokenResponse);
 	}
 }
