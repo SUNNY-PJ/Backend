@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-
 public record CommunityResponse(
     Long id,
+    Long userId,
     String writer,
     String title,
     String contents,
@@ -21,7 +21,6 @@ public record CommunityResponse(
     BoardType type,
     String profileImg,
     String createdAt,
-
     boolean isModified,
     boolean isScraped
 ) {
@@ -31,6 +30,7 @@ public record CommunityResponse(
 
         return new CommunityResponse(
             community.getId(),
+            community.getUsers().getId(),
             community.getUsers().getName(),
             community.getTitle(),
             community.getContents(),
@@ -58,10 +58,7 @@ public record CommunityResponse(
         int commentCount,
         String createdAt,
         boolean isModified
-
-
     ) {
-
         public static PageResponse from(Community community) {
             boolean isModified = community.hasNotBeenModified(community.getCreatedAt(), community.getModifiedAt());
             return new PageResponse(
@@ -72,7 +69,6 @@ public record CommunityResponse(
                 community.getCommentList().size(),
                 DatetimeUtil.timesAgo(community.getCreatedAt()),
                 isModified
-
             );
         }
     }
@@ -85,7 +81,6 @@ public record CommunityResponse(
             return new ViewAndCommentResponse(
                 community.getView_cnt(),
                 community.getCommentList().size()
-
             );
         }
     }
