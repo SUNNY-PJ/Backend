@@ -56,7 +56,7 @@ public class CommunityService {
 		String viewCount = redisUtil.getData(String.valueOf(user.getId()));
 
 		if (StringUtils.isBlank(viewCount)) {
-			redisUtil.setDateExpire(String.valueOf(user.getId()), communityId + "_",
+			redisUtil.setValuesWithTimeout(String.valueOf(user.getId()), communityId + "_",
 					calculateTimeUntilMidnight());
 			community.increaseView();
 		} else {
@@ -65,7 +65,7 @@ public class CommunityService {
 
 			if (!isViewed) {
 				viewCount += communityId + "_";
-				redisUtil.setDateExpire(String.valueOf(user.getId()), viewCount,
+				redisUtil.setValuesWithTimeout(String.valueOf(user.getId()), viewCount,
 						calculateTimeUntilMidnight());
 				community.updateView();
 			}
