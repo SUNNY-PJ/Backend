@@ -35,7 +35,6 @@ public class Save {
     @Column
     @FutureOrPresent
     private LocalDate startDate;
-
     @Column
     @FutureOrPresent
     private LocalDate endDate;
@@ -58,8 +57,6 @@ public class Save {
         double percentage = userMoney != null ?
             100.0 - (((double) userMoney / (double) save.getCost()) * 100.0) : 100.0;
         BigDecimal roundedPercentage = new BigDecimal(percentage).setScale(1, RoundingMode.HALF_UP);
-
-
         return roundedPercentage.doubleValue();
     }
 }

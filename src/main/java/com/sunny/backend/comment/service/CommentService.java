@@ -27,12 +27,10 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CommentService {
-
 	private final CommentRepository commentRepository;
 	private final CommunityRepository communityRepository;
 	private final CommentRequestMapper commentRequestMapper;
 	private final ResponseService responseService;
-
 
 	private CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
 		boolean isPrivate = comment.getIsPrivated();
@@ -78,7 +76,6 @@ public class CommentService {
 				.orElseThrow(() -> new CommonCustomException(COMMUNITY_NOT_FOUND));
 
 		Comment comment = commentRequestMapper.toEntity(commentRequestDTO);
-
 		Comment parentComment = null;
 		if (commentRequestDTO.getParentId() != null) {
 			parentComment = commentRepository.findById(commentRequestDTO.getParentId())
@@ -91,7 +88,6 @@ public class CommentService {
 		comment.setCommunity(community);
 		comment.setContent(commentRequestDTO.getContent());
 		comment.setUsers(user);
-
 		boolean isPrivate = commentRequestDTO.getIsPrivated();
 		comment.setIsPrivated(isPrivate);
 		commentRepository.save(comment);
@@ -99,7 +95,6 @@ public class CommentService {
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),
 						comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 등록했습니다.");
-
 	}
 
 	@Transactional

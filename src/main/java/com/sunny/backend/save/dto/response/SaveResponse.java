@@ -5,7 +5,6 @@ import com.sunny.backend.save.domain.Save;
 import java.time.LocalDate;
 
 public record SaveResponse(
-
     Long id,
     Long cost,
     @JsonFormat(pattern = "yyyy.MM.dd")
@@ -13,7 +12,6 @@ public record SaveResponse(
     @JsonFormat(pattern = "yyyy.MM.dd")
     LocalDate endDate
 ) {
-
     public static SaveResponse from(Save save) {
         return new SaveResponse(
             save.getId(),
@@ -22,14 +20,11 @@ public record SaveResponse(
             save.getEndDate()
         );
     }
-
     public record DetailSaveResponse(
-
         long date,
         double savePercentage
 
     ) {
-
         public static DetailSaveResponse of(long date, double savePercentage) {
             return new DetailSaveResponse(
                 date,

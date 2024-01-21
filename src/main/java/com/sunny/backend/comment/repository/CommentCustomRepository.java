@@ -9,5 +9,4 @@ import java.util.Optional;
 public interface CommentCustomRepository {
     Optional<Comment> findCommentByIdWithParent(Long id);
     List<CommentResponse> findByCommunityId(Long id);
-
 }
