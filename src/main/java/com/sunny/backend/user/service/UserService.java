@@ -1,5 +1,7 @@
 package com.sunny.backend.user.service;
 
+import static com.sunny.backend.common.ComnConstant.*;
+
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -75,6 +77,7 @@ public class UserService {
 			.toList();
 	}
 
+	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
 		CustomUserPrincipal customUserPrincipal, MultipartFile profile) {
 
@@ -82,13 +85,12 @@ public class UserService {
 		// 새 프로필 업로드
 		if (profile != null && !profile.isEmpty()) {
 			String uploadedProfileUrl = s3Util.upload(profile);
-			user.setProfile(uploadedProfileUrl);
+			user.updateProfile(uploadedProfileUrl);
 		} else if (profile == null) {
-			user.setProfile("https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png");
+			user.updateProfile(SUNNY_DEFAULT_IMAGE);
 		}
-		ProfileResponse profileResponse = ProfileResponse.from(user);
 		userRepository.save(user);
-
+		ProfileResponse profileResponse = ProfileResponse.from(user);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), profileResponse, "프로필 변경 완료");
 	}
 

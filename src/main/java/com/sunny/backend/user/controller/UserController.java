@@ -15,8 +15,6 @@ import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.user.dto.ProfileResponse;
-import com.sunny.backend.comment.dto.response.CommentResponse;
-import com.sunny.backend.community.dto.response.CommunityResponse;
 import com.sunny.backend.user.dto.UserCommentResponse;
 import com.sunny.backend.user.dto.UserCommunityResponse;
 import com.sunny.backend.user.dto.UserScrapResponse;

@@ -10,6 +10,10 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
+import com.sunny.backend.common.CommonCustomException;
+import com.sunny.backend.common.CommonErrorCode;
+import com.sunny.backend.common.exception.CustomException;
+
 @Component
 @RequiredArgsConstructor
 public class RedisUtil {
@@ -21,7 +25,7 @@ public class RedisUtil {
 
     public void isExistData(String key) {
         if(redisTemplate.opsForValue().get(key) == null) {
-            throw new RuntimeException("expired jwt");
+            throw new CommonCustomException(CommonErrorCode.TOKEN_EXPIRED);
         }
     }
 
