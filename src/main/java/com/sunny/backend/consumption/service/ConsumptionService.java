@@ -72,10 +72,10 @@ public class ConsumptionService {
 
     @Transactional
     public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>> getSpendTypeStatistics(
-        CustomUserPrincipal customUserPrincipal, YearMonthRequest yearMonthRequest) {
+        CustomUserPrincipal customUserPrincipal, Integer year,Integer month) {
         Users user = customUserPrincipal.getUsers();
         List<SpendTypeStatisticsResponse> statistics = consumptionRepository.getSpendTypeStatistics(
-            user.getId(),yearMonthRequest);
+            user.getId(),year,month);
         return responseService.getListResponse(HttpStatus.OK.value(),
             statistics, "지출 통계 내역을 불러왔습니다.");
     }
@@ -106,9 +106,9 @@ public class ConsumptionService {
 
     @Transactional
     public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumptionResponse>>
-    getConsumptionByCategory(CustomUserPrincipal customUserPrincipal, SpendType spendType,YearMonthRequest yearMonthRequest) {
+    getConsumptionByCategory(CustomUserPrincipal customUserPrincipal, SpendType spendType,Integer year,Integer month) {
         List<ConsumptionResponse.DetailConsumptionResponse> detailConsumptions =
-            consumptionRepository.getConsumptionByCategory(customUserPrincipal.getUsers().getId(),spendType,yearMonthRequest);
+            consumptionRepository.getConsumptionByCategory(customUserPrincipal.getUsers().getId(),spendType,year,month);
         return responseService.getListResponse(HttpStatus.OK.value(),
             detailConsumptions, spendType + "에 맞는 지출 내역을 불러왔습니다.");
     }

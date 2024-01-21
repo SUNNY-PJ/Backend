@@ -40,6 +40,7 @@ public class ConsumptionController {
 	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> createConsumption(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@Valid @RequestBody ConsumptionRequest consumtionRequest) {
+		System.out.println("Zzzzz");
 		return consumptionService.createConsumption(customUserPrincipal, consumtionRequest);
 	}
 
@@ -47,8 +48,8 @@ public class ConsumptionController {
 	@GetMapping("/spendTypeStatistics")
 	public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>>
 	getSpendTypeStatistics(@AuthUser CustomUserPrincipal customUserPrincipal,
-			@RequestBody YearMonthRequest yearMonthRequest) {
-		return consumptionService.getSpendTypeStatistics(customUserPrincipal,yearMonthRequest);
+			@RequestParam(name = "year") Integer year, @RequestParam(name = "month") Integer month) {
+		return consumptionService.getSpendTypeStatistics(customUserPrincipal,year,month);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "날짜에 맞는 지출 내역 조회")
@@ -74,6 +75,7 @@ public class ConsumptionController {
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteConsumption(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@PathVariable Long consumptionId) {
+
 		return consumptionService.deleteConsumption(customUserPrincipal, consumptionId);
 	}
 
@@ -81,8 +83,8 @@ public class ConsumptionController {
 	@GetMapping("/category")
 	public ResponseEntity<CommonResponse.ListResponse<DetailConsumptionResponse>> getConsumptionByCategory(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@Valid @RequestParam(required = false) SpendType spendType,
-			@Valid @RequestBody YearMonthRequest yearMonthRequest) {
-		return consumptionService.getConsumptionByCategory(customUserPrincipal, spendType,yearMonthRequest);
+			@Valid @RequestParam SpendType spendType,
+			@RequestParam(name = "year") Integer year, @RequestParam(name = "month") Integer month) {
+		return consumptionService.getConsumptionByCategory(customUserPrincipal, spendType,year,month);
 	}
 }

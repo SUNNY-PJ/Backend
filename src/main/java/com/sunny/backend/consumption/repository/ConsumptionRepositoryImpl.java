@@ -9,6 +9,7 @@ import com.sunny.backend.consumption.dto.response.ConsumptionResponse;
 import com.sunny.backend.consumption.dto.response.SpendTypeStatisticsResponse;
 import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.consumption.domain.SpendType;
+import io.swagger.models.auth.In;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class ConsumptionRepositoryImpl extends QuerydslRepositorySupport impleme
   }
   @Override
   public List<SpendTypeStatisticsResponse> getSpendTypeStatistics(
-      Long userId, YearMonthRequest yearMonthRequest) {
+      Long userId, Integer year,Integer month) {
     QConsumption consumption = QConsumption.consumption;
 
     List<SpendType> allCategories = List.of(SpendType.values());
@@ -48,12 +49,12 @@ public class ConsumptionRepositoryImpl extends QuerydslRepositorySupport impleme
         .from(consumption)
         .where(
             consumption.users.id.eq(userId)
-                .and(consumption.dateField.year().eq(yearMonthRequest.getYearMonth().getYear()))
-                .and(consumption.dateField.month().eq(yearMonthRequest.getYearMonth().getMonthValue()))
+                .and(consumption.dateField.year().eq(year))
+                .and(consumption.dateField.month().eq(month))
         )
         .groupBy(consumption.category)
         .fetch();
-    long totalSpending = getTotalSpendingByYearMonth(userId,yearMonthRequest);
+    long totalSpending = getTotalSpendingByYearMonth(userId,year,month);
     for (Tuple tuple : tuples) {
       SpendType category = tuple.get(consumption.category);
       Long totalCount = tuple.get(consumption.name.count());
@@ -76,31 +77,34 @@ public class ConsumptionRepositoryImpl extends QuerydslRepositorySupport impleme
         .where(consumption.dateField.between(startDate, endDate))
         .fetchOne();
   }
-  private Long getTotalSpendingByYearMonth(Long userId, YearMonthRequest yearMonthRequest) {
+  private Long getTotalSpendingByYearMonth(Long userId, Integer year,Integer month) {
     QConsumption consumption = QConsumption.consumption;
     Long totalSpending = queryFactory
         .select(consumption.money.sum())
         .from(consumption)
         .where(
             consumption.users.id.eq(userId)
-                .and(consumption.dateField.year().eq(yearMonthRequest.getYearMonth().getYear()))
-                .and(consumption.dateField.month().eq(yearMonthRequest.getYearMonth().getMonthValue()))
+                .and(consumption.dateField.year().eq(year))
+                .and(consumption.dateField.month().eq(month))
         )
         .fetchOne();
     return totalSpending != null ? totalSpending : 0L;
   }
   @Override
   public List<ConsumptionResponse.DetailConsumptionResponse> getConsumptionByCategory(
-      Long userId, SpendType spendType, YearMonthRequest yearMonthRequest) {
+      Long userId, SpendType spendType, Integer year,Integer month) {
     QConsumption consumption = QConsumption.consumption;
     JPAQuery<Consumption> query = queryFactory
         .selectFrom(consumption)
         .where(
             consumption.users.id.eq(userId)
                 .and(consumption.category.eq(spendType))
-                .and(consumption.dateField.year().eq(yearMonthRequest.getYearMonth().getYear()))
-                .and(consumption.dateField.month().eq(yearMonthRequest.getYearMonth().getMonthValue()))
-        );
+                .and(consumption.dateField.year().eq(year))
+                .and(consumption.dateField.month().eq(month)
+        ));
+
+
+
     List<Consumption> consumptionList = query.fetch();
     List<ConsumptionResponse.DetailConsumptionResponse> responseList = consumptionList.stream()
         .map(ConsumptionResponse.DetailConsumptionResponse::from)
