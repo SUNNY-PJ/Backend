@@ -1,10 +1,9 @@
 package com.sunny.backend.consumption.service;
 
-
-
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
+import com.sunny.backend.consumption.dto.request.YearMonthRequest;
 import com.sunny.backend.consumption.dto.response.ConsumptionResponse;
 import com.sunny.backend.consumption.dto.response.SpendTypeStatisticsResponse;
 import com.sunny.backend.consumption.domain.Consumption;
@@ -18,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -26,7 +24,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ConsumptionService {
-
     private final ConsumptionRepository consumptionRepository;
     private final ResponseService responseService;
 
@@ -41,7 +38,6 @@ public class ConsumptionService {
             .dateField(consumptionRequest.getDateField())
             .users(user)
             .build();
-
         consumptionRepository.save(consumption);
         if (user.getConsumptionList() == null) {
             user.addConsumption(consumption);
@@ -76,24 +72,24 @@ public class ConsumptionService {
 
     @Transactional
     public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>> getSpendTypeStatistics(
-        CustomUserPrincipal customUserPrincipal) {
+        CustomUserPrincipal customUserPrincipal, YearMonthRequest yearMonthRequest) {
         Users user = customUserPrincipal.getUsers();
         List<SpendTypeStatisticsResponse> statistics = consumptionRepository.getSpendTypeStatistics(
-            user.getId());
+            user.getId(),yearMonthRequest);
         return responseService.getListResponse(HttpStatus.OK.value(),
             statistics, "지출 통계 내역을 불러왔습니다.");
     }
 
     @Transactional
     public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumptionResponse>>
-    getDetailConsumption(CustomUserPrincipal customUserPrincipal, LocalDate datefield) {
+    getDetailConsumption(CustomUserPrincipal customUserPrincipal, LocalDate dateField) {
         List<Consumption> detailConsumption =
             consumptionRepository.findByUsersIdAndDateField(customUserPrincipal.getUsers().getId(),
-                datefield);
+                dateField);
         List<ConsumptionResponse.DetailConsumptionResponse> detailConsumptions =
             ConsumptionResponse.DetailConsumptionResponse.listFrom(detailConsumption);
         return responseService.getListResponse(HttpStatus.OK.value(),
-            detailConsumptions, datefield + "에 맞는 지출 내역을 불러왔습니다.");
+            detailConsumptions, dateField + "에 맞는 지출 내역을 불러왔습니다.");
     }
 
     @Transactional
@@ -110,12 +106,9 @@ public class ConsumptionService {
 
     @Transactional
     public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumptionResponse>>
-    getConsumptionByCategory(CustomUserPrincipal customUserPrincipal, SpendType spendType) {
-        List<Consumption> detailConsumption =
-            consumptionRepository.findByUsersIdAndCategory(customUserPrincipal.getUsers().getId(),
-                spendType);
+    getConsumptionByCategory(CustomUserPrincipal customUserPrincipal, SpendType spendType,YearMonthRequest yearMonthRequest) {
         List<ConsumptionResponse.DetailConsumptionResponse> detailConsumptions =
-            ConsumptionResponse.DetailConsumptionResponse.listFrom(detailConsumption);
+            consumptionRepository.getConsumptionByCategory(customUserPrincipal.getUsers().getId(),spendType,yearMonthRequest);
         return responseService.getListResponse(HttpStatus.OK.value(),
             detailConsumptions, spendType + "에 맞는 지출 내역을 불러왔습니다.");
     }

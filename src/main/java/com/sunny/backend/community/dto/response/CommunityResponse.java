@@ -48,8 +48,6 @@ public record CommunityResponse(
             isScraped
         );
     }
-
-
     public record PageResponse(
         Long id,
         String title,
