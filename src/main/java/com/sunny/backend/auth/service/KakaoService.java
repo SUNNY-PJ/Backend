@@ -1,23 +1,19 @@
 package com.sunny.backend.auth.service;
 
-import static com.sunny.backend.common.CommonErrorCode.NICKNAME_IN_USE;
 import static com.sunny.backend.common.ComnConstant.*;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.sunny.backend.auth.dto.KakaoIdResponse;
 import com.sunny.backend.auth.dto.KakaoMemberResponse;
 import com.sunny.backend.auth.dto.TokenResponse;
 import com.sunny.backend.auth.dto.UserNameResponse;
+import com.sunny.backend.auth.exception.UserErrorCode;
 import com.sunny.backend.auth.jwt.TokenProvider;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
-import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.auth.dto.OAuthToken;
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.user.domain.Role;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
-import com.sunny.backend.util.RedisUtil;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -104,9 +100,10 @@ public class KakaoService {
         Users user = customUserPrincipal.getUsers();
         Optional<Users> optionalUsers = userRepository.findByName(name);
         if (optionalUsers.isPresent()) {
-            throw new CommonCustomException(NICKNAME_IN_USE);
+            throw new CustomException(UserErrorCode.NICKNAME_IN_USE);
         }
-        user.setName(name);
+        user.updateName(name);
+        userRepository.save(user);
         return new UserNameResponse(user.getName());
     }
 
@@ -135,9 +132,9 @@ public class KakaoService {
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
         ResponseEntity<KakaoIdResponse> response = rt.exchange(
                 url,
-                HttpMethod.POST, // 요청할 방식
-                kakaoTokenRequest, // 요청할 때 보낼 데이터
-                KakaoIdResponse.class // 요청 시 반환되는 데이터 타입
+                HttpMethod.POST,
+                kakaoTokenRequest,
+                KakaoIdResponse.class
         );
     }
 
