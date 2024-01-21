@@ -10,9 +10,9 @@ import java.util.List;
 
 public interface ConsumptionCustomRepository {
 
-    List<SpendTypeStatisticsResponse> getSpendTypeStatistics(Long userId, YearMonthRequest yearMonthRequest);
+    List<SpendTypeStatisticsResponse> getSpendTypeStatistics(Long userId,Integer year,Integer month);
     List<ConsumptionResponse.DetailConsumptionResponse> getConsumptionByCategory(Long userId,
-        SpendType spendType,YearMonthRequest yearMonthRequest);
+        SpendType spendType, Integer year,Integer month);
 
     Long getComsumptionMoney(Long id, LocalDate startDate, LocalDate endDate);
 }
