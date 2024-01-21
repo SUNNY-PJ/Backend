@@ -35,9 +35,10 @@ public class Community {
 
     @Column
     private String contents;
+
     @ColumnDefault("0")
     @Column
-    private int view_cnt;
+    private int viewCnt;
 
 //    @Column
 //    @ColumnDefault("false")
@@ -52,7 +53,6 @@ public class Community {
     @JoinColumn(name= "users_id")
     private Users users;
 
-
     @OneToMany(mappedBy = "community")
     @Builder.Default
     private List<Photo> photoList = new ArrayList<>();
@@ -65,6 +65,10 @@ public class Community {
     @Builder.Default
     private List<Comment> commentList=new ArrayList<>();
 
+    public int getCommentSize() {
+        return commentList.size();
+    }
+
     public void updateCommunity(CommunityRequest communityRequest){
         this.title=communityRequest.getTitle();
         this.contents=communityRequest.getContents();
@@ -72,21 +76,17 @@ public class Community {
     }
 
     public void increaseView() {
-        this.view_cnt+=1;
+        this.viewCnt+=1;
     }
-
 
     public void updateView() {
-        this.view_cnt++;
+        this.viewCnt++;
     }
 
-
     public boolean hasNotBeenModified(LocalDateTime createdAt,LocalDateTime modifiedAt ) {
-
         return !createdAt.isEqual(modifiedAt);
     }
     public void updateModifiedAt(LocalDateTime modifiedAt ) {
-
         this.modifiedAt=modifiedAt;
     }
 
