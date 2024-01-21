@@ -4,12 +4,10 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sunny.backend.consumption.domain.QConsumption;
-import com.sunny.backend.consumption.dto.request.YearMonthRequest;
 import com.sunny.backend.consumption.dto.response.ConsumptionResponse;
 import com.sunny.backend.consumption.dto.response.SpendTypeStatisticsResponse;
 import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.consumption.domain.SpendType;
-import io.swagger.models.auth.In;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -102,9 +100,6 @@ public class ConsumptionRepositoryImpl extends QuerydslRepositorySupport impleme
                 .and(consumption.dateField.year().eq(year))
                 .and(consumption.dateField.month().eq(month)
         ));
-
-
-
     List<Consumption> consumptionList = query.fetch();
     List<ConsumptionResponse.DetailConsumptionResponse> responseList = consumptionList.stream()
         .map(ConsumptionResponse.DetailConsumptionResponse::from)
