@@ -60,7 +60,7 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
       SortType sortType, BoardType boardType, String searchText, int pageSize) {
     JPAQuery<Community> query = queryFactory.selectFrom(community)
         .where(ltCommunityId(communityId))
-        .orderBy(sortType == SortType.VIEW ? community.view_cnt.desc()
+        .orderBy(sortType == SortType.VIEW ? community.viewCnt.desc()
             : community.createdAt.desc())
         .limit(pageSize);
 

@@ -34,7 +34,7 @@ public record CommunityResponse(
             community.getUsers().getName(),
             community.getTitle(),
             community.getContents(),
-            community.getView_cnt(),
+            community.getViewCnt(),
             community.getPhotoList()
                 .stream()
                 .map(Photo::getFileUrl)
@@ -65,7 +65,7 @@ public record CommunityResponse(
                 community.getId(),
                 community.getTitle(),
                 community.getUsers().getName(),
-                community.getView_cnt(),
+                community.getViewCnt(),
                 community.getCommentList().size(),
                 DatetimeUtil.timesAgo(community.getCreatedAt()),
                 isModified
@@ -79,7 +79,7 @@ public record CommunityResponse(
     ) {
         public static ViewAndCommentResponse from(Community community) {
             return new ViewAndCommentResponse(
-                community.getView_cnt(),
+                community.getViewCnt(),
                 community.getCommentList().size()
             );
         }

@@ -18,7 +18,9 @@ import com.sunny.backend.comment.dto.response.CommentResponse;
 import com.sunny.backend.community.dto.response.CommunityResponse;
 import com.sunny.backend.scrap.repository.ScrapRepository;
 import com.sunny.backend.user.domain.Users;
-import com.sunny.backend.user.dto.ScrapResponse;
+import com.sunny.backend.user.dto.UserCommentResponse;
+import com.sunny.backend.user.dto.UserCommunityResponse;
+import com.sunny.backend.user.dto.UserScrapResponse;
 import com.sunny.backend.user.repository.UserRepository;
 import com.sunny.backend.util.S3Util;
 
@@ -47,31 +49,29 @@ public class UserService {
 		return ProfileResponse.from(user);
 	}
 
-	public List<CommunityResponse.PageResponse> getUserCommunityList(CustomUserPrincipal customUserPrincipal,
-		Long userId) {
+	public List<UserCommunityResponse> getUserCommunityList(CustomUserPrincipal customUserPrincipal, Long userId) {
 		Users user = checkUserId(customUserPrincipal, userId);
 
 		return communityRepository.findAllByUsers_Id(user.getId())
 			.stream()
-			.map(CommunityResponse.PageResponse::from)
+			.map(UserCommunityResponse::from)
 			.toList();
 	}
 
 	@Transactional(readOnly = true)
-	public List<CommentResponse.MyComment> getCommentByUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
+	public List<UserCommentResponse> getCommentByUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
 		Users user = checkUserId(customUserPrincipal, userId);
 
 		return commentRepository.findAllByUsers_Id(user.getId())
 			.stream()
-			.map(CommentResponse.MyComment::from)
+			.map(UserCommentResponse::from)
 			.toList();
 	}
 
-	public List<ScrapResponse> getScrapList(CustomUserPrincipal customUserPrincipal) {
-		Users user = customUserPrincipal.getUsers();
-		return scrapRepository.findAllByUsers_Id(user.getId())
+	public List<UserScrapResponse> getScrapList(CustomUserPrincipal customUserPrincipal) {
+		return scrapRepository.findAllByUsers_Id(customUserPrincipal.getUsers().getId())
 			.stream()
-			.map(scrap -> ScrapResponse.from(scrap.getCommunity()))
+			.map(scrap -> UserScrapResponse.from(scrap.getCommunity()))
 			.toList();
 	}
 
@@ -92,10 +92,4 @@ public class UserService {
 		return responseService.getSingleResponse(HttpStatus.OK.value(), profileResponse, "프로필 변경 완료");
 	}
 
-	public ResponseEntity<CommonResponse.GeneralResponse> deleteAccount(
-		CustomUserPrincipal customUserPrincipal) {
-		Users user = customUserPrincipal.getUsers();
-		userRepository.deleteById(user.getId());
-		return responseService.getGeneralResponse(HttpStatus.OK.value(), "성공적으로 탈퇴 되었습니다.");
-	}
 }
