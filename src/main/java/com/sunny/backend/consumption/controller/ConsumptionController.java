@@ -1,6 +1,7 @@
 package com.sunny.backend.consumption.controller;
 
 
+import com.sunny.backend.consumption.dto.request.YearMonthRequest;
 import com.sunny.backend.consumption.dto.response.ConsumptionResponse.DetailConsumptionResponse;
 import com.sunny.backend.consumption.domain.SpendType;
 import java.time.LocalDate;
@@ -45,8 +46,9 @@ public class ConsumptionController {
 	@ApiOperation(tags = "4. Consumption", value = "지출 통계")
 	@GetMapping("/spendTypeStatistics")
 	public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>>
-	getSpendTypeStatistics(@AuthUser CustomUserPrincipal customUserPrincipal) {
-		return consumptionService.getSpendTypeStatistics(customUserPrincipal);
+	getSpendTypeStatistics(@AuthUser CustomUserPrincipal customUserPrincipal,
+			@RequestBody YearMonthRequest yearMonthRequest) {
+		return consumptionService.getSpendTypeStatistics(customUserPrincipal,yearMonthRequest);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "날짜에 맞는 지출 내역 조회")
@@ -79,7 +81,8 @@ public class ConsumptionController {
 	@GetMapping("/category")
 	public ResponseEntity<CommonResponse.ListResponse<DetailConsumptionResponse>> getConsumptionByCategory(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@Valid @RequestParam(required = false) SpendType spendType) {
-		return consumptionService.getConsumptionByCategory(customUserPrincipal, spendType);
+			@Valid @RequestParam(required = false) SpendType spendType,
+			@Valid @RequestBody YearMonthRequest yearMonthRequest) {
+		return consumptionService.getConsumptionByCategory(customUserPrincipal, spendType,yearMonthRequest);
 	}
 }

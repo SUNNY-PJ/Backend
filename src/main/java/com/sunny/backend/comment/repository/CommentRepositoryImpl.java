@@ -9,9 +9,6 @@ import com.sunny.backend.comment.domain.Comment;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.*;
-
-
-
 public class CommentRepositoryImpl extends QuerydslRepositorySupport implements CommentCustomRepository{
     private JPAQueryFactory queryFactory;
 
@@ -39,10 +36,8 @@ public class CommentRepositoryImpl extends QuerydslRepositorySupport implements 
                 .orderBy(comment.parent.id.asc().nullsFirst(),
                         comment.createdDate.asc())
                 .fetch();
-
         List<CommentResponse> commentResponseDTOList = new ArrayList<>();
         Map<Long, CommentResponse> commentDTOHashMap = new HashMap<>();
-
         comments.forEach(c -> {
             CommentResponse commentResponseDTO = convertCommentToDto(c);
             commentDTOHashMap.put(commentResponseDTO.getId(), commentResponseDTO);

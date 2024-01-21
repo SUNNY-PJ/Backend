@@ -1,22 +1,16 @@
 package com.sunny.backend.consumption.domain;
 
 import static com.sunny.backend.common.CommonErrorCode.*;
-
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
-
 import com.sunny.backend.user.domain.Users;
-
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.PositiveOrZero;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
-
 import java.time.LocalDate;
 
 @Entity
@@ -55,7 +49,6 @@ public class Consumption {
         this.name = consumptionRequest.getName();
         this.money = consumptionRequest.getMoney();
         this.dateField = consumptionRequest.getDateField();
-
     }
 
     public static void validateConsumptionByUser(Long userId, Long consumptionUserId) {

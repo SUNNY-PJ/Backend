@@ -44,7 +44,6 @@ public class CommunityController {
 			@RequestParam int pageSize,
 			@RequestParam(required = false) BoardType boardType,
 			@RequestParam(required = false) String search) {
-
 		return communityService.paginationNoOffsetBuilder(communityId, sortType, boardType, search,
 				pageSize);
 	}
