@@ -38,4 +38,13 @@ public class NotificationController {
         return notificationService.sendNotificationToFriends(customUserPrincipal,
             notificationPushReques);
     }
+
+    @ApiOperation(tags = "9. Alarm", value = "알림 전송 테스트")
+    @PostMapping("/save")
+    public void saveRedis(
+        @AuthUser CustomUserPrincipal customUserPrincipal,
+        @Valid @RequestBody NotificationPushReques notificationPushReques) throws IOException {
+        notificationService.saveRedis(notificationPushReques);
+    }
+
 }

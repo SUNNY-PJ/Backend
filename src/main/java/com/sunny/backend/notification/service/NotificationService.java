@@ -5,11 +5,16 @@ import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.notification.dto.request.NotificationRequest;
 import com.sunny.backend.notification.dto.request.NotificationPushReques;
+import com.sunny.backend.notification.dto.response.AlarmResponse;
 import com.sunny.backend.notification.dto.response.NotificationResponse;
 import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.repository.UserRepository;
+import com.sunny.backend.util.RedisUtil;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
@@ -19,10 +24,14 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import static com.sunny.backend.common.CommonErrorCode.NOTIFICATIONS_NOT_SENT;
 
+import javax.validation.Valid;
+
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
+    private final RedisUtil redisUtil;
     private final ResponseService responseService;
+    private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
 
     private String expoPushNotificationUrl = "https://exp.host/--/api/v2/push/send";
@@ -113,4 +122,17 @@ public class NotificationService {
             throw new CommonCustomException(NOTIFICATIONS_NOT_SENT);
         }
     }
+
+    public void saveRedis(@Valid NotificationPushReques notificationPushReques) {
+        Users users = userRepository.getById(notificationPushReques.getFriendsId());
+        AlarmResponse alarmResponse = AlarmResponse.builder()
+            .title(notificationPushReques.getTitle())
+            .name(users.getName())
+            .content(notificationPushReques.getBody())
+            .date(LocalDateTime.now())
+            .build();
+        redisUtil.setHashData(String.valueOf(notificationPushReques.getFriendsId()), alarmResponse);
+        redisUtil.getHashData(String.valueOf(notificationPushReques.getFriendsId()));
+    }
+
 }
