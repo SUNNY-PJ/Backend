@@ -2,6 +2,8 @@ package com.sunny.backend.notification.dto.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.sunny.backend.notification.domain.NotificationType;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
