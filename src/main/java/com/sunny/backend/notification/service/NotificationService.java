@@ -3,6 +3,7 @@ package com.sunny.backend.notification.service;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.response.ResponseService;
+import com.sunny.backend.notification.domain.NotificationType;
 import com.sunny.backend.notification.dto.request.NotificationRequest;
 import com.sunny.backend.notification.dto.request.NotificationPushReques;
 import com.sunny.backend.notification.dto.response.AlarmResponse;
@@ -130,6 +131,7 @@ public class NotificationService {
             .name(users.getName())
             .content(notificationPushReques.getBody())
             .date(LocalDateTime.now())
+            .type(NotificationType.COMMENT)
             .build();
         redisUtil.setHashData(String.valueOf(notificationPushReques.getFriendsId()), alarmResponse);
         redisUtil.getHashData(String.valueOf(notificationPushReques.getFriendsId()));

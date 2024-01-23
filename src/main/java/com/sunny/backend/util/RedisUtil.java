@@ -3,6 +3,7 @@ package com.sunny.backend.util;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -25,7 +26,7 @@ import com.sunny.backend.notification.dto.response.AlarmResponse;
 @RequiredArgsConstructor
 public class RedisUtil {
     private final RedisTemplate<String, String> redisTemplate;
-    private final RedisTemplate<String, Object> objectRedisTemplate;
+    private final RedisTemplate<String, AlarmResponse> listRedisTemplate;
     public String getData(String key) {
         return redisTemplate.opsForValue().get(key);
     }
@@ -46,12 +47,13 @@ public class RedisUtil {
     }
 
     public void getHashData(String key) {
-        RedisOperations<String, Object> list = objectRedisTemplate.opsForList().getOperations();
-        System.out.println(list.opsForList().range(key, 0, list.opsForList().size(key)));
+        ListOperations<String, AlarmResponse> listOperations = listRedisTemplate.opsForList();
+        long size = listOperations.size(key) == null ? 0 : listOperations.size(key);
+        System.out.println(listOperations.range(key, 0, size));
     }
 
     public void setHashData(String key, AlarmResponse alarmResponse) {
-        RedisOperations<String, Object> list = objectRedisTemplate.opsForList().getOperations();
-        list.opsForList().rightPush(key, alarmResponse);
+        ListOperations<String, AlarmResponse> listOperations = listRedisTemplate.opsForList();
+        listOperations.rightPush(key, alarmResponse);
     }
 }
