@@ -3,7 +3,6 @@ package com.sunny.backend.consumption.service;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
-import com.sunny.backend.consumption.dto.request.YearMonthRequest;
 import com.sunny.backend.consumption.dto.response.ConsumptionResponse;
 import com.sunny.backend.consumption.dto.response.SpendTypeStatisticsResponse;
 import com.sunny.backend.consumption.domain.Consumption;
@@ -106,9 +105,11 @@ public class ConsumptionService {
 
     @Transactional
     public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumptionResponse>>
-    getConsumptionByCategory(CustomUserPrincipal customUserPrincipal, SpendType spendType,Integer year,Integer month) {
+    getConsumptionByCategory(CustomUserPrincipal customUserPrincipal, SpendType spendType,
+        Integer year,Integer month) {
         List<ConsumptionResponse.DetailConsumptionResponse> detailConsumptions =
-            consumptionRepository.getConsumptionByCategory(customUserPrincipal.getUsers().getId(),spendType,year,month);
+            consumptionRepository.getConsumptionByCategory(customUserPrincipal.getUsers().getId(),
+                spendType,year,month);
         return responseService.getListResponse(HttpStatus.OK.value(),
             detailConsumptions, spendType + "에 맞는 지출 내역을 불러왔습니다.");
     }
