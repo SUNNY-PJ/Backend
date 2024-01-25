@@ -3,7 +3,6 @@ package com.sunny.backend.consumption.service;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
-import com.sunny.backend.consumption.dto.request.YearMonthRequest;
 import com.sunny.backend.consumption.dto.response.ConsumptionResponse;
 import com.sunny.backend.consumption.dto.response.SpendTypeStatisticsResponse;
 import com.sunny.backend.consumption.domain.Consumption;

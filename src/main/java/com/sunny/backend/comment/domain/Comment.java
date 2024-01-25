@@ -60,7 +60,7 @@ public class Comment extends BaseTime {
     public void changeIsDeleted(Boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
-    public void setContent(String content) {
+    public void updateContent(String content) {
         this.content=content;
     }
     public static void validateCommentByUser(Long userId, Long commentId) {
