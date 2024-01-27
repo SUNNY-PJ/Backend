@@ -94,7 +94,6 @@ public class ConsumptionService {
     @Transactional
     public ResponseEntity<CommonResponse.GeneralResponse> deleteConsumption(
         CustomUserPrincipal customUserPrincipal, Long consumptionId) {
-
         Users user = customUserPrincipal.getUsers();
         Consumption consumption = consumptionRepository.getById(consumptionId);
         Consumption.validateConsumptionByUser(user.getId(), consumption.getUsers().getId());
@@ -105,9 +104,11 @@ public class ConsumptionService {
 
     @Transactional
     public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumptionResponse>>
-    getConsumptionByCategory(CustomUserPrincipal customUserPrincipal, SpendType spendType,Integer year,Integer month) {
+    getConsumptionByCategory(CustomUserPrincipal customUserPrincipal, SpendType spendType,
+        Integer year,Integer month) {
         List<ConsumptionResponse.DetailConsumptionResponse> detailConsumptions =
-            consumptionRepository.getConsumptionByCategory(customUserPrincipal.getUsers().getId(),spendType,year,month);
+            consumptionRepository.getConsumptionByCategory(customUserPrincipal.getUsers().getId(),
+                spendType,year,month);
         return responseService.getListResponse(HttpStatus.OK.value(),
             detailConsumptions, spendType + "에 맞는 지출 내역을 불러왔습니다.");
     }
