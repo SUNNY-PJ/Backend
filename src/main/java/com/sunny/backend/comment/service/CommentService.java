@@ -50,14 +50,14 @@ public class CommentService {
 		if (isPrivate && !(currentUser.getId() == comment.getUsers().getId() ||
 				currentUser.getId() == comment.getCommunity().getUsers().getId())) {
 			commentResponse = new CommentResponse(comment.getId(), currentUser.getName(),
-					"비밀 댓글입니다.", comment.getCreatedDate(), comment.getUpdatedDate());
+					"비밀 댓글입니다.", comment.getCreatedDate());
+
 		} else {
 			commentResponse = new CommentResponse(
 					comment.getId(),
 					currentUser.getName(),
 					comment.getContent(),
-					comment.getCreatedDate(),
-					comment.getUpdatedDate()
+					comment.getCreatedDate()
 			);
 		}
 		commentResponse.setChildren(comment.getChildren()
@@ -115,7 +115,7 @@ public class CommentService {
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),
-						comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 등록했습니다.");
+						comment.getCreatedDate()), "댓글을 등록했습니다.");
 	}
 
 	private void replySendNotifications(CustomUserPrincipal customUserPrincipal,Users users,
@@ -129,9 +129,6 @@ public class CommentService {
 				.community(community)
 				.comment(comment)
 				.parent_id(comment.getParent())
-				.title(title)
-				.body(body)
-				.opponent(customUserPrincipal.getUsers())
 				.build();
 		commentNotificationRepository.save(commentNotification);
 		if(notificationList.size()!=0) {
@@ -157,8 +154,6 @@ public class CommentService {
 				.comment(comment)
 				.parent_id(comment.getParent())
 				.title(title)
-				.body(body)
-				.opponent(customUserPrincipal.getUsers())
 				.build();
 		commentNotificationRepository.save(commentNotification);
 		if(notificationList.size()!=0) {
@@ -173,17 +168,20 @@ public class CommentService {
 		}
 	}
 	@Transactional
-	public ResponseEntity<CommonResponse.GeneralResponse> deleteComment(
+	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> deleteComment(
 			CustomUserPrincipal customUserPrincipal, Long commentId) {
 		Comment comment = commentRepository.findCommentByIdWithParent(commentId)
 				.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
 		validateCommentByUser(customUserPrincipal.getUsers().getId(),comment.getUsers().getId());
 			if (comment.getChildren().size() != 0) {
 				comment.changeIsDeleted(true);
+				CommentResponse commentResponse=CommentResponse.convertCommentToDto(comment);
+				return responseService.getSingleResponse(HttpStatus.OK.value(), commentResponse,"댓글을 삭제 하였습니다.");
 			} else {
 				commentRepository.delete(getDeletableAncestorComment(comment));
+				return responseService.getSingleResponse(HttpStatus.OK.value(), null,"댓글을 삭제 하였습니다.");
 		}
-		return responseService.getGeneralResponse(HttpStatus.OK.value(), "댓글을 삭제 하였습니다.");
+
 	}
 
 	private Comment getDeletableAncestorComment(Comment comment) {
@@ -205,7 +203,7 @@ public class CommentService {
 		comment.setIsPrivated(isPrivate);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),
-						comment.getCreatedDate(), comment.getUpdatedDate()), "댓글을 수정했습니다.");
+						comment.getCreatedDate()), "댓글을 수정했습니다.");
 	}
 
 

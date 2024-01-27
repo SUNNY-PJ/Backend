@@ -45,9 +45,9 @@ public class CommentNotification {
 
   @Column
   private String title;
-  @Column
-  private String body;
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name= "opponent_id")
-  private Users opponent;
+//  @Column
+//  private String body;
+//  @ManyToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name= "opponent_id")
+//  private Users opponent;
 }

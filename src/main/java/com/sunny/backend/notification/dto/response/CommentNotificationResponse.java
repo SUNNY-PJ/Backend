@@ -21,9 +21,9 @@ public record CommentNotificationResponse (
         .map(commentNotification -> new CommentNotificationResponse(
             commentNotification.getId(),
             commentNotification.getCommunity().getId(),
-            commentNotification.getOpponent().getName(),
+            commentNotification.getComment().getUsers().getName(),
             title,
-            commentNotification.getBody(),
+            commentNotification.getComment().getContent(),
             commentNotification.getComment().getCreatedDate()
         ))
        .toList();
