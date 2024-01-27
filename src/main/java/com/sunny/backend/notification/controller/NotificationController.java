@@ -2,8 +2,10 @@ package com.sunny.backend.notification.controller;
 
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.config.AuthUser;
+import com.sunny.backend.common.response.CommonResponse.ListResponse;
 import com.sunny.backend.notification.dto.request.NotificationRequest;
-import com.sunny.backend.notification.dto.request.NotificationPushReques;
+import com.sunny.backend.notification.dto.request.NotificationPushRequest;
+import com.sunny.backend.notification.dto.response.CommentNotificationResponse;
 import com.sunny.backend.notification.dto.response.NotificationResponse;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.notification.service.NotificationService;
@@ -34,8 +36,15 @@ public class NotificationController {
     @PostMapping("")
     public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(
             @AuthUser CustomUserPrincipal customUserPrincipal,
-            @Valid @RequestBody NotificationPushReques notificationPushReques) throws IOException {
+            @Valid @RequestBody NotificationPushRequest notificationPushRequest) throws IOException {
         return notificationService.sendNotificationToFriends(customUserPrincipal,
-            notificationPushReques);
+            notificationPushRequest);
     }
+    @ApiOperation(tags = "9. Alarm", value = "알림 리스트 확인")
+    @GetMapping("/list")
+    public ResponseEntity<ListResponse<CommentNotificationResponse>> getAlarmList(
+        @AuthUser CustomUserPrincipal customUserPrincipal){
+        return notificationService.getAlarmList(customUserPrincipal);
+    }
+
 }
