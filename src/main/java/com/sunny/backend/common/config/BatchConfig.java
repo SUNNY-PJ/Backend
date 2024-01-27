@@ -28,10 +28,10 @@ public class BatchConfig extends QuartzJobBean {
     log.info("save delete");
     LocalDate today=LocalDate.now();
           List<Save> save=saveRepository.findByEndDate(today);
-          if(save.size()>0 && save!=null){
+          if(save.size()>0){
             for(Save saveGoal : save) {
               saveRepository.deleteById(saveGoal.getId());
             }
           }
-  }
+      }
 }
