@@ -55,7 +55,7 @@ public class CommentService {
 		} else {
 			commentResponse = new CommentResponse(
 					comment.getId(),
-					currentUser.getName(),
+					comment.getUsers().getName(),
 					comment.getContent(),
 					comment.getCreatedDate()
 			);
