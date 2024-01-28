@@ -1,8 +1,9 @@
 package com.sunny.backend.notification.domain;
 
-import com.sunny.backend.comment.domain.Comment;
-import com.sunny.backend.community.domain.Community;
+import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.user.domain.Users;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,34 +17,31 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
-@Getter
 @Entity
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentNotification {
+
+public class FriendsNotification {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY) //상대방꺼
   @JoinColumn(name= "users_id")
   private Users users;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name= "community_id")
-  private Community community;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name= "parent_id")
-  private Comment parent_id;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name= "comment_id")
-  private Comment comment;
+  @JoinColumn(name = "user_friend_id")
+  private Users friend; //친구 id
 
   @Column
-  private String title;
+  private String title; //제목
 
+  @Column
+  private String body; //내용
+
+  @Column
+  private LocalDateTime createdAt;
 }

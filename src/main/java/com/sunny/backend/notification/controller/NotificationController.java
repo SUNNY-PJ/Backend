@@ -4,9 +4,7 @@ import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse.ListResponse;
 import com.sunny.backend.notification.dto.request.NotificationRequest;
-import com.sunny.backend.notification.dto.request.NotificationPushRequest;
-import com.sunny.backend.notification.dto.response.CommentNotificationResponse;
-import com.sunny.backend.notification.dto.response.NotificationResponse;
+import com.sunny.backend.notification.dto.response.AlarmListResponse;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.notification.service.NotificationService;
 import io.swagger.annotations.ApiOperation;
@@ -32,17 +30,17 @@ public class NotificationController {
         return notificationService.allowNotification(customUserPrincipal, notificationRequest);
     }
 
-    @ApiOperation(tags = "9. Alarm", value = "알림 전송")
-    @PostMapping("")
-    public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(
-            @AuthUser CustomUserPrincipal customUserPrincipal,
-            @Valid @RequestBody NotificationPushRequest notificationPushRequest) throws IOException {
-        return notificationService.sendNotificationToFriends(customUserPrincipal,
-            notificationPushRequest);
-    }
+//    @ApiOperation(tags = "9. Alarm", value = "알림 전송")
+//    @PostMapping("")
+//    public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(
+//            @AuthUser CustomUserPrincipal customUserPrincipal,
+//            @Valid @RequestBody NotificationPushRequest notificationPushRequest) throws IOException {
+//        return notificationService.sendNotificationToFriends(customUserPrincipal,
+//            notificationPushRequest);
+//    }
     @ApiOperation(tags = "9. Alarm", value = "알림 리스트 확인")
     @GetMapping("/list")
-    public ResponseEntity<ListResponse<CommentNotificationResponse>> getAlarmList(
+    public ResponseEntity<ListResponse<AlarmListResponse>> getAlarmList(
         @AuthUser CustomUserPrincipal customUserPrincipal){
         return notificationService.getAlarmList(customUserPrincipal);
     }
