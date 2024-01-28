@@ -9,6 +9,7 @@ import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.friends.service.FriendService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -44,7 +45,7 @@ public class FriendController {
     @PostMapping("/{userFriendId}")
     public ResponseEntity<CommonResponse.GeneralResponse> addFriend(
         @AuthUser CustomUserPrincipal customUserPrincipal,
-        @PathVariable(name = "userFriendId") Long userFriendId) {
+        @PathVariable(name = "userFriendId") Long userFriendId) throws IOException {
         friendService.addFriend(customUserPrincipal, userFriendId);
         return responseService.getGeneralResponse(HttpStatus.OK.value(), "친구 신청 성공");
     }
@@ -53,7 +54,7 @@ public class FriendController {
     @PostMapping("/approve/{friendId}")
     public ResponseEntity<CommonResponse.GeneralResponse> approveFriend(
         @AuthUser CustomUserPrincipal customUserPrincipal,
-        @PathVariable(name = "friendId") Long friendId) {
+        @PathVariable(name = "friendId") Long friendId) throws IOException {
         friendService.approveFriend(customUserPrincipal, friendId);
         return responseService.getGeneralResponse(HttpStatus.OK.value(), "승인 되었습니다.");
     }
