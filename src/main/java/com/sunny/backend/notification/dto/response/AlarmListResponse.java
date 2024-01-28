@@ -11,8 +11,8 @@ import java.util.List;
 
 
 public record AlarmListResponse(
+
     Long id,
-    Long communityId,
     String postAuthor,
     String title,
     String notificationContent,
@@ -26,7 +26,6 @@ public record AlarmListResponse(
 
     return commentNotifications.stream()
         .map(commentNotification -> new AlarmListResponse(
-            commentNotification.getId(),
             commentNotification.getCommunity().getId(),
             commentNotification.getComment().getUsers().getName(),
             commentNotification.getTitle(),
@@ -54,7 +53,6 @@ public record AlarmListResponse(
 
       return friendsNotifications.stream()
           .map(friendsNotification -> new AlarmListResponse(
-              friendsNotification.getId(), //그냥 id
               friendsNotification.getFriend().getId(), //상대방꺼 id
               friendsNotification.getUsers().getName(), //
               friendsNotification.getTitle(),
@@ -67,7 +65,6 @@ public record AlarmListResponse(
   }
 
   public record CompetitionNotificationResponse(
-      Long id,
       Long competitionId,
       String postAuthor,
       String title,
@@ -81,7 +78,6 @@ public record AlarmListResponse(
         List<CompetitionNotification> competitionNotifications) {
       return competitionNotifications.stream()
           .map(competitionNotification -> new AlarmListResponse(
-              competitionNotification.getId(),
               competitionNotification.getCompetition().getId(), // Assuming competitionId is the correct field
               competitionNotification.getName(),
               competitionNotification.getTitle(),
