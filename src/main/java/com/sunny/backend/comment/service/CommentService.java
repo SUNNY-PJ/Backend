@@ -124,6 +124,7 @@ public class CommentService {
 		List<Notification> notificationList=notificationRepository.findByUsers_Id(users.getId());
 		String body = comment.getContent();
 		String title="[SUNNY] "+customUserPrincipal.getName();
+		String bodyTitle="새로운 답글이 달렸어요";
 		CommentNotification commentNotification=CommentNotification.builder()
 				.users(users)
 				.community(community)
@@ -133,14 +134,12 @@ public class CommentService {
 		commentNotificationRepository.save(commentNotification);
 		if(notificationList.size()!=0) {
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
-					postAuthor != null ? postAuthor : null,
-					title,
+					postAuthor,
+					bodyTitle,
 					body
 			);
-			if (notificationPushRequest != null) {
-				notificationService.sendNotificationToFriends(customUserPrincipal,notificationPushRequest);
+				notificationService.sendNotificationToFriends(title,notificationPushRequest);
 			}
-		}
 	}
 	private void sendNotifications(CustomUserPrincipal customUserPrincipal,
 			Comment comment, Community community) throws IOException {
@@ -148,23 +147,22 @@ public class CommentService {
 		List<Notification> notificationList=notificationRepository.findByUsers_Id(postAuthor);
 		String body = comment.getContent();
 		String title="[SUNNY] "+customUserPrincipal.getName();
+		String bodyTitle="새로운 댓글이 달렸어요.";
 		CommentNotification commentNotification=CommentNotification.builder()
 				.users(community.getUsers())
 				.community(community)
 				.comment(comment)
 				.parent_id(comment.getParent())
-				.title(title)
+				.title("새로운 댓글이 달렸어요.")
 				.build();
 		commentNotificationRepository.save(commentNotification);
 		if(notificationList.size()!=0) {
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
-					postAuthor != null ? postAuthor : null,
-					title,
+					postAuthor,
+					bodyTitle,
 					body
 			);
-			if (notificationPushRequest != null) {
-				notificationService.sendNotificationToFriends(customUserPrincipal,notificationPushRequest);
-			}
+				notificationService.sendNotificationToFriends(title,notificationPushRequest);
 		}
 	}
 	@Transactional

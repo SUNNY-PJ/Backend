@@ -3,6 +3,7 @@ package com.sunny.backend.friends.service;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -91,7 +92,7 @@ class FriendServiceTest {
 	@Nested
 	class 친구_신청_테스트 {
 		@Test
-		void 친구_신청_성공() {
+		void 친구_신청_성공() throws IOException {
 			// given
 
 			// when
