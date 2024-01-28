@@ -17,11 +17,12 @@ public class CommentResponse {
 	private Long id;
 	private String content;
 	private String writer;
+	private boolean isAuthor;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
 	private LocalDateTime createdDate;
 	private List<CommentResponse> children = new ArrayList<>();
 
-	public CommentResponse(Long id, String writer, String content, LocalDateTime createdDate) {
+	public CommentResponse(Long id, String writer, String content,boolean isAuthor, LocalDateTime createdDate) {
 		this.id = id;
 		this.writer = writer;
 		this.content = content;
@@ -29,7 +30,7 @@ public class CommentResponse {
 	}
 
 	//삭제된 댓글로 댓글 내용 수정하기 위한 객체 생성
-	public static CommentResponse convertCommentToDto(Comment comment) {
+	public static CommentResponse convertCommentToDto(Comment comment,boolean isAuthor) {
 		if (comment.getIsDeleted()) {
 			comment.setUsers(null);
 			comment.setContent("삭제된 댓글입니다.");
@@ -41,6 +42,7 @@ public class CommentResponse {
 				comment.getId(),
 				comment.getUsers() != null ? comment.getUsers().getName() : null,
 				comment.getContent(),
+				isAuthor,
 				comment.getCreatedDate()
 		);
 	}
