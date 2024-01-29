@@ -25,7 +25,7 @@ import com.sunny.backend.notification.dto.response.AlarmResponse;
 @RequiredArgsConstructor
 public class RedisUtil {
     private final RedisTemplate<String, String> redisTemplate;
-    private final RedisTemplate<String, Object> objectRedisTemplate;
+
     public String getData(String key) {
         return redisTemplate.opsForValue().get(key);
     }
@@ -45,13 +45,4 @@ public class RedisUtil {
         redisTemplate.delete(key);
     }
 
-    public void getHashData(String key) {
-        RedisOperations<String, Object> list = objectRedisTemplate.opsForList().getOperations();
-        System.out.println(list.opsForList().range(key, 0, list.opsForList().size(key)));
-    }
-
-    public void setHashData(String key, AlarmResponse alarmResponse) {
-        RedisOperations<String, Object> list = objectRedisTemplate.opsForList().getOperations();
-        list.opsForList().rightPush(key, alarmResponse);
-    }
 }

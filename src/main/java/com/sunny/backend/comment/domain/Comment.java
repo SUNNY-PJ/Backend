@@ -6,6 +6,7 @@ import static com.sunny.backend.common.CommonErrorCode.NO_USER_PERMISSION;
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.common.BaseTime;
+import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
 import com.sunny.backend.user.domain.Users;
 import javax.validation.constraints.NotBlank;
 import lombok.*;
@@ -60,7 +61,8 @@ public class Comment extends BaseTime {
     public void changeIsDeleted(Boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
-    public void setContent(String content) {
+
+    public void updateContent(String content) {
         this.content=content;
     }
     public static void validateCommentByUser(Long userId, Long commentId) {
