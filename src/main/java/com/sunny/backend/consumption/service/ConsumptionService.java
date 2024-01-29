@@ -3,7 +3,6 @@ package com.sunny.backend.consumption.service;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
-import com.sunny.backend.consumption.dto.request.YearMonthRequest;
 import com.sunny.backend.consumption.dto.response.ConsumptionResponse;
 import com.sunny.backend.consumption.dto.response.SpendTypeStatisticsResponse;
 import com.sunny.backend.consumption.domain.Consumption;
@@ -72,10 +71,10 @@ public class ConsumptionService {
 
     @Transactional
     public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>> getSpendTypeStatistics(
-        CustomUserPrincipal customUserPrincipal, YearMonthRequest yearMonthRequest) {
+        CustomUserPrincipal customUserPrincipal, Integer year,Integer month) {
         Users user = customUserPrincipal.getUsers();
         List<SpendTypeStatisticsResponse> statistics = consumptionRepository.getSpendTypeStatistics(
-            user.getId(),yearMonthRequest);
+            user.getId(),year,month);
         return responseService.getListResponse(HttpStatus.OK.value(),
             statistics, "지출 통계 내역을 불러왔습니다.");
     }
@@ -95,7 +94,6 @@ public class ConsumptionService {
     @Transactional
     public ResponseEntity<CommonResponse.GeneralResponse> deleteConsumption(
         CustomUserPrincipal customUserPrincipal, Long consumptionId) {
-
         Users user = customUserPrincipal.getUsers();
         Consumption consumption = consumptionRepository.getById(consumptionId);
         Consumption.validateConsumptionByUser(user.getId(), consumption.getUsers().getId());
@@ -106,9 +104,11 @@ public class ConsumptionService {
 
     @Transactional
     public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumptionResponse>>
-    getConsumptionByCategory(CustomUserPrincipal customUserPrincipal, SpendType spendType,YearMonthRequest yearMonthRequest) {
+    getConsumptionByCategory(CustomUserPrincipal customUserPrincipal, SpendType spendType,
+        Integer year,Integer month) {
         List<ConsumptionResponse.DetailConsumptionResponse> detailConsumptions =
-            consumptionRepository.getConsumptionByCategory(customUserPrincipal.getUsers().getId(),spendType,yearMonthRequest);
+            consumptionRepository.getConsumptionByCategory(customUserPrincipal.getUsers().getId(),
+                spendType,year,month);
         return responseService.getListResponse(HttpStatus.OK.value(),
             detailConsumptions, spendType + "에 맞는 지출 내역을 불러왔습니다.");
     }

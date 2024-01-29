@@ -50,6 +50,7 @@ public record CommunityResponse(
     }
     public record PageResponse(
         Long id,
+        Long userId,
         String title,
         String writer,
         int viewCount,
@@ -61,6 +62,7 @@ public record CommunityResponse(
             boolean isModified = community.hasNotBeenModified(community.getCreatedAt(), community.getModifiedAt());
             return new PageResponse(
                 community.getId(),
+                community.getUsers().getId(),
                 community.getTitle(),
                 community.getUsers().getName(),
                 community.getViewCnt(),
