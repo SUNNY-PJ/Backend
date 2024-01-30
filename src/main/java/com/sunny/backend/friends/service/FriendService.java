@@ -94,8 +94,6 @@ public class FriendService {
 	public void approveFriend(CustomUserPrincipal customUserPrincipal, Long friendId)
 			throws IOException {
 		Friend friend = friendRepository.getById(friendId);
-		System.out.println("friends_id");
-		System.out.println(friend);
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
 		friend.validateFriendsByUser(friend.getUsers().getId(), tokenUserId);
 
@@ -128,7 +126,6 @@ public class FriendService {
 		} else {
 			Friend friend = optionalFriend.get();
 			friend.validateStatus();
-			System.out.println("호출");
 			sendNotifications(user,friend);
 		}
 	}
