@@ -1,7 +1,5 @@
 package com.sunny.backend.common.exception;
 
-import com.sunny.backend.common.exception.ErrorCode;
-
 import lombok.Getter;
 
 @Getter
