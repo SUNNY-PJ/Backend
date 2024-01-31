@@ -41,7 +41,6 @@ public class NotificationService {
     private String expoPushNotificationUrl = "https://exp.host/--/api/v2/push/send";
     public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(CustomUserPrincipal customUserPrincipal, NotificationRequest notificationRequest) {
         Users user = customUserPrincipal.getUsers();
-        System.out.println(notificationRequest.getTargetToken());
         Notification notification = Notification.builder()
                 .DeviceToken(notificationRequest.getTargetToken())
                 .users(user)
@@ -51,8 +50,6 @@ public class NotificationService {
         }
 
     public ResponseEntity<ListResponse<AlarmListResponse>> getAlarmList(CustomUserPrincipal customUserPrincipal) {
-        Users user = customUserPrincipal.getUsers();
-
         List<CommentNotification> commentNotifications = commentNotificationRepository.findByUsers_Id(customUserPrincipal.getUsers().getId());
         List<FriendsNotification> friendsNotifications = friendsNotificationRepository.findByFriend_Id(customUserPrincipal.getUsers().getId());
         List<CompetitionNotification> competitionNotifications = competitionNotificationRepository.findByUsers_Id(customUserPrincipal.getUsers().getId());
@@ -71,7 +68,7 @@ public class NotificationService {
     }
 
     public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(
-       String title, NotificationPushRequest notificationPushRequest) throws IOException {
+       String title, NotificationPushRequest notificationPushRequest) {
         List<Notification> notifications = notificationRepository.findByUsers_Id(
             notificationPushRequest.getPostAuthor());
         if (notifications != null && !notifications.isEmpty()) {
@@ -93,8 +90,12 @@ public class NotificationService {
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Accept", "application/json")
                     .build();
-                Response response = client.newCall(request).execute();
-                String responseBody = response.body().string();
+                try {
+                    Response response = client.newCall(request).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
             }
 
             NotificationResponse notificationResponse = new NotificationResponse(
