@@ -1,5 +1,7 @@
 package com.sunny.backend.friends.service;
 
+import com.sunny.backend.common.exception.CustomException;
+import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.notification.domain.FriendsNotification;
 import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.notification.dto.request.NotificationPushRequest;
@@ -42,9 +44,16 @@ public class FriendService {
 		return FriendStatusResponse.of(friendResponses, friendResponses);
 	}
 
+	public void isMyselfFriendApplication(Long id, Long userFriendId) {
+		if(id.equals(userFriendId)) {
+			throw new CustomException(FriendErrorCode.FRIEND_NOT_MYSELF);
+		}
+	}
+
 	public void addFriend(CustomUserPrincipal customUserPrincipal, Long userFriendId) {
 		Users user = customUserPrincipal.getUsers();
 		Users userFriend = userRepository.getById(userFriendId);
+		isMyselfFriendApplication(user.getId(), userFriendId);
 		Friend friend = getByUserAndUserFriend(user, userFriend, Status.WAIT);
 
 		String title = "[SUNNY] " + user.getName();
