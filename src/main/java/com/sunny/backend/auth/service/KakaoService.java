@@ -58,7 +58,6 @@ public class KakaoService {
                 new HttpEntity<>(params, headers),
                 OAuthToken.class
         );
-
         return Objects.requireNonNull(response.getBody()).getAccessToken();
     }
 

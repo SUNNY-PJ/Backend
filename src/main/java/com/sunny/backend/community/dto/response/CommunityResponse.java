@@ -1,11 +1,13 @@
 package com.sunny.backend.community.dto.response;
 
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.user.domain.QUsers;
+import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.util.DatetimeUtil;
 import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.common.photo.Photo;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,11 +57,14 @@ public record CommunityResponse(
         String writer,
         int viewCount,
         int commentCount,
+        BoardType type,
         String createdAt,
-        boolean isModified
+        boolean isModified,
+        boolean isAuthor
     ) {
-        public static PageResponse from(Community community) {
+        public static PageResponse from(Users users,Community community) {
             boolean isModified = community.hasNotBeenModified(community.getCreatedAt(), community.getModifiedAt());
+            boolean isAuthor = community.getUsers().getId().equals(users.getId());
             return new PageResponse(
                 community.getId(),
                 community.getUsers().getId(),
@@ -67,8 +72,10 @@ public record CommunityResponse(
                 community.getUsers().getName(),
                 community.getViewCnt(),
                 community.getCommentList().size(),
+                community.getBoardType(),
                 DatetimeUtil.timesAgo(community.getCreatedAt()),
-                isModified
+                isModified,
+                isAuthor
             );
         }
     }

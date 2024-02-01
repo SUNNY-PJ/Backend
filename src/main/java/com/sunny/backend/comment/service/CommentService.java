@@ -109,6 +109,7 @@ public class CommentService {
 		commentRepository.save(comment);
 		boolean isAuthor=Objects.equals(customUserPrincipal.getUsers().getId(),
 				comment.getCommunity().getUsers().getId());
+		System.out.println(isAuthor);
 		user.addComment(comment);
 		if(community.getUsers().getId()!=customUserPrincipal.getUsers().getId()){
 			if(commentRequestDTO.getParentId() == null) {
@@ -207,6 +208,7 @@ public class CommentService {
 		boolean isPrivate = commentRequestDTO.getIsPrivated();
 		boolean isAuthor=Objects.equals(customUserPrincipal.getUsers().getId(),
 				comment.getCommunity().getUsers().getId());
+		System.out.println(isAuthor);
 		comment.setIsPrivated(isPrivate);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),isAuthor,
