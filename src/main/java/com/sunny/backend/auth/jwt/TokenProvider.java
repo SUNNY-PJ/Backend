@@ -49,7 +49,7 @@ public class TokenProvider {
 			.signWith(SignatureAlgorithm.HS512, tokenSecret)
 			.compact();
 
-		redisUtil.setValuesWithTimeout(email, refreshToken, getClaims(refreshToken).getExpiration().getTime());
+		redisUtil.setValuesWithTimeout(refreshToken, email, getClaims(refreshToken).getExpiration().getTime());
 
 		return new TokenResponse(accessToken, refreshToken);
 	}

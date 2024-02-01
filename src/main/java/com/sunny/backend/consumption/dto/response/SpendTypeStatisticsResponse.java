@@ -13,5 +13,4 @@ public class SpendTypeStatisticsResponse {
     private long totalCount;
     private long totalMoney;
     private double percentage;
-
 }

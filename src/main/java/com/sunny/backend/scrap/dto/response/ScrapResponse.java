@@ -20,7 +20,7 @@ public record ScrapResponse(
 			.title(community.getTitle())
 			.writer(community.getUsers().getName())
 			.createDate(community.getCreatedAt())
-			.view(community.getView_cnt())
+			.view(community.getViewCnt())
 			.comment(community.getCommentList().size())
 			.build();
 	}

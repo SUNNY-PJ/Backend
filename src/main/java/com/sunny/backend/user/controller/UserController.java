@@ -15,9 +15,9 @@ import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.user.dto.ProfileResponse;
-import com.sunny.backend.comment.dto.response.CommentResponse;
-import com.sunny.backend.community.dto.response.CommunityResponse;
-import com.sunny.backend.scrap.dto.response.ScrapResponse;
+import com.sunny.backend.user.dto.UserCommentResponse;
+import com.sunny.backend.user.dto.UserCommunityResponse;
+import com.sunny.backend.user.dto.UserScrapResponse;
 import com.sunny.backend.user.service.UserService;
 
 import io.swagger.annotations.ApiOperation;
@@ -43,30 +43,29 @@ public class UserController {
 
 	@ApiOperation(tags = "0. User", value = "작성 글 가져오기")
 	@GetMapping("/community")
-	public ResponseEntity<List<CommunityResponse.PageResponse>> getUserCommunityList(
+	public ResponseEntity<List<UserCommunityResponse>> getUserCommunityList(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@RequestParam(name = "userId", required = false) Long userId) {
-		List<CommunityResponse.PageResponse> pageResponse =
+		List<UserCommunityResponse> userCommunityResponses =
 			userService.getUserCommunityList(customUserPrincipal, userId);
-		return ResponseEntity.ok().body(pageResponse);
+		return ResponseEntity.ok().body(userCommunityResponses);
 	}
 
 	@ApiOperation(tags = "0. User", value = "스크랩 글 가져오기")
 	@GetMapping("/scrap")
-	public ResponseEntity<List<ScrapResponse>> getScrapList(
+	public ResponseEntity<List<UserScrapResponse>> getScrapList(
 		@AuthUser CustomUserPrincipal customUserPrincipal) {
-		List<ScrapResponse> scrapResponses = userService.getScrapList(customUserPrincipal);
-		return ResponseEntity.ok().body(scrapResponses);
+		List<UserScrapResponse> userScrapResponses = userService.getScrapList(customUserPrincipal);
+		return ResponseEntity.ok().body(userScrapResponses);
 	}
 
 	@ApiOperation(tags = "0. User", value = "댓글 가져오기")
 	@GetMapping("/comment")
-	public ResponseEntity<List<CommentResponse.MyComment>> getCommentList(
+	public ResponseEntity<List<UserCommentResponse>> getCommentList(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@RequestParam(name = "userId", required = false) Long userId) {
-		List<CommentResponse.MyComment> mycomments =
-			userService.getCommentByUserId(customUserPrincipal, userId);
-		return ResponseEntity.ok().body(mycomments);
+		List<UserCommentResponse> userCommentResponses = userService.getCommentByUserId(customUserPrincipal, userId);
+		return ResponseEntity.ok().body(userCommentResponses);
 	}
 
 	@ApiOperation(tags = "0. User", value = "프로필 설정")

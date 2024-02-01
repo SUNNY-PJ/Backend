@@ -1,6 +1,7 @@
 package com.sunny.backend.consumption.controller;
 
 
+import com.sunny.backend.consumption.dto.request.YearMonthRequest;
 import com.sunny.backend.consumption.dto.response.ConsumptionResponse.DetailConsumptionResponse;
 import com.sunny.backend.consumption.domain.SpendType;
 import java.time.LocalDate;
@@ -39,14 +40,16 @@ public class ConsumptionController {
 	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> createConsumption(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@Valid @RequestBody ConsumptionRequest consumtionRequest) {
+		System.out.println("Zzzzz");
 		return consumptionService.createConsumption(customUserPrincipal, consumtionRequest);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "지출 통계")
 	@GetMapping("/spendTypeStatistics")
 	public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>>
-	getSpendTypeStatistics(@AuthUser CustomUserPrincipal customUserPrincipal) {
-		return consumptionService.getSpendTypeStatistics(customUserPrincipal);
+	getSpendTypeStatistics(@AuthUser CustomUserPrincipal customUserPrincipal,
+			@RequestParam(name = "year") Integer year, @RequestParam(name = "month") Integer month) {
+		return consumptionService.getSpendTypeStatistics(customUserPrincipal,year,month);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "날짜에 맞는 지출 내역 조회")
@@ -72,6 +75,7 @@ public class ConsumptionController {
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteConsumption(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@PathVariable Long consumptionId) {
+
 		return consumptionService.deleteConsumption(customUserPrincipal, consumptionId);
 	}
 
@@ -79,7 +83,8 @@ public class ConsumptionController {
 	@GetMapping("/category")
 	public ResponseEntity<CommonResponse.ListResponse<DetailConsumptionResponse>> getConsumptionByCategory(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@Valid @RequestParam(required = false) SpendType spendType) {
-		return consumptionService.getConsumptionByCategory(customUserPrincipal, spendType);
+			@Valid @RequestParam SpendType spendType,
+			@RequestParam(name = "year") Integer year, @RequestParam(name = "month") Integer month) {
+		return consumptionService.getConsumptionByCategory(customUserPrincipal, spendType,year,month);
 	}
 }

@@ -1,6 +1,5 @@
 package com.sunny.backend.user.domain;
 
-
 import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.community.domain.Community;
@@ -26,13 +25,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
-@Setter
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Users extends BaseTime {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")
@@ -42,9 +39,10 @@ public class Users extends BaseTime {
 	private String email;
 
 	@Size(min=2,max=10)
-
-	@Column(unique = true,nullable = false)
+	@Column(unique = true, nullable = false)
 	private String name;
+
+	private String oauthId;
 
 	@Column(nullable = false)
 	@Enumerated(value = EnumType.STRING)
@@ -59,8 +57,10 @@ public class Users extends BaseTime {
 	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	@JsonIgnore
 	private List<Comment> commentList;
+
 	@OneToOne(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private Save save;
+
 	@OneToMany(mappedBy = "users")
 	private List<Scrap> scrapList;
 
@@ -97,6 +97,14 @@ public class Users extends BaseTime {
 		} else {
 			this.save = save;
 		}
+	}
+
+	public void updateName(String name) {
+		this.name = name;
+	}
+
+	public void updateProfile(String profile) {
+		this.profile = profile;
 	}
 }
 

@@ -18,29 +18,21 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "7. Scrap", description = "Scrap API")
+@Tag(name = "2.1 Scrap", description = "Scrap API")
 @RestController
 @RequestMapping("/scrap")
 @RequiredArgsConstructor
 public class ScrapController {
 	private final ScrapService scrapService;
 
-	@ApiOperation(tags = "7. Scrap", value = "스크랩 조회")
-	@GetMapping("")
-	public ResponseEntity<CommonResponse.ListResponse<CommunityResponse>> getScrapsByUserId(
-		@AuthUser CustomUserPrincipal customUserPrincipal) {
-		return scrapService.getScrapsByUserId(customUserPrincipal);
-	}
-
-	@ApiOperation(tags = "7. Scrap", value = "스크랩 등록")
+	@ApiOperation(tags = "2.1 Scrap", value = "스크랩 등록")
 	@PostMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.GeneralResponse> addScrapToCommunity(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId) {
 		return scrapService.addScrapToCommunity(customUserPrincipal, communityId);
 	}
 
-	@ApiOperation(tags = "7. Scrap", value = "스크랩 삭제")
-
+	@ApiOperation(tags = "2.1 Scrap", value = "스크랩 삭제")
 	@DeleteMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.GeneralResponse> removeScrapFromCommunity(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId) {
