@@ -119,10 +119,11 @@ public class CommunityService {
 	}
 	@Transactional(readOnly = true)
 	public ResponseEntity<CommonResponse.SingleResponse<List<CommunityResponse.PageResponse>>> paginationNoOffsetBuilder(
-			Long communityId,
+			CustomUserPrincipal customUserPrincipal,Long communityId,
 			SortType sortType, BoardType boardType, String searchText, int pageSize) {
+		Users users=customUserPrincipal.getUsers();
 		List<CommunityResponse.PageResponse> result = communityRepository.paginationNoOffsetBuilder(
-				communityId, sortType, boardType, searchText, pageSize);
+				users,communityId, sortType, boardType, searchText, pageSize);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), result,
 				"게시판을 성공적으로 조회했습니다.");
 	}

@@ -27,6 +27,7 @@ public class CommentResponse {
 		this.writer = writer;
 		this.content = content;
 		this.createdDate = createdDate;
+		this.isAuthor=isAuthor;
 	}
 
 	//삭제된 댓글로 댓글 내용 수정하기 위한 객체 생성
