@@ -110,7 +110,7 @@ public class CommentService {
 		boolean isAuthor=Objects.equals(customUserPrincipal.getUsers().getId(),
 				comment.getCommunity().getUsers().getId());
 		user.addComment(comment);
-		if(community.getUsers().getId()!=customUserPrincipal.getUsers().getId()){
+		if(!community.getUsers().getId().equals(customUserPrincipal.getUsers().getId())){
 			if(commentRequestDTO.getParentId() == null) {
 				sendNotifications(customUserPrincipal, comment, community);
 			}
@@ -186,7 +186,6 @@ public class CommentService {
 				commentRepository.delete(getDeletableAncestorComment(comment));
 				return responseService.getSingleResponse(HttpStatus.OK.value(), null,"댓글을 삭제 하였습니다.");
 		}
-
 	}
 
 	private Comment getDeletableAncestorComment(Comment comment) {
@@ -199,7 +198,6 @@ public class CommentService {
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> updateComment(
 			CustomUserPrincipal customUserPrincipal, Long commentId, CommentRequest commentRequestDTO) {
-
 		Comment comment = commentRepository.findById(commentId)
 				.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
 		validateCommentByUser(customUserPrincipal.getUsers().getId(),comment.getUsers().getId());
@@ -207,11 +205,10 @@ public class CommentService {
 		boolean isPrivate = commentRequestDTO.getIsPrivated();
 		boolean isAuthor=Objects.equals(customUserPrincipal.getUsers().getId(),
 				comment.getCommunity().getUsers().getId());
+		System.out.println("isAuthor={}"+isAuthor);
 		comment.setIsPrivated(isPrivate);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),isAuthor,
 						comment.getCreatedDate()), "댓글을 수정했습니다.");
 	}
-
-
 }
