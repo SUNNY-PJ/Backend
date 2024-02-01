@@ -25,7 +25,8 @@ public class Competition {
     private String message; // 도발 메세지
 
     @Column
-    private String output; // 결과
+    @Enumerated(value = EnumType.STRING)
+    private CompetitionStatus output; // 결과
 
     @Column
     private LocalDate startDate; // 시작 기간
@@ -45,6 +46,10 @@ public class Competition {
 
     public void approveStatus() {
         status = Status.APPROVE;
+    }
+    public void updateOutput(CompetitionStatus competitionStatus){
+        this.output=competitionStatus;
+
     }
 
     public void validateStatus() {

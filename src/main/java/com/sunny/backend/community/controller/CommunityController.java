@@ -39,13 +39,13 @@ public class CommunityController {
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시판 목록 조회")
 	@GetMapping("/board")
 	public ResponseEntity<CommonResponse.SingleResponse<List<CommunityResponse.PageResponse>>> getCommunityList(
+			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@RequestParam(required = false) Long communityId,
 			@RequestParam(required = false) SortType sortType,
 			@RequestParam int pageSize,
 			@RequestParam(required = false) BoardType boardType,
 			@RequestParam(required = false) String search) {
-
-		return communityService.paginationNoOffsetBuilder(communityId, sortType, boardType, search,
+		return communityService.paginationNoOffsetBuilder(customUserPrincipal,communityId, sortType, boardType, search,
 				pageSize);
 	}
 

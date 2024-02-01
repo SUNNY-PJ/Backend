@@ -29,41 +29,33 @@ public class Community {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "community_id")
     private Long id;
-
     @Column
     private String title;
-
     @Column
     private String contents;
     @ColumnDefault("0")
     @Column
-    private int view_cnt;
-
-//    @Column
-//    @ColumnDefault("false")
-//    private boolean modified;
-
+    private int viewCnt;
     @Column
     private LocalDateTime createdAt;
     @Column
     private LocalDateTime modifiedAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "users_id")
     private Users users;
-
-
     @OneToMany(mappedBy = "community")
     @Builder.Default
     private List<Photo> photoList = new ArrayList<>();
-
     @Enumerated(EnumType.STRING)
     @NotNull(message = "올바른 카테고리 값을 입력해야합니다.")
     private BoardType boardType;
-
     @OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<Comment> commentList=new ArrayList<>();
+
+    public int getCommentSize() {
+        return commentList.size();
+    }
 
     public void updateCommunity(CommunityRequest communityRequest){
         this.title=communityRequest.getTitle();
@@ -72,21 +64,17 @@ public class Community {
     }
 
     public void increaseView() {
-        this.view_cnt+=1;
+        this.viewCnt+=1;
     }
-
 
     public void updateView() {
-        this.view_cnt++;
+        this.viewCnt++;
     }
 
-
     public boolean hasNotBeenModified(LocalDateTime createdAt,LocalDateTime modifiedAt ) {
-
         return !createdAt.isEqual(modifiedAt);
     }
     public void updateModifiedAt(LocalDateTime modifiedAt ) {
-
         this.modifiedAt=modifiedAt;
     }
 

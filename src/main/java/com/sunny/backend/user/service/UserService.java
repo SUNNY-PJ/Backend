@@ -1,5 +1,7 @@
 package com.sunny.backend.user.service;
 
+import static com.sunny.backend.common.ComnConstant.*;
+
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -14,11 +16,11 @@ import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.user.dto.ProfileResponse;
-import com.sunny.backend.comment.dto.response.CommentResponse;
-import com.sunny.backend.community.dto.response.CommunityResponse;
 import com.sunny.backend.scrap.repository.ScrapRepository;
 import com.sunny.backend.user.domain.Users;
-import com.sunny.backend.scrap.dto.response.ScrapResponse;
+import com.sunny.backend.user.dto.UserCommentResponse;
+import com.sunny.backend.user.dto.UserCommunityResponse;
+import com.sunny.backend.user.dto.UserScrapResponse;
 import com.sunny.backend.user.repository.UserRepository;
 import com.sunny.backend.util.S3Util;
 
@@ -47,34 +49,33 @@ public class UserService {
 		return ProfileResponse.from(user);
 	}
 
-	public List<CommunityResponse.PageResponse> getUserCommunityList(CustomUserPrincipal customUserPrincipal,
-		Long userId) {
+	public List<UserCommunityResponse> getUserCommunityList(CustomUserPrincipal customUserPrincipal, Long userId) {
 		Users user = checkUserId(customUserPrincipal, userId);
 
 		return communityRepository.findAllByUsers_Id(user.getId())
 			.stream()
-			.map(CommunityResponse.PageResponse::from)
+			.map(UserCommunityResponse::from)
 			.toList();
 	}
 
 	@Transactional(readOnly = true)
-	public List<CommentResponse.MyComment> getCommentByUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
+	public List<UserCommentResponse> getCommentByUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
 		Users user = checkUserId(customUserPrincipal, userId);
 
 		return commentRepository.findAllByUsers_Id(user.getId())
 			.stream()
-			.map(CommentResponse.MyComment::from)
+			.map(UserCommentResponse::from)
 			.toList();
 	}
 
-	public List<ScrapResponse> getScrapList(CustomUserPrincipal customUserPrincipal) {
-		Users user = customUserPrincipal.getUsers();
-		return scrapRepository.findAllByUsers_Id(user.getId())
+	public List<UserScrapResponse> getScrapList(CustomUserPrincipal customUserPrincipal) {
+		return scrapRepository.findAllByUsers_Id(customUserPrincipal.getUsers().getId())
 			.stream()
-			.map(scrap -> ScrapResponse.from(scrap.getCommunity()))
+			.map(scrap -> UserScrapResponse.from(scrap.getCommunity()))
 			.toList();
 	}
 
+	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
 		CustomUserPrincipal customUserPrincipal, MultipartFile profile) {
 
@@ -82,20 +83,13 @@ public class UserService {
 		// 새 프로필 업로드
 		if (profile != null && !profile.isEmpty()) {
 			String uploadedProfileUrl = s3Util.upload(profile);
-			user.setProfile(uploadedProfileUrl);
+			user.updateProfile(uploadedProfileUrl);
 		} else if (profile == null) {
-			user.setProfile("https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png");
+			user.updateProfile(SUNNY_DEFAULT_IMAGE);
 		}
-		ProfileResponse profileResponse = ProfileResponse.from(user);
 		userRepository.save(user);
-
+		ProfileResponse profileResponse = ProfileResponse.from(user);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), profileResponse, "프로필 변경 완료");
 	}
 
-	public ResponseEntity<CommonResponse.GeneralResponse> deleteAccount(
-		CustomUserPrincipal customUserPrincipal) {
-		Users user = customUserPrincipal.getUsers();
-		userRepository.deleteById(user.getId());
-		return responseService.getGeneralResponse(HttpStatus.OK.value(), "성공적으로 탈퇴 되었습니다.");
-	}
 }

@@ -35,7 +35,6 @@ public class Save {
     @Column
     @FutureOrPresent
     private LocalDate startDate;
-
     @Column
     @FutureOrPresent
     private LocalDate endDate;
@@ -51,15 +50,13 @@ public class Save {
 
     public long calculateRemainingDays(Save save) {
         LocalDate currentDate = LocalDate.now();
-        return ChronoUnit.DAYS.between(currentDate, save.getEndDate())+1;
+        return ChronoUnit.DAYS.between(currentDate, save.getEndDate());
     }
 
     public double calculateSavePercentage(Long userMoney, Save save) {
         double percentage = userMoney != null ?
             100.0 - (((double) userMoney / (double) save.getCost()) * 100.0) : 100.0;
         BigDecimal roundedPercentage = new BigDecimal(percentage).setScale(1, RoundingMode.HALF_UP);
-
-
         return roundedPercentage.doubleValue();
     }
 }

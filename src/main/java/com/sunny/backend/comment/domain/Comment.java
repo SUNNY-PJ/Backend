@@ -6,6 +6,7 @@ import static com.sunny.backend.common.CommonErrorCode.NO_USER_PERMISSION;
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.common.BaseTime;
+import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
 import com.sunny.backend.user.domain.Users;
 import javax.validation.constraints.NotBlank;
 import lombok.*;
@@ -20,12 +21,12 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@DynamicInsert //동적 삽입
+@DynamicInsert
 public class Comment extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; //댓글 id
+    private Long id;
 
     @NotBlank(message = "댓글 내용은 필수 입력값입니다.")
     @Column(name = "text", nullable = false)
@@ -33,40 +34,37 @@ public class Comment extends BaseTime {
 
     @ColumnDefault("FALSE")
     @Column(nullable = false)
-    private Boolean isDeleted; //댓글 삭제 여부
+    private Boolean isDeleted;
 
     @ColumnDefault("FALSE")
     @Column(nullable = false)
-    private Boolean isPrivated; //비밀 댓글 여부
+    private Boolean isPrivated;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="community_id")
-    private Community community; //게시글 아이디
+    private Community community;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "users_id") //유저 아아디
+    @JoinColumn(name = "users_id")
     private Users users;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
-    private Comment parent; //부모 댓글 (null이면 최상위 댓글)
+    private Comment parent;
 
-    @OneToMany(mappedBy = "parent", orphanRemoval = true) // 부모 댓글 삭제 시 하위 댓글 모두 삭제
-    private List<Comment> children = new ArrayList<>(); //자식 댓글
-
+    @OneToMany(mappedBy = "parent", orphanRemoval = true)
+    private List<Comment> children = new ArrayList<>();
 
     public Comment(String content) {
         this.content = content;
     }
-
     public void changeIsDeleted(Boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
 
-    public void setContent(String content) {
+    public void updateContent(String content) {
         this.content=content;
     }
-
     public static void validateCommentByUser(Long userId, Long commentId) {
         if(!userId.equals(commentId)) {
             throw new CommonCustomException(NO_USER_PERMISSION);

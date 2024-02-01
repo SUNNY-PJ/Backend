@@ -13,9 +13,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import com.nimbusds.oauth2.sdk.util.StringUtils;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -40,7 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class CommunityService {
-
 	private final CommunityRepository communityRepository;
 	private final PhotoRepository photoRepository;
 	private final ScrapRepository scrapRepository;
@@ -56,7 +53,7 @@ public class CommunityService {
 		String viewCount = redisUtil.getData(String.valueOf(user.getId()));
 
 		if (StringUtils.isBlank(viewCount)) {
-			redisUtil.setDateExpire(String.valueOf(user.getId()), communityId + "_",
+			redisUtil.setValuesWithTimeout(String.valueOf(user.getId()), communityId + "_",
 					calculateTimeUntilMidnight());
 			community.increaseView();
 		} else {
@@ -65,7 +62,7 @@ public class CommunityService {
 
 			if (!isViewed) {
 				viewCount += communityId + "_";
-				redisUtil.setDateExpire(String.valueOf(user.getId()), viewCount,
+				redisUtil.setValuesWithTimeout(String.valueOf(user.getId()), viewCount,
 						calculateTimeUntilMidnight());
 				community.updateView();
 			}
@@ -97,7 +94,6 @@ public class CommunityService {
 				.createdAt(LocalDateTime.now())
 				.users(user)
 				.build();
-
 		if (multipartFileList != null && !multipartFileList.isEmpty()) {
 			List<Photo> photoList = new ArrayList<>();
 			for (MultipartFile multipartFile : multipartFileList) {
@@ -117,26 +113,17 @@ public class CommunityService {
 		if (user.getCommunityList() == null) {
 			user.addCommunity(community);
 		}
-
-		boolean isModified = community.hasNotBeenModified(community.getCreatedAt(), community.getModifiedAt());
-		System.out.println(isModified);
-		System.out.println(community.getModifiedAt());
-		System.out.println(community.getCreatedAt());
-
-
-
 		CommunityResponse communityResponse = CommunityResponse.of(community,  false);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
 				"게시글을 성공적으로 작성했습니다.");
 	}
-
-
 	@Transactional(readOnly = true)
 	public ResponseEntity<CommonResponse.SingleResponse<List<CommunityResponse.PageResponse>>> paginationNoOffsetBuilder(
-			Long communityId,
+			CustomUserPrincipal customUserPrincipal,Long communityId,
 			SortType sortType, BoardType boardType, String searchText, int pageSize) {
+		Users users=customUserPrincipal.getUsers();
 		List<CommunityResponse.PageResponse> result = communityRepository.paginationNoOffsetBuilder(
-				communityId, sortType, boardType, searchText, pageSize);
+				users,communityId, sortType, boardType, searchText, pageSize);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), result,
 				"게시판을 성공적으로 조회했습니다.");
 	}
@@ -151,15 +138,12 @@ public class CommunityService {
 		community.getPhotoList().clear();
 		community.updateCommunity(communityRequest);
 		community.updateModifiedAt(LocalDateTime.now());
-
-
 		if (files != null && !files.isEmpty()) {
 			List<Photo> existingPhotos = photoRepository.findByCommunityId(communityId);
 			photoRepository.deleteAll(existingPhotos);
 			for (Photo photo : existingPhotos) {
 				s3Util.deleteFile(photo.getFileUrl());
 			}
-
 			List<Photo> photoList = new ArrayList<>();
 			for (MultipartFile multipartFile : files) {
 				Photo photo = Photo.builder()
@@ -175,21 +159,14 @@ public class CommunityService {
 		}
 		Scrap scrap = scrapRepository.findByUsersAndCommunity(user, community);
 		boolean isScrapedByCurrentUser = (scrap != null);
-		boolean isModified = community.hasNotBeenModified(community.getCreatedAt(), community.getModifiedAt());
-		System.out.println(isModified);
-		System.out.println(community.getModifiedAt());
-		System.out.println(community.getCreatedAt());
 		CommunityResponse communityResponse = CommunityResponse.of(community,
 				isScrapedByCurrentUser);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
 				"게시글 수정을 완료했습니다.");
 	}
-
-	//게시글 삭제
 	@Transactional
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteCommunity(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
-
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.getById(communityId);
 		List<Photo> photoList = photoRepository.findByCommunityId(communityId);
@@ -199,20 +176,16 @@ public class CommunityService {
 		}
 		photoRepository.deleteByCommunityId(communityId);
 		communityRepository.deleteById(communityId);
-
 		return responseService.getGeneralResponse(HttpStatus.OK.value(),
 				"게시글을 삭제했습니다.");
 	}
-
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse.ViewAndCommentResponse>> getCommentAndViewByCommunity(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
-
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.getById(communityId);
 		ViewAndCommentResponse viewAndCommentResponse = CommunityResponse.ViewAndCommentResponse.from(community);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),viewAndCommentResponse,
 				"게시글 조회수와 댓글수를 불러왔습니다.");
 	}
-
 }
