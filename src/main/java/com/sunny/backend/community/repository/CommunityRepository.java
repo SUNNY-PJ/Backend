@@ -1,6 +1,6 @@
 package com.sunny.backend.community.repository;
 
-import static com.sunny.backend.common.CommonErrorCode.COMMUNITY_NOT_FOUND;
+import static com.sunny.backend.common.CommonErrorCode.*;
 
 import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.community.domain.Community;
@@ -14,6 +14,6 @@ public interface CommunityRepository extends JpaRepository<Community, Long>,
     List<Community> findAllByUsers_Id(Long userId);
     default Community getById(Long id) {
         return findById(id)
-            .orElseThrow(() -> new CommonCustomException(COMMUNITY_NOT_FOUND));
+            .orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
     }
 }

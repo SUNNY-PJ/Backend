@@ -6,6 +6,9 @@ import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.domain.SortType;
 import com.sunny.backend.community.dto.response.CommunityResponse.ViewAndCommentResponse;
+import com.sunny.backend.declaration.domain.CommunityDeclaration;
+import com.sunny.backend.declaration.dto.DeclareRequest;
+import com.sunny.backend.declaration.repository.CommunityDeclarationRepository;
 import com.sunny.backend.scrap.domain.Scrap;
 import com.sunny.backend.scrap.repository.ScrapRepository;
 import java.time.LocalDateTime;
@@ -44,6 +47,7 @@ public class CommunityService {
 	private final ResponseService responseService;
 	private final S3Util s3Util;
 	private final RedisUtil redisUtil;
+	private final CommunityDeclarationRepository communityDeclarationRepository;
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> findCommunity(
@@ -182,7 +186,6 @@ public class CommunityService {
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse.ViewAndCommentResponse>> getCommentAndViewByCommunity(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
-		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.getById(communityId);
 		ViewAndCommentResponse viewAndCommentResponse = CommunityResponse.ViewAndCommentResponse.from(community);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),viewAndCommentResponse,
