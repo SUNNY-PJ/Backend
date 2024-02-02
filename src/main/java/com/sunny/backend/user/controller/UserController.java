@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -14,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.declaration.dto.DeclareRequest;
 import com.sunny.backend.user.dto.ProfileResponse;
 import com.sunny.backend.user.dto.UserCommentResponse;
 import com.sunny.backend.user.dto.UserCommunityResponse;
@@ -76,4 +79,10 @@ public class UserController {
 		return userService.updateProfile(customUserPrincipal, profile);
 	}
 
+	@ApiOperation(tags = "0. User", value = "유저 신고")
+	@PostMapping("/declare")
+	public ResponseEntity<CommonResponse.GeneralResponse> declareCommunity(
+		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody DeclareRequest declareRequest) {
+		return userService.declareCommunity(customUserPrincipal, declareRequest);
+	}
 }
