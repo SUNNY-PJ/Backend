@@ -7,12 +7,10 @@ import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.notification.domain.CommentNotification;
 import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.notification.dto.request.NotificationPushRequest;
-import com.sunny.backend.notification.dto.request.NotificationRequest;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.notification.service.NotificationService;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.http.HttpStatus;
@@ -47,21 +45,19 @@ public class CommentService {
 
 	private CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
 		boolean isPrivate = comment.getIsPrivated();
-		boolean isAuthor=Objects.equals(currentUser.getId(),
-				comment.getCommunity().getUsers().getId());
 		CommentResponse commentResponse;
 		if (isPrivate && !(currentUser.getId() == comment.getUsers().getId() ||
 				currentUser.getId() == comment.getCommunity().getUsers().getId())) {
 			commentResponse = new CommentResponse(comment.getId(), currentUser.getName(),
-					"비밀 댓글입니다.", isAuthor,comment.getCreatedDate());
+					"비밀 댓글입니다.",comment.getCreatedDate(),comment.getAuthor());
 
 		} else {
 			commentResponse = new CommentResponse(
 					comment.getId(),
 					comment.getUsers().getName(),
 					comment.getContent(),
-					isAuthor,
-					comment.getCreatedDate()
+					comment.getCreatedDate(),
+					comment.getAuthor()
 			);
 		}
 		commentResponse.setChildren(comment.getChildren()
@@ -106,22 +102,25 @@ public class CommentService {
 		comment.setUsers(user);
 		boolean isPrivate = commentRequestDTO.getIsPrivated();
 		comment.setIsPrivated(isPrivate);
-		commentRepository.save(comment);
 		boolean isAuthor=Objects.equals(customUserPrincipal.getUsers().getId(),
 				comment.getCommunity().getUsers().getId());
-		System.out.println(isAuthor);
+
+		comment.setAuthor(isAuthor);
+		commentRepository.save(comment);
+
 		user.addComment(comment);
 		if(community.getUsers().getId()!=customUserPrincipal.getUsers().getId()){
 			if(commentRequestDTO.getParentId() == null) {
 				sendNotifications(customUserPrincipal, comment, community);
 			}
 			else{
+				System.out.println("replySendNotification response success");
 					replySendNotifications(customUserPrincipal,comment.getParent().getUsers(), comment, community);
 			}
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),isAuthor,
-						comment.getCreatedDate()), "댓글을 등록했습니다.");
+				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),
+						comment.getCreatedDate(), isAuthor),"댓글을 등록했습니다.");
 	}
 
 	private void replySendNotifications(CustomUserPrincipal customUserPrincipal,Users users,
@@ -136,6 +135,7 @@ public class CommentService {
 				.community(community)
 				.comment(comment)
 				.parent_id(comment.getParent())
+				.title("새로운 답글이 달렸어요.")
 				.build();
 		commentNotificationRepository.save(commentNotification);
 		if(notificationList.size()!=0) {
@@ -177,17 +177,15 @@ public class CommentService {
 		Comment comment = commentRepository.findCommentByIdWithParent(commentId)
 				.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
 		validateCommentByUser(customUserPrincipal.getUsers().getId(),comment.getUsers().getId());
-		boolean isAuthor= Objects.equals(customUserPrincipal.getUsers().getId(),
-				comment.getCommunity().getUsers().getId());
-			if (comment.getChildren().size() != 0) {
-				comment.changeIsDeleted(true);
-				CommentResponse commentResponse=CommentResponse.convertCommentToDto(comment,isAuthor);
-				return responseService.getSingleResponse(HttpStatus.OK.value(), commentResponse,"댓글을 삭제 하였습니다.");
-			} else {
-				commentRepository.delete(getDeletableAncestorComment(comment));
-				return responseService.getSingleResponse(HttpStatus.OK.value(), null,"댓글을 삭제 하였습니다.");
-		}
 
+//			if (comment.getChildren().size() != 0) {
+				comment.changeIsDeleted(true);
+				CommentResponse commentResponse=CommentResponse.convertCommentToDto(comment);
+				return responseService.getSingleResponse(HttpStatus.OK.value(), commentResponse,"댓글을 삭제 하였습니다.");
+//			} else {
+//				commentRepository.delete(getDeletableAncestorComment(comment));
+//				return responseService.getSingleResponse(HttpStatus.OK.value(), null,"댓글을 삭제 하였습니다.");
+//		}
 	}
 
 	private Comment getDeletableAncestorComment(Comment comment) {
@@ -200,7 +198,6 @@ public class CommentService {
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> updateComment(
 			CustomUserPrincipal customUserPrincipal, Long commentId, CommentRequest commentRequestDTO) {
-
 		Comment comment = commentRepository.findById(commentId)
 				.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
 		validateCommentByUser(customUserPrincipal.getUsers().getId(),comment.getUsers().getId());
@@ -208,12 +205,9 @@ public class CommentService {
 		boolean isPrivate = commentRequestDTO.getIsPrivated();
 		boolean isAuthor=Objects.equals(customUserPrincipal.getUsers().getId(),
 				comment.getCommunity().getUsers().getId());
-		System.out.println(isAuthor);
 		comment.setIsPrivated(isPrivate);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),isAuthor,
-						comment.getCreatedDate()), "댓글을 수정했습니다.");
+				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),
+						comment.getCreatedDate(), isAuthor),"댓글을 수정했습니다.");
 	}
-
-
 }
