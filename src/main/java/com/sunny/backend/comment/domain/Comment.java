@@ -40,6 +40,10 @@ public class Comment extends BaseTime {
     @Column(nullable = false)
     private Boolean isPrivated;
 
+    @ColumnDefault("FALSE")
+    @Column(nullable = false)
+    private Boolean Author;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="community_id")
     private Community community;
