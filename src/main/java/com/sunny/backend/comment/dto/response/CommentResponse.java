@@ -16,6 +16,7 @@ import lombok.Setter;
 public class CommentResponse {
 
 	private Long id;
+	private Long userId;
 	private String content;
 	private String writer;
 	private boolean isAuthor;
@@ -23,9 +24,10 @@ public class CommentResponse {
 	private LocalDateTime createdDate;
 	private List<CommentResponse> children = new ArrayList<>();
 
-	public CommentResponse(Long id, String writer, String content, LocalDateTime createdDate,
+	public CommentResponse(Long id, Long userId,String writer, String content, LocalDateTime createdDate,
 			boolean isAuthor) {
 		this.id = id;
+		this.userId=userId;
 		this.writer = writer;
 		this.content = content;
 		this.createdDate = createdDate;
@@ -36,6 +38,7 @@ public class CommentResponse {
 	public static CommentResponse convertCommentToDto(Comment comment) {
 		if (comment.getIsDeleted()) {
 			return new CommentResponse(
+					comment.getId(),
 					null,
 					null,
 					"삭제된 댓글입니다.",
@@ -47,7 +50,7 @@ public class CommentResponse {
 			String content = comment.getContent();
 			LocalDateTime createdDate = comment.getCreatedDate();
 			boolean isAuthor =comment.getAuthor();
-			return new CommentResponse(comment.getId(), writer, content, createdDate, isAuthor);
+			return new CommentResponse(comment.getId(),comment.getUsers().getId(), writer, content, createdDate, isAuthor);
 		}
 	}
 

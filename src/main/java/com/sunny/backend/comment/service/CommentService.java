@@ -13,6 +13,7 @@ import com.sunny.backend.notification.service.NotificationService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -48,12 +49,13 @@ public class CommentService {
 		CommentResponse commentResponse;
 		if (isPrivate && !(currentUser.getId() == comment.getUsers().getId() ||
 				currentUser.getId() == comment.getCommunity().getUsers().getId())) {
-			commentResponse = new CommentResponse(comment.getId(), currentUser.getName(),
+			commentResponse = new CommentResponse(comment.getId(),comment.getUsers().getId(), currentUser.getName(),
 					"비밀 댓글입니다.",comment.getCreatedDate(),comment.getAuthor());
 
 		} else {
 			commentResponse = new CommentResponse(
 					comment.getId(),
+					comment.getUsers().getId(),
 					comment.getUsers().getName(),
 					comment.getContent(),
 					comment.getCreatedDate(),
@@ -74,10 +76,13 @@ public class CommentService {
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new CommonCustomException(COMMUNITY_NOT_FOUND));
 		List<Comment> comments = commentRepository.findAllByCommunity_Id(communityId);
-		List<CommentResponse> commentResponses = comments.stream()
-				.filter(comment -> comment.getParent() == null)
-				.map(comment -> mapCommentToResponse(comment, user))
+		List<Comment> DeletedComments = comments.stream()
+				.filter(comment -> !comment.getIsDeleted())
 				.toList();
+		List<CommentResponse> commentResponses = Stream.concat(
+				DeletedComments.stream().map(comment -> mapCommentToResponse(comment, user)),
+				comments.stream().filter(Comment::getIsDeleted).map(CommentResponse::convertCommentToDto)
+		).toList();
 		return responseService.getListResponse(HttpStatus.OK.value(), commentResponses, "댓글을 조회했습니다.");
 	}
 	@Transactional
@@ -119,7 +124,7 @@ public class CommentService {
 			}
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),
+				new CommentResponse(comment.getId(),comment.getUsers().getId(), comment.getUsers().getName(), comment.getContent(),
 						comment.getCreatedDate(), isAuthor),"댓글을 등록했습니다.");
 	}
 
@@ -178,14 +183,9 @@ public class CommentService {
 				.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
 		validateCommentByUser(customUserPrincipal.getUsers().getId(),comment.getUsers().getId());
 
-//			if (comment.getChildren().size() != 0) {
 				comment.changeIsDeleted(true);
 				CommentResponse commentResponse=CommentResponse.convertCommentToDto(comment);
 				return responseService.getSingleResponse(HttpStatus.OK.value(), commentResponse,"댓글을 삭제 하였습니다.");
-//			} else {
-//				commentRepository.delete(getDeletableAncestorComment(comment));
-//				return responseService.getSingleResponse(HttpStatus.OK.value(), null,"댓글을 삭제 하였습니다.");
-//		}
 	}
 
 	private Comment getDeletableAncestorComment(Comment comment) {
@@ -207,7 +207,7 @@ public class CommentService {
 				comment.getCommunity().getUsers().getId());
 		comment.setIsPrivated(isPrivate);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-				new CommentResponse(comment.getId(), comment.getUsers().getName(), comment.getContent(),
+				new CommentResponse(comment.getId(),comment.getUsers().getId(), comment.getUsers().getName(), comment.getContent(),
 						comment.getCreatedDate(), isAuthor),"댓글을 수정했습니다.");
 	}
 }
