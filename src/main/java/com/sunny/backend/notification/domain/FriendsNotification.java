@@ -1,8 +1,7 @@
 package com.sunny.backend.notification.domain;
 
-import com.sunny.backend.friends.domain.Friend;
+import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.user.domain.Users;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,7 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class FriendsNotification {
+public class FriendsNotification extends BaseTime {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
