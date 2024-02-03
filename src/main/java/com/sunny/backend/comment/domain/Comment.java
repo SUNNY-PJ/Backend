@@ -3,6 +3,7 @@ package com.sunny.backend.comment.domain;
 
 import static com.sunny.backend.common.CommonErrorCode.NO_USER_PERMISSION;
 
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.user.domain.Users;
@@ -69,7 +70,7 @@ public class Comment extends BaseTime {
     }
     public static void validateCommentByUser(Long userId, Long commentId) {
         if(!userId.equals(commentId)) {
-            throw new CommonCustomException(NO_USER_PERMISSION);
+            throw new CustomException(NO_USER_PERMISSION);
         }
     }
 }

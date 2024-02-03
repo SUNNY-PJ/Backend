@@ -71,7 +71,7 @@ public class Friend {
 
 	public void validateFriendsByUser(Long userId, Long tokenUserId) {
 		if(!userId.equals(tokenUserId)) {
-			throw new CommonCustomException(CommonErrorCode.TOKEN_INVALID);
+			throw new CustomException(CommonErrorCode.TOKEN_INVALID);
 		}
 	}
 }

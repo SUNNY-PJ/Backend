@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.TimeUnit;
 
 import com.sunny.backend.common.CommonErrorCode;
+import com.sunny.backend.common.exception.CustomException;
 
 @Component
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class RedisUtil {
 
     public void isExistData(String key) {
         if(redisTemplate.opsForValue().get(key) == null) {
-            throw new CommonCustomException(CommonErrorCode.TOKEN_EXPIRED);
+            throw new CustomException(CommonErrorCode.TOKEN_EXPIRED);
         }
     }
 
