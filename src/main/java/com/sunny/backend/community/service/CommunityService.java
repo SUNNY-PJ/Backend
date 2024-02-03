@@ -11,11 +11,15 @@ import com.sunny.backend.declaration.dto.DeclareRequest;
 import com.sunny.backend.declaration.repository.CommunityDeclarationRepository;
 import com.sunny.backend.scrap.domain.Scrap;
 import com.sunny.backend.scrap.repository.ScrapRepository;
+
+import java.awt.font.OpenType;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+
 import com.nimbusds.oauth2.sdk.util.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,11 +75,14 @@ public class CommunityService {
 				community.updateView();
 			}
 		}
-		Scrap scrap = scrapRepository.findByUsersAndCommunity(user, community);
 
-		boolean isScrapedByCurrentUser = (scrap != null);
-		CommunityResponse communityResponse = CommunityResponse.of(community,
-				isScrapedByCurrentUser);
+		boolean isScrap = false;
+		Optional<Scrap> scrap = scrapRepository.findByUsersAndCommunity(user, community);
+		if(scrap.isPresent()) {
+			isScrap = true;
+		}
+
+		CommunityResponse communityResponse = CommunityResponse.of(community, isScrap);
 		return responseService.getSingleResponse(
 				HttpStatus.OK.value(), communityResponse, "게시글을 성공적으로 불러왔습니다.");
 	}
@@ -161,10 +168,14 @@ public class CommunityService {
 			photoRepository.saveAll(photoList);
 			community.addPhoto(photoList);
 		}
-		Scrap scrap = scrapRepository.findByUsersAndCommunity(user, community);
-		boolean isScrapedByCurrentUser = (scrap != null);
-		CommunityResponse communityResponse = CommunityResponse.of(community,
-				isScrapedByCurrentUser);
+
+		boolean isScrap = false;
+		Optional<Scrap> scrap = scrapRepository.findByUsersAndCommunity(user, community);
+		if(scrap.isPresent()) {
+			isScrap = true;
+		}
+
+		CommunityResponse communityResponse = CommunityResponse.of(community, isScrap);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
 				"게시글 수정을 완료했습니다.");
 	}
@@ -183,6 +194,7 @@ public class CommunityService {
 		return responseService.getGeneralResponse(HttpStatus.OK.value(),
 				"게시글을 삭제했습니다.");
 	}
+
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse.ViewAndCommentResponse>> getCommentAndViewByCommunity(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {

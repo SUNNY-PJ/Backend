@@ -3,9 +3,7 @@ package com.sunny.backend.community.domain;
 
 import static com.sunny.backend.common.CommonErrorCode.*;
 
-import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.community.dto.request.CommunityRequest;
-import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.common.photo.Photo;
 import com.sunny.backend.user.domain.Users;

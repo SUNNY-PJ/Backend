@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.CommonErrorCode;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.competition.domain.Competition;

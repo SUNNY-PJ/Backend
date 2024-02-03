@@ -1,7 +1,7 @@
 package com.sunny.backend.consumption.domain;
 
 import static com.sunny.backend.common.CommonErrorCode.*;
-import com.sunny.backend.common.CommonCustomException;
+
 import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
 import com.sunny.backend.user.domain.Users;
 import javax.validation.constraints.PastOrPresent;

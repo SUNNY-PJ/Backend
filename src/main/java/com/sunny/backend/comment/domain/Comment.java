@@ -3,10 +3,8 @@ package com.sunny.backend.comment.domain;
 
 import static com.sunny.backend.common.CommonErrorCode.NO_USER_PERMISSION;
 
-import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.common.BaseTime;
-import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
 import com.sunny.backend.user.domain.Users;
 import javax.validation.constraints.NotBlank;
 import lombok.*;
