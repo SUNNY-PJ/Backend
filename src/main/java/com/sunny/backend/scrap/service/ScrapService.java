@@ -1,13 +1,13 @@
 package com.sunny.backend.scrap.service;
 
-import static com.sunny.backend.common.CommonErrorCode.ALREADY_SCRAP;
-import static com.sunny.backend.common.CommonErrorCode.NOT_FOUND_SCRAP;
+import static com.sunny.backend.scrap.domain.QScrap.*;
+import static com.sunny.backend.scrap.exception.ScrapErrorCode.*;
 
-
-import com.sunny.backend.common.CommonCustomException;
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.repository.CommunityRepository;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,16 +47,16 @@ public class ScrapService {
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.getById(communityId);
 
-		Scrap scrap = scrapRepository.findByUsersAndCommunity(user, community);
-		if (scrap == null) {
-			scrapRepository.save(Scrap.builder()
-					.community(community)
-					.users(user)
-					.build());
-			return responseService.getGeneralResponse(HttpStatus.OK.value(), "스크랩하였습니다.");
-		} else {
-			throw new CommonCustomException(ALREADY_SCRAP);
-		}
+		scrapRepository.findByUsersAndCommunity(user, community)
+			.ifPresent(e -> {
+				throw new CustomException(SCRAP_ALREADY);
+			});
+
+		scrapRepository.save(Scrap.builder()
+			.community(community)
+			.users(user)
+			.build());
+		return responseService.getGeneralResponse(HttpStatus.OK.value(), "스크랩하였습니다.");
 	}
 
 	public ResponseEntity<CommonResponse.GeneralResponse> removeScrapFromCommunity(
@@ -64,12 +64,13 @@ public class ScrapService {
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.getById(communityId);
 
-		Scrap deleteScrap = scrapRepository.findByUsersAndCommunity(user, community);
-		if (deleteScrap != null) {
-			scrapRepository.delete(deleteScrap);
+		Optional<Scrap> scrap = scrapRepository.findByUsersAndCommunity(user, community);
+
+		if(scrap.isPresent()) {
+			scrapRepository.delete(scrap.get());
 			return responseService.getGeneralResponse(HttpStatus.OK.value(), "스크랩 게시글이 삭제 되었습니다.");
 		} else {
-			throw new CommonCustomException(NOT_FOUND_SCRAP);
+			throw new CustomException(SCRAP_NOT_FOUND);
 		}
 	}
 }

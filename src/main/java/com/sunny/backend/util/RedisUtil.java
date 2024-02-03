@@ -2,24 +2,12 @@ package com.sunny.backend.util;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.CommonErrorCode;
-import com.sunny.backend.common.exception.CustomException;
-import com.sunny.backend.notification.domain.NotificationType;
-import com.sunny.backend.notification.dto.response.AlarmResponse;
 
 @Component
 @RequiredArgsConstructor

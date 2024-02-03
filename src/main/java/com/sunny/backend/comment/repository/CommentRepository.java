@@ -1,9 +1,9 @@
 package com.sunny.backend.comment.repository;
 
-import static com.sunny.backend.common.CommonErrorCode.*;
+import static com.sunny.backend.community.exception.CommunityErrorCode.*;
 
 import com.sunny.backend.comment.domain.Comment;
-import com.sunny.backend.common.CommonCustomException;
+import com.sunny.backend.common.exception.CustomException;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,6 +15,6 @@ public interface CommentRepository extends JpaRepository<Comment,Long>, CommentC
 
     default Comment getById(Long id) {
         return findById(id)
-            .orElseThrow(() -> new CommonCustomException(COMMUNITY_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
     }
 }
