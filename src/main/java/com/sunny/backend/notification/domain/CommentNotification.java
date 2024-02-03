@@ -1,6 +1,7 @@
 package com.sunny.backend.notification.domain;
 
 import com.sunny.backend.comment.domain.Comment;
+import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.user.domain.Users;
 import javax.persistence.CascadeType;
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentNotification {
+public class CommentNotification extends BaseTime {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

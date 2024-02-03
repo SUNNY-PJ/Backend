@@ -177,16 +177,15 @@ public class CommentService {
 		Comment comment = commentRepository.findCommentByIdWithParent(commentId)
 				.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
 		validateCommentByUser(customUserPrincipal.getUsers().getId(),comment.getUsers().getId());
-		boolean isAuthor= Objects.equals(customUserPrincipal.getUsers().getId(),
-				comment.getCommunity().getUsers().getId());
-			if (comment.getChildren().size() != 0) {
+
+//			if (comment.getChildren().size() != 0) {
 				comment.changeIsDeleted(true);
 				CommentResponse commentResponse=CommentResponse.convertCommentToDto(comment);
 				return responseService.getSingleResponse(HttpStatus.OK.value(), commentResponse,"댓글을 삭제 하였습니다.");
-			} else {
-				commentRepository.delete(getDeletableAncestorComment(comment));
-				return responseService.getSingleResponse(HttpStatus.OK.value(), null,"댓글을 삭제 하였습니다.");
-		}
+//			} else {
+//				commentRepository.delete(getDeletableAncestorComment(comment));
+//				return responseService.getSingleResponse(HttpStatus.OK.value(), null,"댓글을 삭제 하였습니다.");
+//		}
 	}
 
 	private Comment getDeletableAncestorComment(Comment comment) {
