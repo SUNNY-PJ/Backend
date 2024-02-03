@@ -3,6 +3,7 @@ package com.sunny.backend.community.domain;
 
 import static com.sunny.backend.common.CommonErrorCode.*;
 
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.community.dto.request.CommunityRequest;
 import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.common.photo.Photo;
@@ -82,7 +83,7 @@ public class Community {
 
     public static void validateCommunityByUser(Long userId, Long tokenUserId) {
         if(!userId.equals(tokenUserId)) {
-            throw new CommonCustomException(NO_USER_PERMISSION);
+            throw new CustomException(NO_USER_PERMISSION);
         }
     }
 }

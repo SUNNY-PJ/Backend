@@ -2,6 +2,7 @@ package com.sunny.backend.consumption.domain;
 
 import static com.sunny.backend.common.CommonErrorCode.*;
 
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
 import com.sunny.backend.user.domain.Users;
 import javax.validation.constraints.PastOrPresent;
@@ -53,7 +54,7 @@ public class Consumption {
 
     public static void validateConsumptionByUser(Long userId, Long consumptionUserId) {
         if (!userId.equals(consumptionUserId)) {
-            throw new CommonCustomException(NO_USER_PERMISSION);
+            throw new CustomException(NO_USER_PERMISSION);
         }
     }
 
