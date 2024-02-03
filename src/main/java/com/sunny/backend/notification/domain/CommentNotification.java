@@ -3,6 +3,7 @@ package com.sunny.backend.notification.domain;
 import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.user.domain.Users;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -27,19 +28,19 @@ public class CommentNotification {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
   @JoinColumn(name= "users_id")
   private Users users;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
   @JoinColumn(name= "community_id")
   private Community community;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
   @JoinColumn(name= "parent_id")
   private Comment parent_id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
   @JoinColumn(name= "comment_id")
   private Comment comment;
 
