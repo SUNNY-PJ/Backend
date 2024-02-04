@@ -3,8 +3,12 @@ package com.sunny.backend.user.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -14,10 +18,13 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
-import com.sunny.backend.user.dto.ProfileResponse;
-import com.sunny.backend.user.dto.UserCommentResponse;
-import com.sunny.backend.user.dto.UserCommunityResponse;
-import com.sunny.backend.user.dto.UserScrapResponse;
+import com.sunny.backend.declaration.dto.DeclareRequest;
+import com.sunny.backend.declaration.dto.DeclareStatusRequest;
+import com.sunny.backend.user.dto.response.ProfileResponse;
+import com.sunny.backend.user.dto.response.UserCommentResponse;
+import com.sunny.backend.user.dto.response.UserCommunityResponse;
+import com.sunny.backend.user.dto.response.UserDeclareResponse;
+import com.sunny.backend.user.dto.response.UserScrapResponse;
 import com.sunny.backend.user.service.UserService;
 
 import io.swagger.annotations.ApiOperation;
@@ -76,4 +83,25 @@ public class UserController {
 		return userService.updateProfile(customUserPrincipal, profile);
 	}
 
+	@ApiOperation(tags = "0. User", value = "유저 신고")
+	@PostMapping("/declare")
+	public ResponseEntity<UserDeclareResponse> declareCommunity(
+		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody DeclareRequest declareRequest) {
+		UserDeclareResponse userDeclareResponse = userService.declareCommunity(customUserPrincipal, declareRequest);
+		return ResponseEntity.ok().body(userDeclareResponse);
+	}
+
+	@ApiOperation(tags = "0. User", value = "유저 신고 승인")
+	@PatchMapping("/declare")
+	public ResponseEntity<CommonResponse.GeneralResponse> approveUserDeclare(
+		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody DeclareStatusRequest declareStatusRequest) {
+		return userService.approveUserDeclare(declareStatusRequest);
+	}
+
+	@ApiOperation(tags = "0. User", value = "유저 신고 거절")
+	@DeleteMapping("/declare")
+	public ResponseEntity<CommonResponse.GeneralResponse> refuseUserDeclare(
+		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody DeclareStatusRequest declareStatusRequest) {
+		return userService.refuseUserDeclare(declareStatusRequest);
+	}
 }

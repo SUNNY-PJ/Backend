@@ -1,4 +1,4 @@
-package com.sunny.backend.user.dto;
+package com.sunny.backend.user.dto.response;
 
 import com.sunny.backend.user.domain.Users;
 
