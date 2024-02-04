@@ -1,11 +1,11 @@
-package com.sunny.backend.declaration.domain;
+package com.sunny.backend.report.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum DeclarationStatus {
+public enum ReportStatus {
 	COMMUNITY("커뮤니티"), COMMENT("댓글");
 
 	private final String status;

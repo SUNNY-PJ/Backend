@@ -6,13 +6,10 @@ import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.domain.SortType;
 import com.sunny.backend.community.dto.response.CommunityResponse.ViewAndCommentResponse;
-import com.sunny.backend.declaration.domain.CommunityDeclaration;
-import com.sunny.backend.declaration.dto.DeclareRequest;
-import com.sunny.backend.declaration.repository.CommunityDeclarationRepository;
+import com.sunny.backend.report.repository.CommunityReportRepository;
 import com.sunny.backend.scrap.domain.Scrap;
 import com.sunny.backend.scrap.repository.ScrapRepository;
 
-import java.awt.font.OpenType;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -51,7 +48,7 @@ public class CommunityService {
 	private final ResponseService responseService;
 	private final S3Util s3Util;
 	private final RedisUtil redisUtil;
-	private final CommunityDeclarationRepository communityDeclarationRepository;
+	private final CommunityReportRepository communityReportRepository;
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> findCommunity(

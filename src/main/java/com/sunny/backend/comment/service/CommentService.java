@@ -2,8 +2,10 @@ package com.sunny.backend.comment.service;
 
 import static com.sunny.backend.comment.domain.Comment.validateCommentByUser;
 import static com.sunny.backend.comment.dto.response.CommentResponse.convertCommentToDto;
-import static com.sunny.backend.common.CommonErrorCode.*;
+import static com.sunny.backend.comment.exception.CommentErrorCode.*;
+import static com.sunny.backend.community.exception.CommunityErrorCode.*;
 
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.notification.domain.CommentNotification;
 import com.sunny.backend.notification.domain.Notification;
@@ -20,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sunny.backend.common.response.CommonResponse;
-import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.comment.dto.request.CommentRequest;
 import com.sunny.backend.comment.dto.request.CommentRequestMapper;
@@ -92,7 +93,7 @@ public class CommentService {
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
-				.orElseThrow(() -> new CommonCustomException(COMMUNITY_NOT_FOUND));
+				.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
 		List<Comment> comments = commentRepository.findAllByCommunity_Id(communityId);
 		List<CommentResponse> commentResponses = comments.stream()
 				.filter(comment -> comment.getParent() == null)
@@ -107,14 +108,14 @@ public class CommentService {
 			throws IOException {
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.findById(communityId)
-				.orElseThrow(() -> new CommonCustomException(COMMUNITY_NOT_FOUND));
+				.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
 		Comment comment = commentRequestMapper.toEntity(commentRequestDTO);
 		Comment parentComment = null;
 		if (commentRequestDTO.getParentId() != null) {
 			parentComment = commentRepository.findById(commentRequestDTO.getParentId())
-					.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
+					.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
 			if (parentComment.getParent() != null) {
-				throw new CommonCustomException(REPLYING_NOT_ALLOWED);
+				throw new CustomException(REPLYING_NOT_ALLOWED);
 			}
 			comment.setParent(parentComment);
 		}
@@ -198,7 +199,7 @@ public class CommentService {
 	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> deleteComment(
 			CustomUserPrincipal customUserPrincipal, Long commentId) {
 		Comment comment = commentRepository.findCommentByIdWithParent(commentId)
-				.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
+				.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
 		validateCommentByUser(customUserPrincipal.getUsers().getId(),comment.getUsers().getId());
 		comment.changeIsDeleted(true);
 		CommentResponse commentResponse= convertCommentToDto(comment);
@@ -216,7 +217,7 @@ public class CommentService {
 	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> updateComment(
 			CustomUserPrincipal customUserPrincipal, Long commentId, CommentRequest commentRequestDTO) {
 		Comment comment = commentRepository.findById(commentId)
-				.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
+				.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
 		validateCommentByUser(customUserPrincipal.getUsers().getId(),comment.getUsers().getId());
 		comment.updateContent(commentRequestDTO.getContent());
 		boolean isPrivate = commentRequestDTO.getIsPrivated();

@@ -1,4 +1,4 @@
-package com.sunny.backend.declaration.exception;
+package com.sunny.backend.report.exception;
 
 import org.springframework.http.HttpStatus;
 
@@ -7,10 +7,10 @@ import com.sunny.backend.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public enum DeclarationErrorCode implements ErrorCode {
+public enum ReportErrorCode implements ErrorCode {
 	ALREADY_PROCESS(HttpStatus.INTERNAL_SERVER_ERROR, "이미 처리된 신고 기록 입니다."),
-	DECLARE_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글 신고 기록을 찾을 수 없습니다."),
-	DECLARE_COMMUNITY_NOT_FOUND(HttpStatus.NOT_FOUND, "커뮤니티 신고 기록을 찾을 수 없습니다.");
+	REPORT_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글 신고 기록을 찾을 수 없습니다."),
+	REPORT_COMMUNITY_NOT_FOUND(HttpStatus.NOT_FOUND, "커뮤니티 신고 기록을 찾을 수 없습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;
