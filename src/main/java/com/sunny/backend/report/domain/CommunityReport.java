@@ -1,6 +1,6 @@
-package com.sunny.backend.declaration.domain;
+package com.sunny.backend.report.domain;
 
-import static com.sunny.backend.declaration.exception.DeclarationErrorCode.*;
+import static com.sunny.backend.report.exception.ReportErrorCode.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,9 +14,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.common.exception.CustomException;
+import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.friends.domain.Status;
 import com.sunny.backend.user.domain.Users;
 
@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentDeclaration extends BaseTime {
+public class CommunityReport extends BaseTime {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -40,8 +40,8 @@ public class CommentDeclaration extends BaseTime {
 	private Users users;
 
 	@ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
-	@JoinColumn(name= "comment_id")
-	private Comment comment;
+	@JoinColumn(name= "community_id")
+	private Community community;
 
 	@Column
 	private String reason;
