@@ -123,7 +123,7 @@ public class CommentService {
 		comment.setUsers(user);
 		boolean isPrivate = commentRequestDTO.getIsPrivated();
 		comment.setIsPrivated(isPrivate);
-		boolean isAuthor=Objects.equals(customUserPrincipal.getUsers().getId(),
+		boolean isAuthor=Objects.equals(user.getId(),
 				comment.getCommunity().getUsers().getId());
 
 		comment.setAuthor(isAuthor);

@@ -40,7 +40,7 @@ public class CommentResponse {
 			return new CommentResponse(
 					comment.getId(),
 					null,
-					null,
+					"(알수없음)",
 					"삭제된 댓글입니다.",
 					null,
 					comment.getAuthor()
