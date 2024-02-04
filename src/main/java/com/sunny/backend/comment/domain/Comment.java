@@ -55,7 +55,7 @@ public class Comment extends BaseTime {
     @JoinColumn(name = "parent_id")
     private Comment parent;
 
-    @OneToMany(mappedBy = "parent", orphanRemoval = true)
+    @OneToMany(mappedBy = "parent", orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<Comment> children = new ArrayList<>();
 
     public Comment(String content) {
