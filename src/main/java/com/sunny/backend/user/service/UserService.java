@@ -1,8 +1,6 @@
 package com.sunny.backend.user.service;
 
 import static com.sunny.backend.common.ComnConstant.*;
-import static com.sunny.backend.community.domain.QCommunity.*;
-import static com.sunny.backend.declaration.domain.DeclarationStatus.*;
 
 import java.util.List;
 
@@ -15,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.comment.repository.CommentRepository;
-import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.community.domain.Community;
@@ -23,14 +20,17 @@ import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.declaration.domain.CommentDeclaration;
 import com.sunny.backend.declaration.domain.CommunityDeclaration;
 import com.sunny.backend.declaration.dto.DeclareRequest;
+import com.sunny.backend.declaration.dto.DeclareStatusRequest;
 import com.sunny.backend.declaration.repository.CommentDeclarationRepository;
 import com.sunny.backend.declaration.repository.CommunityDeclarationRepository;
-import com.sunny.backend.user.dto.ProfileResponse;
+import com.sunny.backend.friends.domain.Status;
+import com.sunny.backend.user.dto.response.ProfileResponse;
 import com.sunny.backend.scrap.repository.ScrapRepository;
 import com.sunny.backend.user.domain.Users;
-import com.sunny.backend.user.dto.UserCommentResponse;
-import com.sunny.backend.user.dto.UserCommunityResponse;
-import com.sunny.backend.user.dto.UserScrapResponse;
+import com.sunny.backend.user.dto.response.UserCommentResponse;
+import com.sunny.backend.user.dto.response.UserCommunityResponse;
+import com.sunny.backend.user.dto.response.UserDeclareResponse;
+import com.sunny.backend.user.dto.response.UserScrapResponse;
 import com.sunny.backend.user.repository.UserRepository;
 import com.sunny.backend.util.S3Util;
 
@@ -104,7 +104,8 @@ public class UserService {
 		return responseService.getSingleResponse(HttpStatus.OK.value(), profileResponse, "프로필 변경 완료");
 	}
 
-	public ResponseEntity<CommonResponse.GeneralResponse> declareCommunity(CustomUserPrincipal customUserPrincipal,
+	@Transactional
+	public UserDeclareResponse declareCommunity(CustomUserPrincipal customUserPrincipal,
 		DeclareRequest declareRequest) {
 		switch (declareRequest.status()) {
 			case COMMUNITY -> {
@@ -113,9 +114,10 @@ public class UserService {
 					.users(customUserPrincipal.getUsers())
 					.community(community)
 					.reason(declareRequest.reason())
+					.status(Status.WAIT)
 					.build();
 				communityDeclarationRepository.save(communityDeclaration);
-				return responseService.getGeneralResponse(HttpStatus.OK.value(), "게시글을 신고했습니다.");
+				return UserDeclareResponse.toCommunity(communityDeclaration.getCreatedDate(), community, declareRequest.reason());
 			}
 			case COMMENT -> {
 				Comment comment = commentRepository.getById(declareRequest.id());
@@ -123,11 +125,48 @@ public class UserService {
 					.users(customUserPrincipal.getUsers())
 					.comment(comment)
 					.reason(declareRequest.reason())
+					.status(Status.WAIT)
 					.build();
 				commentDeclarationRepository.save(commentDeclaration);
-				return responseService.getGeneralResponse(HttpStatus.OK.value(), "게시글을 신고했습니다.");
+				return UserDeclareResponse.toComment(commentDeclaration.getCreatedDate(), comment, declareRequest.reason());
 			}
 		}
 		return null;
+	}
+
+	@Transactional
+	public ResponseEntity<CommonResponse.GeneralResponse> approveUserDeclare(DeclareStatusRequest declareStatusRequest) {
+		switch (declareStatusRequest.status()) {
+			case COMMUNITY -> {
+				CommunityDeclaration communityDeclaration = communityDeclarationRepository.getById(declareStatusRequest.id());
+				communityDeclaration.isWait();
+				communityDeclaration.approveStatus();
+				communityDeclaration.getUsers().increaseCount();
+			}
+			case COMMENT -> {
+				CommentDeclaration commentDeclaration = commentDeclarationRepository.getById(declareStatusRequest.id());
+				commentDeclaration.isWait();
+				commentDeclaration.approveStatus();
+				commentDeclaration.getUsers().increaseCount();
+			}
+		}
+		return responseService.getGeneralResponse(HttpStatus.OK.value(), "신고가 승인되었습니다.");
+	}
+
+	@Transactional
+	public ResponseEntity<CommonResponse.GeneralResponse> refuseUserDeclare(DeclareStatusRequest declareStatusRequest) {
+		switch (declareStatusRequest.status()) {
+			case COMMUNITY -> {
+				CommunityDeclaration communityDeclaration = communityDeclarationRepository.getById(declareStatusRequest.id());
+				communityDeclaration.isWait();
+				communityDeclarationRepository.deleteById(declareStatusRequest.id());
+			}
+			case COMMENT -> {
+				CommentDeclaration commentDeclaration = commentDeclarationRepository.getById(declareStatusRequest.id());
+				commentDeclaration.isWait();
+				commentDeclarationRepository.deleteById(declareStatusRequest.id());
+			}
+		}
+		return responseService.getGeneralResponse(HttpStatus.OK.value(), "신고가 거절되었습니다.");
 	}
 }

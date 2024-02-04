@@ -14,6 +14,9 @@ import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sunny.backend.friends.domain.Friend;
 
@@ -27,6 +30,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Builder
+@DynamicInsert
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Users extends BaseTime {
@@ -70,6 +74,9 @@ public class Users extends BaseTime {
 	@Column
 	private String profile;
 
+	@ColumnDefault("0")
+	private int count;
+
 	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private List<Friend> friends = new ArrayList<>();
 
@@ -105,6 +112,10 @@ public class Users extends BaseTime {
 
 	public void updateProfile(String profile) {
 		this.profile = profile;
+	}
+
+	public void increaseCount() {
+		count++;
 	}
 }
 

@@ -1,7 +1,12 @@
 package com.sunny.backend.declaration.domain;
 
+import static com.sunny.backend.declaration.exception.DeclarationErrorCode.*;
+
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,6 +16,8 @@ import javax.persistence.ManyToOne;
 
 import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.common.BaseTime;
+import com.sunny.backend.common.exception.CustomException;
+import com.sunny.backend.friends.domain.Status;
 import com.sunny.backend.user.domain.Users;
 
 import lombok.AllArgsConstructor;
@@ -36,5 +43,20 @@ public class CommentDeclaration extends BaseTime {
 	@JoinColumn(name= "comment_id")
 	private Comment comment;
 
+	@Column
 	private String reason;
+
+	@Column
+	@Enumerated(value = EnumType.STRING)
+	private Status status;
+
+	public void isWait() {
+		if(status != Status.WAIT) {
+			throw new CustomException(ALREADY_PROCESS);
+		}
+	}
+
+	public void approveStatus() {
+		status = Status.APPROVE;
+	}
 }
