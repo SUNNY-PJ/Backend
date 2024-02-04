@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,12 +17,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
-import com.sunny.backend.declaration.dto.DeclareRequest;
-import com.sunny.backend.declaration.dto.DeclareStatusRequest;
+import com.sunny.backend.report.dto.ReportRequest;
+import com.sunny.backend.report.dto.ReportStatusRequest;
 import com.sunny.backend.user.dto.response.ProfileResponse;
 import com.sunny.backend.user.dto.response.UserCommentResponse;
 import com.sunny.backend.user.dto.response.UserCommunityResponse;
-import com.sunny.backend.user.dto.response.UserDeclareResponse;
+import com.sunny.backend.user.dto.response.UserReportResponse;
 import com.sunny.backend.user.dto.response.UserScrapResponse;
 import com.sunny.backend.user.service.UserService;
 
@@ -84,24 +83,24 @@ public class UserController {
 	}
 
 	@ApiOperation(tags = "0. User", value = "유저 신고")
-	@PostMapping("/declare")
-	public ResponseEntity<UserDeclareResponse> declareCommunity(
-		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody DeclareRequest declareRequest) {
-		UserDeclareResponse userDeclareResponse = userService.declareCommunity(customUserPrincipal, declareRequest);
-		return ResponseEntity.ok().body(userDeclareResponse);
+	@PostMapping("/report")
+	public ResponseEntity<UserReportResponse> reportCommunity(
+		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody ReportRequest reportRequest) {
+		UserReportResponse userReportResponse = userService.reportCommunity(customUserPrincipal, reportRequest);
+		return ResponseEntity.ok().body(userReportResponse);
 	}
 
 	@ApiOperation(tags = "0. User", value = "유저 신고 승인")
-	@PatchMapping("/declare")
-	public ResponseEntity<CommonResponse.GeneralResponse> approveUserDeclare(
-		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody DeclareStatusRequest declareStatusRequest) {
-		return userService.approveUserDeclare(declareStatusRequest);
+	@PatchMapping("/report")
+	public ResponseEntity<CommonResponse.GeneralResponse> approveUserReport(
+		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody ReportStatusRequest reportStatusRequest) {
+		return userService.approveUserReport(reportStatusRequest);
 	}
 
 	@ApiOperation(tags = "0. User", value = "유저 신고 거절")
-	@DeleteMapping("/declare")
-	public ResponseEntity<CommonResponse.GeneralResponse> refuseUserDeclare(
-		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody DeclareStatusRequest declareStatusRequest) {
-		return userService.refuseUserDeclare(declareStatusRequest);
+	@DeleteMapping("/report")
+	public ResponseEntity<CommonResponse.GeneralResponse> refuseUserReport(
+		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody ReportStatusRequest reportStatusRequest) {
+		return userService.refuseUserReport(reportStatusRequest);
 	}
 }

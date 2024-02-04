@@ -75,7 +75,7 @@ public class Users extends BaseTime {
 	private String profile;
 
 	@ColumnDefault("0")
-	private int count;
+	private int reportCount;
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private List<Friend> friends = new ArrayList<>();
@@ -114,8 +114,8 @@ public class Users extends BaseTime {
 		this.profile = profile;
 	}
 
-	public void increaseCount() {
-		count++;
+	public void increaseReportCount() {
+		reportCount++;
 	}
 }
 
