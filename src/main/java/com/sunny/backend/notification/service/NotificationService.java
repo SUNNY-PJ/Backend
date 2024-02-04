@@ -1,7 +1,7 @@
 package com.sunny.backend.notification.service;
 
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.common.response.CommonResponse;
-import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.response.CommonResponse.ListResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.notification.domain.CommentNotification;
@@ -27,7 +27,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
-import static com.sunny.backend.common.CommonErrorCode.NOTIFICATIONS_NOT_SENT;
+
+import static com.sunny.backend.common.ComnConstant.*;
+import static com.sunny.backend.notification.exception.NotificationErrorCode.NOTIFICATIONS_NOT_SENT;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +40,6 @@ public class NotificationService {
     private final FriendsNotificationRepository friendsNotificationRepository;
     private final CompetitionNotificationRepository competitionNotificationRepository;
 
-    private String expoPushNotificationUrl = "https://exp.host/--/api/v2/push/send";
     public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(CustomUserPrincipal customUserPrincipal, NotificationRequest notificationRequest) {
         Users user = customUserPrincipal.getUsers();
         Notification notification = Notification.builder()
@@ -85,7 +86,7 @@ public class NotificationService {
                         "}");
 
                 Request request = new Request.Builder()
-                    .url(expoPushNotificationUrl)
+                    .url(EXPO_PUSH_URL)
                     .post(body)
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Accept", "application/json")
@@ -106,7 +107,7 @@ public class NotificationService {
             return responseService.getSingleResponse(HttpStatus.OK.value(), notificationResponse,
                 "알림 성공");
         } else {
-            throw new CommonCustomException(NOTIFICATIONS_NOT_SENT);
+            throw new CustomException(NOTIFICATIONS_NOT_SENT);
         }
     }
 
