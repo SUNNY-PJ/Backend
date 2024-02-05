@@ -17,16 +17,16 @@ import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.repository.CommunityRepository;
+import com.sunny.backend.friends.domain.Status;
 import com.sunny.backend.report.domain.CommentReport;
 import com.sunny.backend.report.domain.CommunityReport;
 import com.sunny.backend.report.dto.ReportRequest;
 import com.sunny.backend.report.dto.ReportStatusRequest;
 import com.sunny.backend.report.repository.CommentReportRepository;
 import com.sunny.backend.report.repository.CommunityReportRepository;
-import com.sunny.backend.friends.domain.Status;
-import com.sunny.backend.user.dto.response.ProfileResponse;
 import com.sunny.backend.scrap.repository.ScrapRepository;
 import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.dto.response.ProfileResponse;
 import com.sunny.backend.user.dto.response.UserCommentResponse;
 import com.sunny.backend.user.dto.response.UserCommunityResponse;
 import com.sunny.backend.user.dto.response.UserReportResponse;
@@ -56,11 +56,13 @@ public class UserService {
 		return customUserPrincipal.getUsers();
 	}
 
+	@Transactional(readOnly = true)
 	public ProfileResponse getUserProfile(CustomUserPrincipal customUserPrincipal, Long userId) {
 		Users user = checkUserId(customUserPrincipal, userId);
 		return ProfileResponse.from(user);
 	}
 
+	@Transactional(readOnly = true)
 	public List<UserCommunityResponse> getUserCommunityList(CustomUserPrincipal customUserPrincipal, Long userId) {
 		Users user = checkUserId(customUserPrincipal, userId);
 
@@ -87,7 +89,6 @@ public class UserService {
 			.toList();
 	}
 
-	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
 		CustomUserPrincipal customUserPrincipal, MultipartFile profile) {
 
@@ -104,9 +105,7 @@ public class UserService {
 		return responseService.getSingleResponse(HttpStatus.OK.value(), profileResponse, "프로필 변경 완료");
 	}
 
-	@Transactional
-	public UserReportResponse reportCommunity(CustomUserPrincipal customUserPrincipal,
-		ReportRequest reportRequest) {
+	public UserReportResponse reportCommunity(CustomUserPrincipal customUserPrincipal, ReportRequest reportRequest) {
 		switch (reportRequest.status()) {
 			case COMMUNITY -> {
 				Community community = communityRepository.getById(reportRequest.id());
@@ -117,7 +116,8 @@ public class UserService {
 					.status(Status.WAIT)
 					.build();
 				communityReportRepository.save(communityReport);
-				return UserReportResponse.toCommunity(communityReport.getCreatedDate(), community, reportRequest.reason());
+				return UserReportResponse.toCommunity(communityReport.getCreatedDate(), community,
+					reportRequest.reason());
 			}
 			case COMMENT -> {
 				Comment comment = commentRepository.getById(reportRequest.id());
@@ -143,7 +143,7 @@ public class UserService {
 				communityReport.approveStatus();
 
 				Users users = communityReport.getUsers();
-				if(users.getReportCount()==4) {
+				if (users.getReportCount() == 4) {
 					userRepository.deleteById(users.getId());
 				} else {
 					communityReport.getUsers().increaseReportCount();
@@ -155,7 +155,7 @@ public class UserService {
 				commentReport.approveStatus();
 
 				Users users = commentReport.getUsers();
-				if(users.getReportCount()==4) {
+				if (users.getReportCount() == 4) {
 					userRepository.deleteById(users.getId());
 				} else {
 					commentReport.getUsers().increaseReportCount();

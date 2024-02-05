@@ -48,7 +48,6 @@ public class CommunityService {
 	private final ResponseService responseService;
 	private final S3Util s3Util;
 	private final RedisUtil redisUtil;
-	private final CommunityReportRepository communityReportRepository;
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> findCommunity(
