@@ -93,14 +93,14 @@ public class UserController {
 	@ApiOperation(tags = "0. User", value = "유저 신고 승인")
 	@PatchMapping("/report")
 	public ResponseEntity<CommonResponse.GeneralResponse> approveUserReport(
-		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody ReportStatusRequest reportStatusRequest) {
+		@RequestBody ReportStatusRequest reportStatusRequest) {
 		return userService.approveUserReport(reportStatusRequest);
 	}
 
 	@ApiOperation(tags = "0. User", value = "유저 신고 거절")
 	@DeleteMapping("/report")
 	public ResponseEntity<CommonResponse.GeneralResponse> refuseUserReport(
-		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody ReportStatusRequest reportStatusRequest) {
+		@RequestBody ReportStatusRequest reportStatusRequest) {
 		return userService.refuseUserReport(reportStatusRequest);
 	}
 }

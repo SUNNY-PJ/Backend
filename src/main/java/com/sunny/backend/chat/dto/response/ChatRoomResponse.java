@@ -5,13 +5,15 @@ import com.sunny.backend.chat.domain.ChatUser;
 public record ChatRoomResponse (
 	Long chatRoomId,
 	Long userFriendId,
-	String friendName
+	String friendName,
+	String friendProfile
 ){
 	public static ChatRoomResponse from(ChatUser chatUser) {
 		return new ChatRoomResponse(
 			chatUser.getChatRoom().getId(),
 			chatUser.getFriend().getId(),
-			chatUser.getFriend().getName()
+			chatUser.getFriend().getName(),
+			chatUser.getFriend().getProfile()
 		);
 	}
 }

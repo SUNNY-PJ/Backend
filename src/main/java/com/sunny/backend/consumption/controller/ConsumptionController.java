@@ -1,7 +1,5 @@
 package com.sunny.backend.consumption.controller;
 
-
-import com.sunny.backend.consumption.dto.request.YearMonthRequest;
 import com.sunny.backend.consumption.dto.response.ConsumptionResponse.DetailConsumptionResponse;
 import com.sunny.backend.consumption.domain.SpendType;
 import java.time.LocalDate;
@@ -28,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/consumption")
 public class ConsumptionController {
 	private final ConsumptionService consumptionService;
+
 	@ApiOperation(tags = "4. Consumption", value = "지출 조회")
 	@GetMapping("")
 	public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse>> getConsumptionList(
@@ -38,34 +37,33 @@ public class ConsumptionController {
 	@ApiOperation(tags = "4. Consumption", value = "지출 등록")
 	@PostMapping("")
 	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> createConsumption(
-			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@Valid @RequestBody ConsumptionRequest consumtionRequest) {
-		System.out.println("Zzzzz");
+		@AuthUser CustomUserPrincipal customUserPrincipal,
+		@Valid @RequestBody ConsumptionRequest consumtionRequest) {
 		return consumptionService.createConsumption(customUserPrincipal, consumtionRequest);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "지출 통계")
 	@GetMapping("/spendTypeStatistics")
-	public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>>
-	getSpendTypeStatistics(@AuthUser CustomUserPrincipal customUserPrincipal,
-			@RequestParam(name = "year") Integer year, @RequestParam(name = "month") Integer month) {
+	public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>> getSpendTypeStatistics(
+		@AuthUser CustomUserPrincipal customUserPrincipal,
+		@RequestParam(name = "year") Integer year, @RequestParam(name = "month") Integer month) {
 		return consumptionService.getSpendTypeStatistics(customUserPrincipal,year,month);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "날짜에 맞는 지출 내역 조회")
 	@GetMapping("/date")
 	public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumptionResponse>> getDetailConsumption(
-			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@RequestParam("datefield") @DateTimeFormat(pattern = "yyyy.MM.dd") LocalDate datefield) {
+		@AuthUser CustomUserPrincipal customUserPrincipal,
+		@RequestParam("datefield") @DateTimeFormat(pattern = "yyyy.MM.dd") LocalDate datefield) {
 		return consumptionService.getDetailConsumption(customUserPrincipal, datefield);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "지출 내역 수정")
 	@PutMapping("/{consumptionId}")
 	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> updateConsumption(
-			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@Valid @RequestBody ConsumptionRequest consumtionRequest,
-			@PathVariable Long consumptionId) {
+		@AuthUser CustomUserPrincipal customUserPrincipal,
+		@Valid @RequestBody ConsumptionRequest consumtionRequest,
+		@PathVariable Long consumptionId) {
 		return consumptionService.updateConsumption(customUserPrincipal, consumtionRequest,
 				consumptionId);
 	}
@@ -73,9 +71,8 @@ public class ConsumptionController {
 	@ApiOperation(tags = "4. Consumption", value = "지출 내역 삭제")
 	@DeleteMapping("/{consumptionId}")
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteConsumption(
-			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@PathVariable Long consumptionId) {
-
+		@AuthUser CustomUserPrincipal customUserPrincipal,
+		@PathVariable Long consumptionId) {
 		return consumptionService.deleteConsumption(customUserPrincipal, consumptionId);
 	}
 
