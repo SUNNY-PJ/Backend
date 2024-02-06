@@ -40,13 +40,13 @@ public class CommentResponse {
 			return new CommentResponse(
 					comment.getId(),
 					null,
-					"(알수없음)",
+					"(알 수 없음)",
 					"삭제된 댓글입니다.",
 					null,
 					comment.getAuthor()
 			);
 		} else {
-			String writer = comment.getUsers() != null ? comment.getUsers().getName() : null;
+			String writer = comment.getUsers() != null ? comment.getUsers().getNickname() : null;
 			String content = comment.getContent();
 			LocalDateTime createdDate = comment.getCreatedDate();
 			boolean isAuthor =comment.getAuthor();
@@ -72,7 +72,7 @@ public class CommentResponse {
 				.communityId(comment.getCommunity().getId())
 				.commentId(comment.getId())
 				.content(comment.getContent())
-				.writer(comment.getUsers().getName())
+				.writer(comment.getUsers().getNickname())
 				.createdDate(comment.getCreatedDate())
 				.updateDate(comment.getUpdatedDate())
 				.build();

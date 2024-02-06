@@ -42,9 +42,13 @@ public class Users extends BaseTime {
 	@Column(unique = true)
 	private String email;
 
-	@Size(min=2,max=10)
-	@Column(unique = true, nullable = false)
+
+	@Column(nullable = false)
 	private String name;
+
+	@Size(min=2,max=10)
+	@Column(unique = true)
+	private String nickname;
 
 	private String oauthId;
 
@@ -107,7 +111,7 @@ public class Users extends BaseTime {
 	}
 
 	public void updateName(String name) {
-		this.name = name;
+		this.nickname = name;
 	}
 
 	public void updateProfile(String profile) {

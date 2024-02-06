@@ -10,7 +10,7 @@ public record ProfileResponse (
     public static ProfileResponse from(Users users) {
         return new ProfileResponse(
             users.getId(),
-            users.getName(),
+            users.getNickname(),
             users.getProfile()
         );
     }

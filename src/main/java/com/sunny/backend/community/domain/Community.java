@@ -48,7 +48,7 @@ public class Community {
     @Enumerated(EnumType.STRING)
     @NotNull(message = "올바른 카테고리 값을 입력해야합니다.")
     private BoardType boardType;
-    @OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "community",orphanRemoval = true)
     @Builder.Default
     private List<Comment> commentList=new ArrayList<>();
 

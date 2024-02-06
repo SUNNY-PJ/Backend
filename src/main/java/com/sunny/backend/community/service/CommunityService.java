@@ -1,12 +1,13 @@
 package com.sunny.backend.community.service;
 
-
+import com.sunny.backend.comment.repository.CommentRepository;
 import com.sunny.backend.common.photo.Photo;
 import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.domain.SortType;
 import com.sunny.backend.community.dto.response.CommunityResponse.ViewAndCommentResponse;
-import com.sunny.backend.report.repository.CommunityReportRepository;
+import com.sunny.backend.notification.domain.CommentNotification;
+import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.scrap.domain.Scrap;
 import com.sunny.backend.scrap.repository.ScrapRepository;
 
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.nimbusds.oauth2.sdk.util.StringUtils;
+import javax.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -48,6 +50,8 @@ public class CommunityService {
 	private final ResponseService responseService;
 	private final S3Util s3Util;
 	private final RedisUtil redisUtil;
+	private final CommentNotificationRepository commentNotificationRepository;
+	private final CommentRepository commentRepository;
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> findCommunity(
@@ -180,15 +184,22 @@ public class CommunityService {
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.getById(communityId);
-		List<Photo> photoList = photoRepository.findByCommunityId(communityId);
+
 		Community.validateCommunityByUser(community.getUsers().getId(), user.getId());
+
+		List<CommentNotification> commentNotifications = commentNotificationRepository.findByCommunityId(communityId);
+		for (CommentNotification commentNotification : commentNotifications) {
+			commentNotificationRepository.deleteById(commentNotification.getId());
+		}
+
+		List<Photo> photoList = photoRepository.findByCommunityId(communityId);
 		for (Photo existingFile : photoList) {
 			s3Util.deleteFile(existingFile.getFileUrl());
 		}
 		photoRepository.deleteByCommunityId(communityId);
+
 		communityRepository.deleteById(communityId);
-		return responseService.getGeneralResponse(HttpStatus.OK.value(),
-				"게시글을 삭제했습니다.");
+		return responseService.getGeneralResponse(HttpStatus.OK.value(), "게시글을 삭제했습니다.");
 	}
 
 	@Transactional

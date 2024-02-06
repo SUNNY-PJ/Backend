@@ -99,17 +99,17 @@ public class KakaoService {
 		}
 	}
 
-	@Transactional
-	public UserNameResponse changeNickname(CustomUserPrincipal customUserPrincipal, String name) {
-		Users user = customUserPrincipal.getUsers();
-		Optional<Users> optionalUsers = userRepository.findByName(name);
-		if (optionalUsers.isPresent()) {
-			throw new CustomException(UserErrorCode.NICKNAME_IN_USE);
-		}
-		user.updateName(name);
-		userRepository.save(user);
-		return new UserNameResponse(user.getName());
-	}
+    @Transactional
+    public UserNameResponse changeNickname(CustomUserPrincipal customUserPrincipal, String name){
+        Users user = customUserPrincipal.getUsers();
+        Optional<Users> optionalUsers = userRepository.findByNickname(name);
+        if (optionalUsers.isPresent()) {
+            throw new CustomException(UserErrorCode.NICKNAME_IN_USE);
+        }
+        user.updateName(name);
+        userRepository.save(user);
+        return new UserNameResponse(user.getNickname());
+    }
 
 	@Transactional
 	public void leave(CustomUserPrincipal customUserPrincipal) {
@@ -117,6 +117,7 @@ public class KakaoService {
 		appAdminKeyMethod(users.getOauthId(), KAKAO_LEAVE_URL);
 		userRepository.deleteById(users.getId());
 	}
+
 
 	public void logout(CustomUserPrincipal customUserPrincipal) {
 		Users users = customUserPrincipal.getUsers();

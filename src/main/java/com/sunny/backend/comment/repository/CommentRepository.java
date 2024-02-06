@@ -13,6 +13,7 @@ public interface CommentRepository extends JpaRepository<Comment,Long>, CommentC
     List<Comment> findAllByUsers_Id (Long userId);
     List<Comment> findAllByCommunity_Id (Long communityId);
 
+
     default Comment getById(Long id) {
         return findById(id)
             .orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
