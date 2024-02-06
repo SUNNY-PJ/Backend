@@ -19,7 +19,7 @@ public record CommunityResponse(
     String contents,
     int viewCount,
     List<String> photoList,
-    long commentCnt,
+    int commentCnt,
     BoardType type,
     String profileImg,
     String createdAt,
@@ -29,9 +29,6 @@ public record CommunityResponse(
 
     public static CommunityResponse of(Community community, boolean isScraped) {
         boolean isModified = community.hasNotBeenModified(community.getCreatedAt(), community.getModifiedAt());
-        long nonDeletedCommentsCount = community.getCommentList().stream()
-            .filter(comment -> !comment.getIsDeleted())
-            .count();
 
         return new CommunityResponse(
             community.getId(),
@@ -45,7 +42,7 @@ public record CommunityResponse(
                 .map(Photo::getFileUrl)
                 .filter(Objects::nonNull)
                 .toList(),
-            nonDeletedCommentsCount,
+            community.getCommentList().size(),
             community.getBoardType(),
             community.getUsers().getProfile(),
             DatetimeUtil.timesAgo(community.getCreatedAt()),
@@ -59,7 +56,7 @@ public record CommunityResponse(
         String title,
         String writer,
         int viewCount,
-        long commentCount,
+        int commentCount,
         BoardType type,
         String createdAt,
         boolean isModified,
@@ -68,16 +65,13 @@ public record CommunityResponse(
         public static PageResponse from(Users users,Community community) {
             boolean isModified = community.hasNotBeenModified(community.getCreatedAt(), community.getModifiedAt());
             boolean isAuthor = community.getUsers().getId().equals(users.getId());
-            long nonDeletedCommentsCount = community.getCommentList().stream()
-                .filter(comment -> !comment.getIsDeleted())
-                .count();
             return new PageResponse(
                 community.getId(),
                 community.getUsers().getId(),
                 community.getTitle(),
                 community.getUsers().getNickname(),
                 community.getViewCnt(),
-                nonDeletedCommentsCount,
+                community.getCommentList().size(),
                 community.getBoardType(),
                 DatetimeUtil.timesAgo(community.getCreatedAt()),
                 isModified,
