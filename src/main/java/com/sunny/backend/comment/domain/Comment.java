@@ -47,7 +47,7 @@ public class Comment extends BaseTime {
     @JoinColumn(name="community_id")
     private Community community;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
     @JoinColumn(name = "users_id")
     private Users users;
 
