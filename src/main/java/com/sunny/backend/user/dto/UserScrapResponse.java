@@ -19,7 +19,7 @@ public record UserScrapResponse(
 	public static UserScrapResponse from(Community community) {
 		return UserScrapResponse.builder()
 			.title(community.getTitle())
-			.writer(community.getUsers().getName())
+			.writer(community.getUsers().getNickname())
 			.createDate(community.getCreatedAt())
 			.viewCnt(community.getViewCnt())
 			.commentCnt(community.getCommentSize())

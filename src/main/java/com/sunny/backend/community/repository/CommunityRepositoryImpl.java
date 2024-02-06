@@ -7,12 +7,13 @@ import static com.sunny.backend.user.domain.QUsers.users;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.community.dto.response.CommunityResponse;
 import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.domain.SortType;
-import java.util.Optional;
-import javax.swing.text.html.Option;
+import com.sunny.backend.community.dto.response.CommunityResponse.PageResponse;
+import com.sunny.backend.user.domain.Users;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
@@ -28,8 +29,9 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
     super(Community.class);
     this.queryFactory = jpaQueryFactory;
   }
-  public List<CommunityResponse.PageResponse> paginationNoOffsetBuilder(@Nullable Long communityId,
+  public List<CommunityResponse.PageResponse> paginationNoOffsetBuilder(Users users,@Nullable Long communityId,
       SortType sortType, BoardType boardType, String searchText, int pageSize) {
+
     JPAQuery<Community> query = queryFactory.selectFrom(community)
         .where(ltCommunityId(communityId))
         .orderBy(sortType == SortType.VIEW ? community.viewCnt.desc()
@@ -43,7 +45,7 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
     }
     List<Community> results = query.fetch();
     return results.stream()
-        .map(CommunityResponse.PageResponse::from)
+        .map(community -> PageResponse.from(users,community))
         .collect(Collectors.toList());
   }
   private BooleanExpression ltCommunityId(Long communityId) {

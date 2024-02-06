@@ -58,7 +58,6 @@ public class KakaoService {
                 new HttpEntity<>(params, headers),
                 OAuthToken.class
         );
-
         return Objects.requireNonNull(response.getBody()).getAccessToken();
     }
 
@@ -98,13 +97,13 @@ public class KakaoService {
     @Transactional
     public UserNameResponse changeNickname(CustomUserPrincipal customUserPrincipal, String name){
         Users user = customUserPrincipal.getUsers();
-        Optional<Users> optionalUsers = userRepository.findByName(name);
+        Optional<Users> optionalUsers = userRepository.findByNickname(name);
         if (optionalUsers.isPresent()) {
             throw new CustomException(UserErrorCode.NICKNAME_IN_USE);
         }
         user.updateName(name);
         userRepository.save(user);
-        return new UserNameResponse(user.getName());
+        return new UserNameResponse(user.getNickname());
     }
 
     @Transactional

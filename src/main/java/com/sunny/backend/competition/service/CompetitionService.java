@@ -61,7 +61,7 @@ public class CompetitionService {
 		friendWithUserFriend.addCompetition(competition);
 
 		CompetitionApplyResponse competitionApplyResponse =  CompetitionApplyResponse.of(friendWithUserFriend.getId(),
-			friendWithUserFriend.getUsers().getName(), competition);
+			friendWithUserFriend.getUsers().getNickname(), competition);
 		sendNotifications(friendWithUserFriend,competition);
 		//  신청후 알람을 보내는 행위
 		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionApplyResponse, "대결 신청이 됐습니다.");
@@ -70,7 +70,7 @@ public class CompetitionService {
 	private void sendNotifications(Friend friend,Competition competition) throws IOException {
 		Long postAuthor=friend.getUserFriend().getId();
 		System.out.println(postAuthor);
-		String title="[SUNNY] "+friend.getUsers().getName();
+		String title="[SUNNY] "+friend.getUsers().getNickname();
 		String bodyTitle="대결 신청을 받았어요";
 		String body=competition.getCompensation();
 		System.out.println(friend.getStatus());
@@ -80,7 +80,7 @@ public class CompetitionService {
 				.competition(competition)
 				.title(bodyTitle)
 				.body(body)
-				.name(friend.getUsers().getName())
+				.name(friend.getUsers().getNickname())
 				.createdAt(LocalDateTime.now())
 				.build();
 		competitionNotificationRepository.save(competitionNotification);
@@ -167,8 +167,8 @@ public class CompetitionService {
 			.compensation(competition.getCompensation())
 			.endDate(competition.getEndDate())
 			.dDay(diff)
-			.username(user.getName())
-			.friendName(userFriend.getName())
+			.username(user.getNickname())
+			.friendName(userFriend.getNickname())
 			.userPercent(userMoney / competition.getPrice())
 			.friendsPercent(friendsMoney / competition.getPrice())
 			.result(result)

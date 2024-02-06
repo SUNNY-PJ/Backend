@@ -16,8 +16,6 @@ import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.user.dto.ProfileResponse;
-import com.sunny.backend.comment.dto.response.CommentResponse;
-import com.sunny.backend.community.dto.response.CommunityResponse;
 import com.sunny.backend.scrap.repository.ScrapRepository;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.dto.UserCommentResponse;
