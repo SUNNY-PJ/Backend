@@ -110,22 +110,26 @@ public class CommentService {
 				.orElseThrow(() -> new CommonCustomException(COMMUNITY_NOT_FOUND));
 		Comment comment = commentRequestMapper.toEntity(commentRequestDTO);
 		Comment parentComment = null;
+		String content = commentRequestDTO.getContent();
 		if (commentRequestDTO.getParentId() != null) {
 			parentComment = commentRepository.findById(commentRequestDTO.getParentId())
 					.orElseThrow(() -> new CommonCustomException(COMMENT_NOT_FOUND));
+			content = removeUserTag(content,parentComment);
+			comment.setContent(content);
 			if (parentComment.getParent() != null) {
 				throw new CommonCustomException(REPLYING_NOT_ALLOWED);
 			}
 			comment.setParent(parentComment);
 		}
+		else{
+			comment.setContent(commentRequestDTO.getContent());
+		}
 		comment.setCommunity(community);
-		comment.setContent(commentRequestDTO.getContent());
 		comment.setUsers(user);
 		boolean isPrivate = commentRequestDTO.getIsPrivated();
 		comment.setIsPrivated(isPrivate);
 		boolean isAuthor=Objects.equals(user.getId(),
 				comment.getCommunity().getUsers().getId());
-
 		comment.setAuthor(isAuthor);
 		commentRepository.save(comment);
 
@@ -135,7 +139,7 @@ public class CommentService {
 				sendNotifications(customUserPrincipal, comment, community);
 			}
 			else{
-				System.out.println("replySendNotification response success");
+
 				replySendNotifications(customUserPrincipal,comment.getParent().getUsers(), comment, community);
 			}
 		}
@@ -144,6 +148,9 @@ public class CommentService {
 						comment.getCreatedDate(), comment.getAuthor()),"댓글을 등록했습니다.");
 	}
 
+	private String removeUserTag(String content,Comment parent) {
+		return content.replaceFirst("@" + parent.getUsers().getName() + "\\s", "");
+	}
 
 		private void replySendNotifications(CustomUserPrincipal customUserPrincipal,Users users,
 			Comment comment, Community community) throws IOException {
