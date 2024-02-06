@@ -3,9 +3,8 @@ package com.sunny.backend.community.domain;
 
 import static com.sunny.backend.common.CommonErrorCode.*;
 
-import com.sunny.backend.common.CommonCustomException;
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.community.dto.request.CommunityRequest;
-import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.common.photo.Photo;
 import com.sunny.backend.user.domain.Users;
@@ -49,7 +48,7 @@ public class Community {
     @Enumerated(EnumType.STRING)
     @NotNull(message = "올바른 카테고리 값을 입력해야합니다.")
     private BoardType boardType;
-    @OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "community",orphanRemoval = true)
     @Builder.Default
     private List<Comment> commentList=new ArrayList<>();
 
@@ -84,7 +83,7 @@ public class Community {
 
     public static void validateCommunityByUser(Long userId, Long tokenUserId) {
         if(!userId.equals(tokenUserId)) {
-            throw new CommonCustomException(NO_USER_PERMISSION);
+            throw new CustomException(NO_USER_PERMISSION);
         }
     }
 }

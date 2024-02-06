@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.CommonErrorCode;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.competition.domain.Competition;
@@ -72,7 +71,7 @@ public class Friend {
 
 	public void validateFriendsByUser(Long userId, Long tokenUserId) {
 		if(!userId.equals(tokenUserId)) {
-			throw new CommonCustomException(CommonErrorCode.TOKEN_INVALID);
+			throw new CustomException(CommonErrorCode.TOKEN_INVALID);
 		}
 	}
 }

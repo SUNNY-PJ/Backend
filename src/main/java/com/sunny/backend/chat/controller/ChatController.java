@@ -12,19 +12,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sunny.backend.common.response.CommonResponse;
-import com.sunny.backend.common.response.ResponseService;
-import com.sunny.backend.common.config.AuthUser;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.chat.dto.response.ChatMessageResponse;
 import com.sunny.backend.chat.dto.response.ChatRoomResponse;
-import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.chat.service.ChatService;
+import com.sunny.backend.common.config.AuthUser;
+import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.common.response.ResponseService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "10. Chat", description = "Chat API")
+@Tag(name = "8. Chat", description = "Chat API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/chat")
@@ -32,7 +32,7 @@ public class ChatController {
 	private final ResponseService responseService;
 	private final ChatService chatService;
 
-	@ApiOperation(tags = "10. Chat", value = "채팅 대화 조회")
+	@ApiOperation(tags = "8. Chat", value = "채팅 대화 조회")
 	@GetMapping("/{chatRoomId}")
 	public ResponseEntity<Slice<ChatMessageResponse>> getChatMessageList(
 		@PathVariable(name = "chatRoomId") Long chatRoomId, Pageable pageable) {
@@ -40,7 +40,7 @@ public class ChatController {
 		return ResponseEntity.ok().body(chatMessageResponses);
 	}
 
-	@ApiOperation(tags = "10. Chat", value = "채팅방 조회 조회")
+	@ApiOperation(tags = "8. Chat", value = "채팅방 조회 조회")
 	@GetMapping("/room")
 	public ResponseEntity<CommonResponse.ListResponse<ChatRoomResponse>> getChatRoomList(
 		@AuthUser CustomUserPrincipal customUserPrincipal) {
@@ -48,7 +48,7 @@ public class ChatController {
 		return responseService.getListResponse(HttpStatus.OK.value(), chatRoomResponses, "채팅방 목록 조회");
 	}
 
-	@ApiOperation(tags = "10. Chat", value = "채팅방 삭제")
+	@ApiOperation(tags = "8. Chat", value = "채팅방 삭제")
 	@DeleteMapping("/{chatRoomId}")
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteChatRoom(
 		@PathVariable(name = "chatRoomId") Long chatUserId) {

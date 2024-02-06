@@ -1,19 +1,28 @@
 package com.sunny.backend.community.service;
 
 
+import com.sunny.backend.comment.domain.Comment;
+import com.sunny.backend.comment.repository.CommentRepository;
 import com.sunny.backend.common.photo.Photo;
 import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.domain.SortType;
 import com.sunny.backend.community.dto.response.CommunityResponse.ViewAndCommentResponse;
+import com.sunny.backend.notification.domain.CommentNotification;
+import com.sunny.backend.notification.repository.CommentNotificationRepository;
+import com.sunny.backend.report.repository.CommunityReportRepository;
 import com.sunny.backend.scrap.domain.Scrap;
 import com.sunny.backend.scrap.repository.ScrapRepository;
+
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+
 import com.nimbusds.oauth2.sdk.util.StringUtils;
+import javax.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -44,6 +53,8 @@ public class CommunityService {
 	private final ResponseService responseService;
 	private final S3Util s3Util;
 	private final RedisUtil redisUtil;
+	private final CommentNotificationRepository commentNotificationRepository;
+	private final CommentRepository commentRepository;
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> findCommunity(
@@ -67,11 +78,14 @@ public class CommunityService {
 				community.updateView();
 			}
 		}
-		Scrap scrap = scrapRepository.findByUsersAndCommunity(user, community);
 
-		boolean isScrapedByCurrentUser = (scrap != null);
-		CommunityResponse communityResponse = CommunityResponse.of(community,
-				isScrapedByCurrentUser);
+		boolean isScrap = false;
+		Optional<Scrap> scrap = scrapRepository.findByUsersAndCommunity(user, community);
+		if(scrap.isPresent()) {
+			isScrap = true;
+		}
+
+		CommunityResponse communityResponse = CommunityResponse.of(community, isScrap);
 		return responseService.getSingleResponse(
 				HttpStatus.OK.value(), communityResponse, "게시글을 성공적으로 불러왔습니다.");
 	}
@@ -157,10 +171,14 @@ public class CommunityService {
 			photoRepository.saveAll(photoList);
 			community.addPhoto(photoList);
 		}
-		Scrap scrap = scrapRepository.findByUsersAndCommunity(user, community);
-		boolean isScrapedByCurrentUser = (scrap != null);
-		CommunityResponse communityResponse = CommunityResponse.of(community,
-				isScrapedByCurrentUser);
+
+		boolean isScrap = false;
+		Optional<Scrap> scrap = scrapRepository.findByUsersAndCommunity(user, community);
+		if(scrap.isPresent()) {
+			isScrap = true;
+		}
+
+		CommunityResponse communityResponse = CommunityResponse.of(community, isScrap);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
 				"게시글 수정을 완료했습니다.");
 	}
@@ -169,20 +187,33 @@ public class CommunityService {
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.getById(communityId);
-		List<Photo> photoList = photoRepository.findByCommunityId(communityId);
+
 		Community.validateCommunityByUser(community.getUsers().getId(), user.getId());
+
+		List<CommentNotification> commentNotifications = commentNotificationRepository.findByCommunityId(communityId);
+		for (CommentNotification commentNotification : commentNotifications) {
+			System.out.println(commentNotification);
+			commentNotificationRepository.deleteById(commentNotification.getId());
+		}
+		for (Comment comment : community.getCommentList()) {
+			deleteCommentAndChildren(comment);
+		}
+		List<Photo> photoList = photoRepository.findByCommunityId(communityId);
 		for (Photo existingFile : photoList) {
 			s3Util.deleteFile(existingFile.getFileUrl());
 		}
 		photoRepository.deleteByCommunityId(communityId);
+
 		communityRepository.deleteById(communityId);
-		return responseService.getGeneralResponse(HttpStatus.OK.value(),
-				"게시글을 삭제했습니다.");
+		return responseService.getGeneralResponse(HttpStatus.OK.value(), "게시글을 삭제했습니다.");
+	}
+
+	private void deleteCommentAndChildren(Comment comment) {
+		commentNotificationRepository.deleteByCommentId(comment.getId());
 	}
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse.ViewAndCommentResponse>> getCommentAndViewByCommunity(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
-		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.getById(communityId);
 		ViewAndCommentResponse viewAndCommentResponse = CommunityResponse.ViewAndCommentResponse.from(community);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),viewAndCommentResponse,

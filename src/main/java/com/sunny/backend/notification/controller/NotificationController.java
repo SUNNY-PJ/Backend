@@ -20,11 +20,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/alarm")
 public class NotificationController {
     private final NotificationService notificationService;
+
     @ApiOperation(tags = "9. Alarm", value = "알림 토큰 전송")
     @PostMapping("/token")
     public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(
-            @AuthUser CustomUserPrincipal customUserPrincipal,
-            @Valid @RequestBody NotificationRequest notificationRequest) {
+        @AuthUser CustomUserPrincipal customUserPrincipal,
+        @Valid @RequestBody NotificationRequest notificationRequest) {
         return notificationService.allowNotification(customUserPrincipal, notificationRequest);
     }
 
