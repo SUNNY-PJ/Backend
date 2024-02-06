@@ -12,16 +12,6 @@ public class ErrorResponseHandler {
     private int status;
     private String message;
 
-    public static ResponseEntity<ErrorResponseHandler> toResponseEntity(CommonErrorCode e){
-        return ResponseEntity
-                .status(e.getHttpStatus())
-                .body(ErrorResponseHandler.builder()
-                        .status(e.getHttpStatus().value())
-                        .message(e.getMessage())
-                        .build()
-                );
-    }
-
     public static ResponseEntity<ErrorResponseHandler> toResponseEntity(ErrorCode e){
         return ResponseEntity
             .status(e.getHttpStatus())

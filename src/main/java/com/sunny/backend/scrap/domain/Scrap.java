@@ -19,24 +19,24 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Getter
 public class Scrap {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Users users;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private Users users;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "community_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Community community;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "community_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private Community community;
 
 }

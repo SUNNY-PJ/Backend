@@ -1,11 +1,15 @@
 package com.sunny.backend.auth.jwt;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
-import com.sunny.backend.user.domain.Users;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+
+import com.sunny.backend.user.domain.Users;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,19 +18,15 @@ import lombok.Setter;
 public class CustomUserPrincipal implements OAuth2User, UserDetails {
 	private final Users users;
 
-	private Collection<? extends GrantedAuthority> authorities;
+	private final Collection<GrantedAuthority> authorities;
 	@Setter
 	private Map<String, Object> attributes;
 
 	public CustomUserPrincipal(Users users) {
 		this.users = users;
-	}
-
-	public CustomUserPrincipal(Users users, Collection<? extends GrantedAuthority> authorities,
-		Map<String, Object> attributes) {
-		this.users = users;
-		this.authorities = authorities;
-		this.attributes = attributes;
+		authorities = new ArrayList<>();
+		GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + users.getRole());
+		authorities.add(authority);
 	}
 
 	@Override

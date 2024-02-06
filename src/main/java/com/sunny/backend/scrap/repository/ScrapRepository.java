@@ -7,9 +7,10 @@ import com.sunny.backend.user.domain.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ScrapRepository extends JpaRepository<Scrap,Long> {
     List<Scrap> findAllByUsers_Id(Long id);
 
-    Scrap findByUsersAndCommunity(Users user, Community community);
+    Optional<Scrap> findByUsersAndCommunity(Users user, Community community);
 }

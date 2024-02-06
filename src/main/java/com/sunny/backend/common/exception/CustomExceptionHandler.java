@@ -9,7 +9,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.sunny.backend.common.CommonCustomException;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 
@@ -19,11 +18,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomExceptionHandler {
 	private final ResponseService responseService;
-
-	@ExceptionHandler(CommonCustomException.class)
-	protected ResponseEntity<ErrorResponseHandler> handleCommonCustomException(CommonCustomException e) {
-		return ErrorResponseHandler.toResponseEntity(e.getCommonErrorCode());
-	}
 
 	@ExceptionHandler(CustomException.class)
 	protected ResponseEntity<ErrorResponseHandler> handleCustomException(CustomException e) {
