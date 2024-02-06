@@ -47,7 +47,7 @@ public class Users extends BaseTime {
 	private String name;
 
 	@Size(min=2,max=10)
-	@Column(unique = true, nullable = false)
+	@Column(unique = true)
 	private String nickname;
 
 	private String oauthId;

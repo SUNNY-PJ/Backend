@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 
 @Getter
@@ -47,5 +48,6 @@ public class CommentNotification extends BaseTime {
 
   @Column
   private String title;
+
 
 }
