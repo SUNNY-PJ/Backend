@@ -14,7 +14,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class CommentResponse {
+
 	private Long id;
+	private Long userId;
 	private String content;
 	private String writer;
 	private boolean isAuthor;
@@ -22,30 +24,36 @@ public class CommentResponse {
 	private LocalDateTime createdDate;
 	private List<CommentResponse> children = new ArrayList<>();
 
-	public CommentResponse(Long id, String writer, String content,boolean isAuthor, LocalDateTime createdDate) {
+	public CommentResponse(Long id, Long userId,String writer, String content, LocalDateTime createdDate,
+			boolean isAuthor) {
 		this.id = id;
+		this.userId=userId;
 		this.writer = writer;
 		this.content = content;
 		this.createdDate = createdDate;
+		this.isAuthor = isAuthor;
 	}
 
 	//삭제된 댓글로 댓글 내용 수정하기 위한 객체 생성
-	public static CommentResponse convertCommentToDto(Comment comment,boolean isAuthor) {
+	public static CommentResponse convertCommentToDto(Comment comment) {
 		if (comment.getIsDeleted()) {
-			comment.setUsers(null);
-			comment.setContent("삭제된 댓글입니다.");
-			comment.setCreatedDate(null);
-			comment.setUpdatedDate(null);
+			return new CommentResponse(
+					comment.getId(),
+					null,
+					"(알 수 없음)",
+					"삭제된 댓글입니다.",
+					null,
+					comment.getAuthor()
+			);
+		} else {
+			String writer = comment.getUsers() != null ? comment.getUsers().getNickname() : null;
+			String content = comment.getContent();
+			LocalDateTime createdDate = comment.getCreatedDate();
+			boolean isAuthor =comment.getAuthor();
+			return new CommentResponse(comment.getId(),comment.getUsers().getId(), writer, content, createdDate, isAuthor);
 		}
-
-		return new CommentResponse(
-				comment.getId(),
-				comment.getUsers() != null ? comment.getUsers().getName() : null,
-				comment.getContent(),
-				isAuthor,
-				comment.getCreatedDate()
-		);
 	}
+
 	@Getter
 	@Builder
 	public static class MyComment {
@@ -64,7 +72,7 @@ public class CommentResponse {
 				.communityId(comment.getCommunity().getId())
 				.commentId(comment.getId())
 				.content(comment.getContent())
-				.writer(comment.getUsers().getName())
+				.writer(comment.getUsers().getNickname())
 				.createdDate(comment.getCreatedDate())
 				.updateDate(comment.getUpdatedDate())
 				.build();

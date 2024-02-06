@@ -1,8 +1,9 @@
 package com.sunny.backend.notification.domain;
 
+import com.fasterxml.jackson.databind.ser.Serializers.Base;
+import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.user.domain.Users;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,7 +23,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class CompetitionNotification {
+public class CompetitionNotification extends BaseTime {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

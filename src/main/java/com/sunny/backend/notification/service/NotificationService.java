@@ -18,6 +18,7 @@ import com.sunny.backend.notification.repository.FriendsNotificationRepository;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.user.domain.Users;
+
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import static com.sunny.backend.common.CommonErrorCode.NOTIFICATIONS_NOT_SENT;
-import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -71,9 +71,7 @@ public class NotificationService {
     }
 
     public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(
-       String title,
-        NotificationPushRequest notificationPushRequest) throws IOException {
-        System.out.println(title);
+       String title, NotificationPushRequest notificationPushRequest) throws IOException {
         List<Notification> notifications = notificationRepository.findByUsers_Id(
             notificationPushRequest.getPostAuthor());
         if (notifications != null && !notifications.isEmpty()) {
@@ -110,4 +108,5 @@ public class NotificationService {
             throw new CommonCustomException(NOTIFICATIONS_NOT_SENT);
         }
     }
+
 }

@@ -14,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-
 @Tag(name = "9. Alarm", description = "Alarm API")
 @RestController
 @RequiredArgsConstructor
@@ -30,14 +28,6 @@ public class NotificationController {
         return notificationService.allowNotification(customUserPrincipal, notificationRequest);
     }
 
-//    @ApiOperation(tags = "9. Alarm", value = "알림 전송")
-//    @PostMapping("")
-//    public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(
-//            @AuthUser CustomUserPrincipal customUserPrincipal,
-//            @Valid @RequestBody NotificationPushRequest notificationPushRequest) throws IOException {
-//        return notificationService.sendNotificationToFriends(customUserPrincipal,
-//            notificationPushRequest);
-//    }
     @ApiOperation(tags = "9. Alarm", value = "알림 리스트 확인")
     @GetMapping("/list")
     public ResponseEntity<ListResponse<AlarmListResponse>> getAlarmList(

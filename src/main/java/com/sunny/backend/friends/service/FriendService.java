@@ -56,17 +56,17 @@ public class FriendService {
 
 	private void sendNotifications(Users users, Friend friend) throws IOException {
 		Long postAuthor=friend.getUsers().getId();
-		String body =friend.getUserFriend().getName()+"님이 친구 신청을 거절했어요";;
-		String title="[SUNNY] "+users.getName();
+		String body =friend.getUserFriend().getNickname()+"님이 친구 신청을 거절했어요";;
+		String title="[SUNNY] "+users.getNickname();
 		String bodyTitle="친구 신청 결과를 알려드려요";
 		System.out.println(friend.getStatus());
 		if(Status.WAIT.equals(friend.getStatus())) {
 			bodyTitle="친구 신청을 받았어요.";
-			body = users.getName()+"님이 친구를 신청했어요!";
+			body = users.getNickname()+"님이 친구를 신청했어요!";
 
 		}
 		if(Status.APPROVE.equals(friend.getStatus())) {
-			body = friend.getUserFriend().getName()+"님이 친구 신청을 수락했어요";
+			body = friend.getUserFriend().getNickname()+"님이 친구 신청을 수락했어요";
 
 		}
 		FriendsNotification friendsNotification=FriendsNotification.builder()
@@ -94,8 +94,6 @@ public class FriendService {
 	public void approveFriend(CustomUserPrincipal customUserPrincipal, Long friendId)
 			throws IOException {
 		Friend friend = friendRepository.getById(friendId);
-		System.out.println("friends_id");
-		System.out.println(friend);
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
 		friend.validateFriendsByUser(friend.getUsers().getId(), tokenUserId);
 
@@ -128,7 +126,6 @@ public class FriendService {
 		} else {
 			Friend friend = optionalFriend.get();
 			friend.validateStatus();
-			System.out.println("호출");
 			sendNotifications(user,friend);
 		}
 	}
