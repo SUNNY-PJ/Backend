@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 
 @Getter
@@ -29,23 +30,24 @@ public class CommentNotification extends BaseTime {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name= "users_id")
   private Users users;
 
-  @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name= "community_id")
   private Community community;
 
-  @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name= "parent_id")
   private Comment parent_id;
 
   @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
-  @JoinColumn(name= "comment_id")
+  @JoinColumn(name = "comment_id")
   private Comment comment;
 
   @Column
   private String title;
+
 
 }

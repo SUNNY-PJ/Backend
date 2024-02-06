@@ -105,14 +105,14 @@ public class FriendService {
 
 		if(notificationList.size()!=0) {
 			NotificationPushRequest notificationPushRequest =
-				new NotificationPushRequest(postAuthor, noticeTitle, noticeBody);
+					new NotificationPushRequest(postAuthor, noticeTitle, noticeBody);
 			notificationService.sendNotificationToFriends(title,notificationPushRequest);
 		}
 	}
 
 	public Friend getByUserAndUserFriend(Users user, Users userFriend, Status status) {
 		Optional<Friend> optionalFriend = friendRepository
-			.findByUsers_IdAndUserFriend_Id(userFriend.getId(), user.getId());
+				.findByUsers_IdAndUserFriend_Id(userFriend.getId(), user.getId());
 
 		if(optionalFriend.isPresent()) {
 			Friend friend = optionalFriend.get();
@@ -120,10 +120,10 @@ public class FriendService {
 		}
 
 		Friend friends = Friend.builder()
-			.users(userFriend)
-			.userFriend(user)
-			.status(status)
-			.build();
+				.users(userFriend)
+				.userFriend(user)
+				.status(status)
+				.build();
 		return friendRepository.save(friends);
 	}
 
@@ -133,7 +133,7 @@ public class FriendService {
 		friend.validateFriendsByUser(friend.getUsers().getId(), customUserPrincipal.getUsers().getId());
 
 		Optional<Friend> optionalFriend = friendRepository
-			.findByUsers_IdAndUserFriend_Id(friend.getUserFriend().getId(), friend.getUsers().getId());
+				.findByUsers_IdAndUserFriend_Id(friend.getUserFriend().getId(), friend.getUsers().getId());
 		optionalFriend.ifPresent(value -> friendRepository.deleteById(value.getId()));
 
 		friendRepository.deleteById(friendId);

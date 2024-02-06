@@ -2,7 +2,9 @@ package com.sunny.backend.notification.service;
 
 import static com.sunny.backend.common.ComnConstant.*;
 import static com.sunny.backend.notification.exception.NotificationErrorCode.*;
+import static java.util.stream.Collectors.toList;
 
+import com.sunny.backend.comment.domain.Comment;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
@@ -60,13 +62,20 @@ public class NotificationService {
 	public ResponseEntity<ListResponse<AlarmListResponse>> getAlarmList(CustomUserPrincipal customUserPrincipal) {
 		List<CommentNotification> commentNotifications = commentNotificationRepository.findByUsers_Id(
 			customUserPrincipal.getUsers().getId());
+		List<CommentNotification> filteredCommentNotifications = commentNotifications.stream()
+				.filter(notification -> {
+					Comment comment = notification.getComment();
+					return comment != null && !comment.getIsDeleted();
+				})
+				.toList();
+
 		List<FriendsNotification> friendsNotifications = friendsNotificationRepository.findByFriend_Id(
 			customUserPrincipal.getUsers().getId());
 		List<CompetitionNotification> competitionNotifications = competitionNotificationRepository.findByUsers_Id(
 			customUserPrincipal.getUsers().getId());
 
 		List<AlarmListResponse> commentNotificationResponse = AlarmListResponse.commentNotification(
-			commentNotifications);
+				filteredCommentNotifications);
 		List<AlarmListResponse> friendsNotificationResponse = AlarmListResponse.friendsNotification.freindsFrom(
 			friendsNotifications);
 		List<AlarmListResponse> competitionNotificationResponse = AlarmListResponse.CompetitionNotificationResponse.competitionFrom(

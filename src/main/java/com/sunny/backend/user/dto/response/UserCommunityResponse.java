@@ -21,7 +21,7 @@ public record UserCommunityResponse(
 		return UserCommunityResponse.builder()
 			.communityId(community.getId())
 			.title(community.getTitle())
-			.writer(community.getUsers().getName())
+			.writer(community.getUsers().getNickname())
 			.createdDate(community.getCreatedAt())
 			.viewCnt(community.getViewCnt())
 			.commentCnt(community.getCommentSize())

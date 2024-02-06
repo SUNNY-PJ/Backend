@@ -21,7 +21,7 @@ public record UserCommentResponse (
 			.communityId(comment.getCommunity().getId())
 			.commentId(comment.getId())
 			.content(comment.getContent())
-			.writer(comment.getUsers().getName())
+			.writer(comment.getUsers().getNickname())
 			.createdDate(comment.getCreatedDate())
 			.build();
 	}

@@ -33,7 +33,7 @@ public record CommunityResponse(
         return new CommunityResponse(
             community.getId(),
             community.getUsers().getId(),
-            community.getUsers().getName(),
+            community.getUsers().getNickname(),
             community.getTitle(),
             community.getContents(),
             community.getViewCnt(),
@@ -69,7 +69,7 @@ public record CommunityResponse(
                 community.getId(),
                 community.getUsers().getId(),
                 community.getTitle(),
-                community.getUsers().getName(),
+                community.getUsers().getNickname(),
                 community.getViewCnt(),
                 community.getCommentList().size(),
                 community.getBoardType(),

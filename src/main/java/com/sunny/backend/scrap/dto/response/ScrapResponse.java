@@ -18,7 +18,7 @@ public record ScrapResponse(
 	public static ScrapResponse from(Community community) {
 		return ScrapResponse.builder()
 			.title(community.getTitle())
-			.writer(community.getUsers().getName())
+			.writer(community.getUsers().getNickname())
 			.createDate(community.getCreatedAt())
 			.view(community.getViewCnt())
 			.comment(community.getCommentList().size())
