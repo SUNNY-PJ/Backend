@@ -137,6 +137,7 @@ public class CommentService {
 		boolean isAuthor=Objects.equals(user.getId(),
 				comment.getCommunity().getUsers().getId());
 		comment.setAuthor(isAuthor);
+		comment.changeIsDeleted(false);
 		commentRepository.save(comment);
 
 		user.addComment(comment);
@@ -145,7 +146,7 @@ public class CommentService {
 				sendNotifications(customUserPrincipal, comment, community);
 			}
 			else{
-				replySendNotifications(customUserPrincipal,comment.getParent().getUsers(), comment, community);
+				replySendNotifications(comment.getParent().getUsers(), comment, community);
 			}
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
@@ -165,7 +166,7 @@ public class CommentService {
 			return comment.getContent();
 		}
 	}
-	private void replySendNotifications(CustomUserPrincipal customUserPrincipal,Users users,
+	private void replySendNotifications(Users users,
 			Comment comment, Community community) throws IOException {
 		Long postAuthor=users.getId();
 		List<Notification> notificationList=notificationRepository.findByUsers_Id(users.getId());

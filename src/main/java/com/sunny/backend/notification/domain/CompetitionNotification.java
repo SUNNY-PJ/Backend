@@ -44,7 +44,6 @@ public class CompetitionNotification extends BaseTime {
   @Column
   private String name; //신청자 이름
 
-
   @Column
   private LocalDateTime createdAt;
 

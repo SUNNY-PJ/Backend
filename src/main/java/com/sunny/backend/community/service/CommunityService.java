@@ -1,7 +1,5 @@
 package com.sunny.backend.community.service;
 
-
-import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.comment.repository.CommentRepository;
 import com.sunny.backend.common.photo.Photo;
 import com.sunny.backend.community.domain.BoardType;
@@ -10,7 +8,6 @@ import com.sunny.backend.community.domain.SortType;
 import com.sunny.backend.community.dto.response.CommunityResponse.ViewAndCommentResponse;
 import com.sunny.backend.notification.domain.CommentNotification;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
-import com.sunny.backend.report.repository.CommunityReportRepository;
 import com.sunny.backend.scrap.domain.Scrap;
 import com.sunny.backend.scrap.repository.ScrapRepository;
 
@@ -192,12 +189,9 @@ public class CommunityService {
 
 		List<CommentNotification> commentNotifications = commentNotificationRepository.findByCommunityId(communityId);
 		for (CommentNotification commentNotification : commentNotifications) {
-			System.out.println(commentNotification);
 			commentNotificationRepository.deleteById(commentNotification.getId());
 		}
-		for (Comment comment : community.getCommentList()) {
-			deleteCommentAndChildren(comment);
-		}
+
 		List<Photo> photoList = photoRepository.findByCommunityId(communityId);
 		for (Photo existingFile : photoList) {
 			s3Util.deleteFile(existingFile.getFileUrl());
@@ -208,9 +202,6 @@ public class CommunityService {
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "게시글을 삭제했습니다.");
 	}
 
-	private void deleteCommentAndChildren(Comment comment) {
-		commentNotificationRepository.deleteByCommentId(comment.getId());
-	}
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse.ViewAndCommentResponse>> getCommentAndViewByCommunity(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
