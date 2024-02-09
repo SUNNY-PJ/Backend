@@ -1,6 +1,7 @@
 package com.sunny.backend.competition.controller;
 
 import java.io.IOException;
+
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -13,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.competition.dto.request.CompetitionRequest;
 import com.sunny.backend.competition.dto.response.CompetitionApplyResponse;
-import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.competition.dto.response.CompetitionResponseDto;
-import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.competition.service.CompetitionService;
 
 import io.swagger.annotations.ApiOperation;
@@ -29,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "3. Competition", description = "Competition API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/compettion")
+@RequestMapping("/competition")
 public class CompetitionController {
 
 	private final ResponseService responseService;
