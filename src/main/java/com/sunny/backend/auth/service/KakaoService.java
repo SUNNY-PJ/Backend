@@ -2,6 +2,7 @@ package com.sunny.backend.auth.service;
 
 import static com.sunny.backend.common.ComnConstant.*;
 
+import com.sunny.backend.auth.dto.KakaoRequest;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -45,6 +46,27 @@ public class KakaoService {
 	private final TokenProvider tokenProvider;
 	private final UserRepository userRepository;
 
+
+	public TokenResponse kakaoLogin(KakaoRequest kakaoRequest) {
+//		KakaoRequest.kakaoRequest kakaoAccount = kakaoRequest.getKakaoAccount();
+		String email = kakaoRequest.getEmail();
+		String progile=kakaoRequest.getProfile();
+
+		Optional<Users> usersOptional = userRepository.findByEmail(email);
+		if (usersOptional.isEmpty()) {
+			Users users = Users.builder()
+					.email(email)
+					.name(kakaoRequest.getNickname())
+					.profile(kakaoRequest.getProfile())
+					.role(Role.USER)
+					.oauthId(String.valueOf(kakaoRequest.getId()))
+					.build();
+			userRepository.save(users);
+			return tokenProvider.createToken(email, Role.USER.getRole());
+		} else {
+			return tokenProvider.createToken(email, usersOptional.get().getRole().getRole());
+		}
+	}
 	public String getAccessToken(String code) {
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
