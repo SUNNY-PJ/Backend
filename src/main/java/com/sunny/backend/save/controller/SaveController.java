@@ -4,8 +4,8 @@ import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,7 +37,7 @@ public class SaveController {
 	}
 
 	@ApiOperation(tags = "6. Save", value = "절약 목표 수정")
-	@PutMapping("")
+	@PatchMapping("")
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> updateSaveGoal(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@Valid @RequestBody SaveRequest saveRequest) {
