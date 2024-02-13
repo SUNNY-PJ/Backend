@@ -1,15 +1,23 @@
 package com.sunny.backend.comment.controller;
 
 import java.io.IOException;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import com.sunny.backend.common.response.CommonResponse;
-import com.sunny.backend.common.config.AuthUser;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.comment.dto.request.CommentRequest;
 import com.sunny.backend.comment.dto.response.CommentResponse;
-import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.comment.service.CommentService;
+import com.sunny.backend.common.config.AuthUser;
+import com.sunny.backend.common.response.CommonResponse;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,12 +44,12 @@ public class CommentController {
 	@ApiOperation(tags = "1. Comment", value = "댓글 조회")
 	@GetMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.ListResponse<CommentResponse>> createComment(
-			@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId) {
+		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId) {
 		return commentService.getCommentList(customUserPrincipal, communityId);
 	}
 
 	@ApiOperation(tags = "1. Comment", value = "댓글 수정")
-	@PutMapping("/{commentId}")
+	@PatchMapping("/{commentId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> updateComment(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long commentId,
 		@RequestBody CommentRequest commentRequestDTO) {
