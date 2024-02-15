@@ -1,11 +1,7 @@
 package com.sunny.backend.auth.controller;
 
 import com.sunny.backend.auth.dto.KakaoRequest;
-import java.util.HashMap;
-import java.util.Map;
 import javax.validation.constraints.Size;
-
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

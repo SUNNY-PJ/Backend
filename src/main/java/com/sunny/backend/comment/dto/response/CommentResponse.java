@@ -40,7 +40,7 @@ public class CommentResponse {
 			return new CommentResponse(
 					comment.getId(),
 					null,
-					"(알 수 없음)",
+					null,
 					"삭제된 댓글입니다.",
 					null,
 					comment.getAuthor()
@@ -54,6 +54,16 @@ public class CommentResponse {
 		}
 	}
 
+	public static CommentResponse leaveCommentToDto(Comment comment) {
+			return new CommentResponse(
+					comment.getId(),
+					null,
+					"(알 수 없음)",
+					"탈퇴한 회원의 댓글입니다.",
+					null,
+					comment.getAuthor()
+			);
+	}
 	@Getter
 	@Builder
 	public static class MyComment {
