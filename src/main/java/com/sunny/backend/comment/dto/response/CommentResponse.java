@@ -20,18 +20,20 @@ public class CommentResponse {
 	private String content;
 	private String writer;
 	private boolean isAuthor;
+	private boolean isDeleted;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
 	private LocalDateTime createdDate;
 	private List<CommentResponse> children = new ArrayList<>();
 
 	public CommentResponse(Long id, Long userId,String writer, String content, LocalDateTime createdDate,
-			boolean isAuthor) {
+			boolean isAuthor,boolean isDeleted) {
 		this.id = id;
 		this.userId=userId;
 		this.writer = writer;
 		this.content = content;
 		this.createdDate = createdDate;
 		this.isAuthor = isAuthor;
+		this.isDeleted=isDeleted;
 	}
 
 	//삭제된 댓글로 댓글 내용 수정하기 위한 객체 생성
@@ -43,14 +45,15 @@ public class CommentResponse {
 					null,
 					"삭제된 댓글입니다.",
 					null,
-					comment.getAuthor()
+					comment.getAuthor(),
+					true
 			);
 		} else {
 			String writer = comment.getUsers() != null ? comment.getUsers().getNickname() : null;
 			String content = comment.getContent();
 			LocalDateTime createdDate = comment.getCreatedDate();
 			boolean isAuthor =comment.getAuthor();
-			return new CommentResponse(comment.getId(),comment.getUsers().getId(), writer, content, createdDate, isAuthor);
+			return new CommentResponse(comment.getId(),comment.getUsers().getId(), writer, content, createdDate, isAuthor,false);
 		}
 	}
 
@@ -61,7 +64,8 @@ public class CommentResponse {
 					"(알 수 없음)",
 					"탈퇴한 회원의 댓글입니다.",
 					null,
-					comment.getAuthor()
+					comment.getAuthor(),
+					comment.getIsDeleted()
 			);
 	}
 	@Getter

@@ -69,7 +69,8 @@ public class CommentService {
 							comment.getUsers().getNickname(),
 							"비밀 댓글입니다.",
 							comment.getCreatedDate(),
-							comment.getAuthor()
+							comment.getAuthor(),
+							false
 					);
 				}
 			} else {
@@ -82,7 +83,8 @@ public class CommentService {
 							comment.getUsers().getNickname(),
 							content,
 							comment.getCreatedDate(),
-							comment.getAuthor()
+							comment.getAuthor(),
+							false
 
 					);
 				}
@@ -153,7 +155,7 @@ public class CommentService {
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(),comment.getUsers().getId(), comment.getUsers().getNickname(), addUserTag(comment),
-						comment.getCreatedDate(), comment.getAuthor()),"댓글을 등록했습니다.");
+						comment.getCreatedDate(), comment.getAuthor(),false),"댓글을 등록했습니다.");
 	}
 
 	private String removeUserTag(String content,Comment parent) {
@@ -244,6 +246,6 @@ public class CommentService {
 		comment.setIsPrivated(isPrivate);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(), comment.getUsers().getId(),comment.getUsers().getNickname(), comment.getContent(),
-						comment.getCreatedDate(),comment.getAuthor()), "댓글을 수정했습니다.");
+						comment.getCreatedDate(),comment.getAuthor(),false), "댓글을 수정했습니다.");
 	}
 }
