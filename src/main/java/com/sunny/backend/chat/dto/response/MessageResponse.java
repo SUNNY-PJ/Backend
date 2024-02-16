@@ -4,11 +4,19 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-public record MessageResponse(
-	String message,
-	Long userId,
-	String name,
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class MessageResponse {
+	private Long id;
+	private String message;
+	private Long userId;
+	private String name;
+	private int read;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
-	LocalDateTime time
-) {
+	private LocalDateTime time;
 }

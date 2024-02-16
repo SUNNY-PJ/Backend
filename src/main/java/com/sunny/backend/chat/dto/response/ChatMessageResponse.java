@@ -2,8 +2,14 @@ package com.sunny.backend.chat.dto.response;
 
 import java.util.List;
 
-public record ChatMessageResponse(
-	String createdDate,
-	List<MessageResponse> messageResponses
-) {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class ChatMessageResponse {
+	private String createdDate;
+	private List<MessageResponse> messageResponses;
 }
