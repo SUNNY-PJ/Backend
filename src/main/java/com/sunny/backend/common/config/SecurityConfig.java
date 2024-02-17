@@ -42,37 +42,37 @@ public class SecurityConfig {
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		//Spring Seucrity 로직을 수행하지 않고 아래 요청에 접근
 		return (web) -> web.ignoring().
-			antMatchers("/images/**", "/js/**", "/webjars/**", "/swagger-ui/**",
-				"/swagger-resources/**", "/v3/api-docs", "/favicon**", "/auth/**");
+				antMatchers("/images/**", "/js/**", "/webjars/**", "/swagger-ui/**",
+						"/swagger-resources/**", "/v3/api-docs", "/favicon**");
 	}
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
-			.cors().configurationSource(corsConfigurationSource())
-			.and()
-			.csrf().disable()
+				.cors().configurationSource(corsConfigurationSource())
+				.and()
+				.csrf().disable()
 
-			.headers().frameOptions().sameOrigin()
-			.and()
-			.httpBasic().disable()
-			.formLogin().disable()
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				.headers().frameOptions().sameOrigin()
+				.and()
+				.httpBasic().disable()
+				.formLogin().disable()
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
-			// 401, 403 Exception 핸들링
-			.and()
-			.exceptionHandling()
-			.authenticationEntryPoint(jwtAuthenticationEntryPoint)
-			.accessDeniedHandler(jwtAccessDeniedHandler)
+				// 401, 403 Exception 핸들링
+				.and()
+				.exceptionHandling()
+				.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+				.accessDeniedHandler(jwtAccessDeniedHandler)
 
-			// HttpServletRequest를 사용하는 요청들에 대한 접근 제한 설정
-			.and()
-			.authorizeRequests()
-			.antMatchers("/auth/**").permitAll()
-			.antMatchers("/stomp/chat").permitAll()
-			.antMatchers(HttpMethod.PATCH, "/users/report").hasRole("ADMIN")
-			.antMatchers(HttpMethod.DELETE, "/users/report").hasRole("ADMIN")
-			.anyRequest().authenticated();
+				// HttpServletRequest를 사용하는 요청들에 대한 접근 제한 설정
+				.and()
+				.authorizeRequests()
+				.antMatchers("/auth/**").permitAll()
+				.antMatchers("/stomp/chat").permitAll()
+				.antMatchers(HttpMethod.PATCH, "/users/report").hasRole("ADMIN")
+				.antMatchers(HttpMethod.DELETE, "/users/report").hasRole("ADMIN")
+				.anyRequest().authenticated();
 
 		http.addFilterBefore(customJwtFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -88,8 +88,8 @@ public class SecurityConfig {
 		configuration.addAllowedMethod("*");
 		configuration.setAllowCredentials(false);
 		configuration.setExposedHeaders(Arrays.asList("Access-Control-Allow-Headers",
-			"Authorization, x-xsrf-token, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
-				"Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers", "Content-Disposition"));
+				"Authorization, x-xsrf-token, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
+						"Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers", "Content-Disposition"));
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;

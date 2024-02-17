@@ -2,9 +2,8 @@ package com.sunny.backend.comment.service;
 
 import static com.sunny.backend.comment.domain.Comment.validateCommentByUser;
 import static com.sunny.backend.comment.dto.response.CommentResponse.convertCommentToDto;
-import static com.sunny.backend.comment.exception.CommentErrorCode.COMMENT_NOT_FOUND;
+import static com.sunny.backend.comment.dto.response.CommentResponse.leaveCommentToDto;
 import static com.sunny.backend.comment.exception.CommentErrorCode.REPLYING_NOT_ALLOWED;
-import static com.sunny.backend.community.exception.CommunityErrorCode.COMMUNITY_NOT_FOUND;
 
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.community.repository.CommunityRepository;
@@ -50,40 +49,48 @@ public class CommentService {
 	private CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
 		boolean isPrivate = comment.getIsPrivated();
 		CommentResponse commentResponse;
-		String content=comment.getContent();
-		if(comment.getParent()!=null){
-			content="@"+comment.getParent().getUsers().getNickname()+" "+comment.getContent();
-		}
-		if (isPrivate && !(currentUser.getId().equals(comment.getUsers().getId()) ||
-				currentUser.getId().equals(comment.getCommunity().getUsers().getId()))) {
-			if (comment.getIsDeleted()) {
-				commentResponse = convertCommentToDto(comment);
-			} else {
-				commentResponse = new CommentResponse(
-						comment.getId(),
-						comment.getUsers().getId(),
-						comment.getUsers().getNickname(),
-						"비밀 댓글입니다.",
-						comment.getCreatedDate(),
-						comment.getAuthor()
-				);
-			}
-		}
-		else {
-			if (comment.getIsDeleted()) {
-				commentResponse = convertCommentToDto(comment);
-			}
-			else {
-				commentResponse = new CommentResponse(
-						comment.getId(),
-						comment.getUsers().getId(),
-						comment.getUsers().getNickname(),
-						content,
-						comment.getCreatedDate(),
-						comment.getAuthor()
+		String content = comment.getContent();
 
-				);
+		String writer; //현재 사용자 기준이 아닌 id 값이 없을 경우 알 수 없음으로 떠야 됨
+		if (comment.getUsers() != null) {
+			writer = comment.getUsers().getNickname();
+
+			if (comment.getParent() != null) {
+				content = "@" + comment.getParent().getUsers().getNickname() + " " + comment.getContent();
 			}
+			if (isPrivate && !(currentUser.getId().equals(comment.getUsers().getId()) ||
+					currentUser.getId().equals(comment.getCommunity().getUsers().getId()))) {
+				if (comment.getIsDeleted()) {
+					commentResponse = convertCommentToDto(comment);
+				} else {
+					commentResponse = new CommentResponse(
+							comment.getId(),
+							comment.getUsers().getId(),
+							comment.getUsers().getNickname(),
+							"비밀 댓글입니다.",
+							comment.getCreatedDate(),
+							comment.getAuthor(),
+							false
+					);
+				}
+			} else {
+				if (comment.getIsDeleted()) {
+					commentResponse = convertCommentToDto(comment);
+				} else {
+					commentResponse = new CommentResponse(
+							comment.getId(),
+							comment.getUsers().getId(),
+							comment.getUsers().getNickname(),
+							content,
+							comment.getCreatedDate(),
+							comment.getAuthor(),
+							false
+
+					);
+				}
+			}
+		} else {
+			commentResponse = leaveCommentToDto(comment);
 		}
 		commentResponse.setChildren(
 				comment.getChildren().stream()
@@ -97,8 +104,7 @@ public class CommentService {
 	public ResponseEntity<CommonResponse.ListResponse<CommentResponse>> getCommentList(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
 		Users user = customUserPrincipal.getUsers();
-		Community community = communityRepository.findById(communityId)
-				.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
+		Community community = communityRepository.getById(communityId);
 		List<Comment> comments = commentRepository.findAllByCommunity_Id(communityId);
 		List<CommentResponse> commentResponses = comments.stream()
 				.filter(comment -> comment.getParent() == null)
@@ -112,14 +118,12 @@ public class CommentService {
 			CustomUserPrincipal customUserPrincipal, Long communityId, CommentRequest commentRequestDTO)
 			throws IOException {
 		Users user = customUserPrincipal.getUsers();
-		Community community = communityRepository.findById(communityId)
-				.orElseThrow(() -> new CustomException(COMMUNITY_NOT_FOUND));
+		Community community = communityRepository.getById(communityId);
 		Comment comment = commentRequestMapper.toEntity(commentRequestDTO);
 		Comment parentComment = null;
 		String content = commentRequestDTO.getContent();
 		if (commentRequestDTO.getParentId() != null) {
-			parentComment = commentRepository.findById(commentRequestDTO.getParentId())
-					.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
+			parentComment = commentRepository.getById(commentRequestDTO.getParentId());
 			content = removeUserTag(content,parentComment);
 			comment.setContent(content);
 			if (parentComment.getParent() != null) {
@@ -151,7 +155,7 @@ public class CommentService {
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(),comment.getUsers().getId(), comment.getUsers().getNickname(), addUserTag(comment),
-						comment.getCreatedDate(), comment.getAuthor()),"댓글을 등록했습니다.");
+						comment.getCreatedDate(), comment.getAuthor(),false),"댓글을 등록했습니다.");
 	}
 
 	private String removeUserTag(String content,Comment parent) {
@@ -218,8 +222,7 @@ public class CommentService {
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> deleteComment(
 			CustomUserPrincipal customUserPrincipal, Long commentId) {
-		Comment comment = commentRepository.findCommentByIdWithParent(commentId)
-				.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
+		Comment comment = commentRepository.getById(commentId);
 		validateCommentByUser(customUserPrincipal.getUsers().getId(),comment.getUsers().getId());
 		comment.changeIsDeleted(true);
 		CommentResponse commentResponse= convertCommentToDto(comment);
@@ -236,14 +239,13 @@ public class CommentService {
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> updateComment(
 			CustomUserPrincipal customUserPrincipal, Long commentId, CommentRequest commentRequestDTO) {
-		Comment comment = commentRepository.findById(commentId)
-				.orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
+		Comment comment = commentRepository.getById(commentId);
 		validateCommentByUser(customUserPrincipal.getUsers().getId(),comment.getUsers().getId());
 		comment.updateContent(commentRequestDTO.getContent());
 		boolean isPrivate = commentRequestDTO.getIsPrivated();
 		comment.setIsPrivated(isPrivate);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(), comment.getUsers().getId(),comment.getUsers().getNickname(), comment.getContent(),
-						comment.getCreatedDate(),comment.getAuthor()), "댓글을 수정했습니다.");
+						comment.getCreatedDate(),comment.getAuthor(),false), "댓글을 수정했습니다.");
 	}
 }

@@ -6,15 +6,21 @@ import static com.sunny.backend.comment.dto.response.CommentResponse.convertComm
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sunny.backend.comment.dto.response.CommentResponse;
 import com.sunny.backend.comment.domain.Comment;
+import javax.persistence.EntityManager;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.*;
+import org.springframework.transaction.annotation.Transactional;
+
 public class CommentRepositoryImpl extends QuerydslRepositorySupport implements CommentCustomRepository{
     private JPAQueryFactory queryFactory;
+    private final EntityManager entityManager;
 
-    public CommentRepositoryImpl(JPAQueryFactory jpaQueryFactory) {
+
+    public CommentRepositoryImpl(JPAQueryFactory jpaQueryFactory,EntityManager entityManager) {
         super(Comment.class);
         this.queryFactory = jpaQueryFactory;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -26,6 +32,25 @@ public class CommentRepositoryImpl extends QuerydslRepositorySupport implements 
                 .fetchOne();
 
         return Optional.ofNullable(selectedComment);
+    }
+
+    @Transactional
+    public void nullifyUserAssociation(Long userId, EntityManager entityManager) {
+        // Nullify the association between Comment and Users
+        entityManager.createQuery("UPDATE Comment c SET c.users = null WHERE c.users.id = :userId")
+            .setParameter("userId", userId)
+            .executeUpdate();
+
+        // Delete the associated child entities (e.g., CommentNotification) only for non-null userId
+        if (userId != null) {
+            entityManager.createQuery("DELETE FROM CommentNotification cn WHERE cn.comment.users.id = :userId")
+                .setParameter("userId", userId)
+                .executeUpdate();
+        } else {
+            // If userId is null, nullify the association in CommentNotification without filtering by userId
+            entityManager.createQuery("UPDATE CommentNotification cn SET cn.comment = null WHERE cn.comment.users IS NULL")
+                .executeUpdate();
+        }
     }
 
 //    @Override
