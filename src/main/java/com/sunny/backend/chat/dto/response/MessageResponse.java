@@ -16,7 +16,7 @@ public class MessageResponse {
 	private String message;
 	private Long userId;
 	private String name;
-	private int read;
+	private int readCnt;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
 	private LocalDateTime time;
 }

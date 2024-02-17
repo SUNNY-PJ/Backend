@@ -9,6 +9,7 @@ import java.util.stream.IntStream;
 
 import javax.transaction.Transactional;
 
+import com.sunny.backend.chat.dto.response.ChatRoomRes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -103,7 +104,7 @@ class ChatServiceTest {
 			createChatUser(user, userFriend, chatRoom);
 
 			// when
-			List<ChatRoomResponse> actual = chatService.getChatRoomList(customUserPrincipal);
+			List<ChatRoomRes> actual = chatService.getChatRoomList(customUserPrincipal);
 
 			// then
 			assertThat(actual.get(0))
