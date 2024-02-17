@@ -34,8 +34,8 @@ public class ChatService {
 
 		for (ChatMessageResponse chatMessageResponse : responses) {
 			for (MessageResponse messageResponse : chatMessageResponse.getMessageResponses()) {
-				if (messageResponse.getRead() == 1 && !messageResponse.getUserId().equals(users.getId())) {
-					messageResponse.setRead(0);
+				if (messageResponse.getReadCnt() == 1 && !messageResponse.getUserId().equals(users.getId())) {
+					messageResponse.setReadCnt(0);
 					chatMessageRepository.readMessage(messageResponse.getId());
 				}
 			}

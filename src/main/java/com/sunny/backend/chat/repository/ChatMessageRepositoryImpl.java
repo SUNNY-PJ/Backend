@@ -39,7 +39,7 @@ public class ChatMessageRepositoryImpl extends QuerydslRepositorySupport impleme
 				groupBy(LocalDateTimeToString(chatMessage.createdDate)).list(
 					Projections.constructor(ChatMessageResponse.class, LocalDateTimeToString(chatMessage.createdDate),
 						list(Projections.constructor(MessageResponse.class, chatMessage.id, chatMessage.message,
-							chatMessage.users.id.as("userId"), chatMessage.users.name, chatMessage.read,
+							chatMessage.users.id.as("userId"), chatMessage.users.name, chatMessage.readCnt,
 							chatMessage.createdDate.as("time"))
 						)
 					)

@@ -18,9 +18,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class ChatMessage extends BaseTime {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,13 +36,13 @@ public class ChatMessage extends BaseTime {
 	private ChatRoom chatRoom;
 
 	@Column
-	private int read;
+	private int readCnt;
 
 	public ChatMessage(String message, Users users, ChatRoom chatRoom) {
 		this.message = message;
 		this.users = users;
 		this.chatRoom = chatRoom;
-		this.read = 1;
+		this.readCnt = 1;
 	}
 
 }
