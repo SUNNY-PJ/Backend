@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.chat.dto.response.ChatMessageResponse;
-import com.sunny.backend.chat.dto.response.ChatRoomResponse;
+import com.sunny.backend.chat.dto.response.ChatRoomRes;
 import com.sunny.backend.chat.service.ChatService;
 import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
@@ -45,9 +45,9 @@ public class ChatController {
 
 	@ApiOperation(tags = "8. Chat", value = "채팅방 조회 조회")
 	@GetMapping("/room")
-	public ResponseEntity<CommonResponse.ListResponse<ChatRoomResponse>> getChatRoomList(
+	public ResponseEntity<CommonResponse.ListResponse<ChatRoomRes>> getChatRoomList(
 		@AuthUser CustomUserPrincipal customUserPrincipal) {
-		List<ChatRoomResponse> chatRoomResponses = chatService.getChatRoomList(customUserPrincipal);
+		List<ChatRoomRes> chatRoomResponses = chatService.getChatRoomList(customUserPrincipal);
 		return responseService.getListResponse(HttpStatus.OK.value(), chatRoomResponses, "채팅방 목록 조회");
 	}
 
