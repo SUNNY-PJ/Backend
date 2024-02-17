@@ -191,7 +191,6 @@ public class CommunityService {
 		for (CommentNotification commentNotification : commentNotifications) {
 			commentNotificationRepository.deleteById(commentNotification.getId());
 		}
-
 		List<Photo> photoList = photoRepository.findByCommunityId(communityId);
 		for (Photo existingFile : photoList) {
 			s3Util.deleteFile(existingFile.getFileUrl());

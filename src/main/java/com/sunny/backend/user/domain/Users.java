@@ -62,7 +62,7 @@ public class Users extends BaseTime {
 	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private List<Consumption> consumptionList;
 
-	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "users")
 	@JsonIgnore
 	private List<Comment> commentList;
 
@@ -84,7 +84,7 @@ public class Users extends BaseTime {
 	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
 	private List<Friend> friends = new ArrayList<>();
 
-	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "users")
 	private List<Notification> notification;
 
 	public void addComment(Comment comment) {
