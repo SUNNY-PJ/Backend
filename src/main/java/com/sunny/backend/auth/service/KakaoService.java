@@ -2,9 +2,19 @@ package com.sunny.backend.auth.service;
 
 import static com.sunny.backend.common.ComnConstant.*;
 
+import com.sunny.backend.auth.dto.KakaoRequest;
+import com.sunny.backend.comment.domain.Comment;
+import com.sunny.backend.comment.repository.CommentRepository;
+import com.sunny.backend.community.domain.Community;
+import com.sunny.backend.community.repository.CommunityRepository;
+import com.sunny.backend.notification.domain.CommentNotification;
+import com.sunny.backend.notification.repository.CommentNotificationRepository;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +54,31 @@ public class KakaoService {
 
 	private final TokenProvider tokenProvider;
 	private final UserRepository userRepository;
+	private final CommentRepository commentRepository;
+	private final CommentNotificationRepository commentNotificationRepository;
+	private final CommunityRepository communityRepository;
 
+
+	public TokenResponse kakaoLogin(KakaoRequest kakaoRequest) {
+//		KakaoRequest.kakaoRequest kakaoAccount = kakaoRequest.getKakaoAccount();
+		String email = kakaoRequest.getEmail();
+		String progile=kakaoRequest.getProfile();
+
+		Optional<Users> usersOptional = userRepository.findByEmail(email);
+		if (usersOptional.isEmpty()) {
+			Users users = Users.builder()
+					.email(email)
+					.name(kakaoRequest.getNickname())
+					.profile(kakaoRequest.getProfile())
+					.role(Role.USER)
+					.oauthId(String.valueOf(kakaoRequest.getId()))
+					.build();
+			userRepository.save(users);
+			return tokenProvider.createToken(email, Role.USER.getRole());
+		} else {
+			return tokenProvider.createToken(email, usersOptional.get().getRole().getRole());
+		}
+	}
 	public String getAccessToken(String code) {
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
@@ -114,11 +148,10 @@ public class KakaoService {
 	@Transactional
 	public void leave(CustomUserPrincipal customUserPrincipal) {
 		Users users = customUserPrincipal.getUsers();
-		appAdminKeyMethod(users.getOauthId(), KAKAO_LEAVE_URL);
+		commentNotificationRepository.deleteByUsersId(users.getId());
+		commentRepository.nullifyUsersId(users.getId());
 		userRepository.deleteById(users.getId());
 	}
-
-
 	public void logout(CustomUserPrincipal customUserPrincipal) {
 		Users users = customUserPrincipal.getUsers();
 		appAdminKeyMethod(users.getOauthId(), KAKAO_LOGOUT_URL);

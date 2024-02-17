@@ -42,7 +42,7 @@ public class CommentNotification extends BaseTime {
   @JoinColumn(name= "parent_id")
   private Comment parent_id;
 
-  @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "comment_id")
   private Comment comment;
 
