@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.chat.domain.ChatUser;
 import com.sunny.backend.chat.dto.response.ChatMessageResponse;
-import com.sunny.backend.chat.dto.response.ChatRoomResponse;
+import com.sunny.backend.chat.dto.response.ChatRoomRes;
 import com.sunny.backend.chat.dto.response.MessageResponse;
 import com.sunny.backend.chat.repository.ChatMessageRepository;
 import com.sunny.backend.chat.repository.ChatRoomRepository;
@@ -44,11 +44,12 @@ public class ChatService {
 		return responses;
 	}
 
-	public List<ChatRoomResponse> getChatRoomList(CustomUserPrincipal customUserPrincipal) {
-		return chatUserRepository.findByUsers_Id(customUserPrincipal.getUsers().getId())
-			.stream()
-			.map(ChatRoomResponse::from)
-			.toList();
+	public List<ChatRoomRes> getChatRoomList(CustomUserPrincipal customUserPrincipal) {
+		return chatMessageRepository.findByChatRoomResponse(customUserPrincipal.getUsers().getId());
+		// return chatUserRepository.findByUsers_Id(customUserPrincipal.getUsers().getId())
+		// 	.stream()
+		// 	.map(ChatRoomResponse::from)
+		// 	.toList();
 	}
 
 	@Transactional
