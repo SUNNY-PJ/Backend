@@ -9,6 +9,7 @@ import java.util.stream.IntStream;
 
 import javax.transaction.Transactional;
 
+import com.sunny.backend.chat.dto.response.ChatRoomRes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,11 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.auth.service.CustomUserDetailsService;
 import com.sunny.backend.chat.domain.ChatMessage;
 import com.sunny.backend.chat.domain.ChatRoom;
 import com.sunny.backend.chat.domain.ChatUser;
@@ -29,8 +31,6 @@ import com.sunny.backend.chat.dto.response.ChatRoomResponse;
 import com.sunny.backend.chat.repository.ChatMessageRepository;
 import com.sunny.backend.chat.repository.ChatRoomRepository;
 import com.sunny.backend.chat.repository.ChatUserRepository;
-import com.sunny.backend.auth.service.CustomUserDetailsService;
-import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.user.domain.Role;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
@@ -67,6 +67,7 @@ class ChatServiceTest {
 	MockMvc mockMvc;
 	Users user;
 	Users userFriend;
+
 	@BeforeEach
 	void setUp() {
 		mockMvc = MockMvcBuilders
@@ -86,11 +87,12 @@ class ChatServiceTest {
 			Pageable pageable = PageRequest.of(0, 5);
 
 			// when
-			Slice<ChatMessageResponse> actual = chatService.getChatMessageList(chatRoom.getId(), pageable);
+			List<ChatMessageResponse> actual = chatService.getChatMessageList(customUserPrincipal, chatRoom.getId(),
+				50, null);
 
 			// then
-			assertThat(actual.getContent().get(0).messageResponses().size()).isEqualTo(pageable.getPageSize());
-			assertThat(actual.getContent().get(0).messageResponses().get(0))
+			assertThat(actual.get(0).getMessageResponses().size()).isEqualTo(pageable.getPageSize());
+			assertThat(actual.get(0).getMessageResponses().get(0))
 				.extracting("message", "userId")
 				.containsExactly("1번 메세지", user.getId());
 		}
@@ -102,7 +104,7 @@ class ChatServiceTest {
 			createChatUser(user, userFriend, chatRoom);
 
 			// when
-			List<ChatRoomResponse> actual = chatService.getChatRoomList(customUserPrincipal);
+			List<ChatRoomRes> actual = chatService.getChatRoomList(customUserPrincipal);
 
 			// then
 			assertThat(actual.get(0))
