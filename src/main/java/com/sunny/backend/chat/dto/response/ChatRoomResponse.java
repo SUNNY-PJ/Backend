@@ -1,19 +1,19 @@
 package com.sunny.backend.chat.dto.response;
 
-import com.sunny.backend.chat.domain.ChatUser;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-public record ChatRoomResponse (
-	Long chatRoomId,
-	Long userFriendId,
-	String friendName,
-	String friendProfile
-){
-	public static ChatRoomResponse from(ChatUser chatUser) {
-		return new ChatRoomResponse(
-			chatUser.getChatRoom().getId(),
-			chatUser.getFriend().getId(),
-			chatUser.getFriend().getName(),
-			chatUser.getFriend().getProfile()
-		);
-	}
+@Getter
+@Setter
+@AllArgsConstructor
+public class ChatRoomResponse {
+	private Long chatRoomId;
+	private Long userFriendId;
+	private String friendName;
+	private String friendProfile;
+	private int readCnt;
+	private String message;
+	// @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
+	// private Date time;
 }
