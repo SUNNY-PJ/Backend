@@ -7,6 +7,8 @@ import java.time.LocalDate;
 public record SaveResponse(
     Long id,
     Long cost,
+    boolean expire,
+    boolean success,
     @JsonFormat(pattern = "yyyy.MM.dd")
     LocalDate startDate,
     @JsonFormat(pattern = "yyyy.MM.dd")
@@ -16,6 +18,8 @@ public record SaveResponse(
         return new SaveResponse(
             save.getId(),
             save.getCost(),
+            save.getExpire(),
+            save.getSuccess(),
             save.getStartDate(),
             save.getEndDate()
         );
@@ -32,4 +36,5 @@ public record SaveResponse(
             );
         }
     }
+
 }
