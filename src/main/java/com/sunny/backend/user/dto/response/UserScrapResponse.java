@@ -9,6 +9,8 @@ import lombok.Builder;
 
 @Builder
 public record UserScrapResponse(
+	Long communityId,
+	Long userId,
 	String title,
 	String writer,
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
@@ -18,6 +20,8 @@ public record UserScrapResponse(
 ) {
 	public static UserScrapResponse from(Community community) {
 		return UserScrapResponse.builder()
+			.communityId(community.getId())
+			.userId(community.getUsers().getId())
 			.title(community.getTitle())
 			.writer(community.getUsers().getNickname())
 			.createDate(community.getCreatedAt())
