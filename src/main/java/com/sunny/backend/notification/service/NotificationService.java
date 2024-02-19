@@ -89,6 +89,7 @@ public class NotificationService {
 		return responseService.getListResponse(HttpStatus.OK.value(), combinedList, "알림 조회 저장 성공");
 	}
 
+	//댓글 response만 이거?
 	public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(
 		String title, NotificationPushRequest notificationPushRequest) {
 		List<Notification> notifications = notificationRepository.findByUsers_Id(
@@ -97,15 +98,15 @@ public class NotificationService {
 			OkHttpClient client = new OkHttpClient();
 
 			MediaType mediaType = MediaType.parse("application/json");
-
+			System.out.println(title);
+			System.out.println(notificationPushRequest.getTitle());
 			for (Notification notification : notifications) {
 				RequestBody body = RequestBody.create(mediaType,
-					"{\n" +
-						"  \"to\": \"" + notification.getDeviceToken() + "\",\n" +
-						"  \"title\": \"" + title + "\",\n" +
-						" \"body\": \"" + notificationPushRequest.getTitle() + "\\n\\\""
-						+ notificationPushRequest.getBody() + "\\\"\"\n" +
-						"}");
+						"{\n" +
+								" \"to\": \"" + notification.getDeviceToken() + "\",\n" +
+								" \"title\": \"" + title + "\",\n" +
+								" \"body\": \"" + notificationPushRequest.getTitle() + "\"\n" +
+								"}");
 
 				Request request = new Request.Builder()
 					.url(EXPO_PUSH_URL)
@@ -132,5 +133,51 @@ public class NotificationService {
 			throw new CustomException(NOTIFICATIONS_NOT_SENT);
 		}
 	}
+
+
+	public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> commentSendNotificationToFriends(
+			String title, NotificationPushRequest notificationPushRequest) {
+		List<Notification> notifications = notificationRepository.findByUsers_Id(
+				notificationPushRequest.getPostAuthor());
+		if (notifications != null && !notifications.isEmpty()) {
+			OkHttpClient client = new OkHttpClient();
+
+			MediaType mediaType = MediaType.parse("application/json");
+
+			for (Notification notification : notifications) {
+				RequestBody body = RequestBody.create(mediaType,
+						"{\n" +
+								"  \"to\": \"" + notification.getDeviceToken() + "\",\n" +
+								"  \"title\": \"" + title + "\",\n" +
+								" \"body\": \"" + notificationPushRequest.getTitle() + "\\n\\\""
+								+ notificationPushRequest.getBody() + "\\\"\"\n" +
+								"}");
+
+				Request request = new Request.Builder()
+						.url(EXPO_PUSH_URL)
+						.post(body)
+						.addHeader("Content-Type", "application/json")
+						.addHeader("Accept", "application/json")
+						.build();
+				try {
+					Response response = client.newCall(request).execute();
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+
+			}
+
+			NotificationResponse notificationResponse = new NotificationResponse(
+					notificationPushRequest.getTitle(),
+					notificationPushRequest.getBody(),
+					"알림을 성공적으로 전송했습니다."
+			);
+			return responseService.getSingleResponse(HttpStatus.OK.value(), notificationResponse,
+					"알림 성공");
+		} else {
+			throw new CustomException(NOTIFICATIONS_NOT_SENT);
+		}
+	}
+
 
 }
