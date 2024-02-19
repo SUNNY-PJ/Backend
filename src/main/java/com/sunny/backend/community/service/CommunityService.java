@@ -51,7 +51,6 @@ public class CommunityService {
 	private final S3Util s3Util;
 	private final RedisUtil redisUtil;
 	private final CommentNotificationRepository commentNotificationRepository;
-	private final CommentRepository commentRepository;
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> findCommunity(
@@ -59,15 +58,16 @@ public class CommunityService {
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.getById(communityId);
 		String viewCount = redisUtil.getData(String.valueOf(user.getId()));
-
+		System.out.println("viewcount 호출="+viewCount);
 		if (StringUtils.isBlank(viewCount)) {
 			redisUtil.setValuesWithTimeout(String.valueOf(user.getId()), communityId + "_",
 					calculateTimeUntilMidnight());
+			System.out.println(redisUtil.getData(String.valueOf(user.getId())));
 			community.increaseView();
 		} else {
 			List<String> redisBoardList = Arrays.asList(viewCount.split("_"));
+			System.out.println(redisBoardList);
 			boolean isViewed = redisBoardList.contains(String.valueOf(communityId));
-
 			if (!isViewed) {
 				viewCount += communityId + "_";
 				redisUtil.setValuesWithTimeout(String.valueOf(user.getId()), viewCount,
@@ -90,6 +90,7 @@ public class CommunityService {
 	public static long calculateTimeUntilMidnight() {
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime midnight = now.truncatedTo(ChronoUnit.DAYS).plusDays(1);
+		System.out.println("남은 일수 계산"+ChronoUnit.SECONDS.between(now, midnight));
 		return ChronoUnit.SECONDS.between(now, midnight);
 	}
 

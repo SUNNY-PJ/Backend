@@ -216,7 +216,7 @@ public class CommentService {
 					bodyTitle,
 					body
 			);
-			notificationService.sendNotificationToFriends(title,notificationPushRequest);
+			notificationService.commentSendNotificationToFriends(title,notificationPushRequest);
 		}
 	}
 	@Transactional

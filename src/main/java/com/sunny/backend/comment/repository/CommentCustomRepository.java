@@ -9,5 +9,5 @@ import javax.persistence.EntityManager;
 
 public interface CommentCustomRepository {
     Optional<Comment> findCommentByIdWithParent(Long id);
-    void nullifyUserAssociation(Long userId, EntityManager entityManager);
+
 }

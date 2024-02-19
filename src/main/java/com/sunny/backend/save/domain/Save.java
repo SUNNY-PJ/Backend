@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 
 
 @Entity
@@ -32,13 +33,21 @@ public class Save {
     @PositiveOrZero
     private Long cost;
 
+    @ColumnDefault("FALSE")
+    @Column(nullable = false)
+    private Boolean success;
+
+    @ColumnDefault("FALSE")
+    @Column(nullable = false)
+    private Boolean expire;
+
     @Column
     @FutureOrPresent
     private LocalDate startDate;
     @Column
     @FutureOrPresent
     private LocalDate endDate;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private Users users;
 
@@ -46,6 +55,11 @@ public class Save {
         this.cost = saveRequest.getCost();
         this.startDate = saveRequest.getStartDate();
         this.endDate = saveRequest.getEndDate();
+    }
+
+    public void updateSuccessAndExpire(boolean success,boolean expire ) {
+        this.success = success;
+        this.expire = expire;
     }
 
     public long calculateRemainingDays(Save save) {

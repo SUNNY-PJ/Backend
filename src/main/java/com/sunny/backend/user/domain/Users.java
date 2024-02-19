@@ -66,8 +66,8 @@ public class Users extends BaseTime {
 	@JsonIgnore
 	private List<Comment> commentList;
 
-	@OneToOne(mappedBy = "users", cascade = CascadeType.REMOVE)
-	private Save save;
+	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
+	private List<Save> saveList;
 
 	@OneToMany(mappedBy = "users")
 	private List<Scrap> scrapList;
@@ -103,12 +103,9 @@ public class Users extends BaseTime {
 	}
 
 	public void addSave(Save save) {
-		if (this.save != null) {
-			throw new IllegalStateException("이미 절약 목표가 존재합니다.");
-		} else {
-			this.save = save;
+		this.saveList = new ArrayList<>();
+		this.saveList.add(save);
 		}
-	}
 
 	public void updateName(String name) {
 		this.nickname = name;

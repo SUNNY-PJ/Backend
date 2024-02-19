@@ -1,5 +1,6 @@
 package com.sunny.backend.friends.controller;
 
+import java.io.IOException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,7 +51,7 @@ public class FriendController {
 	@PostMapping("/{userFriendId}")
 	public ResponseEntity<CommonResponse.GeneralResponse> addFriend(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@PathVariable(name = "userFriendId") Long userFriendId) {
+		@PathVariable(name = "userFriendId") Long userFriendId) throws IOException {
 		friendService.addFriend(customUserPrincipal, userFriendId);
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "친구 신청 성공");
 	}
@@ -59,7 +60,7 @@ public class FriendController {
 	@PostMapping("/approve/{friendId}")
 	public ResponseEntity<CommonResponse.GeneralResponse> approveFriend(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@PathVariable(name = "friendId") Long friendId) {
+		@PathVariable(name = "friendId") Long friendId) throws IOException {
 		friendService.approveFriend(customUserPrincipal, friendId);
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "승인 되었습니다.");
 	}
