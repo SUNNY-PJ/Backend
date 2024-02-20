@@ -29,9 +29,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/stomp/chat") // ex ) ws://localhost:8080/stomp/chat
+		registry.addEndpoint("/stomp") // ex ) ws://localhost:8080/stomp
 			.setAllowedOriginPatterns("*") // 허용하는 도메인 주소 (일단 모두 허용으로 바꾸었다.)
-			// .withSockJS(); // 웹 소켓 사용
+		// .withSockJS(); // 웹 소켓 사용
 		;
 	}
 
