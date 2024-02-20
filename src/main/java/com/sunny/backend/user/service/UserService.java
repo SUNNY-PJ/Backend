@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,6 +31,7 @@ import com.sunny.backend.user.dto.response.ProfileResponse;
 import com.sunny.backend.user.dto.response.UserCommentResponse;
 import com.sunny.backend.user.dto.response.UserCommunityResponse;
 import com.sunny.backend.user.dto.response.UserReportResponse;
+import com.sunny.backend.user.dto.response.UserReportResultResponse;
 import com.sunny.backend.user.dto.response.UserScrapResponse;
 import com.sunny.backend.user.repository.UserRepository;
 import com.sunny.backend.util.S3Util;
@@ -47,6 +49,7 @@ public class UserService {
 	private final ScrapRepository scrapRepository;
 	private final CommunityReportRepository communityReportRepository;
 	private final CommentReportRepository commentReportRepository;
+	private final SimpMessagingTemplate template;
 	private final S3Util s3Util;
 
 	public Users checkUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
@@ -142,24 +145,30 @@ public class UserService {
 				communityReport.isWait();
 				communityReport.approveStatus();
 
-				Users users = communityReport.getUsers();
+				Users report = communityReport.getUsers();
+				Users users = communityReport.getCommunity().getUsers();
 				if (users.getReportCount() == 4) {
 					userRepository.deleteById(users.getId());
 				} else {
-					communityReport.getUsers().increaseReportCount();
+					users.increaseReportCount();
 				}
+				template.convertAndSend("/sub/user/" + report.getOauthId(),
+					UserReportResultResponse.ofCommunity(communityReport, true));
 			}
 			case COMMENT -> {
 				CommentReport commentReport = commentReportRepository.getById(reportStatusRequest.id());
 				commentReport.isWait();
 				commentReport.approveStatus();
 
-				Users users = commentReport.getUsers();
+				Users report = commentReport.getUsers();
+				Users users = commentReport.getComment().getUsers();
 				if (users.getReportCount() == 4) {
 					userRepository.deleteById(users.getId());
 				} else {
-					commentReport.getUsers().increaseReportCount();
+					users.increaseReportCount();
 				}
+				template.convertAndSend("/sub/user/" + report.getOauthId(),
+					UserReportResultResponse.ofCommentReport(commentReport, true));
 			}
 		}
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "신고가 승인되었습니다.");
@@ -171,11 +180,15 @@ public class UserService {
 			case COMMUNITY -> {
 				CommunityReport communityReport = communityReportRepository.getById(reportStatusRequest.id());
 				communityReport.isWait();
+				template.convertAndSend("/sub/user/" + communityReport.getUsers().getOauthId(),
+					UserReportResultResponse.ofCommunity(communityReport, false));
 				communityReportRepository.deleteById(reportStatusRequest.id());
 			}
 			case COMMENT -> {
 				CommentReport commentReport = commentReportRepository.getById(reportStatusRequest.id());
 				commentReport.isWait();
+				template.convertAndSend("/sub/user/" + commentReport.getUsers().getOauthId(),
+					UserReportResultResponse.ofCommentReport(commentReport, false));
 				commentReportRepository.deleteById(reportStatusRequest.id());
 			}
 		}
