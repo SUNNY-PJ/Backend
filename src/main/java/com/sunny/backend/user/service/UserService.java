@@ -152,7 +152,7 @@ public class UserService {
 				} else {
 					users.increaseReportCount();
 				}
-				template.convertAndSend("/sub/user/" + report.getOauthId(),
+				template.convertAndSend("/sub/user/" + report.getId(),
 					UserReportResultResponse.ofCommunity(communityReport, true));
 			}
 			case COMMENT -> {
@@ -167,7 +167,7 @@ public class UserService {
 				} else {
 					users.increaseReportCount();
 				}
-				template.convertAndSend("/sub/user/" + report.getOauthId(),
+				template.convertAndSend("/sub/user/" + report.getId(),
 					UserReportResultResponse.ofCommentReport(commentReport, true));
 			}
 		}
@@ -180,14 +180,14 @@ public class UserService {
 			case COMMUNITY -> {
 				CommunityReport communityReport = communityReportRepository.getById(reportStatusRequest.id());
 				communityReport.isWait();
-				template.convertAndSend("/sub/user/" + communityReport.getUsers().getOauthId(),
+				template.convertAndSend("/sub/user/" + communityReport.getUsers().getId(),
 					UserReportResultResponse.ofCommunity(communityReport, false));
 				communityReportRepository.deleteById(reportStatusRequest.id());
 			}
 			case COMMENT -> {
 				CommentReport commentReport = commentReportRepository.getById(reportStatusRequest.id());
 				commentReport.isWait();
-				template.convertAndSend("/sub/user/" + commentReport.getUsers().getOauthId(),
+				template.convertAndSend("/sub/user/" + commentReport.getUsers().getId(),
 					UserReportResultResponse.ofCommentReport(commentReport, false));
 				commentReportRepository.deleteById(reportStatusRequest.id());
 			}
