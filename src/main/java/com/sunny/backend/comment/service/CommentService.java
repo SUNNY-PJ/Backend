@@ -143,8 +143,8 @@ public class CommentService {
 		comment.setAuthor(isAuthor);
 		comment.changeIsDeleted(false);
 		commentRepository.save(comment);
-
 		user.addComment(comment);
+		System.out.println(user.getCommentList().size());
 		if(!community.getUsers().getId().equals(customUserPrincipal.getUsers().getId())){
 			if(commentRequestDTO.getParentId() == null) {
 				sendNotifications(customUserPrincipal, comment, community);

@@ -32,15 +32,6 @@ public class Save {
     @Column
     @PositiveOrZero
     private Long cost;
-
-    @ColumnDefault("FALSE")
-    @Column(nullable = false)
-    private Boolean success;
-
-    @ColumnDefault("FALSE")
-    @Column(nullable = false)
-    private Boolean expire;
-
     @Column
     @FutureOrPresent
     private LocalDate startDate;
@@ -57,11 +48,6 @@ public class Save {
         this.endDate = saveRequest.getEndDate();
     }
 
-    public void updateSuccessAndExpire(boolean success,boolean expire ) {
-        this.success = success;
-        this.expire = expire;
-    }
-
     public long calculateRemainingDays(Save save) {
         LocalDate currentDate = LocalDate.now();
         return ChronoUnit.DAYS.between(currentDate, save.getEndDate());
@@ -72,5 +58,8 @@ public class Save {
             100.0 - (((double) userMoney / (double) save.getCost()) * 100.0) : 100.0;
         BigDecimal roundedPercentage = new BigDecimal(percentage).setScale(1, RoundingMode.HALF_UP);
         return roundedPercentage.doubleValue();
+    }
+    public boolean checkExpired(LocalDate expirationDate) {
+        return expirationDate != null && LocalDate.now().isAfter(expirationDate);
     }
 }
