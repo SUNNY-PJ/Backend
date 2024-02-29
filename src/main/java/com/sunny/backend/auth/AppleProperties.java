@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 public class AppleProperties {
-  //TODO 사전에 필요한 애플 설정
-
   private String grantType;
   private String clientId;
   private String keyId;
