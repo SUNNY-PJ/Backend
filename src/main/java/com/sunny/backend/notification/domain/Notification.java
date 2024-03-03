@@ -15,7 +15,7 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(unique = true)
     private String DeviceToken;
 
     @ManyToOne(fetch = FetchType.LAZY)
