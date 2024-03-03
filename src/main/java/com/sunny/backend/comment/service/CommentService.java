@@ -150,7 +150,7 @@ public class CommentService {
 				sendNotifications(customUserPrincipal, comment, community);
 			}
 			else{
-				replySendNotifications(comment.getParent().getUsers(), comment, community);
+				replySendNotifications(customUserPrincipal,comment.getParent().getUsers(), comment, community);
 			}
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
@@ -170,12 +170,12 @@ public class CommentService {
 			return comment.getContent();
 		}
 	}
-	private void replySendNotifications(Users users,
+	private void replySendNotifications(CustomUserPrincipal customUserPrincipal,Users users,
 			Comment comment, Community community) throws IOException {
 		Long postAuthor=users.getId();
 		List<Notification> notificationList=notificationRepository.findByUsers_Id(users.getId());
 		String body = comment.getContent();
-		String title="[SUNNY] "+users.getNickname();
+		String title="[SUNNY] "+customUserPrincipal.getUsers().getNickname();
 		String bodyTitle="새로운 답글이 달렸어요";
 		CommentNotification commentNotification=CommentNotification.builder()
 				.users(users)
@@ -191,7 +191,7 @@ public class CommentService {
 					bodyTitle,
 					body
 			);
-			notificationService.sendNotificationToFriends(title,notificationPushRequest);
+			notificationService.commentSendNotificationToFriends(title,notificationPushRequest);
 		}
 	}
 	private void sendNotifications(CustomUserPrincipal customUserPrincipal,
