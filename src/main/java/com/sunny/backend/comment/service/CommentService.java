@@ -121,6 +121,8 @@ public class CommentService {
 		Community community = communityRepository.getById(communityId);
 		Comment comment = commentRequestMapper.toEntity(commentRequestDTO);
 		Comment parentComment = null;
+		String title;
+		String bodyTitle;
 		String content = commentRequestDTO.getContent();
 		if (commentRequestDTO.getParentId() != null) {
 			parentComment = commentRepository.getById(commentRequestDTO.getParentId());
@@ -144,13 +146,20 @@ public class CommentService {
 		comment.changeIsDeleted(false);
 		commentRepository.save(comment);
 		user.addComment(comment);
-		System.out.println(user.getCommentList().size());
+
 		if(!community.getUsers().getId().equals(customUserPrincipal.getUsers().getId())){
 			if(commentRequestDTO.getParentId() == null) {
-				sendNotifications(customUserPrincipal, comment, community);
+				title="[SUNNY] "+customUserPrincipal.getUsers().getNickname();
+				bodyTitle="새로운 댓글이 달렸어요.";
+				createCommentNotifiacation(comment.getCommunity().getUsers(),comment,bodyTitle);
+				sendNotifications(customUserPrincipal, comment,title,bodyTitle);
 			}
-			else{
-				replySendNotifications(customUserPrincipal,comment.getParent().getUsers(), comment, community);
+
+			else if(!comment.getParent().getUsers().getId().equals(customUserPrincipal.getUsers().getId())){
+				 title="[SUNNY] "+customUserPrincipal.getUsers().getNickname();
+				 bodyTitle="새로운 답글이 달렸어요";
+				createCommentNotifiacation(comment.getParent().getUsers(),comment,bodyTitle);
+				replySendNotifications(customUserPrincipal,comment.getParent().getUsers(), comment,title,bodyTitle);
 			}
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
@@ -170,21 +179,22 @@ public class CommentService {
 			return comment.getContent();
 		}
 	}
-	private void replySendNotifications(CustomUserPrincipal customUserPrincipal,Users users,
-			Comment comment, Community community) throws IOException {
-		Long postAuthor=users.getId();
-		List<Notification> notificationList=notificationRepository.findByUsers_Id(users.getId());
-		String body = comment.getContent();
-		String title="[SUNNY] "+customUserPrincipal.getUsers().getNickname();
-		String bodyTitle="새로운 답글이 달렸어요";
+	private void createCommentNotifiacation(Users users,Comment comment,String bodyTitle){
 		CommentNotification commentNotification=CommentNotification.builder()
 				.users(users)
-				.community(community)
+				.community(comment.getCommunity())
 				.comment(comment)
 				.parent_id(comment.getParent())
 				.title(bodyTitle)
 				.build();
 		commentNotificationRepository.save(commentNotification);
+
+	}
+	private void replySendNotifications(CustomUserPrincipal customUserPrincipal,Users users,
+			Comment comment,String title,String bodyTitle) throws IOException {
+		Long postAuthor=users.getId();
+		List<Notification> notificationList=notificationRepository.findByUsers_Id(users.getId());
+		String body = comment.getContent();
 		if(notificationList.size()!=0) {
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
 					postAuthor,
@@ -195,21 +205,11 @@ public class CommentService {
 		}
 	}
 	private void sendNotifications(CustomUserPrincipal customUserPrincipal,
-			Comment comment, Community community) throws IOException {
-		Long postAuthor=community.getUsers().getId();
+			Comment comment, String title,String bodyTitle) throws IOException {
+		Long postAuthor=comment.getCommunity().getUsers().getId();
 		Users users=customUserPrincipal.getUsers();
 		List<Notification> notificationList=notificationRepository.findByUsers_Id(postAuthor);
 		String body = comment.getContent();
-		String title="[SUNNY] "+users.getNickname();
-		String bodyTitle="새로운 댓글이 달렸어요.";
-		CommentNotification commentNotification=CommentNotification.builder()
-				.users(community.getUsers())
-				.community(community)
-				.comment(comment)
-				.parent_id(comment.getParent())
-				.title(bodyTitle)
-				.build();
-		commentNotificationRepository.save(commentNotification);
 		if(notificationList.size()!=0) {
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
 					postAuthor,

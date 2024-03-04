@@ -74,12 +74,13 @@ public class CommunityService {
 		}
 
 		boolean isScrap = false;
+		boolean isAuthor=community.getUsers().getId().equals(user.getId());
 		Optional<Scrap> scrap = scrapRepository.findByUsersAndCommunity(user, community);
 		if(scrap.isPresent()) {
 			isScrap = true;
 		}
 
-		CommunityResponse communityResponse = CommunityResponse.of(community, isScrap);
+		CommunityResponse communityResponse = CommunityResponse.of(community, isScrap,isAuthor);
 		return responseService.getSingleResponse(
 				HttpStatus.OK.value(), communityResponse, "게시글을 성공적으로 불러왔습니다.");
 	}
@@ -121,7 +122,8 @@ public class CommunityService {
 		if (user.getCommunityList() == null) {
 			user.addCommunity(community);
 		}
-		CommunityResponse communityResponse = CommunityResponse.of(community,  false);
+
+		CommunityResponse communityResponse = CommunityResponse.of(community,  false,true);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
 				"게시글을 성공적으로 작성했습니다.");
 	}
@@ -172,7 +174,7 @@ public class CommunityService {
 			isScrap = true;
 		}
 
-		CommunityResponse communityResponse = CommunityResponse.of(community, isScrap);
+		CommunityResponse communityResponse = CommunityResponse.of(community, isScrap,true);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
 				"게시글 수정을 완료했습니다.");
 	}

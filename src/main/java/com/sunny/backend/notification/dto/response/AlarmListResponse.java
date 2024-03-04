@@ -27,7 +27,7 @@ public record AlarmListResponse(
     return commentNotifications.stream()
         .map(commentNotification -> new AlarmListResponse(
             commentNotification.getCommunity().getId(),
-            commentNotification.getComment().getUsers().getName(),
+            commentNotification.getComment().getUsers().getNickname(),
             commentNotification.getTitle(),
             commentNotification.getComment().getContent(),
             commentNotification.getComment().getCreatedDate().toLocalDate()
@@ -54,7 +54,7 @@ public record AlarmListResponse(
       return friendsNotifications.stream()
           .map(friendsNotification -> new AlarmListResponse(
               friendsNotification.getFriend().getId(), //상대방꺼 id
-              friendsNotification.getUsers().getName(), //
+              friendsNotification.getUsers().getNickname(), //
               friendsNotification.getTitle(),
               friendsNotification.getBody(),
               friendsNotification.getCreatedAt().toLocalDate().isEqual(LocalDate.now()),
@@ -78,7 +78,7 @@ public record AlarmListResponse(
         List<CompetitionNotification> competitionNotifications) {
       return competitionNotifications.stream()
           .map(competitionNotification -> new AlarmListResponse(
-              competitionNotification.getCompetition().getId(), // Assuming competitionId is the correct field
+              competitionNotification.getCompetition().getId(),
               competitionNotification.getName(),
               competitionNotification.getTitle(),
               competitionNotification.getBody(),
