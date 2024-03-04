@@ -10,8 +10,7 @@ import com.sunny.backend.save.domain.Save;
 
 public interface SaveRepository extends JpaRepository<Save, Long> {
 	Optional<Save> findByUsers_Id(Long userId);
-
-	List<Save> findByEndDate(LocalDate localDate);
+	List<Save> findAllByUsers_Id(Long userId);
 
 	default Save getById(Long id) {
 		return findById(id)
