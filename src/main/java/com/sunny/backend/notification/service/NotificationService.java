@@ -61,14 +61,19 @@ public class NotificationService {
 
 	public ResponseEntity<ListResponse<AlarmListResponse>> getAlarmList(CustomUserPrincipal customUserPrincipal) {
 		List<CommentNotification> commentNotifications = commentNotificationRepository.findByUsers_Id(
-			customUserPrincipal.getUsers().getId());
+				customUserPrincipal.getUsers().getId());
+		for (CommentNotification notification : commentNotifications) {
+			System.out.println("Notification ID: " + notification.getId());
+			System.out.println("Notification Content: " + notification.getComment());
+			// 나머지 필요한 속성들에 대해서도 출력 혹은 로깅
+		}
 		List<CommentNotification> filteredCommentNotifications = commentNotifications.stream()
 				.filter(notification -> {
 					Comment comment = notification.getComment();
-					return comment != null && !comment.getIsDeleted();
+					// 댓글이 존재하고 삭제되지 않은 경우, 그리고 댓글을 작성한 사용자가 현재 사용자와 다른 경우에만 필터링
+					return comment != null && !comment.getIsDeleted() && !comment.getUsers().getId().equals(customUserPrincipal.getUsers().getId());
 				})
 				.toList();
-
 		List<FriendsNotification> friendsNotifications = friendsNotificationRepository.findByFriend_Id(
 			customUserPrincipal.getUsers().getId());
 		List<CompetitionNotification> competitionNotifications = competitionNotificationRepository.findByUsers_Id(
@@ -119,7 +124,6 @@ public class NotificationService {
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
-
 			}
 
 			NotificationResponse notificationResponse = new NotificationResponse(

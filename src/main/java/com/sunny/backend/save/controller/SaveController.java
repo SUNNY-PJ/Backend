@@ -46,14 +46,14 @@ public class SaveController {
 
 	@ApiOperation(tags = "6. Save", value = "절약 목표 조회")
 	@GetMapping("")
-	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse.DetailSaveResponse>> getSaveGaol(
+	public ResponseEntity<CommonResponse.ListResponse<SaveResponse.DetailSaveResponse>> getSaveGaol(
 		@AuthUser CustomUserPrincipal customUserPrincipal) {
 		return saveService.getSaveGoal(customUserPrincipal);
 	}
 
 	@ApiOperation(tags = "6. Save", value = "절약 목표 세부 조회")
 	@GetMapping("/detail")
-	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> getDetailSaveGaol(
+	public ResponseEntity<CommonResponse.ListResponse<SaveResponse>> getDetailSaveGaol(
 			@AuthUser CustomUserPrincipal customUserPrincipal) {
 		return saveService.getDetailSaveGoal(customUserPrincipal);
 	}
