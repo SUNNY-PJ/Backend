@@ -50,11 +50,11 @@ public class CompetitionService {
 	public ResponseEntity<CommonResponse.SingleResponse<CompetitionApplyResponse>> applyCompetition(
 		CustomUserPrincipal customUserPrincipal, CompetitionRequest competitionRequest) throws IOException {
 		Friend friendWithUser = friendRepository.getById(competitionRequest.friendsId());
-		friendWithUser.validateFriendsByUser(friendWithUser.getUserFriend().getId(),
+		friendWithUser.validateFriendsByUser(friendWithUser.getUsers().getId(),
 			customUserPrincipal.getUsers().getId());
 
 		Friend friendWithUserFriend = friendRepository
-			.findByUsers_IdAndUserFriend_Id(friendWithUser.getUserFriend().getId(), friendWithUser.getUsers().getId())
+			.findByUsers_IdAndUserFriend_Id(friendWithUser.getUsers().getId(), friendWithUser.getUserFriend().getId())
 			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
 
 		Competition competition = competitionRequest.toEntity();
