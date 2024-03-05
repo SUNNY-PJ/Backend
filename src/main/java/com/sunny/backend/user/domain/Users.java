@@ -1,31 +1,37 @@
 package com.sunny.backend.user.domain;
 
-import com.sunny.backend.comment.domain.Comment;
-import com.sunny.backend.common.BaseTime;
-import com.sunny.backend.community.domain.Community;
-
-import com.sunny.backend.consumption.domain.Consumption;
-import com.sunny.backend.notification.domain.Notification;
-import com.sunny.backend.save.domain.Save;
-import com.sunny.backend.scrap.domain.Scrap;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sunny.backend.comment.domain.Comment;
+import com.sunny.backend.common.BaseTime;
+import com.sunny.backend.community.domain.Community;
+import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.friends.domain.Friend;
+import com.sunny.backend.notification.domain.Notification;
+import com.sunny.backend.save.domain.Save;
+import com.sunny.backend.scrap.domain.Scrap;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Entity
@@ -42,11 +48,10 @@ public class Users extends BaseTime {
 	@Column(unique = true)
 	private String email;
 
-
 	@Column(nullable = false)
 	private String name;
 
-	@Size(min=2,max=10)
+	@Size(min = 2, max = 10)
 	@Column(unique = true)
 	private String nickname;
 
@@ -105,7 +110,7 @@ public class Users extends BaseTime {
 	public void addSave(Save save) {
 		this.saveList = new ArrayList<>();
 		this.saveList.add(save);
-		}
+	}
 
 	public void updateName(String name) {
 		this.nickname = name;
@@ -117,6 +122,10 @@ public class Users extends BaseTime {
 
 	public void increaseReportCount() {
 		reportCount++;
+	}
+
+	public boolean isOwner(Long id) {
+		return this.id.equals(id);
 	}
 }
 
