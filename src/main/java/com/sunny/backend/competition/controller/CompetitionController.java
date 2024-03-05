@@ -20,7 +20,7 @@ import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.competition.dto.request.CompetitionRequest;
 import com.sunny.backend.competition.dto.response.CompetitionApplyResponse;
-import com.sunny.backend.competition.dto.response.CompetitionResponseDto;
+import com.sunny.backend.competition.dto.response.CompetitionStatusResponse;
 import com.sunny.backend.competition.service.CompetitionService;
 
 import io.swagger.annotations.ApiOperation;
@@ -64,8 +64,15 @@ public class CompetitionController {
 
 	@ApiOperation(tags = "3. Competition", value = "대결 상태 가져오기")
 	@GetMapping("/status/{friendId}")
-	public ResponseEntity<CommonResponse.SingleResponse<CompetitionResponseDto.CompetitionStatus>> getCompetitionStatus(
+	public ResponseEntity<CommonResponse.SingleResponse<CompetitionStatusResponse>> getCompetitionStatus(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable(name = "friendId") Long friendId) {
 		return competitionService.getCompetitionStatus(customUserPrincipal, friendId);
+	}
+
+	@DeleteMapping("/give-up/{friendId}")
+	public ResponseEntity<Void> giveUpCompetition(
+		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable(name = "friendId") Long friendId) {
+		competitionService.giveUpCompetition(customUserPrincipal, friendId);
+		return ResponseEntity.ok().build();
 	}
 }
