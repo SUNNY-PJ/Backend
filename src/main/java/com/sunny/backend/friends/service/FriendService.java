@@ -1,13 +1,5 @@
 package com.sunny.backend.friends.service;
 
-import com.sunny.backend.common.exception.CustomException;
-import com.sunny.backend.friends.exception.FriendErrorCode;
-import com.sunny.backend.notification.domain.FriendsNotification;
-import com.sunny.backend.notification.domain.Notification;
-import com.sunny.backend.notification.dto.request.NotificationPushRequest;
-import com.sunny.backend.notification.repository.FriendsNotificationRepository;
-import com.sunny.backend.notification.repository.NotificationRepository;
-import com.sunny.backend.notification.service.NotificationService;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,13 +9,19 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import com.sunny.backend.friends.dto.response.FriendCheckResponse;
-import com.sunny.backend.friends.dto.response.FriendResponse;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.Status;
+import com.sunny.backend.friends.dto.response.FriendCheckResponse;
+import com.sunny.backend.friends.dto.response.FriendResponse;
 import com.sunny.backend.friends.dto.response.FriendStatusResponse;
 import com.sunny.backend.friends.repository.FriendRepository;
-import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.notification.domain.FriendsNotification;
+import com.sunny.backend.notification.domain.Notification;
+import com.sunny.backend.notification.dto.request.NotificationPushRequest;
+import com.sunny.backend.notification.repository.FriendsNotificationRepository;
+import com.sunny.backend.notification.repository.NotificationRepository;
+import com.sunny.backend.notification.service.NotificationService;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
 
@@ -176,7 +174,7 @@ public class FriendService {
 	}
 
 	public void addFriend(CustomUserPrincipal customUserPrincipal, Long userFriendId)
-			throws IOException {
+		throws IOException {
 		Users user = customUserPrincipal.getUsers();
 		Users userFriend = userRepository.getById(userFriendId);
 		//title,bodyTitle,body 따로 전달
@@ -199,19 +197,19 @@ public class FriendService {
 
 		}
 		FriendsNotification friendsNotification = FriendsNotification.builder()
-				.users(friend.getUserFriend()) //상대방꺼
-				.friend(friend.getUsers())
-				.title(bodyTitle)
-				.body(body)
-				.createdAt(LocalDateTime.now())
-				.build();
+			.users(friend.getUserFriend()) //상대방꺼
+			.friend(friend.getUsers())
+			.title(bodyTitle)
+			.body(body)
+			.createdAt(LocalDateTime.now())
+			.build();
 		friendsNotificationRepository.save(friendsNotification);
 		List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
 		if (notificationList.size() != 0) {
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
-					postAuthor,
-					bodyTitle,
-					body
+				postAuthor,
+				bodyTitle,
+				body
 			);
 			notificationService.sendNotificationToFriends(title, notificationPushRequest);
 		}
@@ -219,10 +217,8 @@ public class FriendService {
 
 	@Transactional
 	public void approveFriend(CustomUserPrincipal customUserPrincipal, Long friendId)
-			throws IOException {
+		throws IOException {
 		Friend friend = friendRepository.getById(friendId);
-		System.out.println("friends_id");
-		System.out.println(friend);
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
 		friend.validateFriendsByUser(friend.getUsers().getId(), tokenUserId);
 
@@ -240,22 +236,21 @@ public class FriendService {
 	}
 
 	public void getByUserAndUserFriend(Users user, Users userFriend, Status status)
-			throws IOException {
+		throws IOException {
 		Optional<Friend> optionalFriend = friendRepository
-				.findByUsers_IdAndUserFriend_Id(userFriend.getId(), user.getId());
+			.findByUsers_IdAndUserFriend_Id(userFriend.getId(), user.getId());
 
 		if (optionalFriend.isEmpty()) {
 			Friend friends = Friend.builder()
-					.users(userFriend)
-					.userFriend(user)
-					.status(status)
-					.build();
+				.users(userFriend)
+				.userFriend(user)
+				.status(status)
+				.build();
 			friendRepository.save(friends);
 			sendNotifications(user, friends);
 		} else {
 			Friend friend = optionalFriend.get();
 			friend.validateStatus();
-			System.out.println("호출");
 			sendNotifications(user, friend);
 		}
 	}
@@ -266,17 +261,17 @@ public class FriendService {
 		friend.validateFriendsByUser(friend.getUsers().getId(), customUserPrincipal.getUsers().getId());
 
 		Optional<Friend> optionalFriend = friendRepository
-				.findByUsers_IdAndUserFriend_Id(friend.getUserFriend().getId(), friend.getUsers().getId());
+			.findByUsers_IdAndUserFriend_Id(friend.getUserFriend().getId(), friend.getUsers().getId());
 		optionalFriend.ifPresent(value -> friendRepository.deleteById(value.getId()));
 
 		friendRepository.deleteById(friendId);
 	}
 
 	public FriendCheckResponse checkFriend(CustomUserPrincipal customUserPrincipal,
-			Long userFriendId) {
+		Long userFriendId) {
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
 		Optional<Friend> friendsOptional = friendRepository.findByUsers_IdAndUserFriend_Id(userFriendId,
-				tokenUserId);
+			tokenUserId);
 
 		boolean isFriend = false;
 		Status status = null;
