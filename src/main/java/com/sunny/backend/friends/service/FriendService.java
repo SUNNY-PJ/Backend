@@ -9,7 +9,9 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.sunny.backend.auth.exception.UserErrorCode;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.Status;
 import com.sunny.backend.friends.dto.response.FriendCheckResponse;
@@ -175,6 +177,9 @@ public class FriendService {
 
 	public void addFriend(CustomUserPrincipal customUserPrincipal, Long userFriendId)
 		throws IOException {
+		if (customUserPrincipal.getUsers().getId().equals(userFriendId)) {
+			throw new CustomException(UserErrorCode.CANNOT_MYSELF);
+		}
 		Users user = customUserPrincipal.getUsers();
 		Users userFriend = userRepository.getById(userFriendId);
 		//title,bodyTitle,body 따로 전달
