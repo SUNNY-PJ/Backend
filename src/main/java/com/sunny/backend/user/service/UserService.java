@@ -62,7 +62,7 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public ProfileResponse getUserProfile(CustomUserPrincipal customUserPrincipal, Long userId) {
 		Users user = checkUserId(customUserPrincipal, userId);
-		return ProfileResponse.from(user);
+		return ProfileResponse.of(user, customUserPrincipal.getUsers().getId().equals(userId));
 	}
 
 	@Transactional(readOnly = true)
