@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CompetitionNotificationRepository extends JpaRepository<CompetitionNotification,Long> {
   List<CompetitionNotification> findByUsers_Id (Long userId);
+  void deleteByUsersId(Long userId);
 }

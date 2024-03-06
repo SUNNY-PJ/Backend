@@ -10,6 +10,7 @@ import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.notification.domain.CommentNotification;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
+import com.sunny.backend.notification.repository.FriendsNotificationRepository;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -58,6 +59,7 @@ public class KakaoService {
 	private final CommentRepository commentRepository;
 	private final FriendRepository friendRepository;
 	private final CommentNotificationRepository commentNotificationRepository;
+	private final FriendsNotificationRepository friendsNotificationRepository;
 	private final CommunityRepository communityRepository;
 
 
