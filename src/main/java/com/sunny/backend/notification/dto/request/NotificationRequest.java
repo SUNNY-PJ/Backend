@@ -20,6 +20,5 @@ public class NotificationRequest {
         @NotNull(message = "허용 여부 값은 필수 값입니다.")
         private boolean allow;
         private String targetToken;
-
     }
 }
