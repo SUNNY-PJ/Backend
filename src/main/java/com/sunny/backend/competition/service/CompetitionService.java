@@ -19,6 +19,7 @@ import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.competition.domain.CompetitionStatus;
 import com.sunny.backend.competition.dto.request.CompetitionRequest;
 import com.sunny.backend.competition.dto.response.CompetitionApplyResponse;
+import com.sunny.backend.competition.dto.response.CompetitionResponse;
 import com.sunny.backend.competition.dto.response.CompetitionStatusResponse;
 import com.sunny.backend.competition.repository.CompetitionRepository;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;
@@ -52,6 +53,10 @@ public class CompetitionService {
 		Friend friendWithUser = friendRepository.getById(competitionRequest.friendsId());
 		friendWithUser.validateFriendsByUser(friendWithUser.getUsers().getId(),
 			customUserPrincipal.getUsers().getId());
+
+		if (friendWithUser.getCompetition() != null) {
+			friendWithUser.getCompetition().validateStatus();
+		}
 
 		Friend friendWithUserFriend = friendRepository
 			.findByUsers_IdAndUserFriend_Id(friendWithUser.getUsers().getId(), friendWithUser.getUserFriend().getId())
@@ -172,12 +177,21 @@ public class CompetitionService {
 		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionStatus, "결과 조회");
 	}
 
-
 	public void giveUpCompetition(CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend friend = friendRepository.getById(friendId);
 		friend.validateFriendsByUser(friend.getUsers().getId(), customUserPrincipal.getUsers().getId());
 
 		Competition competition = competitionRepository.getById(friend.getCompetition().getId());
 		competitionRepository.deleteById(competition.getId());
+	}
+
+	public ResponseEntity<CommonResponse.ListResponse<CompetitionResponse>> getCompetition(
+		CustomUserPrincipal customUserPrincipal) {
+		List<CompetitionResponse> responses = friendRepository.findByUsers_Id(customUserPrincipal.getUsers().getId())
+			.stream()
+			.filter(friend -> friend.getCompetition() != null)
+			.map(CompetitionResponse::from)
+			.toList();
+		return responseService.getListResponse(HttpStatus.OK.value(), responses, "결과 조회");
 	}
 }
