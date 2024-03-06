@@ -1,5 +1,6 @@
 package com.sunny.backend.save.controller;
 
+import com.sunny.backend.save.dto.response.SaveResponse.SaveListResponse;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -53,7 +54,7 @@ public class SaveController {
 
 	@ApiOperation(tags = "6. Save", value = "절약 목표 세부 조회")
 	@GetMapping("/detail")
-	public ResponseEntity<CommonResponse.ListResponse<SaveResponse>> getDetailSaveGaol(
+	public ResponseEntity<CommonResponse.ListResponse<SaveListResponse>> getDetailSaveGaol(
 			@AuthUser CustomUserPrincipal customUserPrincipal) {
 		return saveService.getDetailSaveGoal(customUserPrincipal);
 	}

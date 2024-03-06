@@ -13,14 +13,12 @@ public class NotificationPushRequest {
         private String title;
         private String body;
 
-        // Constructors, getters, setters...
-
         public NotificationPushRequest(Long postAuthor, String title, String body) {
             this.postAuthor = postAuthor;
             this.title = title;
             this.body = body;
         }
 
-        // Other constructors, getters, setters...
+
     }
 

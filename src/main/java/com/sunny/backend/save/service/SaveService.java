@@ -1,6 +1,8 @@
 package com.sunny.backend.save.service;
 
+import com.sunny.backend.save.dto.response.SaveResponse.SaveListResponse;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class SaveService {
 
 	private final SaveRepository saveRepository;
@@ -29,8 +32,11 @@ public class SaveService {
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> createSaveGoal(
 			CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
+		System.out.println("호출");
 		Users user = customUserPrincipal.getUsers();
 		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
+		System.out.println(saveRequest.getStartDate());
+
 		boolean allSavesExpired = saves.stream().allMatch(save -> save.checkExpired(save.getEndDate()));
 		if (allSavesExpired) {
 			Save save = Save.builder()
@@ -78,12 +84,12 @@ public class SaveService {
 		return responseService.getListResponse(HttpStatus.OK.value(), saveResponses,
 				"절약 목표를 성공적으로 조회했습니다.");
 	}
-	public ResponseEntity<CommonResponse.ListResponse<SaveResponse>> getDetailSaveGoal(
+	public ResponseEntity<CommonResponse.ListResponse<SaveListResponse>> getDetailSaveGoal(
 			CustomUserPrincipal customUserPrincipal) {
 		Users user = customUserPrincipal.getUsers();
 		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
-		List<SaveResponse> saveResponses = saves.stream().map(save -> {
-			return SaveResponse.from(save,checkSuccessed(user,save));
+		List<SaveListResponse> saveResponses = saves.stream().map(save -> {
+			return SaveListResponse.from(save, checkSuccessed(user, save));
 		}).toList();
 		return responseService.getListResponse(HttpStatus.OK.value(), saveResponses,
 				"절약 목표 성공적으로 조회했습니다.");
