@@ -16,7 +16,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 @EnableBatchProcessing
 @EnableFeignClients
-@EnableConfigurationProperties
 public class BackendApplication {
 
 	public static void main(String[] args) {
