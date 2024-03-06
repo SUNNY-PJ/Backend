@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FriendsNotificationRepository extends JpaRepository<FriendsNotification,Long> {
   List<FriendsNotification> findByFriend_Id(Long userId);
+  void deleteByUsersId(Long userId);
 }
