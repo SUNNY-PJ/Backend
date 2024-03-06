@@ -27,19 +27,19 @@ public class FriendsNotification extends BaseTime {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY) //상대방꺼
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name= "users_id")
   private Users users;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_friend_id")
-  private Users friend; //친구 id
+  private Users friend;
 
   @Column
-  private String title; //제목
+  private String title;
 
   @Column
-  private String body; //내용
+  private String body;
 
   @Column
   private LocalDateTime createdAt;
