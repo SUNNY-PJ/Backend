@@ -187,39 +187,39 @@ public class FriendService {
 	}
 
 	private void sendNotifications(Users users, Friend friend) throws IOException {
-		Long postAuthor = friend.getUsers().getId();
-		String body = friend.getUserFriend().getNickname() + "님이 친구 신청을 거절했어요";
-		;
-		String title = "[SUNNY] " + users.getName();
-		String bodyTitle = "친구 신청 결과를 알려드려요";
-		if (Status.WAIT.equals(friend.getStatus())) {
-			bodyTitle = "친구 신청을 받았어요.";
-			body = users.getNickname() + "님이 친구를 신청했어요!";
-
-		}
-		if (Status.APPROVE.equals(friend.getStatus())) {
-			body = friend.getUserFriend().getNickname() + "님이 친구 신청을 수락했어요";
-
-		}
-		FriendsNotification friendsNotification = FriendsNotification.builder()
-			.users(friend.getUserFriend()) //상대방꺼
-			.friend(friend.getUsers())
-			.title(bodyTitle)
-			.body(body)
-			.createdAt(LocalDateTime.now())
-			.build();
-		friendsNotificationRepository.save(friendsNotification);
-		List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
-		if (notificationList.size() != 0) {
-			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
-				postAuthor,
-				bodyTitle,
-				body
-			);
-			notificationService.sendNotificationToFriends(title, notificationPushRequest);
+		if (users != null && friend != null && friend.getUsers() != null && friend.getUserFriend() != null) {
+			Long postAuthor = friend.getUsers().getId();
+			String body = friend.getUserFriend().getNickname() + "님이 친구 신청을 거절했어요";
+			String title = "[SUNNY] " + users.getName();
+			String bodyTitle = "친구 신청 결과를 알려드려요";
+			if (Status.WAIT.equals(friend.getStatus())) {
+				bodyTitle = "친구 신청을 받았어요.";
+				body = users.getNickname() + "님이 친구를 신청했어요!";
+			}
+			if (Status.APPROVE.equals(friend.getStatus())) {
+				body = friend.getUserFriend().getNickname() + "님이 친구 신청을 수락했어요";
+			}
+			FriendsNotification friendsNotification = FriendsNotification.builder()
+					.users(friend.getUserFriend()) // 상대방꺼
+					.friend(friend.getUsers())
+					.title(bodyTitle)
+					.body(body)
+					.createdAt(LocalDateTime.now())
+					.build();
+			friendsNotificationRepository.save(friendsNotification);
+			List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
+			if (notificationList.size() != 0) {
+				NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
+						postAuthor,
+						bodyTitle,
+						body
+				);
+				notificationService.sendNotificationToFriends(title, notificationPushRequest);
+			}
+		} else {
+			throw new IOException("유저나 친구가 존재하지 않습니다.");
 		}
 	}
-
 	@Transactional
 	public void approveFriend(CustomUserPrincipal customUserPrincipal, Long friendId)
 		throws IOException {
