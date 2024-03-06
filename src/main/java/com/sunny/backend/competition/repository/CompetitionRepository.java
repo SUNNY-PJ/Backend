@@ -1,10 +1,9 @@
 package com.sunny.backend.competition.repository;
 
-import java.util.Optional;
-
-import com.sunny.backend.competition.domain.Competition;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.sunny.backend.competition.domain.Competition;
 
 @Repository
 public interface CompetitionRepository extends JpaRepository<Competition, Long> {

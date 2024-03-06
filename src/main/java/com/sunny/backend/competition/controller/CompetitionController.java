@@ -20,6 +20,7 @@ import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.competition.dto.request.CompetitionRequest;
 import com.sunny.backend.competition.dto.response.CompetitionApplyResponse;
+import com.sunny.backend.competition.dto.response.CompetitionResponse;
 import com.sunny.backend.competition.dto.response.CompetitionStatusResponse;
 import com.sunny.backend.competition.service.CompetitionService;
 
@@ -35,6 +36,13 @@ public class CompetitionController {
 
 	private final ResponseService responseService;
 	private final CompetitionService competitionService;
+
+	@ApiOperation(tags = "3. Competition", value = "대결 목록 확인")
+	@GetMapping("")
+	public ResponseEntity<CommonResponse.ListResponse<CompetitionResponse>> getCompetition(
+		@AuthUser CustomUserPrincipal customUserPrincipal) throws IOException {
+		return competitionService.getCompetition(customUserPrincipal);
+	}
 
 	@ApiOperation(tags = "3. Competition", value = "친구에게 대결 신청")
 	@PostMapping("")
