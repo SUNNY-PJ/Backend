@@ -49,5 +49,4 @@ public class CommentNotification extends BaseTime {
   @Column
   private String title;
 
-
 }

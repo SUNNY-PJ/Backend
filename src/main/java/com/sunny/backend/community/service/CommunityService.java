@@ -72,14 +72,12 @@ public class CommunityService {
 				community.updateView();
 			}
 		}
-
 		boolean isScrap = false;
 		boolean isAuthor=community.getUsers().getId().equals(user.getId());
 		Optional<Scrap> scrap = scrapRepository.findByUsersAndCommunity(user, community);
 		if(scrap.isPresent()) {
 			isScrap = true;
 		}
-
 		CommunityResponse communityResponse = CommunityResponse.of(community, isScrap,isAuthor);
 		return responseService.getSingleResponse(
 				HttpStatus.OK.value(), communityResponse, "게시글을 성공적으로 불러왔습니다.");
