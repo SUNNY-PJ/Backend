@@ -190,7 +190,7 @@ public class FriendService {
 		if (users != null && friend != null && friend.getUsers() != null && friend.getUserFriend() != null) {
 			Long postAuthor = friend.getUsers().getId();
 			String body = friend.getUserFriend().getNickname() + "님이 친구 신청을 거절했어요";
-			String title = "[SUNNY] " + users.getName();
+			String title = "[SUNNY] " + users.getNickname();
 			String bodyTitle = "친구 신청 결과를 알려드려요";
 			if (Status.WAIT.equals(friend.getStatus())) {
 				bodyTitle = "친구 신청을 받았어요.";
@@ -268,7 +268,8 @@ public class FriendService {
 		optionalFriend.ifPresent(value -> friendRepository.deleteById(value.getId()));
 
 		friendRepository.deleteById(friendId);
-	}
+		}
+
 
 	public FriendCheckResponse checkFriend(CustomUserPrincipal customUserPrincipal,
 		Long userFriendId) {
