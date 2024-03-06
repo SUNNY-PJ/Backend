@@ -172,6 +172,7 @@ public class CompetitionService {
 		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionStatus, "결과 조회");
 	}
 
+
 	public void giveUpCompetition(CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend friend = friendRepository.getById(friendId);
 		friend.validateFriendsByUser(friend.getUsers().getId(), customUserPrincipal.getUsers().getId());

@@ -1,17 +1,15 @@
 package com.sunny.backend.save.dto.response;
 
-
 import com.sunny.backend.save.domain.Save;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
 public record SaveResponse(
     Long id,
     Long cost,
     boolean expire,
     boolean success,
-    String startDate,
-    String endDate
+    LocalDate startDate,
+    LocalDate endDate
 ) {
     public static SaveResponse from(Save save, boolean success) {
         return new SaveResponse(
@@ -19,14 +17,14 @@ public record SaveResponse(
             save.getCost(),
             save.checkExpired(save.getEndDate()),
             success,
-            formatStartDateWithDayOfWeek(save.getStartDate()),
-            formatStartDateWithDayOfWeek(save.getEndDate())
+            save.getStartDate(), // 수정
+           save.getEndDate()    // 수정
         );
     }
 
     private static String formatStartDateWithDayOfWeek(LocalDate date) {
-        // 원하는 형태의 포맷으로 날짜와 요일을 함께 표현
-        return date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd EEEE"));
+        String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd EEEE")); // 수정
+        return formattedDate;
     }
 
     public record DetailSaveResponse(
@@ -39,6 +37,25 @@ public record SaveResponse(
                 date,
                 savePercentage,
                 cost
+            );
+        }
+    }
+    public record SaveListResponse (
+        Long id,
+        Long cost,
+        boolean expire,
+        boolean success,
+        String startDate,
+        String endDate
+    ) {
+        public static SaveListResponse from(Save save, boolean success) {
+            return new SaveListResponse(
+                save.getId(),
+                save.getCost(),
+                save.checkExpired(save.getEndDate()),
+                success,
+                formatStartDateWithDayOfWeek(save.getStartDate()),
+                formatStartDateWithDayOfWeek(save.getEndDate())
             );
         }
     }

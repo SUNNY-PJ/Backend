@@ -1,5 +1,6 @@
 package com.sunny.backend.notification.controller;
 
+import com.sunny.backend.common.response.CommonResponse.SingleResponse;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -43,4 +44,11 @@ public class NotificationController {
 		return notificationService.getAlarmList(customUserPrincipal);
 	}
 
+	@ApiOperation(tags = "9. Alarm", value = "알림 허용/거절")
+	@GetMapping("/permission")
+	public ResponseEntity<SingleResponse<Boolean>> permissionAlarm(
+			@AuthUser CustomUserPrincipal customUserPrincipal,
+			@RequestBody NotificationRequest.NotificationAllowRequest notificationAllowRequest) {
+		return notificationService.permissionAlarm(customUserPrincipal,notificationAllowRequest);
+	}
 }
