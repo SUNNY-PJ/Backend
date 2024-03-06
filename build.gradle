@@ -90,6 +90,7 @@ dependencies {
 	// json
 	implementation 'com.google.code.gson:gson:2.10.1'
 
+
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.1'
 
 }
