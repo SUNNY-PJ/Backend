@@ -14,6 +14,7 @@ public interface FriendRepository extends JpaRepository<Friend, Long>, FriendCus
 	Optional<Friend> findByUsers_IdAndUserFriend_Id(Long userId, Long userFriendId);
 
 	List<Friend> findByUsers_Id(Long userId);
+	void deleteByUsersId(Long userId);
 
 	default Friend getById(Long id) {
 		return findById(id)

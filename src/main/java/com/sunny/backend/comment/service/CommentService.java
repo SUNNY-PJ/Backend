@@ -50,7 +50,7 @@ public class CommentService {
 		boolean isPrivate = comment.getIsPrivated();
 		CommentResponse commentResponse;
 		String content = comment.getContent();
-
+		boolean commentAuthor = currentUser.getId().equals(comment.getUsers().getId());
 		String writer; //현재 사용자 기준이 아닌 id 값이 없을 경우 알 수 없음으로 떠야 됨
 		if (comment.getUsers() != null) {
 			writer = comment.getUsers().getNickname();
@@ -61,7 +61,7 @@ public class CommentService {
 			if (isPrivate && !(currentUser.getId().equals(comment.getUsers().getId()) ||
 					currentUser.getId().equals(comment.getCommunity().getUsers().getId()))) {
 				if (comment.getIsDeleted()) {
-					commentResponse = convertCommentToDto(comment);
+					commentResponse = convertCommentToDto(currentUser,comment);
 				} else {
 					commentResponse = new CommentResponse(
 							comment.getId(),
@@ -70,12 +70,13 @@ public class CommentService {
 							"비밀 댓글입니다.",
 							comment.getCreatedDate(),
 							comment.getAuthor(),
+							commentAuthor,
 							false
 					);
 				}
 			} else {
 				if (comment.getIsDeleted()) {
-					commentResponse = convertCommentToDto(comment);
+					commentResponse = convertCommentToDto(currentUser,comment);
 				} else {
 					commentResponse = new CommentResponse(
 							comment.getId(),
@@ -84,13 +85,14 @@ public class CommentService {
 							content,
 							comment.getCreatedDate(),
 							comment.getAuthor(),
+							commentAuthor,
 							false
 
 					);
 				}
 			}
 		} else {
-			commentResponse = leaveCommentToDto(comment);
+			commentResponse = leaveCommentToDto(currentUser,comment);
 		}
 		commentResponse.setChildren(
 				comment.getChildren().stream()
@@ -146,7 +148,7 @@ public class CommentService {
 		comment.changeIsDeleted(false);
 		commentRepository.save(comment);
 		user.addComment(comment);
-
+		boolean commentAuthor = user.getId().equals(comment.getUsers().getId());
 		if(!community.getUsers().getId().equals(customUserPrincipal.getUsers().getId())){
 			if(commentRequestDTO.getParentId() == null) {
 				title="[SUNNY] "+customUserPrincipal.getUsers().getNickname();
@@ -163,8 +165,9 @@ public class CommentService {
 			}
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-				new CommentResponse(comment.getId(),comment.getUsers().getId(), comment.getUsers().getNickname(), addUserTag(comment),
-						comment.getCreatedDate(), comment.getAuthor(),false),"댓글을 등록했습니다.");
+				new CommentResponse(comment.getId(),comment.getUsers().getId(), comment.getUsers().getNickname(),
+						addUserTag(comment), comment.getCreatedDate(), comment.getAuthor(),
+						commentAuthor,false),"댓글을 등록했습니다.");
 	}
 
 	private String removeUserTag(String content,Comment parent) {
@@ -225,7 +228,7 @@ public class CommentService {
 		Comment comment = commentRepository.getById(commentId);
 		validateCommentByUser(customUserPrincipal.getUsers().getId(),comment.getUsers().getId());
 		comment.changeIsDeleted(true);
-		CommentResponse commentResponse= convertCommentToDto(comment);
+		CommentResponse commentResponse= convertCommentToDto(customUserPrincipal.getUsers(),comment);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), commentResponse,"댓글을 삭제 하였습니다.");
 	}
 
@@ -243,9 +246,10 @@ public class CommentService {
 		validateCommentByUser(customUserPrincipal.getUsers().getId(),comment.getUsers().getId());
 		comment.updateContent(commentRequestDTO.getContent());
 		boolean isPrivate = commentRequestDTO.getIsPrivated();
+		boolean commentAuthor = customUserPrincipal.getUsers().getId().equals(comment.getUsers().getId());
 		comment.setIsPrivated(isPrivate);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(), comment.getUsers().getId(),comment.getUsers().getNickname(), comment.getContent(),
-						comment.getCreatedDate(),comment.getAuthor(),false), "댓글을 수정했습니다.");
+						comment.getCreatedDate(),comment.getAuthor(),commentAuthor,false), "댓글을 수정했습니다.");
 	}
 }

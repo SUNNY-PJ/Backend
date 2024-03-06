@@ -1,5 +1,7 @@
 package com.sunny.backend.comment.dto.response;
 
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.user.domain.Users;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,24 +22,27 @@ public class CommentResponse {
 	private String content;
 	private String writer;
 	private boolean isAuthor;
+	private boolean commentAuthor;
 	private boolean isDeleted;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
 	private LocalDateTime createdDate;
 	private List<CommentResponse> children = new ArrayList<>();
 
 	public CommentResponse(Long id, Long userId,String writer, String content, LocalDateTime createdDate,
-			boolean isAuthor,boolean isDeleted) {
+			boolean isAuthor,boolean commentAuthor,boolean isDeleted) {
 		this.id = id;
 		this.userId=userId;
 		this.writer = writer;
 		this.content = content;
 		this.createdDate = createdDate;
 		this.isAuthor = isAuthor;
+		this.commentAuthor=commentAuthor;
 		this.isDeleted=isDeleted;
 	}
 
 	//삭제된 댓글로 댓글 내용 수정하기 위한 객체 생성
-	public static CommentResponse convertCommentToDto(Comment comment) {
+	public static CommentResponse convertCommentToDto(Users users,Comment comment) {
+		boolean commentAuthor = users.getId().equals(comment.getUsers().getId());
 		if (comment.getIsDeleted()) {
 			return new CommentResponse(
 					comment.getId(),
@@ -46,6 +51,7 @@ public class CommentResponse {
 					"삭제된 댓글입니다.",
 					null,
 					comment.getAuthor(),
+					commentAuthor,
 					true
 			);
 		} else {
@@ -53,11 +59,12 @@ public class CommentResponse {
 			String content = comment.getContent();
 			LocalDateTime createdDate = comment.getCreatedDate();
 			boolean isAuthor =comment.getAuthor();
-			return new CommentResponse(comment.getId(),comment.getUsers().getId(), writer, content, createdDate, isAuthor,false);
+			return new CommentResponse(comment.getId(),comment.getUsers().getId(), writer, content, createdDate, isAuthor,commentAuthor,false);
 		}
 	}
 
-	public static CommentResponse leaveCommentToDto(Comment comment) {
+	public static CommentResponse leaveCommentToDto(Users users, Comment comment) {
+		boolean commentAuthor = users.getId().equals(comment.getUsers().getId());
 			return new CommentResponse(
 					comment.getId(),
 					null,
@@ -65,6 +72,7 @@ public class CommentResponse {
 					"탈퇴한 회원의 댓글입니다.",
 					null,
 					comment.getAuthor(),
+					commentAuthor,
 					comment.getIsDeleted()
 			);
 	}

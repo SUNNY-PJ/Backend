@@ -2,13 +2,15 @@ package com.sunny.backend.notification.service;
 
 import static com.sunny.backend.common.ComnConstant.*;
 import static com.sunny.backend.notification.exception.NotificationErrorCode.*;
-import static java.util.stream.Collectors.toList;
 
 import com.sunny.backend.comment.domain.Comment;
+import com.sunny.backend.common.response.CommonResponse.SingleResponse;
+import com.sunny.backend.notification.dto.request.NotificationRequest.NotificationAllowRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -38,9 +40,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationService {
 	private final ResponseService responseService;
 	private final NotificationRepository notificationRepository;
@@ -48,6 +52,25 @@ public class NotificationService {
 	private final FriendsNotificationRepository friendsNotificationRepository;
 	private final CompetitionNotificationRepository competitionNotificationRepository;
 
+	@Transactional
+	public ResponseEntity<SingleResponse<Boolean>> permissionAlarm(CustomUserPrincipal customUserPrincipal,
+			NotificationAllowRequest notificationAllowRequest ) {
+		Users user = customUserPrincipal.getUsers();
+		if(notificationAllowRequest.isAllow()) {
+			if (notificationAllowRequest.getTargetToken() == null || notificationAllowRequest.getTargetToken().isEmpty()) {
+				return responseService.getSingleResponse(HttpStatus.BAD_REQUEST.value(), null, "디바이스 토큰 값은 필수 값입니다.");
+			}
+			Notification notification = Notification.builder()
+					.DeviceToken(notificationAllowRequest.getTargetToken())
+					.users(user)
+					.build();
+			notificationRepository.save(notification);
+		}
+		else{
+			notificationRepository.deleteByUsersId(user.getId());
+		}
+		return responseService.getSingleResponse(HttpStatus.OK.value(),notificationAllowRequest.isAllow(),"알림 허용/거부 성공" );
+	}
 	public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(CustomUserPrincipal customUserPrincipal,
 		NotificationRequest notificationRequest) {
 		Users user = customUserPrincipal.getUsers();
@@ -62,11 +85,6 @@ public class NotificationService {
 	public ResponseEntity<ListResponse<AlarmListResponse>> getAlarmList(CustomUserPrincipal customUserPrincipal) {
 		List<CommentNotification> commentNotifications = commentNotificationRepository.findByUsers_Id(
 				customUserPrincipal.getUsers().getId());
-		for (CommentNotification notification : commentNotifications) {
-			System.out.println("Notification ID: " + notification.getId());
-			System.out.println("Notification Content: " + notification.getComment());
-			// 나머지 필요한 속성들에 대해서도 출력 혹은 로깅
-		}
 		List<CommentNotification> filteredCommentNotifications = commentNotifications.stream()
 				.filter(notification -> {
 					Comment comment = notification.getComment();
@@ -94,7 +112,6 @@ public class NotificationService {
 		return responseService.getListResponse(HttpStatus.OK.value(), combinedList, "알림 조회 저장 성공");
 	}
 
-	//댓글 response만 이거?
 	public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(
 		String title, NotificationPushRequest notificationPushRequest) {
 		List<Notification> notifications = notificationRepository.findByUsers_Id(

@@ -1,6 +1,7 @@
 package com.sunny.backend.auth;
 
 import com.sunny.backend.auth.dto.AppleAuthClient;
+import com.sunny.backend.auth.dto.AppleAuthRequest;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -11,26 +12,30 @@ import java.time.ZoneId;
 import java.util.Base64;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class GetMemberInfoService {
+@Slf4j
+public class AppleService {
   private final AppleAuthClient appleAuthClient;
   private final AppleProperties appleProperties;
 
   public AppleIdTokenPayload get(String authorizationCode){
-    String idToken=appleAuthClient.getIdToken(
-        appleProperties.getClientId(),
-        generateClientSecret(),
-        appleProperties.getGrantType(),
-        authorizationCode
-    ).getIdToken();
-    return TokenDecoder.decodePayload(idToken,AppleIdTokenPayload.class);
+    AppleAuthRequest request = new AppleAuthRequest();
+    request.setClientId(appleProperties.getClientId());
+    request.setClientSecret(generateClientSecret());
+    request.setGrantType(appleProperties.getGrantType());
+    request.setCode(authorizationCode);
+    log.info("request={}",request);
+    AppleSocialTokenInfoResponse response = appleAuthClient.getIdToken(request);
+    String idToken = response.getIdToken();
+    System.out.println(idToken);
+    return TokenDecoder.decodePayload(idToken, AppleIdTokenPayload.class);
   }
-
 
 //TODO 유효 기간 30일 이상으로 설정하면 에러 가능성 높음, 테스트 해보고 여기서 오류난다면 수정해야 할 듯
   private String generateClientSecret(){
