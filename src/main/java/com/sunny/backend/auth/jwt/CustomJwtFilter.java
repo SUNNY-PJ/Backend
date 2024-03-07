@@ -32,10 +32,10 @@ public class CustomJwtFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
 
-		// if (list.contains(request.getRequestURI())) {
-		// 	filterChain.doFilter(request, response);
-		// 	return;
-		// }
+		if (list.contains(request.getRequestURI())) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 		Instant beforeTime = Instant.now();
 		String token = getTokenFromRequest(request);
 
