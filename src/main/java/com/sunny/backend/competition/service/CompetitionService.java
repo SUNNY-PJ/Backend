@@ -190,7 +190,7 @@ public class CompetitionService {
 		List<CompetitionResponse> responses = friendRepository.findByUsers_Id(customUserPrincipal.getUsers().getId())
 			.stream()
 			.filter(friend -> friend.getCompetition() != null)
-			.map(CompetitionResponse::from)
+			.map(friend -> CompetitionResponse.from(friend.getCompetition()))
 			.toList();
 		return responseService.getListResponse(HttpStatus.OK.value(), responses, "결과 조회");
 	}

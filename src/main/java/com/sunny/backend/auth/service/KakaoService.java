@@ -2,21 +2,9 @@ package com.sunny.backend.auth.service;
 
 import static com.sunny.backend.common.ComnConstant.*;
 
-import com.sunny.backend.auth.dto.KakaoRequest;
-import com.sunny.backend.comment.domain.Comment;
-import com.sunny.backend.comment.repository.CommentRepository;
-import com.sunny.backend.community.domain.Community;
-import com.sunny.backend.community.repository.CommunityRepository;
-import com.sunny.backend.friends.repository.FriendRepository;
-import com.sunny.backend.notification.domain.CommentNotification;
-import com.sunny.backend.notification.repository.CommentNotificationRepository;
-import com.sunny.backend.notification.repository.FriendsNotificationRepository;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -31,13 +19,19 @@ import org.springframework.web.client.RestTemplate;
 
 import com.sunny.backend.auth.dto.KakaoIdResponse;
 import com.sunny.backend.auth.dto.KakaoMemberResponse;
+import com.sunny.backend.auth.dto.KakaoRequest;
 import com.sunny.backend.auth.dto.OAuthToken;
 import com.sunny.backend.auth.dto.TokenResponse;
 import com.sunny.backend.auth.dto.UserNameResponse;
 import com.sunny.backend.auth.exception.UserErrorCode;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.auth.jwt.TokenProvider;
+import com.sunny.backend.comment.repository.CommentRepository;
 import com.sunny.backend.common.exception.CustomException;
+import com.sunny.backend.community.repository.CommunityRepository;
+import com.sunny.backend.friends.repository.FriendRepository;
+import com.sunny.backend.notification.repository.CommentNotificationRepository;
+import com.sunny.backend.notification.repository.FriendsNotificationRepository;
 import com.sunny.backend.user.domain.Role;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
@@ -62,27 +56,27 @@ public class KakaoService {
 	private final FriendsNotificationRepository friendsNotificationRepository;
 	private final CommunityRepository communityRepository;
 
-
 	public TokenResponse kakaoLogin(KakaoRequest kakaoRequest) {
-//		KakaoRequest.kakaoRequest kakaoAccount = kakaoRequest.getKakaoAccount();
+		//		KakaoRequest.kakaoRequest kakaoAccount = kakaoRequest.getKakaoAccount();
 		String email = kakaoRequest.getEmail();
-		String progile=kakaoRequest.getProfile();
+		String progile = kakaoRequest.getProfile();
 
 		Optional<Users> usersOptional = userRepository.findByEmail(email);
 		if (usersOptional.isEmpty()) {
 			Users users = Users.builder()
-					.email(email)
-					.name(kakaoRequest.getNickname())
-					.profile(kakaoRequest.getProfile())
-					.role(Role.USER)
-					.oauthId(String.valueOf(kakaoRequest.getId()))
-					.build();
+				.email(email)
+				.name(kakaoRequest.getNickname())
+				.profile(kakaoRequest.getProfile())
+				.role(Role.USER)
+				.oauthId(String.valueOf(kakaoRequest.getId()))
+				.build();
 			userRepository.save(users);
 			return tokenProvider.createToken(email, Role.USER.getRole());
 		} else {
 			return tokenProvider.createToken(email, usersOptional.get().getRole().getRole());
 		}
 	}
+
 	public String getAccessToken(String code) {
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
@@ -137,17 +131,17 @@ public class KakaoService {
 		}
 	}
 
-    @Transactional
-    public UserNameResponse changeNickname(CustomUserPrincipal customUserPrincipal, String name){
-        Users user = customUserPrincipal.getUsers();
-        Optional<Users> optionalUsers = userRepository.findByNickname(name);
-        if (optionalUsers.isPresent()) {
-            throw new CustomException(UserErrorCode.NICKNAME_IN_USE);
-        }
-        user.updateName(name);
-        userRepository.save(user);
-        return new UserNameResponse(user.getNickname());
-    }
+	@Transactional
+	public UserNameResponse changeNickname(CustomUserPrincipal customUserPrincipal, String name) {
+		Users user = customUserPrincipal.getUsers();
+		Optional<Users> optionalUsers = userRepository.findByNickname(name);
+		if (optionalUsers.isPresent()) {
+			throw new CustomException(UserErrorCode.NICKNAME_IN_USE);
+		}
+		user.updateName(name);
+		userRepository.save(user);
+		return new UserNameResponse(user.getNickname());
+	}
 
 	@Transactional
 	public void leave(CustomUserPrincipal customUserPrincipal) {
@@ -156,6 +150,7 @@ public class KakaoService {
 		commentRepository.nullifyUsersId(users.getId());
 		userRepository.deleteById(users.getId());
 	}
+
 	public void logout(CustomUserPrincipal customUserPrincipal) {
 		Users users = customUserPrincipal.getUsers();
 		appAdminKeyMethod(users.getOauthId(), KAKAO_LOGOUT_URL);
@@ -180,4 +175,36 @@ public class KakaoService {
 		);
 	}
 
+	public TokenResponse getEmailForUserInfoByKakaoAccessToken(String kakaoAccessToken) {
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + kakaoAccessToken);
+
+		ResponseEntity<KakaoMemberResponse> response = rt.exchange(
+			KAKAO_USER_URL,
+			HttpMethod.GET,
+			new HttpEntity<>(headers),
+			KakaoMemberResponse.class
+		);
+
+		KakaoMemberResponse kakaoMemberResponse = response.getBody();
+		KakaoMemberResponse.KakaoAccount kakaoAccount = kakaoMemberResponse.getKakaoAccount();
+		String email = kakaoAccount.getEmail();
+		kakaoAccount.getProfile().checkDefaultImage();
+
+		Optional<Users> usersOptional = userRepository.findByEmail(email);
+		if (usersOptional.isEmpty()) {
+			Users users = Users.builder()
+				.email(email)
+				.name(kakaoAccount.getProfile().getNickname())
+				.profile(kakaoAccount.getProfile().getProfileImageUrl())
+				.role(Role.USER)
+				.oauthId(String.valueOf(kakaoMemberResponse.getId()))
+				.build();
+			userRepository.save(users);
+			return tokenProvider.createToken(email, Role.USER.getRole());
+		} else {
+			return tokenProvider.createToken(email, usersOptional.get().getRole().getRole());
+		}
+	}
 }

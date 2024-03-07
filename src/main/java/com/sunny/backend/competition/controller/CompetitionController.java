@@ -38,7 +38,7 @@ public class CompetitionController {
 	private final CompetitionService competitionService;
 
 	@ApiOperation(tags = "3. Competition", value = "대결 목록 확인")
-	@GetMapping("")
+	@GetMapping("/{friendId}")
 	public ResponseEntity<CommonResponse.ListResponse<CompetitionResponse>> getCompetition(
 		@AuthUser CustomUserPrincipal customUserPrincipal) throws IOException {
 		return competitionService.getCompetition(customUserPrincipal);
@@ -77,6 +77,7 @@ public class CompetitionController {
 		return competitionService.getCompetitionStatus(customUserPrincipal, friendId);
 	}
 
+	@ApiOperation(tags = "3. Competition", value = "대결 포기하기")
 	@DeleteMapping("/give-up/{friendId}")
 	public ResponseEntity<Void> giveUpCompetition(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable(name = "friendId") Long friendId) {
