@@ -159,11 +159,11 @@ public class UserService {
 
 				Users report = communityReport.getUsers();
 				Users users = communityReport.getCommunity().getUsers();
-				sendNotifications(users);
 				if (users.getReportCount() == 4) {
 					userRepository.deleteById(users.getId());
 				} else {
 					users.increaseReportCount();
+					sendNotifications(users);
 				}
 				template.convertAndSend("/sub/user/" + report.getId(),
 					UserReportResultResponse.ofCommunity(communityReport, true));
@@ -175,11 +175,11 @@ public class UserService {
 
 				Users report = commentReport.getUsers();
 				Users users = commentReport.getComment().getUsers();
-				sendNotifications(users);
 				if (users.getReportCount() == 4) {
 					userRepository.deleteById(users.getId());
 				} else {
 					users.increaseReportCount();
+					sendNotifications(users);
 				}
 				template.convertAndSend("/sub/user/" + report.getId(),
 					UserReportResultResponse.ofCommentReport(commentReport, true));
