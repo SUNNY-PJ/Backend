@@ -38,10 +38,9 @@ public class AppleFeignClientConfiguration {
     JavaTimeModule javaTimeModule = new JavaTimeModule();
     objectMapper.registerModule(javaTimeModule);
 
-    // LocalDate를 원하는 형식으로 직렬화하기 위한 설정 추가
-    objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // NULL 값은 직렬화하지 않음
-    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); // 날짜를 timestamp 형태로 출력하지 않음
-    objectMapper.setDateFormat(new SimpleDateFormat("yyyy.MM.dd")); // 원하는 날짜 형식으로 지정
+    objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    objectMapper.setDateFormat(new SimpleDateFormat("yyyy.MM.dd"));
 
     return objectMapper;
   }
