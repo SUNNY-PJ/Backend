@@ -1,6 +1,5 @@
 package com.sunny.backend;
 
-import java.time.LocalDateTime;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
@@ -11,10 +10,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableBatchProcessing
+@EnableScheduling
 @EnableFeignClients
 @EnableConfigurationProperties
 public class BackendApplication {
