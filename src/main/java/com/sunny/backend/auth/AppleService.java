@@ -39,7 +39,6 @@ public class AppleService {
           appleProperties.getGrantType(),
           authorizationCode
       ).getIdToken();
-
       return idToken;
     } catch (Exception e) {
       e.printStackTrace();
