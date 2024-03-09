@@ -2,6 +2,15 @@ package com.sunny.backend.user.service;
 
 import static com.sunny.backend.common.ComnConstant.*;
 
+import com.sunny.backend.competition.domain.Competition;
+import com.sunny.backend.friends.domain.Friend;
+import com.sunny.backend.notification.domain.CompetitionNotification;
+import com.sunny.backend.notification.domain.Notification;
+import com.sunny.backend.notification.dto.request.NotificationPushRequest;
+import com.sunny.backend.notification.repository.NotificationRepository;
+import com.sunny.backend.notification.service.NotificationService;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -49,6 +58,8 @@ public class UserService {
 	private final ScrapRepository scrapRepository;
 	private final CommunityReportRepository communityReportRepository;
 	private final CommentReportRepository commentReportRepository;
+	private final NotificationRepository notificationRepository;
+	private final NotificationService notificationService;
 	private final SimpMessagingTemplate template;
 	private final S3Util s3Util;
 
@@ -138,7 +149,8 @@ public class UserService {
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.GeneralResponse> approveUserReport(ReportStatusRequest reportStatusRequest) {
+	public ResponseEntity<CommonResponse.GeneralResponse> approveUserReport(ReportStatusRequest reportStatusRequest)
+			throws IOException {
 		switch (reportStatusRequest.status()) {
 			case COMMUNITY -> {
 				CommunityReport communityReport = communityReportRepository.getById(reportStatusRequest.id());
@@ -147,6 +159,7 @@ public class UserService {
 
 				Users report = communityReport.getUsers();
 				Users users = communityReport.getCommunity().getUsers();
+				sendNotifications(users);
 				if (users.getReportCount() == 4) {
 					userRepository.deleteById(users.getId());
 				} else {
@@ -162,6 +175,7 @@ public class UserService {
 
 				Users report = commentReport.getUsers();
 				Users users = commentReport.getComment().getUsers();
+				sendNotifications(users);
 				if (users.getReportCount() == 4) {
 					userRepository.deleteById(users.getId());
 				} else {
@@ -171,9 +185,43 @@ public class UserService {
 					UserReportResultResponse.ofCommentReport(commentReport, true));
 			}
 		}
+
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "신고가 승인되었습니다.");
 	}
+	private void sendNotifications(Users users) throws IOException {
+		Long postAuthor=users.getId();
+		String title = "[SUNNY]" ;
+		String bodyTitle = users.getReportCount()+"번 째 경고를 받았어요";
+		String body = users.getReportCount()+"번 째 경고를 받았어요";
+		List<Notification> notificationList = notificationRepository.findByUsers_Id(users.getId());
 
+		if (notificationList.size() != 0) {
+			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
+					postAuthor,
+					bodyTitle,
+					body
+			);
+			notificationService.sendNotificationToFriends(title, notificationPushRequest);
+		}
+	}
+
+	// TODO 신고 결과 API 호출 수정해야 됨
+	private void reportResultNotifications(Users users) throws IOException {
+		Long postAuthor=users.getId();
+		String title = "[SUNNY]" ;
+		String bodyTitle = "신고 결과를 알려드려요";
+		String body = "회원님의 신고에 대한 결과를 알려드려요";
+		List<Notification> notificationList = notificationRepository.findByUsers_Id(users.getId());
+
+		if (notificationList.size() != 0) {
+			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
+					postAuthor,
+					bodyTitle,
+					body
+			);
+			notificationService.sendNotificationToFriends(title, notificationPushRequest);
+		}
+	}
 	@Transactional
 	public ResponseEntity<CommonResponse.GeneralResponse> refuseUserReport(ReportStatusRequest reportStatusRequest) {
 		switch (reportStatusRequest.status()) {
