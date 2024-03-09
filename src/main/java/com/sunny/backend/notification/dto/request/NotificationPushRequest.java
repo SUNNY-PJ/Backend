@@ -18,7 +18,5 @@ public class NotificationPushRequest {
             this.title = title;
             this.body = body;
         }
-
-
     }
 
