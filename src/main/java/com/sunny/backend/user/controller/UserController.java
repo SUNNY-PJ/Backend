@@ -1,5 +1,6 @@
 package com.sunny.backend.user.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -93,7 +94,7 @@ public class UserController {
 	@ApiOperation(tags = "0. User", value = "유저 신고 승인")
 	@PatchMapping("/report")
 	public ResponseEntity<CommonResponse.GeneralResponse> approveUserReport(
-		@RequestBody ReportStatusRequest reportStatusRequest) {
+		@RequestBody ReportStatusRequest reportStatusRequest) throws IOException {
 		return userService.approveUserReport(reportStatusRequest);
 	}
 
