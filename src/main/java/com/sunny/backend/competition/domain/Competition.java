@@ -36,6 +36,9 @@ public class Competition {
 	private Long output; // 결과
 
 	@Column
+	private Integer day;
+
+	@Column
 	private LocalDate startDate; // 시작 기간
 
 	@Column
@@ -68,4 +71,8 @@ public class Competition {
 		}
 	}
 
+	public void addDate(LocalDate startDate, LocalDate endDate) {
+		this.startDate = startDate;
+		this.endDate = endDate;
+	}
 }
