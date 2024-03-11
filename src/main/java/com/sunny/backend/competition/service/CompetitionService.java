@@ -2,6 +2,7 @@ package com.sunny.backend.competition.service;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,7 +11,6 @@ import javax.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
@@ -111,6 +111,7 @@ public class CompetitionService {
 
 		Competition competition = competitionRepository.getById(friendWithUser.getCompetition().getId());
 		competition.approveStatus();
+		competition.addDate(LocalDate.now().plusDays(1), LocalDate.now().plusDays(1).plusDays(competition.getDay()));
 		Friend friendWithUserFriend = friendRepository
 			.findByUsers_IdAndUserFriend_Id(friendWithUser.getUserFriend().getId(), friendWithUser.getUsers().getId())
 			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
@@ -200,7 +201,7 @@ public class CompetitionService {
 	}
 
 	@Transactional
-	@Scheduled(cron = "*/30 * * * * *")
+	// @Scheduled(cron = "*/30 * * * * *")
 	public void sendCompetitionResult() {
 		for (CompetitionResultDto competitionResultDto : friendRepository.getCompetitionResult()) {
 			System.out.println(CompetitionResult.from(competitionResultDto));
