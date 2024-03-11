@@ -24,12 +24,16 @@ public record FriendResponse(
 			.nickname(friendResponseDto.nickname())
 			.profile(friendResponseDto.profile())
 			.friendStatus(friendResponseDto.friendStatus())
-			.competitionStatus(friendResponseDto.competitionStatus())
+			.competitionStatus(
+				friendResponseDto.competitionStatus() != null ? friendResponseDto.competitionStatus() : Status.NONE)
 			.output(isWinner(friendResponseDto.userId(), friendResponseDto.output()))
 			.build();
 	}
 
 	public static CompetitionStatus isWinner(Long userId, Long output) {
+		if (output == null) {
+			return null;
+		}
 		if (userId.equals(output)) {
 			return CompetitionStatus.WIN;
 		} else if (output.equals(-1L)) {

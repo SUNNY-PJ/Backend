@@ -30,7 +30,8 @@ public class FriendRepositoryImpl extends QuerydslRepositorySupport implements F
 				Projections.constructor(FriendResponseDto.class, friend.users.id.as("userId"),
 					friend.id.as("friendId"), competition.id.as("competitionId"),
 					friend.userFriend.id, friend.userFriend.nickname, friend.userFriend.profile,
-					friend.status.as("friendStatus"), competition.status.as("competitionStatus").nullif(Status.NONE),
+					friend.status.as("friendStatus"),
+					competition.status.as("competitionStatus"),
 					competition.output
 				))
 			.from(users)
