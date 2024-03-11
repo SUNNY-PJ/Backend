@@ -80,7 +80,7 @@ public class CompetitionService {
 	private void sendNotifications(Friend friend, Competition competition) throws IOException {
 		Long postAuthor = friend.getUserFriend().getId();
 		String title = "[SUNNY] " + friend.getUsers().getNickname();
-		String bodyTitle = friend.getUsers().getNickname()+"님이 대결을 신청했어요";
+		String bodyTitle = friend.getUsers().getNickname() + "님이 대결을 신청했어요";
 		String body = competition.getCompensation();
 
 		CompetitionNotification competitionNotification = CompetitionNotification.builder()
@@ -110,6 +110,7 @@ public class CompetitionService {
 		friendWithUser.validateFriendsByUser(friendWithUser.getUsers().getId(), customUserPrincipal.getUsers().getId());
 
 		Competition competition = competitionRepository.getById(friendWithUser.getCompetition().getId());
+		competition.addOutput();
 		competition.approveStatus();
 		competition.addDate(LocalDate.now().plusDays(1), LocalDate.now().plusDays(1).plusDays(competition.getDay()));
 		Friend friendWithUserFriend = friendRepository
