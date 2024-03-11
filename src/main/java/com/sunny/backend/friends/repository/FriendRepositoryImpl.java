@@ -14,7 +14,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sunny.backend.competition.dto.response.CompetitionResultDto;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.Status;
-import com.sunny.backend.friends.dto.response.FriendResponse;
+import com.sunny.backend.friends.dto.response.FriendResponseDto;
 
 public class FriendRepositoryImpl extends QuerydslRepositorySupport implements FriendCustomRepository {
 	private JPAQueryFactory queryFactory;
@@ -25,12 +25,13 @@ public class FriendRepositoryImpl extends QuerydslRepositorySupport implements F
 	}
 
 	@Override
-	public List<FriendResponse> getFriendResponse(Long userId) {
+	public List<FriendResponseDto> getFriendResponse(Long userId) {
 		return queryFactory.select(
-				Projections.constructor(FriendResponse.class,
+				Projections.constructor(FriendResponseDto.class, friend.users.id.as("userId"),
 					friend.id.as("friendId"), competition.id.as("competitionId"),
 					friend.userFriend.id, friend.userFriend.nickname, friend.userFriend.profile,
-					friend.status.as("friendStatus"), competition.status.as("competitionStatus")
+					friend.status.as("friendStatus"), competition.status.as("competitionStatus").nullif(Status.NONE),
+					competition.output
 				))
 			.from(users)
 			.leftJoin(users.friends, friend)
