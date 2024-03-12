@@ -1,7 +1,6 @@
 package com.sunny.backend.notification.controller;
 
 import com.sunny.backend.common.response.CommonResponse.SingleResponse;
-import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
-import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.CommonResponse.ListResponse;
 import com.sunny.backend.notification.dto.request.NotificationRequest;
 import com.sunny.backend.notification.dto.response.AlarmListResponse;
@@ -29,12 +27,12 @@ import lombok.RequiredArgsConstructor;
 public class NotificationController {
 	private final NotificationService notificationService;
 
-	@ApiOperation(tags = "9. Alarm", value = "알림 토큰 전송")
-	@PostMapping("")
-	public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(
-		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@Valid @RequestBody NotificationRequest notificationRequest) {
-		return notificationService.allowNotification(customUserPrincipal, notificationRequest);
+
+	@ApiOperation(tags = "9. Alarm", value = "알림 리스트 확인")
+	@GetMapping("/permission/allow")
+	public ResponseEntity<SingleResponse<Boolean>> getPermissionAlarm(
+			@AuthUser CustomUserPrincipal customUserPrincipal) {
+		return notificationService.getPermissionAlarm(customUserPrincipal);
 	}
 
 	@ApiOperation(tags = "9. Alarm", value = "알림 리스트 확인")
@@ -51,4 +49,5 @@ public class NotificationController {
 			@RequestBody NotificationRequest.NotificationAllowRequest notificationAllowRequest) {
 		return notificationService.permissionAlarm(customUserPrincipal,notificationAllowRequest);
 	}
+
 }
