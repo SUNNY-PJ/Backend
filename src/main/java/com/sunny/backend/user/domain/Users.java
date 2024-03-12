@@ -61,17 +61,17 @@ public class Users extends BaseTime {
 	@Enumerated(value = EnumType.STRING)
 	private Role role;
 
-	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Community> communityList;
 
-	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Consumption> consumptionList;
 
 	@OneToMany(mappedBy = "users")
 	@JsonIgnore
 	private List<Comment> commentList;
 
-	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Save> saveList;
 
 	@OneToMany(mappedBy = "users")
@@ -86,7 +86,7 @@ public class Users extends BaseTime {
 	@ColumnDefault("0")
 	private int reportCount;
 
-	@OneToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Friend> friends = new ArrayList<>();
 
 	@OneToMany(mappedBy = "users")
