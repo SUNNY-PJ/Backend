@@ -15,7 +15,7 @@ import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.Status;
 import com.sunny.backend.friends.dto.response.FriendCheckResponse;
-import com.sunny.backend.friends.dto.response.FriendResponse;
+import com.sunny.backend.friends.dto.response.FriendResponseDto;
 import com.sunny.backend.friends.dto.response.FriendStatusResponse;
 import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.notification.domain.FriendsNotification;
@@ -171,7 +171,7 @@ public class FriendService {
 
 	public FriendStatusResponse getFriends(CustomUserPrincipal customUserPrincipal) {
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
-		List<FriendResponse> friendResponses = friendRepository.getFriendResponse(tokenUserId);
+		List<FriendResponseDto> friendResponses = friendRepository.getFriendResponse(tokenUserId);
 		return FriendStatusResponse.of(friendResponses, friendResponses);
 	}
 
@@ -200,19 +200,19 @@ public class FriendService {
 				body = friend.getUserFriend().getNickname() + "님이 친구 신청을 수락했어요";
 			}
 			FriendsNotification friendsNotification = FriendsNotification.builder()
-					.users(friend.getUserFriend()) // 상대방꺼
-					.friend(friend.getUsers())
-					.title(bodyTitle)
-					.body(body)
-					.createdAt(LocalDateTime.now())
-					.build();
+				.users(friend.getUserFriend()) // 상대방꺼
+				.friend(friend.getUsers())
+				.title(bodyTitle)
+				.body(body)
+				.createdAt(LocalDateTime.now())
+				.build();
 			friendsNotificationRepository.save(friendsNotification);
 			List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
 			if (notificationList.size() != 0) {
 				NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
-						postAuthor,
-						bodyTitle,
-						body
+					postAuthor,
+					bodyTitle,
+					body
 				);
 				notificationService.sendNotificationToFriends(title, notificationPushRequest);
 			}
@@ -220,6 +220,7 @@ public class FriendService {
 			throw new IOException("유저나 친구가 존재하지 않습니다.");
 		}
 	}
+
 	@Transactional
 	public void approveFriend(CustomUserPrincipal customUserPrincipal, Long friendId)
 		throws IOException {
@@ -268,8 +269,7 @@ public class FriendService {
 		optionalFriend.ifPresent(value -> friendRepository.deleteById(value.getId()));
 
 		friendRepository.deleteById(friendId);
-		}
-
+	}
 
 	public FriendCheckResponse checkFriend(CustomUserPrincipal customUserPrincipal,
 		Long userFriendId) {

@@ -1,9 +1,11 @@
 package com.sunny.backend.friends.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,11 +33,11 @@ public class Friend {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "user_id")
 	private Users users;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "user_friend_id")
 	private Users userFriend;
 
@@ -43,14 +45,13 @@ public class Friend {
 	@Enumerated(value = EnumType.STRING)
 	private Status status;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "competition_id")
 	private Competition competition;
 
 	public void addCompetition(Competition competition) {
 		this.competition = competition;
 	}
-
 
 	public void approveStatus() {
 		status = Status.APPROVE;
@@ -61,16 +62,16 @@ public class Friend {
 	}
 
 	public void validateStatus() {
-		if(status.equals(Status.WAIT)) {
+		if (status.equals(Status.WAIT)) {
 			throw new CustomException(FriendErrorCode.FRIEND_NOT_APPROVE);
 		}
-		if(status.equals(Status.APPROVE)) {
+		if (status.equals(Status.APPROVE)) {
 			throw new CustomException(FriendErrorCode.FRIEND_EXIST);
 		}
 	}
 
 	public void validateFriendsByUser(Long userId, Long tokenUserId) {
-		if(!userId.equals(tokenUserId)) {
+		if (!userId.equals(tokenUserId)) {
 			throw new CustomException(CommonErrorCode.TOKEN_INVALID);
 		}
 	}

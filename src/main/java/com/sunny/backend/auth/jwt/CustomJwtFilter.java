@@ -25,17 +25,17 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CustomJwtFilter extends OncePerRequestFilter {
 	private final TokenProvider tokenProvider;
-	List<String> list = Arrays.asList("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/h2-console/**",
+	List<String> list = Arrays.asList("/swagger-ui/", "/swagger-resources/", "/v3/api-docs/", "/h2-console/",
 		"/auth/token");
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
 
-		// if (list.contains(request.getRequestURI())) {
-		// 	filterChain.doFilter(request, response);
-		// 	return;
-		// }
+		if (list.contains(request.getRequestURI())) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 		Instant beforeTime = Instant.now();
 		String token = getTokenFromRequest(request);
 
