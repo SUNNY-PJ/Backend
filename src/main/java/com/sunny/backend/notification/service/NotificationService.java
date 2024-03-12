@@ -155,6 +155,16 @@ public class NotificationService {
 		}
 	}
 
+	public ResponseEntity<CommonResponse.SingleResponse<Boolean>> getPermissionAlarm(
+			CustomUserPrincipal customUserPrincipal) {
+		Users users = customUserPrincipal.getUsers();
+		List<Notification> notificationList = notificationRepository.findByUsers_Id(users.getId());
+		if (notificationList.size() != 0) {
+			return responseService.getSingleResponse(HttpStatus.OK.value(), true, "알림 허용");
+		} else {
+			return responseService.getSingleResponse(HttpStatus.OK.value(), false, "알림 거부");
+		}
+	}
 
 	public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> commentSendNotificationToFriends(
 			String title, NotificationPushRequest notificationPushRequest) {
