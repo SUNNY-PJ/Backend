@@ -80,8 +80,8 @@ public class CompetitionService {
 	private void sendNotifications(Friend friend, Competition competition) throws IOException {
 		Long postAuthor = friend.getUserFriend().getId();
 		String title = "[SUNNY] " + friend.getUsers().getNickname();
-		String bodyTitle = friend.getUsers().getNickname() + "님이 대결을 신청했어요";
-		String body = competition.getCompensation();
+		String bodyTitle = friend.getUsers().getNickname()+"님이 대결을 신청했어요";
+		String body = competition.getMessage();
 
 		CompetitionNotification competitionNotification = CompetitionNotification.builder()
 			.users(friend.getUserFriend()) //상대방꺼
