@@ -86,13 +86,15 @@ public class UserService {
 			.toList();
 	}
 
+
+
 	@Transactional(readOnly = true)
 	public List<UserCommentResponse> getCommentByUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
 		Users user = checkUserId(customUserPrincipal, userId);
 
 		return commentRepository.findAllByUsers_Id(user.getId())
 			.stream()
-			.map(UserCommentResponse::from)
+			.map(comment -> UserCommentResponse.from(comment, customUserPrincipal.getUsers()))
 			.toList();
 	}
 

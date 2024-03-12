@@ -9,6 +9,7 @@ import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.common.photo.Photo;
 import com.sunny.backend.user.domain.Users;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -29,6 +30,7 @@ public class Community {
     @Column(name = "community_id")
     private Long id;
     @Column
+    @Size(min = 1, max = 35)
     private String title;
     @Column
     private String contents;

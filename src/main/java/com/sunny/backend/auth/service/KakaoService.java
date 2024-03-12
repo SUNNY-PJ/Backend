@@ -57,10 +57,7 @@ public class KakaoService {
 	private final TokenProvider tokenProvider;
 	private final UserRepository userRepository;
 	private final CommentRepository commentRepository;
-	private final FriendRepository friendRepository;
 	private final CommentNotificationRepository commentNotificationRepository;
-	private final FriendsNotificationRepository friendsNotificationRepository;
-	private final CommunityRepository communityRepository;
 
 
 	public TokenResponse kakaoLogin(KakaoRequest kakaoRequest) {
@@ -78,8 +75,12 @@ public class KakaoService {
 					.oauthId(String.valueOf(kakaoRequest.getId()))
 					.build();
 			userRepository.save(users);
+			TokenResponse t=tokenProvider.createToken(email, Role.USER.getRole());
+			System.out.println(t);
 			return tokenProvider.createToken(email, Role.USER.getRole());
+
 		} else {
+			System.out.println(tokenProvider.createToken(email, usersOptional.get().getRole().getRole()));
 			return tokenProvider.createToken(email, usersOptional.get().getRole().getRole());
 		}
 	}

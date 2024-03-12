@@ -1,6 +1,5 @@
 package com.sunny.backend.comment.dto.response;
 
-import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.user.domain.Users;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -91,13 +90,13 @@ public class CommentResponse {
 
 		public static MyComment from(Comment comment) {
 			return MyComment.builder()
-				.communityId(comment.getCommunity().getId())
-				.commentId(comment.getId())
-				.content(comment.getContent())
-				.writer(comment.getUsers().getNickname())
-				.createdDate(comment.getCreatedDate())
-				.updateDate(comment.getUpdatedDate())
-				.build();
+					.communityId(comment.getCommunity().getId())
+					.commentId(comment.getId())
+					.content(comment.getContent())
+					.writer(comment.getUsers().getNickname())
+					.createdDate(comment.getCreatedDate())
+					.updateDate(comment.getUpdatedDate())
+					.build();
 		}
 	}
 }
