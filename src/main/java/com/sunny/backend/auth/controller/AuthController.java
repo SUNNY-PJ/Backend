@@ -2,6 +2,7 @@ package com.sunny.backend.auth.controller;
 
 import com.sunny.backend.auth.dto.KakaoRequest;
 import javax.validation.constraints.Size;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
+@Slf4j
 public class AuthController {
 
 	private final ResponseService responseService;
@@ -47,7 +49,7 @@ public class AuthController {
 
 //	@ApiOperation(tags = "0. Auth", value = "카카오 로그인 callback")
 //	@GetMapping("/kakao/callback")
-//	public ResponseEntity<String> kakaoCallback(String code) {
+//	public ResponseEntity<String> testkakaoCallback(String code) {
 ////		TokenResponse tokenResponse = kakaoService.getEmailForUserInfo(code);
 //
 //		String accessToken = kakaoService.getAccessToken(code);
@@ -73,6 +75,7 @@ public class AuthController {
 	public ResponseEntity<TokenResponse> kakaoLogin(@RequestBody KakaoRequest kakaoRequest) {
 		System.out.println("호출");
 		TokenResponse tokenResponse = kakaoService.kakaoLogin(kakaoRequest);
+		log.info("kakao={}",tokenResponse);
 		return ResponseEntity.ok(tokenResponse);
 	}
 

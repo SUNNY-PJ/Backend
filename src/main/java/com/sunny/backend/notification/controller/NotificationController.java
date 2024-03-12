@@ -45,7 +45,7 @@ public class NotificationController {
 	}
 
 	@ApiOperation(tags = "9. Alarm", value = "알림 허용/거절")
-	@GetMapping("/permission")
+	@PostMapping("/permission")
 	public ResponseEntity<SingleResponse<Boolean>> permissionAlarm(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@RequestBody NotificationRequest.NotificationAllowRequest notificationAllowRequest) {

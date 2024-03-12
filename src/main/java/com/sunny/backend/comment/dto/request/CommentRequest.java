@@ -1,11 +1,8 @@
 package com.sunny.backend.comment.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import javax.validation.constraints.NotBlank;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
