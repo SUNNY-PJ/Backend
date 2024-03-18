@@ -34,6 +34,7 @@ public class AppleController {
 	public ResponseEntity<CommonResponse.SingleResponse<TokenResponse>> verifyToken(
 			@RequestParam("code") String idToken) {
 		TokenResponse tokenResponse = appleOAuthClient.getOAuthMemberId(idToken);
+		log.info(String.valueOf(tokenResponse));
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				tokenResponse, "애플 로그인");
 	}
@@ -54,6 +55,13 @@ public class AppleController {
 			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@RequestParam("code") String code) {
 		return appleService.revoke(customUserPrincipal, code);
+	}
+
+	@ApiOperation(tags = "0. Auth", value = "refresh 토큰으로 access 토큰 발급")
+	@GetMapping("/reissue")
+	public ResponseEntity<TokenResponse> reissue(@RequestParam(name = "refreshToken") String refreshToken) {
+		TokenResponse tokenResponse = appleService.reissue(refreshToken);
+		return ResponseEntity.ok().body(tokenResponse);
 	}
 }
 
