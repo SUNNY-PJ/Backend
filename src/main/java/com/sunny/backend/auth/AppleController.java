@@ -7,7 +7,6 @@ import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 
 import io.swagger.annotations.ApiOperation;
-import java.io.IOException;
 import javax.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
