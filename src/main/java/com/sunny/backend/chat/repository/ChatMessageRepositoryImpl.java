@@ -28,6 +28,7 @@ public class ChatMessageRepositoryImpl extends QuerydslRepositorySupport impleme
 		this.queryFactory = jpaQueryFactory;
 	}
 
+	//TODO 이거 바뀜 조심 nickname 아님
 	@Override
 	public List<ChatMessageResponse> getChatMessageList(Long chatRoomId, Integer size, Long chatMessageId) {
 		return queryFactory.selectFrom(chatMessage)
@@ -39,7 +40,7 @@ public class ChatMessageRepositoryImpl extends QuerydslRepositorySupport impleme
 				groupBy(LocalDateTimeToString(chatMessage.createdDate)).list(
 					Projections.constructor(ChatMessageResponse.class, LocalDateTimeToString(chatMessage.createdDate),
 						list(Projections.constructor(MessageResponse.class, chatMessage.id, chatMessage.message,
-							chatMessage.users.id.as("userId"), chatMessage.users.name, chatMessage.readCnt,
+							chatMessage.users.id.as("userId"), chatMessage.users.nickname, chatMessage.readCnt,
 							chatMessage.createdDate.as("time"))
 						)
 					)

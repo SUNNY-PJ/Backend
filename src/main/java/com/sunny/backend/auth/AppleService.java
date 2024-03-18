@@ -1,6 +1,8 @@
 package com.sunny.backend.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sunny.backend.auth.dto.AppleAuthClient;
+import com.sunny.backend.auth.dto.AppleTokenResponse;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -10,13 +12,24 @@ import java.security.Security;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -35,7 +48,7 @@ public class AppleService {
     try {
       String idToken = appleAuthClient.getIdToken(
           appleProperties.getClientId(),
-          makeClientSecret(),
+          generateClientSecret(),
           appleProperties.getGrantType(),
           authorizationCode
       ).getIdToken();
@@ -45,80 +58,63 @@ public class AppleService {
     }
     return null;
   }
-  //feign 사용 x
-//  public AppleIdTokenPayload getIdToken(String authorizationCode) {
-//    String tokenUri = "https://appleid.apple.com/auth/token";
-//
-//    HttpHeaders headers = new HttpHeaders();
-//    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//
-//    MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-//    body.add("client_id", appleProperties.getClientId());
-//    body.add("client_secret", generateClientSecret());
-//    body.add("grant_type", appleProperties.getGrantType());
-//    body.add("code", authorizationCode);
-//    log.info("body={}", body);
-//    HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
-//
-//    try {
-//      ResponseEntity<String> responseEntity = restTemplate.exchange(tokenUri, HttpMethod.POST,
-//          requestEntity, String.class);
-//      log.info("responseEntity={}", responseEntity.getBody());
-//      if (responseEntity.getStatusCode().is2xxSuccessful()) {
-//        return TokenDecoder.decodePayload(responseEntity.getBody(), AppleIdTokenPayload.class);
-//      } else {
-//        return null;
-//      }
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//    }
-//
-//    return null;
-//  }
-//
 
+  public HashMap<String, Object> generateAuthToken(String authorizationCode) throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    RestTemplate restTemplate = new RestTemplateBuilder().build();
+    HashMap<String, Object> rtnMap = new HashMap<String, Object>();
+    String authUrl = "https://appleid.apple.com/auth/token";
 
-//  public AppleIdTokenPayload get(String authorizationCode){
-//    String clientSecret = generateClientSecret();
-//    log.info("clientSecret={}", clientSecret);
-//
-//    AppleAuthRequest request = new AppleAuthRequest();
-//    request.setClientId(appleProperties.getClientId());
-//    request.setClientSecret(clientSecret);
-//    request.setGrantType(appleProperties.getGrantType());
-//    request.setCode(authorizationCode);
-//    log.info("request={}", request);
-//
-//    AppleSocialTokenInfoResponse response = appleAuthClient.getIdToken(
-//        request.getClientId(),
-//        request.getClientSecret(),
-//        request.getGrantType(),
-//        request.getCode()
-//    );
-//
-//    String idToken = response.getIdToken();
-//    log.info("idToken={}", idToken);
-//
-//    return TokenDecoder.decodePayload(idToken, AppleIdTokenPayload.class);
-//  }
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    params.add("code", authorizationCode);
+    params.add("client_id", appleProperties.getClientId());
+    params.add("client_secret", generateClientSecret());
+    params.add("grant_type", "authorization_code");
 
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+    HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
 
-//TODO 유효 기간 30일 이상으로 설정하면 에러 가능성 높음
-private String generateClientSecret() {
+    try {
+      ResponseEntity<String> response = restTemplate.postForEntity(authUrl, httpEntity, String.class);
+      HashMap respMap = objectMapper.readValue(response.getBody(), HashMap.class);
 
-  LocalDateTime expiration = LocalDateTime.now().plusMinutes(5);
+      rtnMap.put("statusCode", response.getStatusCodeValue());
+      rtnMap.put("accessToken", respMap.get("access_token"));
+      rtnMap.put("refreshToken", respMap.get("refresh_token"));
+      rtnMap.put("idToken", respMap.get("id_token"));
+      rtnMap.put("expiresIn", respMap.get("expires_in"));
 
-  return Jwts.builder()
-      .setHeaderParam(JwsHeader.KEY_ID, appleProperties.getKeyId())
-      .setIssuer(appleProperties.getTeamId())
-      .setAudience(appleProperties.getAudience())
-      .setSubject(appleProperties.getClientId())
-      .setExpiration(Date.from(expiration.atZone(ZoneId.systemDefault()).toInstant()))
-      .setIssuedAt(new Date())
-      .signWith(SignatureAlgorithm.ES256, getPrivateKey())
-      .compact();
-}
+      return rtnMap;
+    } catch (HttpClientErrorException e) {
+      log.error(String.valueOf(e));
+      log.error("Apple Auth Token Error");
+      HashMap respMap = objectMapper.readValue(e.getResponseBodyAsString(), HashMap.class);
+      rtnMap.put("statusCode", e.getRawStatusCode());
+      rtnMap.put("errorDescription", respMap.get("error_description"));
+      rtnMap.put("error", respMap.get("error"));
 
+      return rtnMap;
+    }
+  }
+
+  public String generateClientSecret() throws IOException {
+    LocalDateTime expiration = LocalDateTime.now().plusMinutes(5);
+    Map<String, Object> jwtHeader = new HashMap<>();
+    jwtHeader.put("kid", appleProperties.getKeyId());
+    jwtHeader.put("alg", "ES256");
+
+    return Jwts.builder()
+        .setHeaderParams(jwtHeader)
+        .setIssuer(appleProperties.getTeamId())
+        .setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간 - UNIX 시간
+        .setExpiration(Date.from(expiration.atZone(ZoneId.systemDefault()).toInstant())) // 만료 시간
+        .setAudience("https://appleid.apple.com")
+        .setSubject(appleProperties.getClientId())
+        .signWith(SignatureAlgorithm.ES256, getPrivateKey())
+        .compact();
+  }
   public String makeClientSecret() throws IOException {
     Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
     return Jwts.builder()
@@ -135,10 +131,8 @@ private String generateClientSecret() {
 
 
   private PrivateKey getPrivateKey() {
-
     Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
     JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
-
     try {
       byte[] privateKeyBytes = Base64.getDecoder().decode(appleProperties.getPrivateKey());
 
@@ -148,4 +142,5 @@ private String generateClientSecret() {
       throw new RuntimeException("Error converting private key from String", e);
     }
   }
+
 }

@@ -58,7 +58,7 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
     if (!searchText.isEmpty()) {
       return community.title.contains(searchText)
           .or(community.contents.contains(searchText))
-          .or(community.users.name.contains(searchText));
+          .or(community.users.nickname.contains(searchText));
     }
     return null;
   }

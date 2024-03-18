@@ -13,7 +13,6 @@ import com.sunny.backend.user.domain.Users;
 
 import lombok.Getter;
 import lombok.Setter;
-
 @Getter
 public class CustomUserPrincipal implements OAuth2User, UserDetails {
 	private final Users users;
@@ -71,6 +70,11 @@ public class CustomUserPrincipal implements OAuth2User, UserDetails {
 
 	@Override
 	public String getName() {
-		return users.getName();
+		return null;
 	}
+
+//	@Override
+//	public String getName() {
+//		return users.getName();
+//	}
 }

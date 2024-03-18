@@ -44,9 +44,6 @@ public class CustomJwtFilter extends OncePerRequestFilter {
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 			log.info("Save Authentication");
 		}
-		// else {
-		// 	log.error("유효한 JWT 토큰이 없습니다!!, uri: {}", request.getRequestURI());
-		// }
 
 		filterChain.doFilter(request, response);
 		log.info("url {} ,response 응답까지 시간  {}ms, {}s",
