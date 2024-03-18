@@ -28,7 +28,7 @@ public class NotificationController {
 	private final NotificationService notificationService;
 
 
-	@ApiOperation(tags = "9. Alarm", value = "알림 리스트 확인")
+	@ApiOperation(tags = "9. Alarm", value = "알림 허용 여부 확인")
 	@GetMapping("/permission/allow")
 	public ResponseEntity<SingleResponse<Boolean>> getPermissionAlarm(
 			@AuthUser CustomUserPrincipal customUserPrincipal) {

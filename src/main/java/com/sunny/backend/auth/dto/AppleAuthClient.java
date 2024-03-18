@@ -3,6 +3,8 @@ package com.sunny.backend.auth.dto;
 
 
 import com.sunny.backend.auth.AppleFeignClientConfiguration;
+import com.sunny.backend.auth.ApplePublicKey;
+import com.sunny.backend.auth.ApplePublicKeys;
 import com.sunny.backend.auth.AppleSocialTokenInfoResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
@@ -20,7 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface AppleAuthClient {
 
     @GetMapping(value = "/keys")
-    ApplePublicKeyResponse getAppleAuthPublicKey();
+    ApplePublicKeys getAppleAuthPublicKey();
+
 
 
     @PostMapping(value = "/auth/token", consumes = "application/x-www-form-urlencoded")

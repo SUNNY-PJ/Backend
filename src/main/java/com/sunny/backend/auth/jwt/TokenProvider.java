@@ -32,7 +32,7 @@ public class TokenProvider {
 	private final RedisUtil redisUtil;
 	private final CustomUserDetailsService customUserDetailsService;
 
-	public TokenResponse createToken(String email, String authorities) {
+	public TokenResponse createToken(String email, String authorities,boolean isUserRegistered) {
 		String accessToken = Jwts.builder()
 			.setHeader(createHeader())
 			.claim("email", email)
@@ -41,7 +41,7 @@ public class TokenProvider {
 			.setExpiration(createExpiredDate(1))
 			.signWith(SignatureAlgorithm.HS512, tokenSecret)
 			.compact();
-
+		System.out.println("accessToken "+accessToken);
 		String refreshToken = Jwts.builder()
 			.setHeader(createHeader())
 			.setSubject("refreshToken")
@@ -51,7 +51,7 @@ public class TokenProvider {
 
 		redisUtil.setValuesWithTimeout(refreshToken, email, getClaims(refreshToken).getExpiration().getTime());
 
-		return new TokenResponse(accessToken, refreshToken);
+		return new TokenResponse(accessToken, refreshToken,isUserRegistered);
 	}
 
 	public Claims getClaims(String token) {

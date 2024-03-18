@@ -8,25 +8,6 @@ import java.text.SimpleDateFormat;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-//public class AppleFeignClientConfiguration {
-//  @Bean
-//  public AppleFeignClientErrorDecoder appleFeignClientErrorDecoder() {
-//    return new AppleFeignClientErrorDecoder(new ObjectMapper());
-//  }
-//}
-
-
-//@Configuration
-//public class AppleFeignClientConfiguration {
-//
-//  @Bean
-//  public ObjectMapper objectMapper() {
-//    ObjectMapper objectMapper = new ObjectMapper();
-//    // 원하는 ObjectMapper 설정을 추가할 수 있습니다.
-//    return objectMapper;
-//  }
-//}
-
 @Configuration
 public class AppleFeignClientConfiguration {
 

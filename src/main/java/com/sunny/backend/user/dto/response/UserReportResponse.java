@@ -21,7 +21,7 @@ public record UserReportResponse(
 	public static UserReportResponse toCommunity(LocalDateTime createdDate, Community community, String reason) {
 		return UserReportResponse.builder()
 			.time(createdDate)
-			.name(community.getUsers().getName())
+			.name(community.getUsers().getNickname())
 			.body(community.getContents())
 			.reason(reason)
 			.build();
@@ -30,7 +30,7 @@ public record UserReportResponse(
 	public static UserReportResponse toComment(LocalDateTime createdDate, Comment comment, String reason) {
 		return UserReportResponse.builder()
 			.time(createdDate)
-			.name(comment.getUsers().getName())
+			.name(comment.getUsers().getNickname())
 			.body(comment.getContent())
 			.reason(reason)
 			.build();
@@ -39,7 +39,7 @@ public record UserReportResponse(
 	public static UserReportResponse toCommunityReport(CommunityReport communityReport) {
 		return UserReportResponse.builder()
 			.time(communityReport.getCreatedDate())
-			.name(communityReport.getCommunity().getUsers().getName())
+			.name(communityReport.getCommunity().getUsers().getNickname())
 			.body(communityReport.getCommunity().getContents())
 			.reason(communityReport.getReason())
 			.build();
@@ -48,7 +48,7 @@ public record UserReportResponse(
 	public static UserReportResponse toCommentReport(CommentReport commentReport) {
 		return UserReportResponse.builder()
 			.time(commentReport.getCreatedDate())
-			.name(commentReport.getComment().getUsers().getName())
+			.name(commentReport.getComment().getUsers().getNickname())
 			.body(commentReport.getComment().getContent())
 			.reason(commentReport.getReason())
 			.build();

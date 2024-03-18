@@ -14,9 +14,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 	private final UserRepository userRepository;
-
 	@Override
 	public CustomUserPrincipal loadUserByUsername(String email) throws UsernameNotFoundException {
+		//Members members = memberRepository.findByEmail(email)
+		// .orElseThrow(() -> new UsernameNotFoundException("User not found with email : " + email));
 		Users users = userRepository.findByEmail(email)
 			.orElseThrow(() -> new UsernameNotFoundException("User not found with email : " + email));
 		return new CustomUserPrincipal(users);
