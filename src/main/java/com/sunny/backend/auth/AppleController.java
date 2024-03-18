@@ -32,10 +32,12 @@ public class AppleController {
 
   @ApiOperation(tags = "0. Auth", value = "애플 로그인 test")
   @GetMapping("/auth/callback")
-  public void appleCallback(@RequestParam("code") String code) throws IOException {
+  public String appleCallback(@RequestParam("code") String code) throws IOException {
 		log.info("code={}", code);
     log.info("apple callback method 호출");
-    appleService.getIdToken(code);
+    String token = appleService.getIdToken(code);
+    log.info("token={}",token);
+    return token;
   }
 
   @ApiOperation(tags = "0. Auth", value = "애플 로그인 callback")
