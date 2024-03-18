@@ -7,8 +7,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.sunny.backend.entity.BaseTime;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.common.BaseTime;
+import com.sunny.backend.user.domain.Users;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

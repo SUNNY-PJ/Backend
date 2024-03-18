@@ -1,18 +1,20 @@
 package com.sunny.backend.save.domain;
 
 
-import com.sunny.backend.dto.request.save.SaveRequest;
-import com.sunny.backend.user.Users;
+import com.sunny.backend.save.dto.request.SaveRequest;
+import com.sunny.backend.user.domain.Users;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 
 
 @Entity
@@ -30,15 +32,13 @@ public class Save {
     @Column
     @PositiveOrZero
     private Long cost;
-
     @Column
     @FutureOrPresent
     private LocalDate startDate;
-
     @Column
     @FutureOrPresent
     private LocalDate endDate;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private Users users;
 
@@ -54,7 +54,12 @@ public class Save {
     }
 
     public double calculateSavePercentage(Long userMoney, Save save) {
-        return userMoney != null ?
+        double percentage = userMoney != null ?
             100.0 - (((double) userMoney / (double) save.getCost()) * 100.0) : 100.0;
+        BigDecimal roundedPercentage = new BigDecimal(percentage).setScale(1, RoundingMode.HALF_UP);
+        return roundedPercentage.doubleValue();
+    }
+    public boolean checkExpired(LocalDate expirationDate) {
+        return expirationDate != null && LocalDate.now().isAfter(expirationDate);
     }
 }

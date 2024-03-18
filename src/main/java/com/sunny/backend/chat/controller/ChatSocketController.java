@@ -7,9 +7,9 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 
+import com.sunny.backend.auth.jwt.TokenProvider;
 import com.sunny.backend.chat.dto.request.ChatSendMessage;
 import com.sunny.backend.chat.service.ChatSocketService;
-import com.sunny.backend.security.jwt.TokenProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ChatSocketController {
 	private final ChatSocketService chatSocketService;
 	private final TokenProvider tokenProvider;
+
 	/**
 	 * websocket "/pub/chat/message"로 들어오는 메시징을 처리한다.
 	 */
