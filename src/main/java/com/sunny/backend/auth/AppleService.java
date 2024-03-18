@@ -3,6 +3,16 @@ package com.sunny.backend.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sunny.backend.auth.dto.AppleAuthClient;
 import com.sunny.backend.auth.dto.AppleTokenResponse;
+import com.sunny.backend.auth.dto.UserNameResponse;
+import com.sunny.backend.auth.exception.UserErrorCode;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.comment.repository.CommentRepository;
+import com.sunny.backend.common.exception.CustomException;
+import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.common.response.ResponseService;
+import com.sunny.backend.notification.repository.CommentNotificationRepository;
+import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.repository.UserRepository;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -16,17 +26,21 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.mapstruct.ap.shaded.freemarker.core.Comment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -39,68 +53,10 @@ public class AppleService {
 
   private final AppleAuthClient appleAuthClient;
   private final AppleProperties appleProperties;
-
-  @Autowired
-  private RestTemplate restTemplate;
-
-  public String getIdToken(String authorizationCode) {
-
-    try {
-      String idToken = appleAuthClient.getIdToken(
-          appleProperties.getClientId(),
-          generateClientSecret(),
-          appleProperties.getGrantType(),
-          authorizationCode
-      ).getIdToken();
-      log.info(generateClientSecret());
-      log.info(idToken);
-      return idToken;
-    } catch (Exception e) {
-      e.printStackTrace();
-      log.info("error={}",e);
-    }
-    return null;
-  }
-
-  public HashMap<String, Object> generateAuthToken(String authorizationCode) throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    RestTemplate restTemplate = new RestTemplateBuilder().build();
-    HashMap<String, Object> rtnMap = new HashMap<String, Object>();
-    String authUrl = "https://appleid.apple.com/auth/token";
-
-    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-    params.add("code", authorizationCode);
-    params.add("client_id", appleProperties.getClientId());
-    params.add("client_secret", generateClientSecret());
-    params.add("grant_type", "authorization_code");
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-    HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
-
-    try {
-      ResponseEntity<String> response = restTemplate.postForEntity(authUrl, httpEntity, String.class);
-      HashMap respMap = objectMapper.readValue(response.getBody(), HashMap.class);
-
-      rtnMap.put("statusCode", response.getStatusCodeValue());
-      rtnMap.put("accessToken", respMap.get("access_token"));
-      rtnMap.put("refreshToken", respMap.get("refresh_token"));
-      rtnMap.put("idToken", respMap.get("id_token"));
-      rtnMap.put("expiresIn", respMap.get("expires_in"));
-
-      return rtnMap;
-    } catch (HttpClientErrorException e) {
-      log.error(String.valueOf(e));
-      log.error("Apple Auth Token Error");
-      HashMap respMap = objectMapper.readValue(e.getResponseBodyAsString(), HashMap.class);
-      rtnMap.put("statusCode", e.getRawStatusCode());
-      rtnMap.put("errorDescription", respMap.get("error_description"));
-      rtnMap.put("error", respMap.get("error"));
-
-      return rtnMap;
-    }
-  }
+  private final UserRepository userRepository;
+  private final CommentRepository commentRepository;
+  private final CommentNotificationRepository commentNotificationRepository;
+  private final ResponseService responseService;
 
   public String generateClientSecret() throws IOException {
     LocalDateTime expiration = LocalDateTime.now().plusMinutes(5);
@@ -113,19 +69,6 @@ public class AppleService {
         .setIssuer(appleProperties.getTeamId())
         .setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간 - UNIX 시간
         .setExpiration(Date.from(expiration.atZone(ZoneId.systemDefault()).toInstant())) // 만료 시간
-        .setAudience("https://appleid.apple.com")
-        .setSubject(appleProperties.getClientId())
-        .signWith(SignatureAlgorithm.ES256, getPrivateKey())
-        .compact();
-  }
-  public String makeClientSecret() throws IOException {
-    Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
-    return Jwts.builder()
-        .setHeaderParam("kid", appleProperties.getKeyId())
-        .setHeaderParam("alg", "ES256")
-        .setIssuer(appleProperties.getTeamId())
-        .setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(expirationDate)
         .setAudience("https://appleid.apple.com")
         .setSubject(appleProperties.getClientId())
         .signWith(SignatureAlgorithm.ES256, getPrivateKey())
@@ -144,6 +87,39 @@ public class AppleService {
     } catch (Exception e) {
       throw new RuntimeException("Error converting private key from String", e);
     }
+  }
+
+  public ResponseEntity<CommonResponse.GeneralResponse> revoke(
+      CustomUserPrincipal customUserPrincipal,
+      String code){
+    try{
+      Users users=customUserPrincipal.getUsers();
+      AppleRevokeRequest appleRevokeRequest=AppleRevokeRequest.builder()
+          .client_id(appleProperties.getClientId())
+          .client_secert(generateClientSecret())
+          .token(code)
+          .token_type_hint("access_token")
+          .build();
+      appleAuthClient.revoke(appleRevokeRequest);
+      commentNotificationRepository.deleteByUsersId(users.getId());
+      commentRepository.nullifyUsersId(users.getId());
+      userRepository.deleteById(users.getId());
+      return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Transactional
+  public UserNameResponse changeNickname(CustomUserPrincipal customUserPrincipal, String name) {
+    Users user = customUserPrincipal.getUsers();
+    Optional<Users> optionalUsers = userRepository.findByNickname(name);
+    if (optionalUsers.isPresent()) {
+      throw new CustomException(UserErrorCode.NICKNAME_IN_USE);
+    }
+    user.updateName(name);
+    userRepository.save(user);
+    return new UserNameResponse(user.getNickname());
   }
 
 }

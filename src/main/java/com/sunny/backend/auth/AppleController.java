@@ -21,77 +21,40 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/apple")
+@RequestMapping("/apple/auth")
 @RequiredArgsConstructor
 @Slf4j
 public class AppleController {
 
-  private final AppleService appleService;
-  private final AppleOAuthClient appleOAuthClient;
-  private final ResponseService responseService;
+	private final AppleService appleService;
+	private final AppleOAuthClient appleOAuthClient;
+	private final ResponseService responseService;
 
-  @ApiOperation(tags = "0. Auth", value = "애플 로그인 test")
-  @GetMapping("/auth/callback")
-  public String appleCallback(@RequestParam("code") String code) throws IOException {
-		log.info("code={}", code);
-    log.info("apple callback method 호출");
-    String token = appleService.getIdToken(code);
-    log.info("token={}",token);
-    return token;
-  }
+	@ApiOperation(tags = "0. Auth", value = "애플 로그인 callback")
+	@GetMapping("/callback")
+	public ResponseEntity<CommonResponse.SingleResponse<TokenResponse>> verifyToken(
+			@RequestParam("code") String idToken) {
+		TokenResponse tokenResponse = appleOAuthClient.getOAuthMemberId(idToken);
+		return responseService.getSingleResponse(HttpStatus.OK.value(),
+				tokenResponse, "애플 로그인");
+	}
 
-  @ApiOperation(tags = "0. Auth", value = "애플 로그인 callback")
-  @GetMapping("/auth")
-  public ResponseEntity<CommonResponse.SingleResponse<TokenResponse>>  verifyToken(@RequestParam("code") String idToken) {
-    log.info("호출");
-    TokenResponse tokenResponse= appleOAuthClient.getOAuthMemberId(idToken);
-    System.out.println("tokenResponse= "+tokenResponse.accessToken());
-    return responseService.getSingleResponse(HttpStatus.OK.value(),
-        tokenResponse, "애플 로그인");
-  }
-
-//  @ApiOperation(tags = "0. Auth", value = "애플 로그인 id token & jwt test")
-//  @GetMapping("/auth")
-//  public ResponseEntity<CommonResponse.SingleResponse<TokenResponse>>  verifyToken(
-//      @RequestParam("token") String idToken,
-//      @RequestParam("code") String code
-//      ) {
-//    log.info("호출");
-//    TokenResponse tokenResponse= appleOAuthClient.getOAuthMemberIdTest(idToken,code);
-//    System.out.println("tokenResponse= "+tokenResponse.accessToken());
-//    return responseService.getSingleResponse(HttpStatus.OK.value(),
-//        tokenResponse, "애플 로그인");
-//  }
-
-  @ApiOperation(tags = "0. Auth", value = "닉네임 변경")
+	@ApiOperation(tags = "0. Auth", value = "닉네임 변경")
 	@PostMapping("/nickname")
 	public ResponseEntity<CommonResponse.SingleResponse<UserNameResponse>> changeNickname(
-		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@RequestParam("name") @Size(min = 2, max = 10, message = "2~10자 이내로 입력해야 합니다.") String name) {
-		UserNameResponse userDto = appleOAuthClient.changeNickname(customUserPrincipal, name);
+			@AuthUser CustomUserPrincipal customUserPrincipal,
+			@RequestParam("name") @Size(min = 2, max = 10, message = "2~10자 이내로 입력해야 합니다.") String name) {
+		UserNameResponse userDto = appleService.changeNickname(customUserPrincipal, name);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), userDto, "닉네임 변경 성공");
 	}
 
-	//이거 일단 임시 테스트임
-//	@ApiOperation(tags = "0. Auth", value = "로그아웃")
-//	@GetMapping("/kakao/logout")
-//	public ResponseEntity<Void> handleKakaoLogout(@AuthUser CustomUserPrincipal customUserPrincipal) {
-//		appleOAuthClient.logout(customUserPrincipal);
-//		return ResponseEntity.ok().build();
-//	}
 
 	@ApiOperation(tags = "0. Auth", value = "탈퇴")
 	@GetMapping("/leave")
-	public ResponseEntity<Void> deleteAccount(@AuthUser CustomUserPrincipal customUserPrincipal) {
-		appleOAuthClient.leave(customUserPrincipal);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<CommonResponse.GeneralResponse> deleteAccount(
+			@AuthUser CustomUserPrincipal customUserPrincipal,
+			@RequestParam("code") String code) {
+		return appleService.revoke(customUserPrincipal, code);
 	}
-
-//
-//	@ApiOperation(tags = "0. Auth", value = "refresh 토큰으로 access 토큰 발급")
-//	@GetMapping("/reissue")
-//	public ResponseEntity<TokenResponse> reissue(@RequestParam(name = "refreshToken") String refreshToken) {
-//		TokenResponse tokenResponse = appleOAuthClient.reissue(refreshToken);
-//		return ResponseEntity.ok().body(tokenResponse);
-//	}
 }
+
