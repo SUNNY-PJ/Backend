@@ -1,5 +1,6 @@
-package com.sunny.backend.auth;
+package com.sunny.backend.apple;
 
+import com.sunny.backend.auth.UnauthorizedException;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;

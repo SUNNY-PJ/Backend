@@ -1,8 +1,6 @@
-package com.sunny.backend.auth;
+package com.sunny.backend.apple;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sunny.backend.auth.dto.AppleAuthClient;
-import com.sunny.backend.auth.dto.AppleTokenResponse;
 import com.sunny.backend.auth.dto.UserNameResponse;
 import com.sunny.backend.auth.exception.UserErrorCode;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
@@ -13,7 +11,6 @@ import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
-import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.IOException;
@@ -22,7 +19,6 @@ import java.security.Security;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,20 +27,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-import org.mapstruct.ap.shaded.freemarker.core.Comment;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor

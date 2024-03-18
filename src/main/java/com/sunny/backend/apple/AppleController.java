@@ -1,4 +1,4 @@
-package com.sunny.backend.auth;
+package com.sunny.backend.apple;
 import com.sunny.backend.auth.dto.TokenResponse;
 import com.sunny.backend.auth.dto.UserNameResponse;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;

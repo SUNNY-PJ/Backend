@@ -1,7 +1,8 @@
-package com.sunny.backend.auth;
+package com.sunny.backend.apple;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sunny.backend.auth.UnauthorizedException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

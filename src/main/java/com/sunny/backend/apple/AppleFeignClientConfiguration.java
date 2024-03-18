@@ -1,4 +1,4 @@
-package com.sunny.backend.auth;
+package com.sunny.backend.apple;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;

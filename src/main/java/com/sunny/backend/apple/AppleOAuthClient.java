@@ -1,28 +1,14 @@
-package com.sunny.backend.auth;
+package com.sunny.backend.apple;
 
-import static com.sunny.backend.common.ComnConstant.KAKAO_USER_URL;
-
+import com.sunny.backend.auth.UnauthorizedException;
 import com.sunny.backend.auth.dto.AppleAuthClient;
-import com.sunny.backend.auth.dto.KakaoIdResponse;
-import com.sunny.backend.auth.dto.KakaoMemberResponse;
 import com.sunny.backend.auth.dto.TokenResponse;
-import com.sunny.backend.auth.dto.UserNameResponse;
-import com.sunny.backend.auth.exception.UserErrorCode;
-import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.auth.jwt.TokenProvider;
-import com.sunny.backend.auth.service.CustomUserDetailsService;
-import com.sunny.backend.comment.repository.CommentRepository;
-import com.sunny.backend.common.exception.CustomException;
-import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.user.domain.Role;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
-import com.sunny.backend.util.RedisUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -30,10 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -43,15 +26,8 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 @Component
 @RequiredArgsConstructor

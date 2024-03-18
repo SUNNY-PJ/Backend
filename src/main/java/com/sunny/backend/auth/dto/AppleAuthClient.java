@@ -2,17 +2,14 @@ package com.sunny.backend.auth.dto;
 
 
 
-import com.sunny.backend.auth.AppleFeignClientConfiguration;
-import com.sunny.backend.auth.ApplePublicKey;
-import com.sunny.backend.auth.ApplePublicKeys;
-import com.sunny.backend.auth.AppleRevokeRequest;
-import com.sunny.backend.auth.AppleSocialTokenInfoResponse;
+import com.sunny.backend.apple.AppleFeignClientConfiguration;
+import com.sunny.backend.apple.ApplePublicKeys;
+import com.sunny.backend.apple.AppleRevokeRequest;
+import com.sunny.backend.apple.AppleSocialTokenInfoResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 @Component
 @FeignClient(

@@ -1,4 +1,4 @@
-package com.sunny.backend.auth;
+package com.sunny.backend.apple;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

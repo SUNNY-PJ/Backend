@@ -1,4 +1,4 @@
-package com.sunny.backend.auth;
+package com.sunny.backend.apple;
 
 import static com.sunny.backend.common.CommonErrorCode.APPLE_LOGIN_FEIGN_API_ERROR;
 
