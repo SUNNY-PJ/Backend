@@ -5,6 +5,7 @@ package com.sunny.backend.auth.dto;
 import com.sunny.backend.auth.AppleFeignClientConfiguration;
 import com.sunny.backend.auth.ApplePublicKey;
 import com.sunny.backend.auth.ApplePublicKeys;
+import com.sunny.backend.auth.AppleRevokeRequest;
 import com.sunny.backend.auth.AppleSocialTokenInfoResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
@@ -24,17 +25,15 @@ public interface AppleAuthClient {
     @GetMapping(value = "/keys")
     ApplePublicKeys getAppleAuthPublicKey();
 
-
-
-    @PostMapping(value = "/auth/token", consumes = "application/x-www-form-urlencoded")
+    @PostMapping(value = "/token", consumes = "application/x-www-form-urlencoded")
     AppleSocialTokenInfoResponse getIdToken(
         @RequestParam("client_id") String clientId,
         @RequestParam("client_secret") String clientSecret,
         @RequestParam("grant_type") String grantType,
         @RequestParam("code") String code
     );
+
+    @PostMapping(value = "/revoke",consumes = "application/x-www-form-urlencoded" )
+    void revoke(AppleRevokeRequest appleRevokeRequest);
   }
-//public interface AppleAuthClient {
-//  @PostMapping("/auth/token")
-//  AppleSocialTokenInfoResponse getIdToken(AppleAuthRequest request);
-//}
+
