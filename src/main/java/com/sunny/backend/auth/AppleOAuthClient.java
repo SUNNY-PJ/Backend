@@ -58,46 +58,16 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class AppleOAuthClient implements OAuth2Client {
   private final JwtParser jwtParser;
-  private final AppleApiCaller appleApiCaller;
   private final AppleOAuthPublicKeyGenerator appleOAuthPublicKeyGenerator;
 
   @Value("${app.auth.tokenSecret}")
   private String tokenSecret;
   @Value("${app.auth.tokenExpirationMsec}")
   private long tokenExpirationMsec;
-
-  private final CommentRepository commentRepository;
-  private final CommentNotificationRepository commentNotificationRepository;
   private final UserRepository userRepository;
   private final TokenProvider tokenProvider;
   private final AppleAuthClient appleAuthClient;
-  private final AppleProperties appleProperties;
 
-
-  @Transactional
-  public TokenResponse getOAuthMemberIdTest(String idToken,String code) {
-
-    ApplePublicKeys applePublicKeys = appleAuthClient.getAppleAuthPublicKey();
-    System.out.println(applePublicKeys.getKeys().size());
-    Map<String, String> headers = jwtParser.parseHeaders(idToken);
-    PublicKey publicKey = appleOAuthPublicKeyGenerator.generatePublicKey(headers,
-        applePublicKeys);
-    Claims claims = jwtParser.parseClaims(idToken, publicKey);
-    String oAuthId = claims.getSubject();
-    String email = claims.get("email", String.class);
-    Optional<Users> usersOptional = userRepository.findByEmail(email);
-    if (usersOptional.isEmpty()) {
-      Users users = Users.builder()
-          .email(email)
-          .oauthId(oAuthId)
-          .role(Role.USER)
-          .build();
-      userRepository.save(users);
-      return tokenProvider.createToken(email, Role.USER.getRole(),false);
-    } else {
-      return tokenProvider.createToken(email, usersOptional.get().getRole().getRole(),true);
-    }
-  }
   @Override
   @Transactional
   public TokenResponse getOAuthMemberId(String idToken) {
@@ -125,27 +95,6 @@ public class AppleOAuthClient implements OAuth2Client {
     }
   }
 
-  	@Transactional
-	public UserNameResponse changeNickname(CustomUserPrincipal customUserPrincipal, String name) {
-		Users user = customUserPrincipal.getUsers();
-		Optional<Users> optionalUsers = userRepository.findByNickname(name);
-		if (optionalUsers.isPresent()) {
-			throw new CustomException(UserErrorCode.NICKNAME_IN_USE);
-		}
-		user.updateName(name);
-		userRepository.save(user);
-		return new UserNameResponse(user.getNickname());
-	}
-
-	@Transactional
-	public void leave(CustomUserPrincipal customUserPrincipal) {
-		Users users = customUserPrincipal.getUsers();
-		commentNotificationRepository.deleteByUsersId(users.getId());
-		commentRepository.nullifyUsersId(users.getId());
-		userRepository.deleteById(users.getId());
-	}
-
-
   private void validateClaims(Claims claims) {
     // 클레임에서 필요한 정보 추출
     String subject = claims.getSubject(); // 서브젝트
@@ -171,48 +120,9 @@ public class AppleOAuthClient implements OAuth2Client {
         .getBody();
   }
 
-  //시작
-
-  public String getIdToken(String authorizationCode) {
-    log.info("호출");
-    try {
-      String idToken = appleAuthClient.getIdToken(
-          appleProperties.getClientId(),
-          createClientSecret(),
-          appleProperties.getGrantType(),
-          authorizationCode
-      ).getIdToken();
-      return idToken;
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-
-  public String createClientSecret() throws IOException {
-    Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
-    Map<String, Object> jwtHeader = new HashMap<>();
-    jwtHeader.put("kid", "R76G46JCNL"); // kid
-    jwtHeader.put("alg", "ES256"); // alg
-    String jwt= Jwts.builder()
-        .setHeaderParams(jwtHeader)
-        .setIssuer("8L6HR8J2B8") // iss
-        .setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간
-        .setExpiration(expirationDate) // 만료 시간
-        .setAudience("https://appleid.apple.com") // aud
-        .setSubject("com.sunnymoney2024.SUNNY") // sub
-        .signWith(SignatureAlgorithm.ES256, getPrivateKey())
-        .compact();
-    log.info("jwt={}",jwt);
-    return jwt;
-  }
-
   public PrivateKey getPrivateKey() throws IOException {
     ClassPathResource resource = new ClassPathResource("static/AuthKey_R76G46JCNL.p8"); // .p8 key파일 위치
     String privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
-
-//    File f = new File("C:/workspace/AuthKey_1234ABCD.p8");
-//    String privateKey = new String(Files.readAllBytes(f.toPath()));
 
     Reader pemReader = new StringReader(privateKey);
     PEMParser pemParser = new PEMParser(pemReader);
@@ -220,7 +130,6 @@ public class AppleOAuthClient implements OAuth2Client {
     PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
     return converter.getPrivateKey(object);
   }
-
 
 }
 

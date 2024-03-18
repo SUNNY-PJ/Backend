@@ -27,8 +27,6 @@ public class AppleOAuthPublicKeyGenerator {
         .filter(key -> key.getKid().equals(tokenHeaders.get(KID_HEADER_KEY)))
         .findAny()
         .orElseThrow(UnauthorizedException::invalid);
-    System.out.println("값"+publicKey.getKid());
-
     return generatePublicKeyWithApplePublicKey(publicKey);
   }
 
