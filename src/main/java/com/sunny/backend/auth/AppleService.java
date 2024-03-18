@@ -52,9 +52,12 @@ public class AppleService {
           appleProperties.getGrantType(),
           authorizationCode
       ).getIdToken();
+      log.info(generateClientSecret());
+      log.info(idToken);
       return idToken;
     } catch (Exception e) {
       e.printStackTrace();
+      log.info("error={}",e);
     }
     return null;
   }
