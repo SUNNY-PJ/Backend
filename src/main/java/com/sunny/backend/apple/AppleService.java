@@ -1,9 +1,11 @@
 package com.sunny.backend.apple;
 
 import com.sunny.backend.auth.dto.AppleAuthClient;
+import com.sunny.backend.auth.dto.TokenResponse;
 import com.sunny.backend.auth.dto.UserNameResponse;
 import com.sunny.backend.auth.exception.UserErrorCode;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.auth.jwt.TokenProvider;
 import com.sunny.backend.comment.repository.CommentRepository;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.common.response.CommonResponse;
@@ -11,6 +13,7 @@ import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
+import com.sunny.backend.util.RedisUtil;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.IOException;
@@ -43,6 +46,9 @@ public class AppleService {
   private final CommentRepository commentRepository;
   private final CommentNotificationRepository commentNotificationRepository;
   private final ResponseService responseService;
+  private final RedisUtil redisUtil;
+  private final TokenProvider tokenProvider;
+
 
   public String generateClientSecret() throws IOException {
     LocalDateTime expiration = LocalDateTime.now().plusMinutes(5);
@@ -106,6 +112,16 @@ public class AppleService {
     user.updateName(name);
     userRepository.save(user);
     return new UserNameResponse(user.getNickname());
+  }
+
+
+  public TokenResponse reissue(String refreshToken) {
+    redisUtil.isExistData(refreshToken);
+
+    String email = redisUtil.getData(refreshToken);
+    userRepository.getByEmail(email);
+    redisUtil.deleteData(refreshToken);
+    return tokenProvider.createToken(email, "ROLE_USER",true);
   }
 
 }
