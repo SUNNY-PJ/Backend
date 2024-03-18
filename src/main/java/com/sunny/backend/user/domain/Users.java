@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 
+import lombok.Builder.Default;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
@@ -35,7 +36,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Builder
 @DynamicInsert
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -48,14 +48,13 @@ public class Users extends BaseTime {
 	@Column(unique = true)
 	private String email;
 
-	@Column(nullable = false)
-	private String name;
+	@Column
+	private String oauthId;
 
 	@Size(min = 2, max = 10)
 	@Column(unique = true)
 	private String nickname;
 
-	private String oauthId;
 
 	@Column(nullable = false)
 	@Enumerated(value = EnumType.STRING)
@@ -76,9 +75,6 @@ public class Users extends BaseTime {
 
 	@OneToMany(mappedBy = "users")
 	private List<Scrap> scrapList;
-
-	@Column
-	private String providerId;
 
 	@Column
 	private String profile;
@@ -110,6 +106,14 @@ public class Users extends BaseTime {
 	public void addSave(Save save) {
 		this.saveList = new ArrayList<>();
 		this.saveList.add(save);
+	}
+
+	@Builder
+	public  Users(String email,String oauthId,Role role){
+		this.email=email;
+		this.oauthId=oauthId;
+		this.role=role;
+		this.profile="https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png";
 	}
 
 	public void updateName(String name) {

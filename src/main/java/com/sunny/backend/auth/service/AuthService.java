@@ -16,12 +16,13 @@ public class AuthService {
 	private final TokenProvider tokenProvider;
 	private final UserRepository userRepository;
 
+	//TODO 수정 필요할 수도, isUserRegistered
 	public TokenResponse reissue(String refreshToken) {
 		redisUtil.isExistData(refreshToken);
 
 		String email = redisUtil.getData(refreshToken);
 		userRepository.getByEmail(email);
 		redisUtil.deleteData(refreshToken);
-		return tokenProvider.createToken(email, "ROLE_USER");
+		return tokenProvider.createToken(email, "ROLE_USER",true);
 	}
 }
