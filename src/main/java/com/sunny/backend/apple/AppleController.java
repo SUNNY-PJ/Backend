@@ -36,7 +36,7 @@ public class AppleController {
 		TokenResponse tokenResponse = appleOAuthClient.getOAuthMemberId(idToken);
 		log.info(String.valueOf(tokenResponse));
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
-				tokenResponse, "애플 로그인");
+				tokenResponse, "애플 로그인 성공");
 	}
 
 	@ApiOperation(tags = "0. Auth", value = "닉네임 변경")
@@ -54,6 +54,7 @@ public class AppleController {
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteAccount(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@RequestParam("code") String code) {
+		log.info("탈퇴 API 호출");
 		return appleService.revoke(customUserPrincipal, code);
 	}
 
