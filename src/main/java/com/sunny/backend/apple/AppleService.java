@@ -81,11 +81,13 @@ public class AppleService {
     }
   }
 
+  @Transactional
   public ResponseEntity<CommonResponse.GeneralResponse> revoke(
       CustomUserPrincipal customUserPrincipal,
       String code){
     try{
       Users users=customUserPrincipal.getUsers();
+      log.info("user_id={}",users.getId());
       AppleRevokeRequest appleRevokeRequest=AppleRevokeRequest.builder()
           .client_id(appleProperties.getClientId())
           .client_secert(generateClientSecret())
@@ -98,6 +100,7 @@ public class AppleService {
       userRepository.deleteById(users.getId());
       return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
     } catch (IOException e) {
+      log.info("error={}",e);
       throw new RuntimeException(e);
     }
   }
