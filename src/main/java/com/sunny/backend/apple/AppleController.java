@@ -1,6 +1,7 @@
 package com.sunny.backend.apple;
 import com.sunny.backend.auth.dto.TokenResponse;
 import com.sunny.backend.auth.dto.UserNameResponse;
+import com.sunny.backend.auth.dto.UserRequest;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,6 +65,12 @@ public class AppleController {
 	public ResponseEntity<TokenResponse> reissue(@RequestParam(name = "refreshToken") String refreshToken) {
 		TokenResponse tokenResponse = appleService.reissue(refreshToken);
 		return ResponseEntity.ok().body(tokenResponse);
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(@Validated UserRequest logout) {
+		// validation check
+		return appleService.logout(logout);
 	}
 }
 

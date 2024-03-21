@@ -3,6 +3,7 @@ package com.sunny.backend.apple;
 import com.sunny.backend.auth.dto.AppleAuthClient;
 import com.sunny.backend.auth.dto.TokenResponse;
 import com.sunny.backend.auth.dto.UserNameResponse;
+import com.sunny.backend.auth.dto.UserRequest;
 import com.sunny.backend.auth.exception.UserErrorCode;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.auth.jwt.TokenProvider;
@@ -98,7 +99,6 @@ public class AppleService {
       commentNotificationRepository.deleteByUsersId(users.getId());
       commentRepository.nullifyUsersId(users.getId());
       userRepository.deleteById(users.getId());
-      log.info("user_id={}",users.getId());
       return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
     } catch (IOException e) {
       log.info("error={}",e);
@@ -127,5 +127,11 @@ public class AppleService {
     redisUtil.deleteData(refreshToken);
     return tokenProvider.createToken(email, "ROLE_USER",true);
   }
+
+  public ResponseEntity<?> logout(UserRequest logout) {
+
+    return tokenProvider.logout(logout);
+  }
+
 
 }
