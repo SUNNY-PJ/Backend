@@ -58,6 +58,7 @@ public class AppleOAuthClient implements OAuth2Client {
     String oAuthId = claims.getSubject();
     String email = claims.get("email", String.class);
     Optional<Users> usersOptional = userRepository.findByEmail(email);
+    log.info("usersOptional={}",usersOptional);
     if (usersOptional.isEmpty()) {
       Users users = Users.builder()
           .email(email)
