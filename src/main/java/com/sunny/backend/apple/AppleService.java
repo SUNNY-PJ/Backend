@@ -98,6 +98,7 @@ public class AppleService {
       commentNotificationRepository.deleteByUsersId(users.getId());
       commentRepository.nullifyUsersId(users.getId());
       userRepository.deleteById(users.getId());
+      log.info("user_id={}",users.getId());
       return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
     } catch (IOException e) {
       log.info("error={}",e);
