@@ -57,10 +57,10 @@ public class TokenProvider {
 			.setExpiration(createExpiredDate(2 * 7 * 24))
 			.signWith(SignatureAlgorithm.HS512, tokenSecret)
 			.compact();
-
-		//TODO test용
-		redisTemplate.opsForValue()
-				.set("RT:" + email, refreshToken, getClaims(refreshToken).getExpiration().getTime(), TimeUnit.MILLISECONDS);
+		Authentication authentication = getAuthentication(accessToken);
+//		//TODO test용
+//		redisTemplate.opsForValue()
+//				.set("RT:" + authentication.getName(), refreshToken, getClaims(refreshToken).getExpiration().getTime(), TimeUnit.MILLISECONDS);
 
 		redisUtil.setValuesWithTimeout(refreshToken, email, getClaims(refreshToken).getExpiration().getTime());
 
