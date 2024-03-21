@@ -67,10 +67,10 @@ public class AppleController {
 		return ResponseEntity.ok().body(tokenResponse);
 	}
 
-	@PostMapping("/logout")
-	public ResponseEntity<?> logout(@Validated UserRequest logout) {
-		// validation check
-		return appleService.logout(logout);
-	}
+//	@PostMapping("/logout")
+//	public ResponseEntity<?> logout(@Validated UserRequest logout) {
+//		// validation check
+//		return appleService.logout(logout);
+//	}
 }
 
