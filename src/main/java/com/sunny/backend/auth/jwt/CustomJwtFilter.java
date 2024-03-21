@@ -42,13 +42,13 @@ public class CustomJwtFilter extends OncePerRequestFilter {
 		Instant beforeTime = Instant.now();
 		String token = getTokenFromRequest(request);
 		if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-			String isLogout = (String)redisTemplate.opsForValue().get(token);
-			if (ObjectUtils.isEmpty(isLogout)) {
+//			String isLogout = (String)redisTemplate.opsForValue().get(token);
+//			if (ObjectUtils.isEmpty(isLogout)) {
 				// 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext 에 저장
 				Authentication authentication = tokenProvider.getAuthentication(token);
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 				log.info("Save Authentication");
-			}
+//			}
 		}
 
 		filterChain.doFilter(request, response);
