@@ -59,8 +59,8 @@ public class TokenProvider {
 				.compact();
 
 		//TODO test용
-		redisTemplate.opsForValue()
-				.set("RT:" + refreshToken, email, getClaims(refreshToken).getExpiration().getTime(), TimeUnit.MILLISECONDS);
+//		redisTemplate.opsForValue()
+//				.set("RT:" + refreshToken, email, getClaims(refreshToken).getExpiration().getTime(), TimeUnit.MILLISECONDS);
 
 		redisUtil.setValuesWithTimeout(refreshToken, email, getClaims(refreshToken).getExpiration().getTime());
 
@@ -116,8 +116,8 @@ public class TokenProvider {
 		}
 		Authentication authentication = getAuthentication(logout.getAccessToken());
 
-		if (redisTemplate.opsForValue().get("RT:" + logout.getRefreshToken()) != null) {
-			redisTemplate.delete("RT:" + logout.getRefreshToken());
+		if (redisTemplate.opsForValue().get(logout.getRefreshToken()) != null) {
+			redisTemplate.delete(logout.getRefreshToken());
 		}
 		//blacklist 처리
 		Long expiration = getExpiration(logout.getAccessToken());
@@ -158,7 +158,7 @@ public class TokenProvider {
 		TokenResponse tokenInfo = createToken(email, authentication.getAuthorities().toString(),true);
 		//RefreshToken Redis 업데이트
 		redisTemplate.opsForValue()
-				.set("RT:" + reissue.getRefreshToken(), email,getClaims(tokenInfo.refreshToken()).getExpiration().getTime(), TimeUnit.MILLISECONDS);
+				.set( reissue.getRefreshToken(), email,getClaims(tokenInfo.refreshToken()).getExpiration().getTime(), TimeUnit.MILLISECONDS);
 
 		return responseService.getSingleResponse(HttpStatus.OK.value(), tokenInfo,"토큰 정복 갱신되었습니다.");
 	}
