@@ -95,7 +95,7 @@ public class FriendService {
 		throws IOException {
 		Friend friend = friendRepository.getById(friendId);
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
-		friend.validateFriendsByUser(friend.getUsers().getId(), tokenUserId);
+		friend.validateUser(tokenUserId);
 		friend.approveStatus();
 		getByUserAndUserFriend(friend.getUsers(), friend.getUserFriend(), FriendStatus.FRIEND);
 	}
@@ -104,14 +104,14 @@ public class FriendService {
 	public void refuseFriend(CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend friend = friendRepository.getById(friendId);
 		Long tokenUserId = customUserPrincipal.getUsers().getId();
-		friend.validateFriendsByUser(friend.getUsers().getId(), tokenUserId);
+		friend.validateUser(tokenUserId);
 		friendRepository.deleteById(friend.getId());
 	}
 
 	public void getByUserAndUserFriend(Users user, Users userFriend, FriendStatus friendStatus)
 		throws IOException {
 		Optional<Friend> optionalFriend = friendRepository
-			.findByUsers_IdAndUserFriend_Id(userFriend.getId(), user.getId());
+			.findByUsersAndUserFriend(userFriend, user);
 
 		if (optionalFriend.isEmpty()) {
 			Friend friends = Friend.builder()
@@ -131,10 +131,10 @@ public class FriendService {
 	@Transactional
 	public void deleteFriends(CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend friend = friendRepository.getById(friendId);
-		friend.validateFriendsByUser(friend.getUsers().getId(), customUserPrincipal.getUsers().getId());
+		friend.validateUser(customUserPrincipal.getUsers().getId());
 
 		Optional<Friend> optionalFriend = friendRepository
-			.findByUsers_IdAndUserFriend_Id(friend.getUserFriend().getId(), friend.getUsers().getId());
+			.findByUsersAndUserFriend(friend.getUserFriend(), friend.getUsers());
 		optionalFriend.ifPresent(value -> friendRepository.deleteById(value.getId()));
 
 		friendRepository.deleteById(friendId);
@@ -142,9 +142,9 @@ public class FriendService {
 
 	public FriendCheckResponse checkFriend(CustomUserPrincipal customUserPrincipal,
 		Long userFriendId) {
-		Long tokenUserId = customUserPrincipal.getUsers().getId();
-		Optional<Friend> friendsOptional = friendRepository.findByUsers_IdAndUserFriend_Id(userFriendId,
-			tokenUserId);
+		Users userFriend = userRepository.getById(userFriendId);
+		Users users = customUserPrincipal.getUsers();
+		Optional<Friend> friendsOptional = friendRepository.findByUsersAndUserFriend(userFriend, users);
 
 		boolean isFriend = false;
 		FriendStatus friendStatus = null;
