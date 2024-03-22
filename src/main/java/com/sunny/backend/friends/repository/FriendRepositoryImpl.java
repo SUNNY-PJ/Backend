@@ -10,11 +10,13 @@ import java.util.List;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sunny.backend.competition.domain.CompetitionStatus;
 import com.sunny.backend.competition.dto.response.CompetitionResultDto;
 import com.sunny.backend.friends.domain.Friend;
-import com.sunny.backend.friends.domain.Status;
-import com.sunny.backend.friends.dto.response.FriendResponseDto;
+import com.sunny.backend.friends.domain.FriendStatus;
+import com.sunny.backend.friends.dto.response.FriendDto;
 
 public class FriendRepositoryImpl extends QuerydslRepositorySupport implements FriendCustomRepository {
 	private JPAQueryFactory queryFactory;
@@ -24,35 +26,42 @@ public class FriendRepositoryImpl extends QuerydslRepositorySupport implements F
 		this.queryFactory = jpaQueryFactory;
 	}
 
-	@Override
-	public List<FriendResponseDto> getFriendResponse(Long userId) {
-		return queryFactory.select(
-				Projections.constructor(FriendResponseDto.class, friend.users.id.as("userId"),
-					friend.id.as("friendId"), competition.id.as("competitionId"),
-					friend.userFriend.id, friend.userFriend.nickname, friend.userFriend.profile,
-					friend.status.as("friendStatus"),
-					competition.status.as("competitionStatus"),
-					competition.output
-				))
-			.from(users)
-			.leftJoin(users.friends, friend)
-			.leftJoin(friend.userFriend, users)
-			.leftJoin(friend.competition, competition)
-			.where(friend.users.id.eq(userId))
-			.fetch();
-	}
+	// public BooleanExpression eqFriendStatus(FriendStatus friendStatus) {
+	// 	if(friendStatus == null) {
+	// 		return null;
+	// 	}
+	// 	return friend.friendStatus.eq(friendStatus);
+	// }
+	//
+	// public BooleanExpression eqCompetitionStatus(CompetitionStatus competitionStatus) {
+	// 	if(competitionStatus == null) {
+	// 		return null;
+	// 	}
+	// 	return CompetitionStatus.competitionStatus.eq(competitionStatus);
+	// }
+
+	// @Override
+	// public List<Friend> findFriends(Long userId, FriendStatus friendStatus, CompetitionStatus competitionStatus) {
+	// 	return queryFactory.selectFrom(friend)
+	// 		.leftJoin(users.friends, friend)
+	// 		.leftJoin(friend.userFriend, users)
+	// 		.leftJoin(friend.competition, competition)
+	// 		.where(friend.users.id.eq(userId), eqFriendStatus(friendStatus), eqCompetitionStatus(competitionStatus))
+	// 		.fetch();
+	// }
 
 	@Override
 	public List<CompetitionResultDto> getCompetitionResult() {
-		return queryFactory.select(
-				Projections.constructor(CompetitionResultDto.class, friend.users.id.as("userId"),
-					friend.userFriend.id.as("userFriendId"),
-					friend.userFriend.nickname.as("userFriendNickname"),
-					competition.output, competition.endDate, competition.price, competition.compensation)
-			)
-			.from(competition)
-			.join(friend).on(friend.competition.id.eq(competition.id))
-			.where(competition.endDate.eq(LocalDate.now()), competition.status.eq(Status.APPROVE))
-			.fetch();
+		return null;
+		// return queryFactory.select(
+		// 		Projections.constructor(CompetitionResultDto.class, friend.users.id.as("userId"),
+		// 			friend.userFriend.id.as("userFriendId"),
+		// 			friend.userFriend.nickname.as("userFriendNickname"),
+		// 			competition.output, competition.endDate, competition.price, competition.compensation)
+		// 	)
+		// 	.from(competition)
+		// 	.join(friend).on(friend.competition.id.eq(competition.id))
+		// 	.where(competition.endDate.eq(LocalDate.now()), competition.status.eq(FriendStatus.FRIEND))
+		// 	.fetch();
 	}
 }

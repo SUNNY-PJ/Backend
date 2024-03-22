@@ -1,5 +1,7 @@
 package com.sunny.backend.friends.domain;
 
+import static com.sunny.backend.friends.exception.FriendErrorCode.*;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,6 +17,8 @@ import javax.persistence.ManyToOne;
 import com.sunny.backend.common.CommonErrorCode;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.competition.domain.Competition;
+import com.sunny.backend.competition.domain.CompetitionStatus;
+import com.sunny.backend.competition.exception.CompetitionErrorCode;
 import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.user.domain.Users;
 
@@ -41,9 +45,9 @@ public class Friend {
 	@JoinColumn(name = "user_friend_id")
 	private Users userFriend;
 
-	@Column
+	@Column(name = "friend_status")
 	@Enumerated(value = EnumType.STRING)
-	private Status status;
+	private FriendStatus status;
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "competition_id")
@@ -54,25 +58,49 @@ public class Friend {
 	}
 
 	public void approveStatus() {
-		status = Status.APPROVE;
+		status = FriendStatus.FRIEND;
 	}
 
-	public boolean isApproveStatus() {
-		return status.equals(Status.APPROVE);
+	public boolean isFriend() {
+		return status == FriendStatus.FRIEND;
 	}
 
-	public void validateStatus() {
-		if (status.equals(Status.WAIT)) {
+	public boolean isFriendPending() {
+		return status == FriendStatus.PENDING;
+	}
+
+	public boolean isCompetition() {
+		return competition != null;
+	}
+
+	public void isExistCompetition() {
+		if(competition == null) {
+			throw new CustomException(FRIEND_NOT_COMPETITION);
+		}
+	}
+	public CompetitionStatus getCompetitionStatus() {
+		isExistCompetition();
+		return competition.getStatus();
+	}
+
+	public void validateProposal() {
+		if (status.equals(FriendStatus.PENDING)) {
 			throw new CustomException(FriendErrorCode.FRIEND_NOT_APPROVE);
 		}
-		if (status.equals(Status.APPROVE)) {
+		if (status.equals(FriendStatus.FRIEND)) {
 			throw new CustomException(FriendErrorCode.FRIEND_EXIST);
 		}
 	}
 
-	public void validateFriendsByUser(Long userId, Long tokenUserId) {
-		if (!userId.equals(tokenUserId)) {
+	public void validateUser(Long tokenUserId) {
+		if (!users.getId().equals(tokenUserId)) {
 			throw new CustomException(CommonErrorCode.TOKEN_INVALID);
+		}
+	}
+
+	public void validateCompetitionStatus() {
+		if(competition != null) {
+			competition.validateStatus();
 		}
 	}
 }

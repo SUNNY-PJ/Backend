@@ -2,15 +2,11 @@ package com.sunny.backend.user.service;
 
 import static com.sunny.backend.common.ComnConstant.*;
 
-import com.sunny.backend.competition.domain.Competition;
-import com.sunny.backend.friends.domain.Friend;
-import com.sunny.backend.notification.domain.CompetitionNotification;
 import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.notification.dto.request.NotificationPushRequest;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.notification.service.NotificationService;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -27,9 +23,10 @@ import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.repository.CommunityRepository;
-import com.sunny.backend.friends.domain.Status;
+import com.sunny.backend.friends.domain.FriendStatus;
 import com.sunny.backend.report.domain.CommentReport;
 import com.sunny.backend.report.domain.CommunityReport;
+import com.sunny.backend.report.domain.ReportStatus;
 import com.sunny.backend.report.dto.ReportRequest;
 import com.sunny.backend.report.dto.ReportStatusRequest;
 import com.sunny.backend.report.repository.CommentReportRepository;
@@ -129,7 +126,7 @@ public class UserService {
 					.users(customUserPrincipal.getUsers())
 					.community(community)
 					.reason(reportRequest.reason())
-					.status(Status.WAIT)
+					.status(ReportStatus.WAIT)
 					.build();
 				communityReportRepository.save(communityReport);
 				return UserReportResponse.toCommunity(communityReport.getCreatedDate(), community,
@@ -141,7 +138,7 @@ public class UserService {
 					.users(customUserPrincipal.getUsers())
 					.comment(comment)
 					.reason(reportRequest.reason())
-					.status(Status.WAIT)
+					.status(ReportStatus.WAIT)
 					.build();
 				commentReportRepository.save(commentReport);
 				return UserReportResponse.toComment(commentReport.getCreatedDate(), comment, reportRequest.reason());

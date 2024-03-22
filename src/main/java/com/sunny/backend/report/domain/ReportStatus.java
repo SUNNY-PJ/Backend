@@ -6,7 +6,5 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ReportStatus {
-	COMMUNITY("커뮤니티"), COMMENT("댓글");
-
-	private final String status;
+	WAIT, APPROVE;
 }

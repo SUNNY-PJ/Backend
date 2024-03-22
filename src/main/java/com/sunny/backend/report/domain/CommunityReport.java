@@ -17,7 +17,7 @@ import javax.persistence.ManyToOne;
 import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.community.domain.Community;
-import com.sunny.backend.friends.domain.Status;
+import com.sunny.backend.friends.domain.FriendStatus;
 import com.sunny.backend.user.domain.Users;
 
 import lombok.AllArgsConstructor;
@@ -48,15 +48,15 @@ public class CommunityReport extends BaseTime {
 
 	@Column
 	@Enumerated(value = EnumType.STRING)
-	private Status status;
+	private ReportStatus status;
 
 	public void isWait() {
-		if(status != Status.WAIT) {
+		if(status != ReportStatus.WAIT) {
 			throw new CustomException(ALREADY_PROCESS);
 		}
 	}
 
 	public void approveStatus() {
-		status = Status.APPROVE;
+		status = ReportStatus.APPROVE;
 	}
 }
