@@ -1,5 +1,6 @@
 package com.sunny.backend.auth.jwt;
 
+import com.sunny.backend.util.RedisUtil;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -25,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CustomJwtFilter extends OncePerRequestFilter {
 	private final TokenProvider tokenProvider;
+
+	private final RedisUtil redisUtil;
 	List<String> list = Arrays.asList("/swagger-ui/", "/swagger-resources/", "/v3/api-docs/", "/h2-console/",
 			"/auth/token");
 
@@ -40,9 +44,13 @@ public class CustomJwtFilter extends OncePerRequestFilter {
 		String token = getTokenFromRequest(request);
 
 		if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-			Authentication authentication = tokenProvider.getAuthentication(token);
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-			log.info("Save Authentication");
+			// Redis 에 해당 accessToken logout 여부 확인
+			String isLogout = redisUtil.getAccessToken(token);
+			if (ObjectUtils.isEmpty(isLogout)) {
+				Authentication authentication = tokenProvider.getAuthentication(token);
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+				log.info("Save Authentication");
+			}
 		}
 
 		filterChain.doFilter(request, response);
