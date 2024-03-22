@@ -85,11 +85,11 @@ public class AppleService {
   @Transactional
   public ResponseEntity<CommonResponse.GeneralResponse> revoke(
       CustomUserPrincipal customUserPrincipal,
-      String code){
-    try{
-      Users users=customUserPrincipal.getUsers();
-      log.info("user_id={}",users.getId());
-      AppleRevokeRequest appleRevokeRequest=AppleRevokeRequest.builder()
+      String code) {
+    try {
+      Users users = customUserPrincipal.getUsers();
+      log.info("user_id={}", users.getId());
+      AppleRevokeRequest appleRevokeRequest = AppleRevokeRequest.builder()
           .client_id(appleProperties.getClientId())
           .client_secert(generateClientSecret())
           .token(code)
@@ -101,7 +101,7 @@ public class AppleService {
       userRepository.deleteById(users.getId());
       return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
     } catch (IOException e) {
-      log.info("error={}",e);
+      log.info("error={}", e);
       throw new RuntimeException(e);
     }
   }
@@ -125,13 +125,13 @@ public class AppleService {
     String email = redisUtil.getData(refreshToken);
     userRepository.getByEmail(email);
     redisUtil.deleteData(refreshToken);
-    return tokenProvider.createToken(email, "ROLE_USER",true);
+    return tokenProvider.createToken(email, "ROLE_USER", true);
   }
 
-  public ResponseEntity<?> logout(UserRequest logout) {
-
-    return tokenProvider.logout(logout);
+  public ResponseEntity<CommonResponse.GeneralResponse> logout(UserRequest logout) {
+    int status =
+        tokenProvider.logout(logout) ? HttpStatus.OK.value() : HttpStatus.BAD_REQUEST.value();
+    String message = tokenProvider.logout(logout) ? "logout 성공" : "logout 실패";
+    return responseService.getGeneralResponse(status, message);
   }
-
-
 }

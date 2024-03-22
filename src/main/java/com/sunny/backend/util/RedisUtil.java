@@ -3,6 +3,7 @@ package com.sunny.backend.util;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
@@ -29,9 +30,24 @@ public class RedisUtil {
         redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.MILLISECONDS);
     }
 
+    public String getRefreshToken(String refreshToken) {
+        return redisTemplate.opsForValue().get(refreshToken);
+    }
+
     public void deleteData(String key) {
         isExistData(key);
         redisTemplate.delete(key);
+    }
+
+    public void deleteRefreshToken(String refreshToken) {
+        // delete 메서드 삭제 시 true 반환
+        redisTemplate.delete(refreshToken);
+    }
+
+    // get AccessToken
+    public String getAccessToken(String accessToken) {
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        return valueOperations.get(accessToken);
     }
 
 }
