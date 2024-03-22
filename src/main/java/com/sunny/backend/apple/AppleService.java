@@ -128,10 +128,10 @@ public class AppleService {
     return tokenProvider.createToken(email, "ROLE_USER",true);
   }
 
-//  public ResponseEntity<?> logout(UserRequest logout) {
-//
-//    return tokenProvider.logout(logout);
-//  }
+  public ResponseEntity<?> logout(UserRequest logout) {
+
+    return tokenProvider.logout(logout);
+  }
 
 
 }
