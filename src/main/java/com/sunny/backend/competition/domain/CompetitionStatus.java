@@ -6,7 +6,5 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum CompetitionStatus {
-  WIN("승리"), LOSE("패배"),DRAW("무승부");
-
-  private final String CompetitionStatus;
+	NONE, PENDING, PROCEEDING, COMPLETE;
 }
