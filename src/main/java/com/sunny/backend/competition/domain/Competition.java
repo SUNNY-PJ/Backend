@@ -16,10 +16,7 @@ import javax.persistence.Id;
 
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.competition.exception.CompetitionErrorCode;
-import com.sunny.backend.friends.domain.FriendStatus;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,7 +35,7 @@ public class Competition {
 	private CompetitionOutput output; // 결과
 
 	@Column
-	private Integer day;
+	private Integer period;
 
 	@Column
 	private LocalDate startDate; // 시작 기간
@@ -56,8 +53,8 @@ public class Competition {
 	@Enumerated(value = EnumType.STRING)
 	private CompetitionStatus status;
 
-	public void approveStatus() {
-		status = CompetitionStatus.PROCEEDING;
+	public void updateStatus(CompetitionStatus status) {
+		this.status = status;
 	}
 
 	public void updateOutput(Long output) {
@@ -78,11 +75,11 @@ public class Competition {
 		this.endDate = endDate;
 	}
 
-
-	private Competition(String message, CompetitionOutput output, Integer day, Long price, String compensation, CompetitionStatus status) {
+	private Competition(String message, CompetitionOutput output, Integer period, Long price, String compensation,
+		CompetitionStatus status) {
 		this.message = message;
 		this.output = output;
-		this.day = day;
+		this.period = period;
 		this.price = price;
 		this.compensation = compensation;
 		this.status = status;
@@ -90,12 +87,12 @@ public class Competition {
 
 	public static Competition of(
 		String message,
-		Integer day,
+		Integer period,
 		Long price,
 		String compensation
 	) {
 		CompetitionOutput output = CompetitionOutput.from(COMPETITION_DEFAULT_VALUE);
-		return new Competition(message, output, day, price, compensation, CompetitionStatus.PENDING);
+		return new Competition(message, output, period, price, compensation, CompetitionStatus.PENDING);
 	}
 
 }

@@ -1,22 +1,15 @@
 package com.sunny.backend.friends.repository;
 
-import static com.sunny.backend.competition.domain.QCompetition.*;
 import static com.sunny.backend.friends.domain.QFriend.*;
-import static com.sunny.backend.user.domain.QUsers.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sunny.backend.competition.domain.CompetitionStatus;
+import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.competition.dto.response.CompetitionResultDto;
 import com.sunny.backend.friends.domain.Friend;
-import com.sunny.backend.friends.domain.FriendStatus;
-import com.sunny.backend.friends.dto.response.FriendDto;
 
 public class FriendRepositoryImpl extends QuerydslRepositorySupport implements FriendCustomRepository {
 	private JPAQueryFactory queryFactory;
@@ -49,6 +42,15 @@ public class FriendRepositoryImpl extends QuerydslRepositorySupport implements F
 	// 		.where(friend.users.id.eq(userId), eqFriendStatus(friendStatus), eqCompetitionStatus(competitionStatus))
 	// 		.fetch();
 	// }
+
+	@Override
+	public void updateNullCompetition(Long competitionId) {
+		queryFactory
+			.update(friend)
+			.set(friend.competition, (Competition)null)
+			.where(friend.competition.id.eq(competitionId))
+			.execute();
+	}
 
 	@Override
 	public List<CompetitionResultDto> getCompetitionResult() {

@@ -1,8 +1,8 @@
 package com.sunny.backend.friends.domain;
 
 import static com.sunny.backend.friends.exception.FriendErrorCode.*;
+import static lombok.AccessLevel.*;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -18,30 +18,25 @@ import com.sunny.backend.common.CommonErrorCode;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.competition.domain.CompetitionStatus;
-import com.sunny.backend.competition.exception.CompetitionErrorCode;
 import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.user.domain.Users;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = PROTECTED)
 public class Friend {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private Users users;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_friend_id")
 	private Users userFriend;
 
@@ -49,9 +44,19 @@ public class Friend {
 	@Enumerated(value = EnumType.STRING)
 	private FriendStatus status;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "competition_id")
 	private Competition competition;
+
+	private Friend(Users users, Users userFriend, FriendStatus status) {
+		this.users = users;
+		this.userFriend = userFriend;
+		this.status = status;
+	}
+
+	public static Friend of(Users users, Users userFriend, FriendStatus status) {
+		return new Friend(users, userFriend, status);
+	}
 
 	public void addCompetition(Competition competition) {
 		this.competition = competition;
@@ -74,10 +79,11 @@ public class Friend {
 	}
 
 	public void isExistCompetition() {
-		if(competition == null) {
+		if (competition == null) {
 			throw new CustomException(FRIEND_NOT_COMPETITION);
 		}
 	}
+
 	public CompetitionStatus getCompetitionStatus() {
 		isExistCompetition();
 		return competition.getStatus();
@@ -99,7 +105,7 @@ public class Friend {
 	}
 
 	public void validateCompetitionStatus() {
-		if(competition != null) {
+		if (competition != null) {
 			competition.validateStatus();
 		}
 	}

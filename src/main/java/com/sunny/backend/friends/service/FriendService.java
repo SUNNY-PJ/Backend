@@ -9,9 +9,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import com.sunny.backend.auth.exception.UserErrorCode;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
-import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.FriendStatus;
 import com.sunny.backend.friends.dto.response.FriendCheckResponse;
@@ -46,10 +44,8 @@ public class FriendService {
 
 	public void addFriend(CustomUserPrincipal customUserPrincipal, Long userFriendId)
 		throws IOException {
-		if (customUserPrincipal.getUsers().getId().equals(userFriendId)) {
-			throw new CustomException(UserErrorCode.CANNOT_MYSELF);
-		}
 		Users user = customUserPrincipal.getUsers();
+		user.canNotMySelf(userFriendId);
 		Users userFriend = userRepository.getById(userFriendId);
 		//title,bodyTitle,body 따로 전달
 		getByUserAndUserFriend(user, userFriend, FriendStatus.PENDING);
@@ -110,17 +106,12 @@ public class FriendService {
 
 	public void getByUserAndUserFriend(Users user, Users userFriend, FriendStatus friendStatus)
 		throws IOException {
-		Optional<Friend> optionalFriend = friendRepository
-			.findByUsersAndUserFriend(userFriend, user);
+		Optional<Friend> optionalFriend = friendRepository.findByUsersAndUserFriend(userFriend, user);
 
 		if (optionalFriend.isEmpty()) {
-			Friend friends = Friend.builder()
-				.users(userFriend)
-				.userFriend(user)
-				.status(friendStatus)
-				.build();
-			friendRepository.save(friends);
-			sendNotifications(user, friends);
+			Friend saveUserFriend = Friend.of(userFriend, user, friendStatus);
+			friendRepository.save(saveUserFriend);
+			sendNotifications(user, saveUserFriend);
 		} else {
 			Friend friend = optionalFriend.get();
 			friend.validateProposal();
@@ -132,29 +123,16 @@ public class FriendService {
 	public void deleteFriends(CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend friend = friendRepository.getById(friendId);
 		friend.validateUser(customUserPrincipal.getUsers().getId());
-
-		Optional<Friend> optionalFriend = friendRepository
-			.findByUsersAndUserFriend(friend.getUserFriend(), friend.getUsers());
-		optionalFriend.ifPresent(value -> friendRepository.deleteById(value.getId()));
-
-		friendRepository.deleteById(friendId);
+		friendRepository.delete(friend);
 	}
 
-	public FriendCheckResponse checkFriend(CustomUserPrincipal customUserPrincipal,
-		Long userFriendId) {
-		Users userFriend = userRepository.getById(userFriendId);
+	public FriendCheckResponse checkFriend(CustomUserPrincipal customUserPrincipal, Long userFriendId) {
 		Users users = customUserPrincipal.getUsers();
-		Optional<Friend> friendsOptional = friendRepository.findByUsersAndUserFriend(userFriend, users);
+		users.canNotMySelf(userFriendId);
+		Users userFriend = userRepository.getById(userFriendId);
+		return friendRepository.findByUsersAndUserFriend(users, userFriend)
+			.map(friend -> new FriendCheckResponse(friend.isFriend(), friend.getStatus()))
+			.orElse(new FriendCheckResponse(false, FriendStatus.NONE));
 
-		boolean isFriend = false;
-		FriendStatus friendStatus = null;
-
-		if (friendsOptional.isPresent()) {
-			Friend friend = friendsOptional.get();
-			friendStatus = friend.getStatus();
-			isFriend = friend.isFriend();
-		}
-
-		return new FriendCheckResponse(isFriend, friendStatus);
 	}
 }

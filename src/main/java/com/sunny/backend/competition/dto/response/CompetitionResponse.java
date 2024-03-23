@@ -9,6 +9,7 @@ import lombok.Builder;
 
 @Builder
 public record CompetitionResponse(
+	Long userFriendId,
 	String compensation,
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
 	LocalDate startDate,
@@ -17,8 +18,9 @@ public record CompetitionResponse(
 	Long price,
 	String message
 ) {
-	public static CompetitionResponse from(Competition competition) {
+	public static CompetitionResponse of(Long userFriendId, Competition competition) {
 		return CompetitionResponse.builder()
+			.userFriendId(userFriendId)
 			.compensation(competition.getCompensation())
 			.startDate(competition.getStartDate())
 			.endDate(competition.getEndDate())

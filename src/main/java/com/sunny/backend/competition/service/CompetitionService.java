@@ -17,6 +17,7 @@ import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.competition.domain.Competition;
+import com.sunny.backend.competition.domain.CompetitionStatus;
 import com.sunny.backend.competition.dto.request.CompetitionRequest;
 import com.sunny.backend.competition.dto.response.CompetitionApplyResponse;
 import com.sunny.backend.competition.dto.response.CompetitionResponse;
@@ -55,7 +56,8 @@ public class CompetitionService {
 		friend.validateUser(customUserPrincipal.getUsers().getId());
 		friend.validateCompetitionStatus();
 
-		Friend friendWithUserFriend = friendRepository.findByUsersAndUserFriend(friend.getUserFriend(), friend.getUsers())
+		Friend friendWithUserFriend = friendRepository.findByUsersAndUserFriend(friend.getUserFriend(),
+				friend.getUsers())
 			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
 
 		Competition competition = Competition.of(
@@ -77,7 +79,7 @@ public class CompetitionService {
 	private void sendNotifications(Friend friend, Competition competition) {
 		Long postAuthor = friend.getUserFriend().getId();
 		String title = "[SUNNY] " + friend.getUsers().getNickname();
-		String bodyTitle = friend.getUsers().getNickname()+"님이 대결을 신청했어요";
+		String bodyTitle = friend.getUsers().getNickname() + "님이 대결을 신청했어요";
 		String body = competition.getMessage();
 
 		CompetitionNotification competitionNotification = CompetitionNotification.builder()
@@ -107,8 +109,8 @@ public class CompetitionService {
 		friendWithUser.validateUser(customUserPrincipal.getUsers().getId());
 
 		Competition competition = competitionRepository.getById(friendWithUser.getCompetition().getId());
-		competition.approveStatus();
-		competition.addDate(LocalDate.now().plusDays(1), LocalDate.now().plusDays(1).plusDays(competition.getDay()));
+		competition.updateStatus(CompetitionStatus.PROCEEDING);
+		competition.addDate(LocalDate.now().plusDays(1), LocalDate.now().plusDays(1).plusDays(competition.getPeriod()));
 		Friend friendWithUserFriend = friendRepository
 			.findByUsersAndUserFriend(friendWithUser.getUserFriend(), friendWithUser.getUsers())
 			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
@@ -179,20 +181,22 @@ public class CompetitionService {
 		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionStatus, "결과 조회");
 	}
 
+	@Transactional
 	public void giveUpCompetition(CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend friend = friendRepository.getById(friendId);
 		friend.validateUser(customUserPrincipal.getUsers().getId());
 
 		Competition competition = competitionRepository.getById(friend.getCompetition().getId());
-		competitionRepository.deleteById(competition.getId());
+		competition.updateStatus(CompetitionStatus.GIVE_UP);
+		friendRepository.updateNullCompetition(competition.getId());
 	}
 
 	public ResponseEntity<CommonResponse.ListResponse<CompetitionResponse>> getCompetition(
 		CustomUserPrincipal customUserPrincipal) {
-		List<CompetitionResponse> responses = friendRepository.findByUsers_Id(customUserPrincipal.getUsers().getId())
+		List<CompetitionResponse> responses = friendRepository.findByUsers(customUserPrincipal.getUsers())
 			.stream()
 			.filter(friend -> friend.getCompetition() != null)
-			.map(friend -> CompetitionResponse.from(friend.getCompetition()))
+			.map(friend -> CompetitionResponse.of(friend.getUserFriend().getId(), friend.getCompetition()))
 			.toList();
 		return responseService.getListResponse(HttpStatus.OK.value(), responses, "결과 조회");
 	}
