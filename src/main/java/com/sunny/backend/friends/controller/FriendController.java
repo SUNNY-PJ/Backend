@@ -15,7 +15,7 @@ import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.friends.dto.response.FriendCheckResponse;
-import com.sunny.backend.friends.dto.response.FriendStatusResponse;
+import com.sunny.backend.friends.dto.response.FriendListResponse;
 import com.sunny.backend.friends.service.FriendService;
 
 import io.swagger.annotations.ApiOperation;
@@ -32,10 +32,10 @@ public class FriendController {
 
 	@ApiOperation(tags = "5. Friends", value = "친구 목록 가져오기")
 	@GetMapping("")
-	public ResponseEntity<CommonResponse.SingleResponse<FriendStatusResponse>> getFriends(
+	public ResponseEntity<CommonResponse.SingleResponse<FriendListResponse>> getFriends(
 		@AuthUser CustomUserPrincipal customUserPrincipal) {
-		FriendStatusResponse friendStatusResponse = friendService.getFriends(customUserPrincipal);
-		return responseService.getSingleResponse(HttpStatus.OK.value(), friendStatusResponse, "친구 목록 가져오기");
+		FriendListResponse friendListResponse = friendService.getFriends(customUserPrincipal);
+		return responseService.getSingleResponse(HttpStatus.OK.value(), friendListResponse, "친구 목록 가져오기");
 	}
 
 	@ApiOperation(tags = "5. Friends", value = "친구인지 확인하기")

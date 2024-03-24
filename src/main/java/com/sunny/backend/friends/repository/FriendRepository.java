@@ -7,14 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.sunny.backend.friends.domain.Friend;
-import com.sunny.backend.friends.domain.Status;
+import com.sunny.backend.user.domain.Users;
 
 @Repository
 public interface FriendRepository extends JpaRepository<Friend, Long>, FriendCustomRepository {
-	Optional<Friend> findByUsers_IdAndUserFriend_Id(Long userId, Long userFriendId);
+	Optional<Friend> findByUsersAndUserFriend(Users users, Users userFriend);
 
-	List<Friend> findByUsers_Id(Long userId);
-	void deleteByUsersId(Long userId);
+	List<Friend> findByUsers(Users users);
 
 	default Friend getById(Long id) {
 		return findById(id)
