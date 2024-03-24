@@ -1,14 +1,10 @@
 package com.sunny.backend.user.controller;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -18,12 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
-import com.sunny.backend.report.dto.ReportRequest;
-import com.sunny.backend.report.dto.ReportStatusRequest;
 import com.sunny.backend.user.dto.response.ProfileResponse;
 import com.sunny.backend.user.dto.response.UserCommentResponse;
 import com.sunny.backend.user.dto.response.UserCommunityResponse;
-import com.sunny.backend.user.dto.response.UserReportResponse;
 import com.sunny.backend.user.dto.response.UserScrapResponse;
 import com.sunny.backend.user.service.UserService;
 
@@ -83,25 +76,4 @@ public class UserController {
 		return userService.updateProfile(customUserPrincipal, profile);
 	}
 
-	@ApiOperation(tags = "0. User", value = "유저 신고")
-	@PostMapping("/report")
-	public ResponseEntity<UserReportResponse> reportCommunity(
-		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody ReportRequest reportRequest) {
-		UserReportResponse userReportResponse = userService.reportCommunity(customUserPrincipal, reportRequest);
-		return ResponseEntity.ok().body(userReportResponse);
-	}
-
-	@ApiOperation(tags = "0. User", value = "유저 신고 승인")
-	@PatchMapping("/report")
-	public ResponseEntity<CommonResponse.GeneralResponse> approveUserReport(
-		@RequestBody ReportStatusRequest reportStatusRequest) throws IOException {
-		return userService.approveUserReport(reportStatusRequest);
-	}
-
-	@ApiOperation(tags = "0. User", value = "유저 신고 거절")
-	@DeleteMapping("/report")
-	public ResponseEntity<CommonResponse.GeneralResponse> refuseUserReport(
-		@RequestBody ReportStatusRequest reportStatusRequest) {
-		return userService.refuseUserReport(reportStatusRequest);
-	}
 }
