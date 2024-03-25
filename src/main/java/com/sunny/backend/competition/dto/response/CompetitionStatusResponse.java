@@ -22,10 +22,9 @@ public class CompetitionStatusResponse {
 	private Long price;
 	private String compensation;
 	private LocalDate endDate;
-	private long dDay;
+	private long day;
 	private String username;
 	private String friendName;
-	private Long userPercent;
-	private Long friendsPercent;
-	private String result;
+	private double userPercent;
+	private double friendsPercent;
 }
