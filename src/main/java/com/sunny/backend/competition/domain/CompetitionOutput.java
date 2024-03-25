@@ -16,16 +16,18 @@ public class CompetitionOutput {
 	public static final Long COMPETITION_DEFAULT_VALUE = -1L;
 	Long output;
 
-	private CompetitionOutput(Long output) { this.output = output; }
+	private CompetitionOutput(Long output) {
+		this.output = output;
+	}
 
 	public static CompetitionOutput from(Long output) {
 		return new CompetitionOutput(output);
 	}
 
 	public CompetitionOutputType isWinner(Long userId) {
-		if(Objects.equals(userId, COMPETITION_DEFAULT_VALUE)) {
+		if (Objects.equals(output, COMPETITION_DEFAULT_VALUE)) {
 			return CompetitionOutputType.DRAW;
-		} else if(Objects.equals(userId, output)) {
+		} else if (Objects.equals(userId, output)) {
 			return CompetitionOutputType.WIN;
 		}
 
