@@ -17,6 +17,7 @@ import com.sunny.backend.comment.repository.CommentRepository;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.community.repository.CommunityRepository;
+import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.notification.dto.request.NotificationPushRequest;
 import com.sunny.backend.notification.repository.NotificationRepository;
@@ -45,6 +46,7 @@ public class UserService {
 	private final NotificationService notificationService;
 	private final SimpMessagingTemplate template;
 	private final S3Util s3Util;
+	private final FriendRepository friendRepository;
 
 	public Users checkUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
 		if (userId != null) {
@@ -55,9 +57,15 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public ProfileResponse getUserProfile(CustomUserPrincipal customUserPrincipal, Long userId) {
-		Long userTokenId = customUserPrincipal.getUsers().getId();
-		Users user = checkUserId(customUserPrincipal, userId);
-		return ProfileResponse.of(user, user.isOwner(userTokenId));
+		if (!customUserPrincipal.getUsers().isOwner(userId) && userId != null) {
+			Users users = customUserPrincipal.getUsers();
+			Users findUser = userRepository.getById(userId);
+			return friendRepository.findByUsersAndUserFriend(users, findUser)
+				.map(friend -> ProfileResponse.of(findUser, friend.getStatus(), friend))
+				.orElse(ProfileResponse.fromNotFriend(findUser));
+		}
+
+		return ProfileResponse.from(customUserPrincipal.getUsers());
 	}
 
 	@Transactional(readOnly = true)

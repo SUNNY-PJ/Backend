@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.FriendStatus;
-import com.sunny.backend.friends.dto.response.FriendCheckResponse;
 import com.sunny.backend.friends.dto.response.FriendListResponse;
 import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.notification.domain.FriendsNotification;
@@ -126,13 +125,4 @@ public class FriendService {
 		friendRepository.delete(friend);
 	}
 
-	public FriendCheckResponse checkFriend(CustomUserPrincipal customUserPrincipal, Long userFriendId) {
-		Users users = customUserPrincipal.getUsers();
-		users.canNotMySelf(userFriendId);
-		Users userFriend = userRepository.getById(userFriendId);
-		return friendRepository.findByUsersAndUserFriend(users, userFriend)
-			.map(friend -> new FriendCheckResponse(friend.isFriend(), friend.getStatus()))
-			.orElse(new FriendCheckResponse(false, FriendStatus.NONE));
-
-	}
 }
