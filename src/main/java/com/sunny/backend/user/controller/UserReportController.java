@@ -46,5 +46,6 @@ public class UserReportController {
 	@DeleteMapping("/report")
 	public ResponseEntity<Void> refuseUserReport(@RequestBody ReportRequest reportRequest) {
 		reportService.refuseUserReport(reportRequest);
+		return ResponseEntity.ok().build();
 	}
 }
