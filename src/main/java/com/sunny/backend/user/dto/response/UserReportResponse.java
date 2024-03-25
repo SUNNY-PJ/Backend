@@ -3,8 +3,6 @@ package com.sunny.backend.user.dto.response;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sunny.backend.comment.domain.Comment;
-import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.report.domain.CommentReport;
 import com.sunny.backend.report.domain.CommunityReport;
 
@@ -18,25 +16,8 @@ public record UserReportResponse(
 	String body,
 	String reason
 ) {
-	public static UserReportResponse toCommunity(LocalDateTime createdDate, Community community, String reason) {
-		return UserReportResponse.builder()
-			.time(createdDate)
-			.name(community.getUsers().getNickname())
-			.body(community.getContents())
-			.reason(reason)
-			.build();
-	}
 
-	public static UserReportResponse toComment(LocalDateTime createdDate, Comment comment, String reason) {
-		return UserReportResponse.builder()
-			.time(createdDate)
-			.name(comment.getUsers().getNickname())
-			.body(comment.getContent())
-			.reason(reason)
-			.build();
-	}
-
-	public static UserReportResponse toCommunityReport(CommunityReport communityReport) {
+	public static UserReportResponse fromCommunityReport(CommunityReport communityReport) {
 		return UserReportResponse.builder()
 			.time(communityReport.getCreatedDate())
 			.name(communityReport.getCommunity().getUsers().getNickname())
@@ -45,7 +26,7 @@ public record UserReportResponse(
 			.build();
 	}
 
-	public static UserReportResponse toCommentReport(CommentReport commentReport) {
+	public static UserReportResponse fromCommentReport(CommentReport commentReport) {
 		return UserReportResponse.builder()
 			.time(commentReport.getCreatedDate())
 			.name(commentReport.getComment().getUsers().getNickname())
