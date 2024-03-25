@@ -119,12 +119,12 @@ public class CompetitionService {
 
 	@Transactional
 	public void refuseFriend(CustomUserPrincipal customUserPrincipal, Long friendId) {
-		Friend friendWithUser = friendRepository.getById(friendId);
-		friendWithUser.validateUser(customUserPrincipal.getUsers().getId());
+		Friend friend = friendRepository.getById(friendId);
+		friend.validateUser(customUserPrincipal.getUsers().getId());
 
-		Competition competition = competitionRepository.getById(friendWithUser.getCompetition().getId());
-		competitionRepository.deleteById(competition.getId());
-		friendWithUser.addCompetition(null);
+		Competition competition = competitionRepository.getById(friend.getCompetition().getId());
+		competition.updateStatus(CompetitionStatus.NONE);
+		friendRepository.updateNullCompetition(competition.getId());
 	}
 
 	@Transactional
