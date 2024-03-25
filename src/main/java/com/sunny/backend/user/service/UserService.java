@@ -2,10 +2,6 @@ package com.sunny.backend.user.service;
 
 import static com.sunny.backend.common.ComnConstant.*;
 
-import com.sunny.backend.notification.domain.Notification;
-import com.sunny.backend.notification.dto.request.NotificationPushRequest;
-import com.sunny.backend.notification.repository.NotificationRepository;
-import com.sunny.backend.notification.service.NotificationService;
 import java.io.IOException;
 import java.util.List;
 
@@ -23,7 +19,11 @@ import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.repository.CommunityRepository;
-import com.sunny.backend.friends.domain.FriendStatus;
+import com.sunny.backend.friends.repository.FriendRepository;
+import com.sunny.backend.notification.domain.Notification;
+import com.sunny.backend.notification.dto.request.NotificationPushRequest;
+import com.sunny.backend.notification.repository.NotificationRepository;
+import com.sunny.backend.notification.service.NotificationService;
 import com.sunny.backend.report.domain.CommentReport;
 import com.sunny.backend.report.domain.CommunityReport;
 import com.sunny.backend.report.domain.ReportStatus;
@@ -59,6 +59,7 @@ public class UserService {
 	private final NotificationService notificationService;
 	private final SimpMessagingTemplate template;
 	private final S3Util s3Util;
+	private final FriendRepository friendRepository;
 
 	public Users checkUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
 		if (userId != null) {
@@ -69,8 +70,15 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public ProfileResponse getUserProfile(CustomUserPrincipal customUserPrincipal, Long userId) {
-		Users user = checkUserId(customUserPrincipal, userId);
-		return ProfileResponse.of(user, customUserPrincipal.getUsers().getId().equals(userId));
+		if (!customUserPrincipal.getUsers().isOwner(userId) && userId != null) {
+			Users users = customUserPrincipal.getUsers();
+			Users findUser = userRepository.getById(userId);
+			return friendRepository.findByUsersAndUserFriend(users, findUser)
+				.map(friend -> ProfileResponse.of(findUser, friend.getStatus(), friend))
+				.orElse(ProfileResponse.fromNotFriend(findUser));
+		}
+
+		return ProfileResponse.from(customUserPrincipal.getUsers());
 	}
 
 	@Transactional(readOnly = true)
@@ -82,8 +90,6 @@ public class UserService {
 			.map(UserCommunityResponse::from)
 			.toList();
 	}
-
-
 
 	@Transactional(readOnly = true)
 	public List<UserCommentResponse> getCommentByUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
@@ -149,7 +155,7 @@ public class UserService {
 
 	@Transactional
 	public ResponseEntity<CommonResponse.GeneralResponse> approveUserReport(ReportStatusRequest reportStatusRequest)
-			throws IOException {
+		throws IOException {
 		switch (reportStatusRequest.status()) {
 			case COMMUNITY -> {
 				CommunityReport communityReport = communityReportRepository.getById(reportStatusRequest.id());
@@ -187,18 +193,19 @@ public class UserService {
 
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "신고가 승인되었습니다.");
 	}
+
 	private void sendNotifications(Users users) throws IOException {
-		Long postAuthor=users.getId();
-		String title = "[SUNNY]" ;
-		String bodyTitle = users.getReportCount()+"번 째 경고를 받았어요";
-		String body = users.getReportCount()+"번 째 경고를 받았어요";
+		Long postAuthor = users.getId();
+		String title = "[SUNNY]";
+		String bodyTitle = users.getReportCount() + "번 째 경고를 받았어요";
+		String body = users.getReportCount() + "번 째 경고를 받았어요";
 		List<Notification> notificationList = notificationRepository.findByUsers_Id(users.getId());
 
 		if (notificationList.size() != 0) {
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
-					postAuthor,
-					bodyTitle,
-					body
+				postAuthor,
+				bodyTitle,
+				body
 			);
 			notificationService.sendNotificationToFriends(title, notificationPushRequest);
 		}
@@ -206,21 +213,22 @@ public class UserService {
 
 	// TODO 신고 결과 API 호출 수정해야 됨
 	private void reportResultNotifications(Users users) throws IOException {
-		Long postAuthor=users.getId();
-		String title = "[SUNNY]" ;
+		Long postAuthor = users.getId();
+		String title = "[SUNNY]";
 		String bodyTitle = "신고 결과를 알려드려요";
 		String body = "회원님의 신고에 대한 결과를 알려드려요";
 		List<Notification> notificationList = notificationRepository.findByUsers_Id(users.getId());
 
 		if (notificationList.size() != 0) {
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
-					postAuthor,
-					bodyTitle,
-					body
+				postAuthor,
+				bodyTitle,
+				body
 			);
 			notificationService.sendNotificationToFriends(title, notificationPushRequest);
 		}
 	}
+
 	@Transactional
 	public ResponseEntity<CommonResponse.GeneralResponse> refuseUserReport(ReportStatusRequest reportStatusRequest) {
 		switch (reportStatusRequest.status()) {
