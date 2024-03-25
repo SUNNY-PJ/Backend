@@ -57,8 +57,6 @@ public class CompetitionService {
 	private final NotificationService notificationService;
 	private final CompetitionNotificationRepository competitionNotificationRepository;
 	private final NotificationRepository notificationRepository;
-	private final SimpMessagingTemplate messagingTemplate;
-	private final SaveRepository saveRepository;
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CompetitionApplyResponse>> applyCompetition(
@@ -134,91 +132,15 @@ public class CompetitionService {
 
 	@Transactional
 	public void refuseFriend(CustomUserPrincipal customUserPrincipal, Long friendId) {
-		Friend friendWithUser = friendRepository.getById(friendId);
-		friendWithUser.validateUser(customUserPrincipal.getUsers().getId());
+		Friend friend = friendRepository.getById(friendId);
+		friend.validateUser(customUserPrincipal.getUsers().getId());
 
-		Competition competition = competitionRepository.getById(
-				friendWithUser.getCompetition().getId());
-		competitionRepository.deleteById(competition.getId());
-		friendWithUser.addCompetition(null);
+
+		Competition competition = competitionRepository.getById(friend.getCompetition().getId());
+		competition.updateStatus(CompetitionStatus.NONE);
+		friendRepository.updateNullCompetition(competition.getId());
+
 	}
-
-	//	@Transactional
-//	public ResponseEntity<CommonResponse.SingleResponse<CompetitionStatusResponse>> getCompetitionStatus(
-//			CustomUserPrincipal customUserPrincipal, Long friendId) {
-//		Friend friendWithUser = friendRepository.getById(friendId);
-//		friendWithUser.validateUser(customUserPrincipal.getUsers().getId());
-//
-//		Competition competition = competitionRepository.getById(friendWithUser.getCompetition().getId());
-//
-//		Users user = friendWithUser.getUsers();
-//		Users userFriend = friendWithUser.getUserFriend();
-//
-//		long diff = Duration.between(competition.getStartDate().atStartOfDay(),
-//				competition.getEndDate().atStartOfDay()).toDays();
-//
-//		List<Save> userSaves = saveRepository.findAllByUsers_Id(user.getId());
-//		List<Save> friendsSaves = saveRepository.findAllByUsers_Id(userFriend.getId());
-//
-//		double percentageUsed;
-//		double friendsPercentageUsed;
-//
-//		if (userSaves != null && !userSaves.isEmpty()) {
-//			double userPercentageSum = 0.0;
-//			for (Save userSave : userSaves) {
-//				Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), userSave.getStartDate(), userSave.getEndDate());
-//				double percentage = userSave.calculateSavePercentage(userMoney, userSave);
-//				userPercentageSum += percentage;
-//			}
-//			percentageUsed = userPercentageSum / userSaves.size();
-//		} else {
-//			percentageUsed = 100.0;
-//		}
-//
-//		if (friendsSaves != null && !friendsSaves.isEmpty()) {
-//			double friendsPercentageSum = 0.0;
-//			for (Save friendSave : friendsSaves) {
-//				Long friendsMoney = consumptionRepository.getComsumptionMoney(userFriend.getId(), friendSave.getStartDate(), friendSave.getEndDate());
-//				double friendsPercentage = friendSave.calculateSavePercentage(friendsMoney, friendSave);
-//				friendsPercentageSum += friendsPercentage;
-//			}
-//			friendsPercentageUsed = friendsPercentageSum / friendsSaves.size();
-//		} else {
-//			friendsPercentageUsed = 100.0;
-//		}
-//
-//		String result;
-//		if (percentageUsed > friendsPercentageUsed) {
-//			if (diff < 0) {
-//				competition.updateOutput(user.getId());
-//			}
-//			result = "유저가 이기고 있습니다.";
-//		} else if (percentageUsed < friendsPercentageUsed) {
-//			if (diff < 0) {
-//				competition.updateOutput(userFriend.getId());
-//			}
-//			result = "유저가 지고 있습니다.";
-//		} else {
-//			if (diff < 0) {
-//				competition.updateOutput(-1L);
-//			}
-//			result = "비기고 있습니다.";
-//		}
-//
-//		CompetitionStatusResponse competitionStatus = CompetitionStatusResponse.builder()
-//				.competitionId(competition.getId())
-//				.price(competition.getPrice())
-//				.compensation(competition.getCompensation())
-//				.endDate(competition.getEndDate())
-//				.dDay(diff)
-//				.username(user.getNickname())
-//				.friendName(userFriend.getNickname())
-//				.userPercent(percentageUsed)
-//				.friendsPercent(friendsPercentageUsed)
-//				.result(result)
-//				.build();
-//		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionStatus, "결과 조회");
-//	}
 	@Transactional
 	public void giveUpCompetition(CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend friend = friendRepository.getById(friendId);
@@ -278,7 +200,7 @@ public class CompetitionService {
 				.price(competition.getPrice())
 				.compensation(competition.getCompensation())
 				.endDate(competition.getEndDate())
-				.dDay(diff)
+				.day(diff)
 				.username(user.getNickname())
 				.friendName(userFriend.getNickname())
 				.userPercent(percentageUsed)
