@@ -6,5 +6,5 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum FriendStatus {
-	NONE, PENDING, FRIEND
+	NONE, RECEIVE, SEND, FRIEND
 }

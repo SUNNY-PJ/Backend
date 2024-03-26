@@ -8,24 +8,26 @@ import com.sunny.backend.friends.domain.FriendStatus;
 
 public record FriendListResponse(
 	List<FriendCompetitionResponse> competitions,
-	List<FriendResponse> approveList,
+	List<FriendCompetitionResponse> approveList,
 	List<FriendResponse> waitList
 ) {
 	public static FriendListResponse of(List<Friend> friends) {
 		List<FriendCompetitionResponse> competitions = friends.stream()
-			.filter(Friend::isCompetition)
+			.filter(Friend::hasCompetition)
+			.filter(friend -> friend.getCompetition().isEqualToCompetitionStatus(CompetitionStatus.PROCEEDING))
 			.map(FriendCompetitionResponse::from)
 			.toList();
 
-		List<FriendResponse> approveList = friends.stream()
-			.filter(friend -> !friend.isCompetition())
-			.filter(Friend::isFriend)
-			.map(FriendResponse::from)
+		List<FriendCompetitionResponse> approveList = friends.stream()
+			.filter(friend -> (!friend.hasCompetition() && friend.isEqualToFriendStatus(FriendStatus.FRIEND))
+				|| (friend.hasCompetition() && friend.getCompetition()
+				.isEqualToCompetitionStatus(CompetitionStatus.PENDING)))
+			.map(FriendCompetitionResponse::from)
 			.toList();
 
 		List<FriendResponse> waitList = friends.stream()
-			.filter(friend -> !friend.isCompetition())
-			.filter(Friend::isFriendPending)
+			.filter(friend -> !friend.hasCompetition())
+			.filter(friend -> friend.isEqualToFriendStatus(FriendStatus.RECEIVE))
 			.map(FriendResponse::from)
 			.toList();
 

@@ -18,7 +18,6 @@ import com.sunny.backend.common.CommonErrorCode;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.competition.domain.CompetitionStatus;
-import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.user.domain.Users;
 
 import lombok.Getter;
@@ -62,19 +61,15 @@ public class Friend {
 		this.competition = competition;
 	}
 
-	public void approveStatus() {
-		status = FriendStatus.FRIEND;
+	public void updateFriendStatus(FriendStatus friendStatus) {
+		status = friendStatus;
 	}
 
-	public boolean isFriend() {
-		return status == FriendStatus.FRIEND;
+	public boolean isEqualToFriendStatus(FriendStatus friendStatus) {
+		return status == friendStatus;
 	}
 
-	public boolean isFriendPending() {
-		return status == FriendStatus.PENDING;
-	}
-
-	public boolean isCompetition() {
+	public boolean hasCompetition() {
 		return competition != null;
 	}
 
@@ -87,15 +82,6 @@ public class Friend {
 	public CompetitionStatus getCompetitionStatus() {
 		isExistCompetition();
 		return competition.getStatus();
-	}
-
-	public void validateProposal() {
-		if (status.equals(FriendStatus.PENDING)) {
-			throw new CustomException(FriendErrorCode.FRIEND_NOT_APPROVE);
-		}
-		if (status.equals(FriendStatus.FRIEND)) {
-			throw new CustomException(FriendErrorCode.FRIEND_EXIST);
-		}
 	}
 
 	public void validateUser(Long tokenUserId) {
