@@ -64,9 +64,11 @@ public class CompetitionService {
 			competitionRequest.message(),
 			competitionRequest.day(),
 			competitionRequest.price(),
-			competitionRequest.compensation()
+			competitionRequest.compensation(),
+			friend.getUsers()
 		);
 		competitionRepository.save(competition);
+		friend.addCompetition(competition);
 		friendWithUserFriend.addCompetition(competition);
 
 		CompetitionApplyResponse competitionApplyResponse = CompetitionApplyResponse.of(
@@ -184,6 +186,8 @@ public class CompetitionService {
 		double percentageUsed = calculateUserPercentage(userSaves, user.getId(), competition);
 		double friendsPercentageUsed = calculateUserPercentage(friendsSaves, userFriend.getId(),
 			competition);
+
+		competition.getOutput().updateOutput(percentageUsed, friendId, user.getId(), userFriend.getId());
 
 		CompetitionStatusResponse competitionStatus = CompetitionStatusResponse.builder()
 			.competitionId(competition.getId())

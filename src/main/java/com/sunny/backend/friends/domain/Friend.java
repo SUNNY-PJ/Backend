@@ -17,7 +17,6 @@ import javax.persistence.ManyToOne;
 import com.sunny.backend.common.CommonErrorCode;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.competition.domain.Competition;
-import com.sunny.backend.competition.domain.CompetitionStatus;
 import com.sunny.backend.user.domain.Users;
 
 import lombok.Getter;
@@ -77,11 +76,6 @@ public class Friend {
 		if (competition == null) {
 			throw new CustomException(FRIEND_NOT_COMPETITION);
 		}
-	}
-
-	public CompetitionStatus getCompetitionStatus() {
-		isExistCompetition();
-		return competition.getStatus();
 	}
 
 	public void validateUser(Long tokenUserId) {
