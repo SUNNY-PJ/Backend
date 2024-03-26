@@ -10,12 +10,16 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.competition.exception.CompetitionErrorCode;
+import com.sunny.backend.user.domain.Users;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,6 +57,10 @@ public class Competition {
 	@Enumerated(value = EnumType.STRING)
 	private CompetitionStatus status;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	private Users users;
+
 	public boolean isEqualToCompetitionStatus(CompetitionStatus competitionStatus) {
 		return status == competitionStatus;
 	}
@@ -62,11 +70,22 @@ public class Competition {
 	}
 
 	public void validateStatus() {
-		if (status.equals(CompetitionStatus.PENDING)) {
-			throw new CustomException(CompetitionErrorCode.COMPETITION_PEND);
+		if (status == CompetitionStatus.SEND) {
+			throw new CustomException(CompetitionErrorCode.COMPETITION_SEND);
 		}
-		if (status.equals(CompetitionStatus.PROCEEDING)) {
+		if (status == CompetitionStatus.PROCEEDING) {
 			throw new CustomException(CompetitionErrorCode.COMPETITION_EXIST);
+		}
+	}
+
+	public CompetitionStatus getStatus(Long id) {
+		if (this.status != CompetitionStatus.SEND) {
+			return this.status;
+		} else {
+			if (id.equals(users.getId())) {
+				return CompetitionStatus.SEND;
+			}
+			return CompetitionStatus.RECEIVE;
 		}
 	}
 
@@ -76,23 +95,25 @@ public class Competition {
 	}
 
 	private Competition(String message, CompetitionOutput output, Integer period, Long price, String compensation,
-		CompetitionStatus status) {
+		CompetitionStatus status, Users users) {
 		this.message = message;
 		this.output = output;
 		this.period = period;
 		this.price = price;
 		this.compensation = compensation;
 		this.status = status;
+		this.users = users;
 	}
 
 	public static Competition of(
 		String message,
 		Integer period,
 		Long price,
-		String compensation
+		String compensation,
+		Users users
 	) {
-		CompetitionOutput output = CompetitionOutput.from(COMPETITION_DEFAULT_VALUE);
-		return new Competition(message, output, period, price, compensation, CompetitionStatus.PENDING);
+		CompetitionOutput output = CompetitionOutput.from(COMPETITION_NONE_VALUE);
+		return new Competition(message, output, period, price, compensation, CompetitionStatus.SEND, users);
 	}
 
 }

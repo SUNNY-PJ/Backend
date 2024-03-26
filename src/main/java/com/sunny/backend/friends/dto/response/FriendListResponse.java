@@ -20,8 +20,7 @@ public record FriendListResponse(
 
 		List<FriendCompetitionResponse> approveList = friends.stream()
 			.filter(friend -> (!friend.hasCompetition() && friend.isEqualToFriendStatus(FriendStatus.FRIEND))
-				|| (friend.hasCompetition() && friend.getCompetition()
-				.isEqualToCompetitionStatus(CompetitionStatus.PENDING)))
+				|| (friend.hasCompetition()))
 			.map(FriendCompetitionResponse::from)
 			.toList();
 
