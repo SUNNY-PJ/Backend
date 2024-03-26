@@ -1,6 +1,7 @@
 package com.sunny.backend.competition.domain;
 
 import static com.sunny.backend.competition.domain.CompetitionOutput.*;
+import static com.sunny.backend.competition.exception.CompetitionErrorCode.*;
 import static lombok.AccessLevel.*;
 
 import java.time.LocalDate;
@@ -18,7 +19,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.sunny.backend.common.exception.CustomException;
-import com.sunny.backend.competition.exception.CompetitionErrorCode;
 import com.sunny.backend.user.domain.Users;
 
 import lombok.Getter;
@@ -69,12 +69,18 @@ public class Competition {
 		this.status = status;
 	}
 
+	public void validateReceiveUser(Long userId) {
+		if (users.getId().equals(userId)) {
+			throw new CustomException(COMPETITION_NOT_MYSELF);
+		}
+	}
+
 	public void validateStatus() {
 		if (status == CompetitionStatus.SEND) {
-			throw new CustomException(CompetitionErrorCode.COMPETITION_SEND);
+			throw new CustomException(COMPETITION_SEND);
 		}
 		if (status == CompetitionStatus.PROCEEDING) {
-			throw new CustomException(CompetitionErrorCode.COMPETITION_EXIST);
+			throw new CustomException(COMPETITION_EXIST);
 		}
 	}
 

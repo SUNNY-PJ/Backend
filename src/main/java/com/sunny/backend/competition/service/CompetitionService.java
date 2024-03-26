@@ -112,8 +112,9 @@ public class CompetitionService {
 		Friend friendWithUser = friendRepository.getById(friendId);
 		friendWithUser.validateUser(customUserPrincipal.getUsers().getId());
 
-		Competition competition = competitionRepository.getById(
-			friendWithUser.getCompetition().getId());
+		Competition competition = competitionRepository.getById(friendWithUser.getCompetition().getId());
+		competition.validateReceiveUser(friendWithUser.getUsers().getId());
+
 		competition.updateStatus(CompetitionStatus.PROCEEDING);
 		competition.addDate(LocalDate.now().plusDays(1),
 			LocalDate.now().plusDays(1).plusDays(competition.getPeriod()));
@@ -129,9 +130,9 @@ public class CompetitionService {
 		friend.validateUser(customUserPrincipal.getUsers().getId());
 
 		Competition competition = competitionRepository.getById(friend.getCompetition().getId());
+		competition.validateReceiveUser(friend.getUsers().getId());
 		competition.updateStatus(CompetitionStatus.NONE);
 		friendRepository.updateCompetitionToNull(competition.getId());
-
 	}
 
 	@Transactional
