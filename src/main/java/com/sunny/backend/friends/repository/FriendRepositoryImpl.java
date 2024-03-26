@@ -44,7 +44,7 @@ public class FriendRepositoryImpl extends QuerydslRepositorySupport implements F
 	// }
 
 	@Override
-	public void updateNullCompetition(Long competitionId) {
+	public void updateCompetitionToNull(Long competitionId) {
 		queryFactory
 			.update(friend)
 			.set(friend.competition, (Competition)null)

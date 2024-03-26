@@ -53,17 +53,17 @@ public class Competition {
 	@Enumerated(value = EnumType.STRING)
 	private CompetitionStatus status;
 
+	public boolean isEqualToCompetitionStatus(CompetitionStatus competitionStatus) {
+		return status == competitionStatus;
+	}
+
 	public void updateStatus(CompetitionStatus status) {
 		this.status = status;
 	}
 
-	public void updateOutput(Long output) {
-		this.output = CompetitionOutput.from(output);
-	}
-
 	public void validateStatus() {
 		if (status.equals(CompetitionStatus.PENDING)) {
-			throw new CustomException(CompetitionErrorCode.COMPETITION_NOT_APPROVE);
+			throw new CustomException(CompetitionErrorCode.COMPETITION_PEND);
 		}
 		if (status.equals(CompetitionStatus.PROCEEDING)) {
 			throw new CustomException(CompetitionErrorCode.COMPETITION_EXIST);

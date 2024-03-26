@@ -21,13 +21,14 @@ public record FriendCompetitionResponse(
 	public static FriendCompetitionResponse from(Friend friend) {
 		return FriendCompetitionResponse.builder()
 			.friendId(friend.getId())
-			.competitionId(friend.getCompetition().getId())
+			.competitionId(friend.hasCompetition() ? friend.getCompetition().getId() : null)
 			.userFriendId(friend.getUserFriend().getId())
 			.nickname(friend.getUserFriend().getNickname())
 			.profile(friend.getUserFriend().getProfile())
 			.friendStatus(friend.getStatus())
-			.competitionStatus(friend.getCompetitionStatus())
-			.output(friend.getCompetition().getOutput().isWinner(friend.getUsers().getId()))
+			.competitionStatus(friend.hasCompetition() ? friend.getCompetitionStatus() : CompetitionStatus.NONE)
+			.output(friend.hasCompetition() ? friend.getCompetition().getOutput().isWinner(friend.getUsers().getId())
+				: CompetitionOutputType.NONE)
 			.build();
 	}
 
