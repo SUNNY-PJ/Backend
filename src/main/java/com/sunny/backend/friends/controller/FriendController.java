@@ -60,7 +60,7 @@ public class FriendController {
 	@DeleteMapping("/approve/{friendId}")
 	public ResponseEntity<CommonResponse.GeneralResponse> refuseFriend(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@PathVariable(name = "friendId") Long friendId) {
+		@PathVariable(name = "friendId") Long friendId) throws IOException {
 		friendService.refuseFriend(customUserPrincipal, friendId);
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "거절 되었습니다.");
 	}

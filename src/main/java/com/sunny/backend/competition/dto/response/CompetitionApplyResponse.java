@@ -8,7 +8,6 @@ import lombok.Builder;
 public record CompetitionApplyResponse(
 	Long friendId,
 	String message,
-	String applyMessage,
 	String compensation,
 	Integer period,
 	Long price
@@ -19,7 +18,6 @@ public record CompetitionApplyResponse(
 		return CompetitionApplyResponse.builder()
 			.friendId(friendId)
 			.message(competition.getMessage())
-			.applyMessage(name + "님에게서 대결 신청이 왔어요!")
 			.compensation(competition.getCompensation())
 			.period(competition.getPeriod())
 			.price(competition.getPrice())
