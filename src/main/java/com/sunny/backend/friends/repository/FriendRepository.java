@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.sunny.backend.competition.domain.CompetitionStatus;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.user.domain.Users;
 
@@ -15,7 +16,7 @@ public interface FriendRepository extends JpaRepository<Friend, Long>, FriendCus
 
 	List<Friend> findByUsers(Users users);
 
-	List<Friend> findByUsersAndCompetitionIsNotNull(Users users);
+	List<Friend> findByUsersAndCompetitionIsNotNullAndCompetition_Status(Users users, CompetitionStatus status);
 
 	default Friend getById(Long id) {
 		return findById(id)

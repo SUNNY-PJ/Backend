@@ -12,6 +12,7 @@ import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.competition.domain.Competition;
+import com.sunny.backend.competition.domain.CompetitionStatus;
 import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.consumption.domain.SpendType;
 import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
@@ -51,7 +52,8 @@ public class ConsumptionService {
 		}
 		ConsumptionResponse consumptionResponse = ConsumptionResponse.from(consumption);
 
-		for (Friend friend : friendRepository.findByUsersAndCompetitionIsNotNull(user)) {
+		for (Friend friend : friendRepository.findByUsersAndCompetitionIsNotNullAndCompetition_Status(user,
+			CompetitionStatus.PROCEEDING)) {
 			double percentageUsed = calculateUserPercentage(user.getId(), friend.getCompetition());
 			double friendsPercentageUsed = calculateUserPercentage(friend.getUserFriend().getId(),
 				friend.getCompetition());
