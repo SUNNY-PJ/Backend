@@ -55,9 +55,8 @@ public class Save {
 
     public double calculateSavePercentage(Long userMoney, Save save) {
         double percentage = userMoney != null ?
-            100.0 - (((double) userMoney / (double) save.getCost()) * 100.0) : 100.0;
-        BigDecimal roundedPercentage = new BigDecimal(percentage).setScale(1, RoundingMode.HALF_UP);
-        return roundedPercentage.doubleValue();
+            100.0 - ((userMoney / save.getCost()) * 100.0):100.0;
+        return Math.round(percentage * 10) / 10.0; // 소수점 첫째 자리 반올림
     }
     public boolean checkExpired(LocalDate expirationDate) {
         return expirationDate != null && LocalDate.now().isAfter(expirationDate);

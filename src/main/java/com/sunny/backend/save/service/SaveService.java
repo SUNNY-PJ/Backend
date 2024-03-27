@@ -1,5 +1,7 @@
 package com.sunny.backend.save.service;
 
+import com.sunny.backend.competition.domain.Competition;
+import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.save.dto.response.SaveResponse.SaveListResponse;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,6 @@ import com.sunny.backend.user.domain.Users;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class SaveService {
@@ -59,7 +60,7 @@ public class SaveService {
 			}
 		}
 	}
-
+	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> updateSaveGoal(
 		CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
 		Users user = customUserPrincipal.getUsers();
@@ -75,13 +76,16 @@ public class SaveService {
 			CustomUserPrincipal customUserPrincipal) {
 		Users user = customUserPrincipal.getUsers();
 		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
-		List<SaveResponse.DetailSaveResponse> saveResponses = saves.stream().map(save -> {
-			long remainingDays = save.calculateRemainingDays(save);
-			Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(), save.getEndDate());
-			System.out.println(userMoney);
-			double percentageUsed = save.calculateSavePercentage(userMoney,save);
-			return SaveResponse.DetailSaveResponse.of(remainingDays, percentageUsed,save.getCost());
-		}).toList();
+
+		List<SaveResponse.DetailSaveResponse> saveResponses = saves.stream()
+				.map(save -> {
+					long remainingDays = save.calculateRemainingDays(save);
+					Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(), save.getEndDate());
+
+					double percentageUsed = save.calculateSavePercentage(userMoney, save);
+					return SaveResponse.DetailSaveResponse.of(remainingDays, percentageUsed, save.getCost());
+				})
+				.toList();
 		return responseService.getListResponse(HttpStatus.OK.value(), saveResponses,
 				"절약 목표를 성공적으로 조회했습니다.");
 	}
@@ -100,6 +104,20 @@ public class SaveService {
 		Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(), save.getEndDate());
 		double percentageUsed = save.calculateSavePercentage(userMoney,save);
 		return percentageUsed >= 0;
+	}
+
+	//TODO 메소드 분리
+	private double calculateUserPercentage( Long userId, Save save) {
+		if (save == null) {
+			return 100.0;
+		}
+
+		// 사용자 소비 금액 계산
+		Long totalSpent = consumptionRepository.getComsumptionMoney(userId, save.getStartDate(), save.getEndDate());
+
+		//소비 비율 계산
+		double percentage = 100.0 - ((totalSpent / save.getCost()) * 100.0);
+		return Math.round(percentage * 10) / 10.0; // 소수점 첫째 자리 반올림
 	}
 
 }
