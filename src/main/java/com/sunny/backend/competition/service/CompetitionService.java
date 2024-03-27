@@ -207,18 +207,11 @@ public class CompetitionService {
 	//TODO 메소드 분리
 	private double calculateUserPercentage(List<Consumption> consumptions, Long userId,
 		Competition competition) {
-		if (consumptions == null) {
+		if (consumptions == null || consumptions.isEmpty()) {
 			return 100.0;
 		}
-
-		// 사용자 소비 금액 계산
-		double totalSpent = consumptions.stream()
-			.filter(consumption -> consumption.getUsers().getId().equals(userId))
-			.mapToDouble(Consumption::getMoney)
-			.sum();
-
-		//소비 비율 계산
-		double percentage = 100.0 - ((totalSpent / competition.getPrice()) * 100.0);
+		Long totalSpent = consumptionRepository.getComsumptionMoney(userId, competition.getStartDate(), competition.getEndDate());
+		double percentage = 100.0 - ((totalSpent * 100.0) / competition.getPrice());
 		return Math.round(percentage * 10) / 10.0; // 소수점 첫째 자리 반올림
 	}
 }
