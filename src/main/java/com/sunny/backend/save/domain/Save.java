@@ -54,8 +54,10 @@ public class Save {
     }
 
     public double calculateSavePercentage(Long userMoney, Save save) {
-        double percentage = userMoney != null ?
-            100.0 - ((userMoney / save.getCost()) * 100.0):100.0;
+        if (userMoney == null) {
+            return 100.0;
+        }
+        double percentage = 100.0 - ((userMoney * 100.0) / save.getCost());
         return Math.round(percentage * 10) / 10.0; // 소수점 첫째 자리 반올림
     }
     public boolean checkExpired(LocalDate expirationDate) {
