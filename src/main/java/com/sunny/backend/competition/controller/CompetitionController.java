@@ -1,7 +1,5 @@
 package com.sunny.backend.competition.controller;
 
-import java.io.IOException;
-
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -38,9 +36,9 @@ public class CompetitionController {
 	private final CompetitionService competitionService;
 
 	@ApiOperation(tags = "3. Competition", value = "대결 목록 확인")
-	@GetMapping("/{friendId}")
+	@GetMapping
 	public ResponseEntity<CommonResponse.ListResponse<CompetitionResponse>> getCompetition(
-		@AuthUser CustomUserPrincipal customUserPrincipal) throws IOException {
+		@AuthUser CustomUserPrincipal customUserPrincipal) {
 		return competitionService.getCompetition(customUserPrincipal);
 	}
 
@@ -48,7 +46,7 @@ public class CompetitionController {
 	@PostMapping("")
 	public ResponseEntity<CommonResponse.SingleResponse<CompetitionApplyResponse>> applyCompetition(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@Valid @RequestBody CompetitionRequest competitionRequest) throws IOException {
+		@Valid @RequestBody CompetitionRequest competitionRequest) {
 		return competitionService.applyCompetition(customUserPrincipal, competitionRequest);
 	}
 

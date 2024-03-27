@@ -17,30 +17,27 @@ import javax.persistence.ManyToOne;
 import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.community.domain.Community;
-import com.sunny.backend.friends.domain.Status;
 import com.sunny.backend.user.domain.Users;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommunityReport extends BaseTime {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
-	@JoinColumn(name= "users_id")
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@JoinColumn(name = "users_id")
 	private Users users;
 
-	@ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
-	@JoinColumn(name= "community_id")
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@JoinColumn(name = "community_id")
 	private Community community;
 
 	@Column
@@ -48,15 +45,23 @@ public class CommunityReport extends BaseTime {
 
 	@Column
 	@Enumerated(value = EnumType.STRING)
-	private Status status;
+	private ReportStatus status;
+
+	@Builder
+	public CommunityReport(Users users, Community community, String reason, ReportStatus status) {
+		this.users = users;
+		this.community = community;
+		this.reason = reason;
+		this.status = status;
+	}
 
 	public void isWait() {
-		if(status != Status.WAIT) {
+		if (status != ReportStatus.WAIT) {
 			throw new CustomException(ALREADY_PROCESS);
 		}
 	}
 
 	public void approveStatus() {
-		status = Status.APPROVE;
+		status = ReportStatus.APPROVE;
 	}
 }

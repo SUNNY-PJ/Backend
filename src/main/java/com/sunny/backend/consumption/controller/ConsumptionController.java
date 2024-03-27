@@ -50,8 +50,8 @@ public class ConsumptionController {
 	@PostMapping("")
 	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> createConsumption(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@Valid @RequestBody ConsumptionRequest consumtionRequest) {
-		return consumptionService.createConsumption(customUserPrincipal, consumtionRequest);
+		@Valid @RequestBody ConsumptionRequest consumptionRequest) {
+		return consumptionService.createConsumption(customUserPrincipal, consumptionRequest);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "지출 통계")

@@ -2,14 +2,14 @@ package com.sunny.backend.competition.dto.response;
 
 import java.time.LocalDate;
 
-import com.sunny.backend.competition.domain.CompetitionStatus;
+import com.sunny.backend.competition.domain.CompetitionOutputType;
 
 import lombok.Builder;
 
 @Builder
 public record CompetitionResult(
 	String userFriendNickname,
-	CompetitionStatus output,
+	CompetitionOutputType output,
 	LocalDate endDate,
 	Long price,
 	String compensation
@@ -24,13 +24,13 @@ public record CompetitionResult(
 			.build();
 	}
 
-	public static CompetitionStatus isWinner(Long userId, Long output) {
+	public static CompetitionOutputType isWinner(Long userId, Long output) {
 		if (userId.equals(output)) {
-			return CompetitionStatus.WIN;
+			return CompetitionOutputType.WIN;
 		} else if (output.equals(-1L)) {
-			return CompetitionStatus.DRAW;
+			return CompetitionOutputType.DRAW;
 		} else {
-			return CompetitionStatus.LOSE;
+			return CompetitionOutputType.LOSE;
 		}
 	}
 }

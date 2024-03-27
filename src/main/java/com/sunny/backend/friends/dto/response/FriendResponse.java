@@ -1,45 +1,26 @@
 package com.sunny.backend.friends.dto.response;
 
-import com.sunny.backend.competition.domain.CompetitionStatus;
-import com.sunny.backend.friends.domain.Status;
+import com.sunny.backend.friends.domain.Friend;
+import com.sunny.backend.friends.domain.FriendStatus;
 
 import lombok.Builder;
 
 @Builder
 public record FriendResponse(
-	Long friendsId,
-	Long competitionId,
+	Long friendId,
 	Long userFriendId,
 	String nickname,
 	String profile,
-	Status friendStatus,
-	Status competitionStatus,
-	CompetitionStatus output
+	FriendStatus friendStatus
 ) {
-	public static FriendResponse from(FriendResponseDto friendResponseDto) {
+	public static FriendResponse from(Friend friend) {
 		return FriendResponse.builder()
-			.friendsId(friendResponseDto.friendsId())
-			.competitionId(friendResponseDto.competitionId())
-			.userFriendId(friendResponseDto.friendsId())
-			.nickname(friendResponseDto.nickname())
-			.profile(friendResponseDto.profile())
-			.friendStatus(friendResponseDto.friendStatus())
-			.competitionStatus(
-				friendResponseDto.competitionStatus() != null ? friendResponseDto.competitionStatus() : Status.NONE)
-			.output(isWinner(friendResponseDto.userId(), friendResponseDto.output()))
+			.friendId(friend.getId())
+			.userFriendId(friend.getUserFriend().getId())
+			.nickname(friend.getUserFriend().getNickname())
+			.profile(friend.getUserFriend().getProfile())
+			.friendStatus(friend.getStatus())
 			.build();
 	}
 
-	public static CompetitionStatus isWinner(Long userId, Long output) {
-		if (output == null) {
-			return null;
-		}
-		if (userId.equals(output)) {
-			return CompetitionStatus.WIN;
-		} else if (output.equals(-1L)) {
-			return CompetitionStatus.DRAW;
-		} else {
-			return CompetitionStatus.LOSE;
-		}
-	}
 }

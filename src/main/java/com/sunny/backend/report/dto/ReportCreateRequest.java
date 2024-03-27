@@ -2,8 +2,9 @@ package com.sunny.backend.report.dto;
 
 import com.sunny.backend.report.domain.ReportType;
 
-public record ReportRequest(
+public record ReportCreateRequest(
 	Long id,
-	ReportType reportType
+	ReportType reportType,
+	String reason
 ) {
 }

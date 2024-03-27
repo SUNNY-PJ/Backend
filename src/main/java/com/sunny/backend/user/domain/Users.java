@@ -14,13 +14,14 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 
-import lombok.Builder.Default;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sunny.backend.auth.exception.UserErrorCode;
 import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.common.BaseTime;
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.friends.domain.Friend;
@@ -54,7 +55,6 @@ public class Users extends BaseTime {
 	@Size(min = 2, max = 10)
 	@Column(unique = true)
 	private String nickname;
-
 
 	@Column(nullable = false)
 	@Enumerated(value = EnumType.STRING)
@@ -109,11 +109,11 @@ public class Users extends BaseTime {
 	}
 
 	@Builder
-	public  Users(String email,String oauthId,Role role){
-		this.email=email;
-		this.oauthId=oauthId;
-		this.role=role;
-		this.profile="https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png";
+	public Users(String email, String oauthId, Role role) {
+		this.email = email;
+		this.oauthId = oauthId;
+		this.role = role;
+		this.profile = "https://sunny-pj.s3.ap-northeast-2.amazonaws.com/Profile+Image.png";
 	}
 
 	public void updateName(String name) {
@@ -130,6 +130,12 @@ public class Users extends BaseTime {
 
 	public boolean isOwner(Long id) {
 		return this.id.equals(id);
+	}
+
+	public void canNotMySelf(Long id) {
+		if (this.id.equals(id)) {
+			throw new CustomException(UserErrorCode.CANNOT_MYSELF);
+		}
 	}
 }
 
