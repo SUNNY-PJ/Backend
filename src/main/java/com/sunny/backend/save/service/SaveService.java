@@ -75,7 +75,9 @@ public class SaveService {
 	public ResponseEntity<CommonResponse.ListResponse<SaveResponse.DetailSaveResponse>> getSaveGoal(
 			CustomUserPrincipal customUserPrincipal) {
 		Users user = customUserPrincipal.getUsers();
+		log.info("save user_id:"+user.getId());
 		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
+		log.info("save size:"+saves.size());
 
 		List<SaveResponse.DetailSaveResponse> saveResponses = saves.stream()
 				.map(save -> {
