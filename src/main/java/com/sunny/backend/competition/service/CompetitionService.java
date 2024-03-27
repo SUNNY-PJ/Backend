@@ -74,18 +74,20 @@ public class CompetitionService {
 		CompetitionApplyResponse competitionApplyResponse = CompetitionApplyResponse.of(
 			friendWithUserFriend.getId(),
 			friendWithUserFriend.getUsers().getNickname(), competition);
-		sendNotifications(friendWithUserFriend, competition);
+
+		String title = "[SUNNY] " + friend.getUsers().getNickname();
+		String bodyTitle = friend.getUsers().getNickname() + "님이 대결을 신청했어요";
+		String body = "대결 신청을 받았어요!";
+		sendNotifications(title,bodyTitle,body,friend, competition);
+
+
 		//  신청후 알람을 보내는 행위
 		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionApplyResponse,
 			"대결 신청이 됐습니다.");
 	}
 
-	private void sendNotifications(Friend friend, Competition competition) {
+	private void sendNotifications(String title,String body,String bodyTitle, Friend friend, Competition competition) {
 		Long postAuthor = friend.getUserFriend().getId();
-		String title = "[SUNNY] " + friend.getUsers().getNickname();
-		String bodyTitle = friend.getUsers().getNickname() + "님이 대결을 신청했어요";
-		String body = competition.getMessage();
-
 		CompetitionNotification competitionNotification = CompetitionNotification.builder()
 			.users(friend.getUserFriend()) //상대방꺼
 			.competition(competition)
@@ -100,8 +102,8 @@ public class CompetitionService {
 		if (notificationList.size() != 0) {
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
 				postAuthor,
-				bodyTitle,
-				body
+				body,
+				bodyTitle
 			);
 			notificationService.sendNotificationToFriends(title, notificationPushRequest);
 		}
@@ -122,6 +124,11 @@ public class CompetitionService {
 			.findByUsersAndUserFriend(friendWithUser.getUserFriend(), friendWithUser.getUsers())
 			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
 		friendWithUserFriend.addCompetition(competition);
+
+		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
+		String bodyTitle = friendWithUser.getUsers().getNickname() + "님이 대결을 수락했어요";
+		String body = "대결 신청에 대한 응답을 받았어요";
+		sendNotifications(title,bodyTitle,body,friendWithUser, competition);
 	}
 
 	@Transactional
@@ -133,6 +140,11 @@ public class CompetitionService {
 		competition.validateReceiveUser(friend.getUsers().getId());
 		competition.updateStatus(CompetitionStatus.NONE);
 		friendRepository.updateCompetitionToNull(competition.getId());
+
+		String title = "[SUNNY] " + friend.getUsers().getNickname();
+		String bodyTitle = friend.getUsers().getNickname() + "님이 대결을 거절했어요";
+		String body = "대결 신청에 대한 응답을 받았어요";
+		sendNotifications(title,bodyTitle,body,friend, competition);
 	}
 
 	@Transactional

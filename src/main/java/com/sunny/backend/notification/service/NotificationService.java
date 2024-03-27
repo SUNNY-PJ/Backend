@@ -92,7 +92,7 @@ public class NotificationService {
 					return comment != null && !comment.getIsDeleted() && !comment.getUsers().getId().equals(customUserPrincipal.getUsers().getId());
 				})
 				.toList();
-		List<FriendsNotification> friendsNotifications = friendsNotificationRepository.findByFriend_Id(
+		List<FriendsNotification> friendsNotifications = friendsNotificationRepository.findByUsers_Id(
 			customUserPrincipal.getUsers().getId());
 		List<CompetitionNotification> competitionNotifications = competitionNotificationRepository.findByUsers_Id(
 			customUserPrincipal.getUsers().getId());

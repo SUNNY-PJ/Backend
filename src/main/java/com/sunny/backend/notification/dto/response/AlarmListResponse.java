@@ -54,7 +54,7 @@ public record AlarmListResponse(
       return friendsNotifications.stream()
           .map(friendsNotification -> new AlarmListResponse(
               friendsNotification.getFriend().getId(), //상대방꺼 id
-              friendsNotification.getUsers().getNickname(), //
+              friendsNotification.getFriend().getNickname(), //
               friendsNotification.getTitle(),
               friendsNotification.getBody(),
               friendsNotification.getCreatedAt().toLocalDate().isEqual(LocalDate.now()),
