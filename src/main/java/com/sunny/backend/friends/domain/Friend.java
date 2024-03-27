@@ -72,7 +72,7 @@ public class Friend {
 		return competition != null;
 	}
 
-	public void isExistCompetition() {
+	public void validateCompetition() {
 		if (competition == null) {
 			throw new CustomException(FRIEND_NOT_COMPETITION);
 		}

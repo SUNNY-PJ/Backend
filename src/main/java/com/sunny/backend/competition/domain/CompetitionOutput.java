@@ -40,7 +40,8 @@ public class CompetitionOutput {
 			output = userId;
 		} else if (userPercent < userFriendPercent) {
 			output = userFriendId;
+		} else {
+			output = COMPETITION_DRAW_VALUE;
 		}
-		output = COMPETITION_DRAW_VALUE;
 	}
 }

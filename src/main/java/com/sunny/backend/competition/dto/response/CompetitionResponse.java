@@ -1,31 +1,25 @@
 package com.sunny.backend.competition.dto.response;
 
-import java.time.LocalDate;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sunny.backend.competition.domain.Competition;
+import com.sunny.backend.friends.domain.Friend;
 
 import lombok.Builder;
 
 @Builder
 public record CompetitionResponse(
-	Long userFriendId,
+	Long friendId,
+	String message,
 	String compensation,
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
-	LocalDate startDate,
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
-	LocalDate endDate,
-	Long price,
-	String message
+	Integer period,
+	Long price
 ) {
-	public static CompetitionResponse of(Long userFriendId, Competition competition) {
+	public static CompetitionResponse from(Friend friend) {
 		return CompetitionResponse.builder()
-			.userFriendId(userFriendId)
-			.compensation(competition.getCompensation())
-			.startDate(competition.getStartDate())
-			.endDate(competition.getEndDate())
-			.price(competition.getPrice())
-			.message(competition.getMessage())
+			.friendId(friend.getId())
+			.message(friend.getCompetition().getMessage())
+			.compensation(friend.getCompetition().getCompensation())
+			.period(friend.getCompetition().getPeriod())
+			.price(friend.getCompetition().getPrice())
 			.build();
 	}
 }
+
