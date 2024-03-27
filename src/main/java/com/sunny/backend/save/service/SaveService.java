@@ -81,7 +81,8 @@ public class SaveService {
 				.map(save -> {
 					long remainingDays = save.calculateRemainingDays(save);
 					Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(), save.getEndDate());
-
+					log.info( "userMoney:"+userMoney);
+					log.info( "save:"+save.getCost());
 					double percentageUsed = save.calculateSavePercentage(userMoney, save);
 					return SaveResponse.DetailSaveResponse.of(remainingDays, percentageUsed, save.getCost());
 				})

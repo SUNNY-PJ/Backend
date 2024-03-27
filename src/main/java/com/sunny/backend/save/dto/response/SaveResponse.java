@@ -3,6 +3,8 @@ package com.sunny.backend.save.dto.response;
 import com.sunny.backend.save.domain.Save;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 public record SaveResponse(
     Long id,
     Long cost,
@@ -23,7 +25,7 @@ public record SaveResponse(
     }
 
     private static String formatStartDateWithDayOfWeek(LocalDate date) {
-        String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd EEEE")); // 수정
+        String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd EEEE", Locale.KOREA));
         return formattedDate;
     }
 
