@@ -1,4 +1,4 @@
-package com.sunny.backend.apple;
+package com.sunny.backend.apple.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

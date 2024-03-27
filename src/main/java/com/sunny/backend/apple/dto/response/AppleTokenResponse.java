@@ -1,4 +1,4 @@
-package com.sunny.backend.auth.dto;
+package com.sunny.backend.apple.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;

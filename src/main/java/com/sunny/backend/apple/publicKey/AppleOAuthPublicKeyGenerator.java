@@ -1,5 +1,7 @@
-package com.sunny.backend.apple;
+package com.sunny.backend.apple.publicKey;
 
+import com.sunny.backend.apple.publicKey.ApplePublicKey;
+import com.sunny.backend.apple.publicKey.ApplePublicKeys;
 import com.sunny.backend.auth.UnauthorizedException;
 import java.math.BigInteger;
 import java.security.KeyFactory;

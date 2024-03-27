@@ -1,4 +1,4 @@
-package com.sunny.backend.apple;
+package com.sunny.backend.common.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;

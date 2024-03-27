@@ -1,4 +1,6 @@
-package com.sunny.backend.apple;
+package com.sunny.backend.apple.controller;
+import com.sunny.backend.apple.service.AppleOAuthClient;
+import com.sunny.backend.apple.service.AppleService;
 import com.sunny.backend.auth.dto.TokenResponse;
 import com.sunny.backend.auth.dto.UserNameResponse;
 import com.sunny.backend.auth.dto.UserRequest;
@@ -39,7 +41,6 @@ public class AppleController {
 		TokenResponse tokenResponse = appleOAuthClient.getOAuthMemberId(idToken);
 		log.info(String.valueOf(idToken));
 		log.info(String.valueOf(tokenResponse));
-
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				tokenResponse, "애플 로그인 성공");
 	}
@@ -59,11 +60,10 @@ public class AppleController {
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteAccount(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@RequestParam("code") String code) {
-		log.info("탈퇴 API 호출");
 		return appleService.revoke(customUserPrincipal, code);
 	}
 
-	@ApiOperation(tags = "0. Auth", value = "refresh 토큰으로 access 토큰 발급")
+	@ApiOperation(tags = "0. Auth", value = "refresh 토큰으로 access 토큰 재발급")
 	@GetMapping("/reissue")
 	public ResponseEntity<TokenResponse> reissue(@RequestParam(name = "refreshToken") String refreshToken) {
 		TokenResponse tokenResponse = appleService.reissue(refreshToken);
@@ -72,7 +72,6 @@ public class AppleController {
 
 	@PostMapping("/logout")
 	public ResponseEntity<?> logout(@Validated @RequestBody UserRequest logout) {
-		// validation check
 		return appleService.logout(logout);
 	}
 }

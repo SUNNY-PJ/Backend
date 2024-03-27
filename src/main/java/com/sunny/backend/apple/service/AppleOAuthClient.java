@@ -1,7 +1,10 @@
-package com.sunny.backend.apple;
+package com.sunny.backend.apple.service;
 
+import com.sunny.backend.apple.publicKey.AppleOAuthPublicKeyGenerator;
+import com.sunny.backend.apple.publicKey.ApplePublicKeys;
+import com.sunny.backend.apple.jwt.JwtParser;
 import com.sunny.backend.auth.UnauthorizedException;
-import com.sunny.backend.auth.dto.AppleAuthClient;
+import com.sunny.backend.apple.dto.request.AppleAuthClient;
 import com.sunny.backend.auth.dto.TokenResponse;
 import com.sunny.backend.auth.jwt.TokenProvider;
 import com.sunny.backend.user.domain.Role;
@@ -49,7 +52,6 @@ public class AppleOAuthClient implements OAuth2Client {
   public TokenResponse getOAuthMemberId(String idToken) {
 
     ApplePublicKeys applePublicKeys = appleAuthClient.getAppleAuthPublicKey();
-    System.out.println(applePublicKeys.getKeys().size());
     Map<String, String> headers = jwtParser.parseHeaders(idToken);
     PublicKey publicKey = appleOAuthPublicKeyGenerator.generatePublicKey(headers,
         applePublicKeys);
@@ -58,7 +60,6 @@ public class AppleOAuthClient implements OAuth2Client {
     String oAuthId = claims.getSubject();
     String email = claims.get("email", String.class);
     Optional<Users> usersOptional = userRepository.findByEmail(email);
-    log.info("usersOptional={}",usersOptional);
     if (usersOptional.isEmpty()) {
       Users users = Users.builder()
           .email(email)

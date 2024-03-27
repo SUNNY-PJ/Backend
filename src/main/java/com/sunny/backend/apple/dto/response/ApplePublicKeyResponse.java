@@ -1,4 +1,4 @@
-package com.sunny.backend.auth.dto;
+package com.sunny.backend.apple.dto.response;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,6 +1,8 @@
-package com.sunny.backend.apple;
+package com.sunny.backend.apple.service;
 
-import com.sunny.backend.auth.dto.AppleAuthClient;
+import com.sunny.backend.common.config.AppleProperties;
+import com.sunny.backend.apple.dto.request.AppleRevokeRequest;
+import com.sunny.backend.apple.dto.request.AppleAuthClient;
 import com.sunny.backend.auth.dto.TokenResponse;
 import com.sunny.backend.auth.dto.UserNameResponse;
 import com.sunny.backend.auth.dto.UserRequest;
@@ -88,7 +90,6 @@ public class AppleService {
       String code) {
     try {
       Users users = customUserPrincipal.getUsers();
-      log.info("user_id={}", users.getId());
       AppleRevokeRequest appleRevokeRequest = AppleRevokeRequest.builder()
           .client_id(appleProperties.getClientId())
           .client_secert(generateClientSecret())
