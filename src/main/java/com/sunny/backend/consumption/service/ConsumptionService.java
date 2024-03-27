@@ -11,12 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
+import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.consumption.domain.SpendType;
 import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
 import com.sunny.backend.consumption.dto.response.ConsumptionResponse;
 import com.sunny.backend.consumption.dto.response.SpendTypeStatisticsResponse;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;
+import com.sunny.backend.friends.domain.Friend;
+import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.user.domain.Users;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ConsumptionService {
 	private final ConsumptionRepository consumptionRepository;
 	private final ResponseService responseService;
+	private final FriendRepository friendRepository;
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> createConsumption(
@@ -46,8 +50,30 @@ public class ConsumptionService {
 			user.addConsumption(consumption);
 		}
 		ConsumptionResponse consumptionResponse = ConsumptionResponse.from(consumption);
+
+		for (Friend friend : friendRepository.findByUsersAndCompetitionIsNotNull(user)) {
+			double percentageUsed = calculateUserPercentage(user.getId(), friend.getCompetition());
+			double friendsPercentageUsed = calculateUserPercentage(friend.getUserFriend().getId(),
+				friend.getCompetition());
+
+			friend.getCompetition()
+				.getOutput()
+				.updateOutput(percentageUsed, friendsPercentageUsed, user.getId(), friend.getUserFriend().getId());
+		}
+
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 			consumptionResponse, "지출을 등록했습니다.");
+	}
+
+	public double calculateUserPercentage(Long userId, Competition competition) {
+		Long totalSpent = consumptionRepository.getComsumptionMoney(userId, competition.getStartDate(),
+			competition.getEndDate());
+		if (totalSpent == null) {
+			return 100.0;
+		}
+
+		double percentage = 100.0 - ((totalSpent * 100.0) / competition.getPrice());
+		return Math.round(percentage * 10) / 10.0; // 소수점 첫째 자리 반올림
 	}
 
 	@Transactional

@@ -18,11 +18,9 @@ import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.competition.domain.CompetitionStatus;
 import com.sunny.backend.competition.dto.request.CompetitionRequest;
-import com.sunny.backend.competition.dto.response.CompetitionApplyResponse;
 import com.sunny.backend.competition.dto.response.CompetitionResponse;
 import com.sunny.backend.competition.dto.response.CompetitionStatusResponse;
 import com.sunny.backend.competition.repository.CompetitionRepository;
-import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.exception.FriendErrorCode;
@@ -50,7 +48,7 @@ public class CompetitionService {
 	private final NotificationRepository notificationRepository;
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<CompetitionApplyResponse>> applyCompetition(
+	public ResponseEntity<CommonResponse.SingleResponse<CompetitionResponse>> applyCompetition(
 		CustomUserPrincipal customUserPrincipal, CompetitionRequest competitionRequest) {
 		Friend friend = friendRepository.getById(competitionRequest.friendsId());
 		friend.validateUser(customUserPrincipal.getUsers().getId());
@@ -71,22 +69,20 @@ public class CompetitionService {
 		friend.addCompetition(competition);
 		friendWithUserFriend.addCompetition(competition);
 
-		CompetitionApplyResponse competitionApplyResponse = CompetitionApplyResponse.of(
-			friendWithUserFriend.getId(),
-			friendWithUserFriend.getUsers().getNickname(), competition);
+		CompetitionResponse competitionResponse = CompetitionResponse.from(friendWithUserFriend);
 
 		String title = "[SUNNY] " + friend.getUsers().getNickname();
 		String bodyTitle = friend.getUsers().getNickname() + "님이 대결을 신청했어요";
 		String body = "대결 신청을 받았어요!";
-		sendNotifications(title,bodyTitle,body,friend, competition);
-
+		sendNotifications(title, bodyTitle, body, friend, competition);
 
 		//  신청후 알람을 보내는 행위
-		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionApplyResponse,
+		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionResponse,
 			"대결 신청이 됐습니다.");
 	}
 
-	private void sendNotifications(String title,String body,String bodyTitle, Friend friend, Competition competition) {
+	private void sendNotifications(String title, String body, String bodyTitle, Friend friend,
+		Competition competition) {
 		Long postAuthor = friend.getUserFriend().getId();
 		CompetitionNotification competitionNotification = CompetitionNotification.builder()
 			.users(friend.getUserFriend()) //상대방꺼
@@ -128,7 +124,7 @@ public class CompetitionService {
 		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
 		String bodyTitle = friendWithUser.getUsers().getNickname() + "님이 대결을 수락했어요";
 		String body = "대결 신청에 대한 응답을 받았어요";
-		sendNotifications(title,bodyTitle,body,friendWithUser, competition);
+		sendNotifications(title, bodyTitle, body, friendWithUser, competition);
 	}
 
 	@Transactional
@@ -144,7 +140,7 @@ public class CompetitionService {
 		String title = "[SUNNY] " + friend.getUsers().getNickname();
 		String bodyTitle = friend.getUsers().getNickname() + "님이 대결을 거절했어요";
 		String body = "대결 신청에 대한 응답을 받았어요";
-		sendNotifications(title,bodyTitle,body,friend, competition);
+		sendNotifications(title, bodyTitle, body, friend, competition);
 	}
 
 	@Transactional
@@ -157,16 +153,13 @@ public class CompetitionService {
 		friendRepository.updateCompetitionToNull(competition.getId());
 	}
 
-	public ResponseEntity<CommonResponse.ListResponse<CompetitionResponse>> getCompetition(
-		CustomUserPrincipal customUserPrincipal) {
-		List<CompetitionResponse> responses = friendRepository.findByUsers(
-				customUserPrincipal.getUsers())
-			.stream()
-			.filter(friend -> friend.getCompetition() != null)
-			.map(friend -> CompetitionResponse.of(friend.getUserFriend().getId(),
-				friend.getCompetition()))
-			.toList();
-		return responseService.getListResponse(HttpStatus.OK.value(), responses, "결과 조회");
+	public ResponseEntity<CommonResponse.SingleResponse<CompetitionResponse>> getCompetition(
+		CustomUserPrincipal customUserPrincipal, Long friendId) {
+		Friend friend = friendRepository.getById(friendId);
+		friend.validateUser(customUserPrincipal.getUsers().getId());
+		friend.validateCompetition();
+
+		return responseService.getSingleResponse(HttpStatus.OK.value(), CompetitionResponse.from(friend), "결과 조회");
 	}
 
 	@Transactional
@@ -184,9 +177,8 @@ public class CompetitionService {
 		CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend friendWithUser = friendRepository.getById(friendId);
 		friendWithUser.validateUser(customUserPrincipal.getUsers().getId());
-
-		Competition competition = competitionRepository.getById(
-			friendWithUser.getCompetition().getId());
+		friendWithUser.validateCompetition();
+		Competition competition = friendWithUser.getCompetition();
 
 		Users user = friendWithUser.getUsers();
 		Users userFriend = friendWithUser.getUserFriend();
@@ -194,13 +186,10 @@ public class CompetitionService {
 		long diff = Duration.between(competition.getStartDate().atStartOfDay(),
 			competition.getEndDate().atStartOfDay()).toDays();
 
-		List<Consumption> userSaves = consumptionRepository.findByUsersId(user.getId());
-		List<Consumption> friendsSaves = consumptionRepository.findByUsersId(userFriend.getId());
-		double percentageUsed = calculateUserPercentage(userSaves, user.getId(), competition);
-		double friendsPercentageUsed = calculateUserPercentage(friendsSaves, userFriend.getId(),
-			competition);
+		double percentageUsed = calculateUserPercentage(user.getId(), competition);
+		double friendsPercentageUsed = calculateUserPercentage(userFriend.getId(), competition);
 
-		competition.getOutput().updateOutput(percentageUsed, friendId, user.getId(), userFriend.getId());
+		competition.getOutput().updateOutput(percentageUsed, friendsPercentageUsed, user.getId(), userFriend.getId());
 
 		CompetitionStatusResponse competitionStatus = CompetitionStatusResponse.builder()
 			.competitionId(competition.getId())
@@ -217,12 +206,13 @@ public class CompetitionService {
 	}
 
 	//TODO 메소드 분리
-	private double calculateUserPercentage(List<Consumption> consumptions, Long userId,
-		Competition competition) {
-		if (consumptions == null || consumptions.isEmpty()) {
+	public double calculateUserPercentage(Long userId, Competition competition) {
+		Long totalSpent = consumptionRepository.getComsumptionMoney(userId, competition.getStartDate(),
+			competition.getEndDate());
+		if (totalSpent == null) {
 			return 100.0;
 		}
-		Long totalSpent = consumptionRepository.getComsumptionMoney(userId, competition.getStartDate(), competition.getEndDate());
+
 		double percentage = 100.0 - ((totalSpent * 100.0) / competition.getPrice());
 		return Math.round(percentage * 10) / 10.0; // 소수점 첫째 자리 반올림
 	}
