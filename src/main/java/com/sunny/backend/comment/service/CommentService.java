@@ -49,7 +49,7 @@ public class CommentService {
 	public CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
 		CommentResponse commentResponse;
 		if (comment.getUsers() != null && comment.getUsers().getId() != null) {
-			// Users object associated with the comment is not null
+
 			boolean isPrivate = comment.getIsPrivated();
 			boolean commentAuthor = currentUser.getId().equals(comment.getUsers().getId());
 			String writer = comment.getUsers().getNickname();
@@ -65,7 +65,7 @@ public class CommentService {
 
 			if (isPrivate && !(currentUser.getId().equals(comment.getUsers().getId()) ||
 					currentUser.getId().equals(comment.getCommunity().getUsers().getId()))) {
-				// Handle private comment
+
 				commentResponse = new CommentResponse(
 						comment.getId(),
 						comment.getUsers().getId(),
@@ -79,7 +79,6 @@ public class CommentService {
 						comment.getIsPrivated()
 				);
 			} else {
-				// Handle regular comment
 				commentResponse = new CommentResponse(
 						comment.getId(),
 						comment.getUsers().getId(),
@@ -94,11 +93,8 @@ public class CommentService {
 				);
 			}
 		} else {
-			// Users object associated with the comment is null
 			commentResponse = leaveCommentToDto(currentUser, comment);
 		}
-
-		// Set children comments recursively
 		commentResponse.setChildren(
 				comment.getChildren().stream()
 						.map(childComment -> mapCommentToResponse(childComment, currentUser))
