@@ -16,6 +16,8 @@ public record AlarmListResponse(
     String postAuthor,
     String title,
     String notificationContent,
+    String profileImg,
+
     boolean isToday,
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
     LocalDateTime createdAt
@@ -30,6 +32,7 @@ public record AlarmListResponse(
             commentNotification.getComment().getUsers().getNickname(),
             commentNotification.getTitle(),
             commentNotification.getComment().getContent(),
+            commentNotification.getComment().getUsers().getProfile(),
             commentNotification.getComment().getCreatedDate().toLocalDate()
                 .isEqual(LocalDate.now()),
             commentNotification.getComment().getCreatedDate()
@@ -43,6 +46,7 @@ public record AlarmListResponse(
       String postAuthor,
       String title,
       String notificationContent,
+      String profileImg,
       boolean isToday,
       @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
       LocalDateTime createdAt
@@ -57,6 +61,7 @@ public record AlarmListResponse(
               friendsNotification.getFriend().getNickname(), //
               friendsNotification.getTitle(),
               friendsNotification.getBody(),
+              friendsNotification.getUsers().getProfile(),
               friendsNotification.getCreatedAt().toLocalDate().isEqual(LocalDate.now()),
               friendsNotification.getCreatedAt()
           ))
@@ -69,6 +74,7 @@ public record AlarmListResponse(
       String postAuthor,
       String title,
       String notificationContent,
+      String profileImg,
       boolean isToday,
       @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
       LocalDateTime createdAt
@@ -82,6 +88,7 @@ public record AlarmListResponse(
               competitionNotification.getName(),
               competitionNotification.getTitle(),
               competitionNotification.getBody(),
+              competitionNotification.getUsers().getProfile(),
               competitionNotification.getCreatedAt().toLocalDate().isEqual(LocalDate.now()),
               LocalDateTime.now()
           ))
