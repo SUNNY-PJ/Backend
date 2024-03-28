@@ -46,74 +46,79 @@ public class CommentService {
 	private final CommentNotificationRepository commentNotificationRepository;
 	private final NotificationRepository notificationRepository;
 
-	private CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
-		boolean isPrivate = comment.getIsPrivated();
+	public CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
 		CommentResponse commentResponse;
-		String content = comment.getContent();
-		boolean commentAuthor = currentUser.getId().equals(comment.getUsers().getId());
-		String writer; //현재 사용자 기준이 아닌 id 값이 없을 경우 알 수 없음으로 떠야 됨
-		if (comment.getUsers() != null) {
-			writer = comment.getUsers().getNickname();
+		if (comment.getUsers() != null && comment.getUsers().getId() != null) {
+			// Users object associated with the comment is not null
+			boolean isPrivate = comment.getIsPrivated();
+			boolean commentAuthor = currentUser.getId().equals(comment.getUsers().getId());
+			String writer = comment.getUsers().getNickname();
 
+			String content = comment.getContent();
 			if (comment.getParent() != null) {
-				content = "@" + comment.getParent().getUsers().getNickname() + " " + comment.getContent();
+				// Check if parent comment exists
+				Users parentUser = comment.getParent().getUsers();
+				if (parentUser != null && parentUser.getNickname() != null) {
+					content = "@" + parentUser.getNickname() + " " + content;
+				}
 			}
+
 			if (isPrivate && !(currentUser.getId().equals(comment.getUsers().getId()) ||
 					currentUser.getId().equals(comment.getCommunity().getUsers().getId()))) {
-				if (comment.getIsDeleted()) {
-					commentResponse = convertCommentToDto(currentUser,comment);
-				} else {
-					commentResponse = new CommentResponse(
-							comment.getId(),
-							comment.getUsers().getId(),
-							comment.getUsers().getNickname(),
-							"비밀 댓글입니다.",
-							comment.getCreatedDate(),
-							comment.getAuthor(),
-							commentAuthor,
-							false,
-							comment.getIsPrivated()
-					);
-				}
+				// Handle private comment
+				commentResponse = new CommentResponse(
+						comment.getId(),
+						comment.getUsers().getId(),
+						writer,
+						"비밀 댓글입니다.",
+						comment.getCreatedDate(),
+						comment.getUsers().getProfile(),
+						comment.getAuthor(),
+						commentAuthor,
+						false,
+						comment.getIsPrivated()
+				);
 			} else {
-				if (comment.getIsDeleted()) {
-					commentResponse = convertCommentToDto(currentUser,comment);
-				} else {
-					commentResponse = new CommentResponse(
-							comment.getId(),
-							comment.getUsers().getId(),
-							comment.getUsers().getNickname(),
-							content,
-							comment.getCreatedDate(),
-							comment.getAuthor(),
-							commentAuthor,
-							false,
-							comment.getIsPrivated()
-
-					);
-				}
+				// Handle regular comment
+				commentResponse = new CommentResponse(
+						comment.getId(),
+						comment.getUsers().getId(),
+						writer,
+						content,
+						comment.getCreatedDate(),
+						comment.getUsers().getProfile(),
+						comment.getAuthor(),
+						commentAuthor,
+						false,
+						comment.getIsPrivated()
+				);
 			}
 		} else {
-			commentResponse = leaveCommentToDto(currentUser,comment);
+			// Users object associated with the comment is null
+			commentResponse = leaveCommentToDto(currentUser, comment);
 		}
+
+		// Set children comments recursively
 		commentResponse.setChildren(
 				comment.getChildren().stream()
 						.map(childComment -> mapCommentToResponse(childComment, currentUser))
 						.toList()
 		);
+
 		return commentResponse;
 	}
-
 	@Transactional
 	public ResponseEntity<CommonResponse.ListResponse<CommentResponse>> getCommentList(
 			CustomUserPrincipal customUserPrincipal, Long communityId) {
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.getById(communityId);
 		List<Comment> comments = commentRepository.findAllByCommunity_Id(communityId);
+		System.out.println(comments);
 		List<CommentResponse> commentResponses = comments.stream()
 				.filter(comment -> comment.getParent() == null)
 				.map(comment -> mapCommentToResponse(comment, user))
 				.toList();
+		System.out.println(commentResponses);
 		return responseService.getListResponse(HttpStatus.OK.value(), commentResponses, "댓글을 조회했습니다.");
 	}
 
@@ -168,7 +173,7 @@ public class CommentService {
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(),comment.getUsers().getId(), comment.getUsers().getNickname(),
-						addUserTag(comment), comment.getCreatedDate(), comment.getAuthor(),
+						addUserTag(comment), comment.getCreatedDate(),comment.getUsers().getProfile(), comment.getAuthor(),
 						commentAuthor,false,comment.getIsPrivated()),"댓글을 등록했습니다.");
 	}
 
@@ -252,6 +257,6 @@ public class CommentService {
 		comment.setIsPrivated(isPrivate);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(), comment.getUsers().getId(),comment.getUsers().getNickname(), comment.getContent(),
-						comment.getCreatedDate(),comment.getAuthor(),commentAuthor,false,comment.getIsPrivated()), "댓글을 수정했습니다.");
+						comment.getCreatedDate(),comment.getUsers().getProfile(),comment.getAuthor(),commentAuthor,false,comment.getIsPrivated()), "댓글을 수정했습니다.");
 	}
 }
