@@ -183,6 +183,7 @@ public class AppleService {
   public ResponseEntity<CommonResponse.GeneralResponse> revokeToken(CustomUserPrincipal customUserPrincipal,
       String code) throws IOException {
     Users users = customUserPrincipal.getUsers();
+    log.info("code={}",code);
     try {
       ResponseEntity<String> response = appleAuthClient.revokeToken(
           appleProperties.getClientId(),
