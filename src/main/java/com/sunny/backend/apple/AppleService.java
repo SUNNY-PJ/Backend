@@ -10,6 +10,7 @@ import com.sunny.backend.auth.jwt.TokenProvider;
 import com.sunny.backend.comment.repository.CommentRepository;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.common.response.CommonResponse.GeneralResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.user.domain.Users;
@@ -31,10 +32,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +57,9 @@ public class AppleService {
   private final CommentNotificationRepository commentNotificationRepository;
   private final ResponseService responseService;
   private final RedisUtil redisUtil;
+
+  @Autowired
+  private RestTemplate restTemplate;
   private final TokenProvider tokenProvider;
 
 
@@ -96,6 +108,7 @@ public class AppleService {
           .token(code)
           .token_type_hint("access_token")
           .build();
+      log.info("appleRevokeRequest={}", appleRevokeRequest);
       appleAuthClient.revoke(appleRevokeRequest);
       commentNotificationRepository.deleteByUsersId(users.getId());
       commentRepository.nullifyUsersId(users.getId());
@@ -134,5 +147,37 @@ public class AppleService {
         tokenProvider.logout(logout) ? HttpStatus.OK.value() : HttpStatus.BAD_REQUEST.value();
     String message = tokenProvider.logout(logout) ? "logout 성공" : "logout 실패";
     return responseService.getGeneralResponse(status, message);
+  }
+
+  //TODO feign 사용해보기
+  public ResponseEntity<CommonResponse.GeneralResponse>  revokeToken(CustomUserPrincipal customUserPrincipal,
+      String code) throws IOException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    Users users = customUserPrincipal.getUsers();
+
+    MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+    map.add("client_id", appleProperties.getClientId());
+    map.add("client_secret", generateClientSecret());
+    map.add("token", code);
+    map.add("token_type_hint", "access_token");
+
+    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+
+    String revokeUrl = "https://appleid.apple.com/auth/revoke";
+
+    ResponseEntity<String> response = restTemplate.exchange(
+        revokeUrl, HttpMethod.POST, request, String.class);
+
+    if (response.getStatusCode().is2xxSuccessful()) {
+      log.info("apple Token 삭제");
+      commentNotificationRepository.deleteByUsersId(users.getId());
+      commentRepository.nullifyUsersId(users.getId());
+      userRepository.deleteById(users.getId());
+      return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
+    } else {
+      log.info("apple Token 삭제 실패");
+      return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
+    }
   }
 }

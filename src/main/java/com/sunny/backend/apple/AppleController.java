@@ -8,6 +8,7 @@ import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 
 import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
 import javax.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,9 +60,11 @@ public class AppleController {
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteAccount(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@RequestParam("code") String code) {
-		log.info("탈퇴 API 호출");
-		log.info("탈퇴 API code:",code);
-		return appleService.revoke(customUserPrincipal, code);
+		try {
+			return appleService.revokeToken(customUserPrincipal, code);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@ApiOperation(tags = "0. Auth", value = "refresh 토큰으로 access 토큰 발급")
@@ -73,7 +76,6 @@ public class AppleController {
 
 	@PostMapping("/logout")
 	public ResponseEntity<?> logout(@Validated @RequestBody UserRequest logout) {
-		// validation check
 		return appleService.logout(logout);
 	}
 }
