@@ -89,6 +89,7 @@ public class AppleService {
     try {
       Users users = customUserPrincipal.getUsers();
       log.info("user_id={}", users.getId());
+      log.info("code={}", code);
       AppleRevokeRequest appleRevokeRequest = AppleRevokeRequest.builder()
           .client_id(appleProperties.getClientId())
           .client_secert(generateClientSecret())
