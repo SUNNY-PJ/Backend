@@ -60,6 +60,7 @@ public class AppleController {
 			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@RequestParam("code") String code) {
 		log.info("탈퇴 API 호출");
+		log.info("탈퇴 API code:",code);
 		return appleService.revoke(customUserPrincipal, code);
 	}
 
