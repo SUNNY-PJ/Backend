@@ -150,34 +150,60 @@ public class AppleService {
   }
 
   //TODO feign 사용해보기
-  public ResponseEntity<CommonResponse.GeneralResponse>  revokeToken(CustomUserPrincipal customUserPrincipal,
+//  public ResponseEntity<CommonResponse.GeneralResponse>  revokeToken(CustomUserPrincipal customUserPrincipal,
+//      String code) throws IOException {
+//    HttpHeaders headers = new HttpHeaders();
+//    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//    Users users = customUserPrincipal.getUsers();
+//
+//    MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+//    map.add("client_id", appleProperties.getClientId());
+//    map.add("client_secret", generateClientSecret());
+//    map.add("token", code);
+//    map.add("token_type_hint", "access_token");
+//
+//    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+//
+//    String revokeUrl = "https://appleid.apple.com/auth/revoke";
+//
+//    ResponseEntity<String> response = restTemplate.exchange(
+//        revokeUrl, HttpMethod.POST, request, String.class);
+//
+//    if (response.getStatusCode().is2xxSuccessful()) {
+//      log.info("apple Token 삭제");
+//      commentNotificationRepository.deleteByUsersId(users.getId());
+//      commentRepository.nullifyUsersId(users.getId());
+//      userRepository.deleteById(users.getId());
+//      return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
+//    } else {
+//      log.info("apple Token 삭제 실패");
+//      return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
+//    }
+//  }
+  public ResponseEntity<CommonResponse.GeneralResponse> revokeToken(CustomUserPrincipal customUserPrincipal,
       String code) throws IOException {
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
     Users users = customUserPrincipal.getUsers();
+    try {
+      ResponseEntity<String> response = appleAuthClient.revokeToken(
+          appleProperties.getClientId(),
+          generateClientSecret(),
+          code,
+          "access_token"
+      );
 
-    MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
-    map.add("client_id", appleProperties.getClientId());
-    map.add("client_secret", generateClientSecret());
-    map.add("token", code);
-    map.add("token_type_hint", "access_token");
-
-    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-
-    String revokeUrl = "https://appleid.apple.com/auth/revoke";
-
-    ResponseEntity<String> response = restTemplate.exchange(
-        revokeUrl, HttpMethod.POST, request, String.class);
-
-    if (response.getStatusCode().is2xxSuccessful()) {
-      log.info("apple Token 삭제");
-      commentNotificationRepository.deleteByUsersId(users.getId());
-      commentRepository.nullifyUsersId(users.getId());
-      userRepository.deleteById(users.getId());
-      return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
-    } else {
-      log.info("apple Token 삭제 실패");
-      return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
+      if (response.getStatusCode().is2xxSuccessful()) {
+        log.info("Apple token 삭제 성공");
+        commentNotificationRepository.deleteByUsersId(users.getId());
+        commentRepository.nullifyUsersId(users.getId());
+        userRepository.deleteById(users.getId());
+        return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
+      } else {
+        log.error("Apple token 삭제 실패");
+        return responseService.getGeneralResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "탈퇴 실패");
+      }
+    } catch (Exception e) {
+      log.error("Apple token 탈퇴 중 오류: {}", e.getMessage(), e);
+      return responseService.getGeneralResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "탈퇴 실패");
     }
   }
 }

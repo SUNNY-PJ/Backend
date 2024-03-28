@@ -7,6 +7,8 @@ import com.sunny.backend.apple.ApplePublicKeys;
 import com.sunny.backend.apple.AppleRevokeRequest;
 import com.sunny.backend.apple.AppleSocialTokenInfoResponse;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,5 +34,14 @@ public interface AppleAuthClient {
 
     @PostMapping(value = "/revoke",consumes = "application/x-www-form-urlencoded" )
     void revoke(AppleRevokeRequest appleRevokeRequest);
-  }
+
+    @PostMapping(value = "/revoke", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    ResponseEntity<String> revokeToken(@RequestParam("client_id") String clientId,
+        @RequestParam("client_secret") String clientSecret,
+        @RequestParam("token") String token,
+        @RequestParam("token_type_hint") String tokenTypeHint);
+}
+
+
+
 
