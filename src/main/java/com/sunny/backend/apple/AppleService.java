@@ -181,11 +181,43 @@ public class AppleService {
 //    }
 //  }
 
+//  @Transactional
+//  public ResponseEntity<CommonResponse.GeneralResponse> revokeToken(CustomUserPrincipal customUserPrincipal,
+//      String code) throws IOException {
+//    Users users = customUserPrincipal.getUsers();
+//    log.info("code={}",code);
+//    try {
+//      ResponseEntity<String> response = appleAuthClient.revokeToken(
+//          appleProperties.getClientId(),
+//          generateClientSecret(),
+//          code,
+//          "access_token"
+//      );
+//
+//      if (response.getStatusCode().is2xxSuccessful()) {
+//        log.info("Apple token 삭제 성공");
+//        commentNotificationRepository.deleteByUsersId(users.getId());
+//        commentRepository.nullifyUsersId(users.getId());
+//        userRepository.deleteById(users.getId());
+//        log.info("Apple token 삭제 성공 code={}",HttpStatus.OK.value());
+//        return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
+//      } else {
+//        log.error("Apple token 삭제 실패");
+//        log.info("Apple token 삭제 실패 code={}",HttpStatus.INTERNAL_SERVER_ERROR.value());
+//        return responseService.getGeneralResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "탈퇴 실패");
+//      }
+//    } catch (Exception e) {
+//      log.error("Apple token 탈퇴 중 오류: {}", e.getMessage(), e);
+//      log.info("Apple token 삭제 오류 code={}",HttpStatus.INTERNAL_SERVER_ERROR.value());
+//      return responseService.getGeneralResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "탈퇴 실패");
+//    }
+//  }
+
   @Transactional
   public ResponseEntity<CommonResponse.GeneralResponse> revokeToken(CustomUserPrincipal customUserPrincipal,
       String code) throws IOException {
     Users users = customUserPrincipal.getUsers();
-    log.info("code={}",code);
+    log.info("code={}", code);
     try {
       ResponseEntity<String> response = appleAuthClient.revokeToken(
           appleProperties.getClientId(),
@@ -199,16 +231,16 @@ public class AppleService {
         commentNotificationRepository.deleteByUsersId(users.getId());
         commentRepository.nullifyUsersId(users.getId());
         userRepository.deleteById(users.getId());
-        log.info("Apple token 삭제 성공 code={}",HttpStatus.OK.value());
+        log.info("Apple token 삭제 성공 code={}", HttpStatus.OK.value());
         return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
       } else {
         log.error("Apple token 삭제 실패");
-        log.info("Apple token 삭제 실패 code={}",HttpStatus.INTERNAL_SERVER_ERROR.value());
+        log.info("Apple token 삭제 실패 code={}", HttpStatus.INTERNAL_SERVER_ERROR.value());
         return responseService.getGeneralResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "탈퇴 실패");
       }
     } catch (Exception e) {
       log.error("Apple token 탈퇴 중 오류: {}", e.getMessage(), e);
-      log.info("Apple token 삭제 오류 code={}",HttpStatus.INTERNAL_SERVER_ERROR.value());
+      log.info("Apple token 삭제 오류 code={}", HttpStatus.INTERNAL_SERVER_ERROR.value());
       return responseService.getGeneralResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "탈퇴 실패");
     }
   }
