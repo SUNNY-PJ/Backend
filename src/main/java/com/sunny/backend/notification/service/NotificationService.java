@@ -88,8 +88,8 @@ public class NotificationService {
 		List<CommentNotification> filteredCommentNotifications = commentNotifications.stream()
 				.filter(notification -> {
 					Comment comment = notification.getComment();
-					// 댓글이 존재하고 삭제되지 않은 경우, 그리고 댓글을 작성한 사용자가 현재 사용자와 다른 경우에만 필터링
-					return comment != null && !comment.getIsDeleted() && !comment.getUsers().getId().equals(customUserPrincipal.getUsers().getId());
+					// 유저가 존재& 댓글이 존재하고 삭제되지 않은 경우, 그리고 댓글을 작성한 사용자가 현재 사용자와 다른 경우에만 필터링
+					return comment.getUsers()!=null&comment != null && !comment.getIsDeleted() && !comment.getUsers().getId().equals(customUserPrincipal.getUsers().getId());
 				})
 				.toList();
 		List<FriendsNotification> friendsNotifications = friendsNotificationRepository.findByUsers_Id(
