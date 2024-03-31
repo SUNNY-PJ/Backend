@@ -59,12 +59,10 @@ public class AppleController {
 	@GetMapping("/leave")
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteAccount(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
-			@RequestParam("code") String code) {
-		try {
-			return appleService.revokeToken(customUserPrincipal, code);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+			@RequestParam("code") String code) throws IOException {
+		ResponseEntity<CommonResponse.GeneralResponse> response = appleService.revokeToken(customUserPrincipal, code);
+		log.info("revokeToken: {}", response);
+		return response;
 	}
 
 	@ApiOperation(tags = "0. Auth", value = "refresh 토큰으로 access 토큰 발급")
