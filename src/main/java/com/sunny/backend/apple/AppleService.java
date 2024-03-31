@@ -180,6 +180,8 @@ public class AppleService {
 //      return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
 //    }
 //  }
+
+  @Transactional
   public ResponseEntity<CommonResponse.GeneralResponse> revokeToken(CustomUserPrincipal customUserPrincipal,
       String code) throws IOException {
     Users users = customUserPrincipal.getUsers();
