@@ -25,12 +25,13 @@ public class CommentResponse {
 	private boolean commentAuthor;
 	private boolean isDeleted;
 	private boolean isPrivated;
+	private boolean isRevokeUser;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
 	private LocalDateTime createdDate;
 	private List<CommentResponse> children = new ArrayList<>();
 
 	public CommentResponse(Long id, Long userId,String writer, String content, LocalDateTime createdDate,
-			String profileImg,boolean isAuthor,boolean commentAuthor,boolean isDeleted,boolean isPrivated) {
+			String profileImg,boolean isAuthor,boolean commentAuthor,boolean isDeleted,boolean isPrivated,boolean isRevokeUser) {
 		this.id = id;
 		this.userId=userId;
 		this.writer = writer;
@@ -41,6 +42,7 @@ public class CommentResponse {
 		this.commentAuthor=commentAuthor;
 		this.isDeleted=isDeleted;
 		this.isPrivated=isPrivated;
+		this.isRevokeUser=isRevokeUser;
 	}
 
 	//삭제된 댓글로 댓글 내용 수정하기 위한 객체 생성
@@ -57,6 +59,7 @@ public class CommentResponse {
 					comment.getAuthor(),
 					commentAuthor,
 					true,
+					false,
 					false
 			);
 		} else {
@@ -65,7 +68,7 @@ public class CommentResponse {
 			LocalDateTime createdDate = comment.getCreatedDate();
 			boolean isAuthor =comment.getAuthor();
 			return new CommentResponse(comment.getId(),comment.getUsers().getId(), writer, content, createdDate,
-					users.getProfile(), isAuthor,commentAuthor,false,comment.getIsPrivated());
+					users.getProfile(), isAuthor,commentAuthor,false,comment.getIsPrivated(),false);
 		}
 	}
 
@@ -81,7 +84,8 @@ public class CommentResponse {
 					comment.getAuthor(),
 					false,
 					comment.getIsDeleted(),
-					comment.getIsPrivated()
+					comment.getIsPrivated(),
+					true
 			);
 	}
 	@Getter
