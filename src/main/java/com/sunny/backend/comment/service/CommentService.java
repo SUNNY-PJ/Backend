@@ -78,19 +78,24 @@ public class CommentService {
 						false,
 						comment.getIsPrivated()
 				);
-			} else {
-				commentResponse = new CommentResponse(
-						comment.getId(),
-						comment.getUsers().getId(),
-						writer,
-						content,
-						comment.getCreatedDate(),
-						comment.getUsers().getProfile(),
-						comment.getAuthor(),
-						commentAuthor,
-						false,
-						comment.getIsPrivated()
-				);
+			}
+			else {
+				if (comment.getIsDeleted()) {
+					commentResponse = convertCommentToDto(currentUser, comment);
+				} else {
+					commentResponse = new CommentResponse(
+							comment.getId(),
+							comment.getUsers().getId(),
+							writer,
+							content,
+							comment.getCreatedDate(),
+							comment.getUsers().getProfile(),
+							comment.getAuthor(),
+							commentAuthor,
+							false,
+							comment.getIsPrivated()
+					);
+				}
 			}
 		} else {
 			commentResponse = leaveCommentToDto(currentUser, comment);
