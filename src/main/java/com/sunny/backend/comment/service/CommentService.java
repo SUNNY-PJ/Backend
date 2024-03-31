@@ -76,7 +76,8 @@ public class CommentService {
 						comment.getAuthor(),
 						commentAuthor,
 						false,
-						comment.getIsPrivated()
+						comment.getIsPrivated(),
+						false
 				);
 			}
 			else {
@@ -93,7 +94,8 @@ public class CommentService {
 							comment.getAuthor(),
 							commentAuthor,
 							false,
-							comment.getIsPrivated()
+							comment.getIsPrivated(),
+							false
 					);
 				}
 			}
@@ -175,7 +177,7 @@ public class CommentService {
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(),comment.getUsers().getId(), comment.getUsers().getNickname(),
 						addUserTag(comment), comment.getCreatedDate(),comment.getUsers().getProfile(), comment.getAuthor(),
-						commentAuthor,false,comment.getIsPrivated()),"댓글을 등록했습니다.");
+						commentAuthor,false,comment.getIsPrivated(),false),"댓글을 등록했습니다.");
 	}
 
 	private String removeUserTag(String content,Comment parent) {
@@ -258,6 +260,6 @@ public class CommentService {
 		comment.setIsPrivated(isPrivate);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				new CommentResponse(comment.getId(), comment.getUsers().getId(),comment.getUsers().getNickname(), comment.getContent(),
-						comment.getCreatedDate(),comment.getUsers().getProfile(),comment.getAuthor(),commentAuthor,false,comment.getIsPrivated()), "댓글을 수정했습니다.");
+						comment.getCreatedDate(),comment.getUsers().getProfile(),comment.getAuthor(),commentAuthor,false,comment.getIsPrivated(),false), "댓글을 수정했습니다.");
 	}
 }
