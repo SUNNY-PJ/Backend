@@ -94,7 +94,6 @@ public class CompetitionService {
 		competitionNotificationRepository.save(competitionNotification);
 		List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
 		String notificationBody=friend.getUsers().getNickname()+body;
-		System.out.println(notificationBody);
 		if (notificationList.size() != 0) {
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
 				postAuthor,
