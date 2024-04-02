@@ -123,7 +123,6 @@ public class FriendService {
 		String bodyTitle = "친구 신청 결과를 알려드려요";
 		sendNotifications(title, body, bodyTitle, receiveFriend);
 		receiveFriend.updateFriendStatus(FriendStatus.FRIEND);
-		// getByUserAndUserFriend(friend.getUsers(), friend.getUserFriend(), FriendStatus.FRIEND);
 	}
 
 	@Transactional
@@ -152,20 +151,6 @@ public class FriendService {
 		friendRepository.delete(receiveFriend);
 	}
 
-	// public void getByUserAndUserFriend(Users user, Users userFriend, FriendStatus friendStatus)
-	// 	throws IOException {
-	// 	Optional<Friend> optionalFriend = friendRepository.findByUsersAndUserFriend(userFriend, user);
-	//
-	// 	if (optionalFriend.isEmpty()) {
-	// 		Friend saveUserFriend = Friend.of(userFriend, user, friendStatus);
-	// 		friendRepository.save(saveUserFriend);
-	// 		sendNotifications(user, saveUserFriend);
-	// 	} else {
-	// 		Friend friend = optionalFriend.get();
-	// 		friend.validateProposal();
-	// 		sendNotifications(user, friend);
-	// 	}
-	// }
 
 	@Transactional
 	public void deleteFriends(CustomUserPrincipal customUserPrincipal, Long friendId) {
