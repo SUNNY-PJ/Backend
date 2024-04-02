@@ -94,7 +94,6 @@ public class FriendService {
 				.createdAt(LocalDateTime.now())
 				.build();
 			friendsNotificationRepository.save(friendsNotification);
-			System.out.println("받는 사람" + postAuthor);
 			List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
 			String notificationBody=friend.getUsers().getNickname()+body;
 			if (notificationList.size() != 0) {
