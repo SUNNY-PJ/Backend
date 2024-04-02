@@ -159,7 +159,6 @@ public class FriendService {
 		if (friend.hasCompetition()) {
 			friendRepository.updateCompetitionToNull(friend.getCompetition().getId());
 		}
-
 		// 상대편 친구 관계 삭제
 		friendRepository.findByUsersAndUserFriend(friend.getUserFriend(), friend.getUsers())
 			.ifPresent(friendRepository::delete);
