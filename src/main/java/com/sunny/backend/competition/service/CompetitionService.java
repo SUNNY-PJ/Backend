@@ -123,7 +123,7 @@ public class CompetitionService {
 		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
 		String body = "님이 대결을 수락했어요";
 		String bodyTitle = "대결 신청에 대한 응답을 받았어요";
-		sendNotifications(title, bodyTitle, body, friendWithUser, competition);
+		sendNotifications(title, body, bodyTitle, friendWithUser, competition);
 	}
 
 	@Transactional
@@ -139,7 +139,7 @@ public class CompetitionService {
 		String title = "[SUNNY] " + friend.getUsers().getNickname();
 		String body ="님이 대결을 거절했어요";
 		String bodyTitle = "대결 신청에 대한 응답을 받았어요";
-		sendNotifications(title, bodyTitle, body, friend, competition);
+		sendNotifications(title, body, bodyTitle, friend, competition);
 	}
 
 	@Transactional
@@ -161,15 +161,6 @@ public class CompetitionService {
 		return responseService.getSingleResponse(HttpStatus.OK.value(), CompetitionResponse.from(friend), "결과 조회");
 	}
 
-	@Transactional
-	// @Scheduled(cron = "*/30 * * * * *")
-	public void sendCompetitionResult() {
-		// for (CompetitionResultDto competitionResultDto : friendRepository.getCompetitionResult()) {
-		// 	System.out.println(CompetitionResult.from(competitionResultDto));
-		// 		messagingTemplate.convertAndSend("/sub/user/" + competitionResult.userId(), competitionResult);
-		// }
-		// competitionRepository.deleteByEndDate(LocalDate.now());
-	}
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CompetitionStatusResponse>> getCompetitionStatus(
