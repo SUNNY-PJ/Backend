@@ -79,7 +79,7 @@ public class CompetitionService {
 			"대결 신청이 됐습니다.");
 	}
 
-	private void sendNotifications(String title, String body, String bodyTitle, Friend friend,
+	private void sendNotifications(String title, String bodyTitle, String body, Friend friend,
 		Competition competition) {
 		Long postAuthor = friend.getUserFriend().getId();
 		CompetitionNotification competitionNotification = CompetitionNotification.builder()
