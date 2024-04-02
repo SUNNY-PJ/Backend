@@ -98,8 +98,8 @@ public class CompetitionService {
 		if (notificationList.size() != 0) {
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
 				postAuthor,
-				notificationBody,
-				bodyTitle
+				bodyTitle,
+				notificationBody
 			);
 			notificationService.sendNotificationToFriends(title, notificationPushRequest);
 		}
