@@ -69,17 +69,7 @@ public class FriendService {
 		String title = "[SUNNY] " + sendFriend.getUsers().getNickname();
 		String body = "님이 친구를 신청했어요!";
 		String bodyTitle = "친구 신청을 받았어요";
-
 		sendNotifications(title, body, bodyTitle, sendFriend);
-
-		// TODO
-		// 친구 신청 A -> B 상황
-		// (A -> B) FRIEND : SEND
-		// (B -> A) FRIEND : RECEIVE
-		// sendNotifications(user, userFriend);
-		// sendNotifications(userFriend, user);
-		//title,bodyTitle,body 따로 전달
-		// getByUserAndUserFriend(user, userFriend, FriendStatus.SEND);
 	}
 
 	private void sendNotifications(String title, String body, String bodyTitle, Friend friend) throws IOException {
