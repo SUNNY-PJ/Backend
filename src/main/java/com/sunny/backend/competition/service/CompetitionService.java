@@ -72,7 +72,7 @@ public class CompetitionService {
 		CompetitionResponse competitionResponse = CompetitionResponse.from(friendWithUserFriend);
 
 		String title = "[SUNNY] " + friend.getUsers().getNickname();
-		String body = "님으로부터 대결 신청을 받았어요!";
+		String body = "님으로부터 대결 신청을 받았어요.";
 		String bodyTitle = "대결 신청을 받았어요!";
 		sendNotifications(title, bodyTitle, body, friend, competition);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionResponse,
