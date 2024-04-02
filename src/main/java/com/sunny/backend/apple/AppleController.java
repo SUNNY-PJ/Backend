@@ -38,9 +38,7 @@ public class AppleController {
 	public ResponseEntity<CommonResponse.SingleResponse<TokenResponse>> verifyToken(
 			@RequestParam("code") String idToken) {
 		TokenResponse tokenResponse = appleOAuthClient.getOAuthMemberId(idToken);
-		log.info(String.valueOf(idToken));
 		log.info(String.valueOf(tokenResponse));
-
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				tokenResponse, "애플 로그인 성공");
 	}

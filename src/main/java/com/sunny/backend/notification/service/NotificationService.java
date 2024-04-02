@@ -95,7 +95,7 @@ public class NotificationService {
 							!comment.getUsers().getId().equals(customUserPrincipal.getUsers().getId());
 				})
 				.map(notification -> new AlarmListResponse(
-						UUID.randomUUID().toString(), // Generate unique alarmId
+						UUID.randomUUID().toString(),
 						notification.getId(),
 						notification.getComment().getUsers().getNickname(),
 						notification.getTitle(),
