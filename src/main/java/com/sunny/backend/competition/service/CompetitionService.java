@@ -72,7 +72,7 @@ public class CompetitionService {
 		CompetitionResponse competitionResponse = CompetitionResponse.from(friendWithUserFriend);
 
 		String title = "[SUNNY] " + friend.getUsers().getNickname();
-		String body = "님이 대결을 신청했어요";
+		String body = "님으로부터 대결 신청을 받았어요!";
 		String bodyTitle = "대결 신청을 받았어요!";
 		sendNotifications(title, bodyTitle, body, friend, competition);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionResponse,
@@ -94,6 +94,7 @@ public class CompetitionService {
 		competitionNotificationRepository.save(competitionNotification);
 		List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
 		String notificationBody=friend.getUsers().getNickname()+body;
+		System.out.println(notificationBody);
 		if (notificationList.size() != 0) {
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
 				postAuthor,
