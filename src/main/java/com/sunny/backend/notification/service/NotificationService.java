@@ -87,15 +87,6 @@ public class NotificationService {
 	public ResponseEntity<ListResponse<AlarmListResponse>> getAlarmList(CustomUserPrincipal customUserPrincipal) {
 		List<CommentNotification> commentNotifications = commentNotificationRepository.findByUsers_Id(
 				customUserPrincipal.getUsers().getId());
-//		List<CommentNotification> filteredCommentNotifications = commentNotifications.stream()
-//				.filter(notification -> {
-//					Comment comment = notification.getComment();
-//					// 유저가 존재& 댓글이 존재하고 삭제되지 않은 경우, 그리고 댓글을 작성한 사용자가 현재 사용자와 다른 경우에만 필터링
-//					return comment.getUsers()!=null&comment != null && !comment.getIsDeleted() && !comment.getUsers().getId().equals(customUserPrincipal.getUsers().getId());
-//				})
-//				.toList();
-		//		List<AlarmListResponse> commentNotificationResponse = AlarmListResponse.commentNotification(
-//				filteredCommentNotifications);
 		List<AlarmListResponse> commentNotificationResponse = commentNotifications.stream()
 				.filter(notification -> {
 					Comment comment = notification.getComment();
@@ -218,7 +209,6 @@ public class NotificationService {
 				}
 
 			}
-
 			NotificationResponse notificationResponse = new NotificationResponse(
 					notificationPushRequest.getTitle(),
 					notificationPushRequest.getBody(),
@@ -230,6 +220,4 @@ public class NotificationService {
 			throw new CustomException(NOTIFICATIONS_NOT_SENT);
 		}
 	}
-
-
 }

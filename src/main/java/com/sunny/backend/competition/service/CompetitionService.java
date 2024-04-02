@@ -120,6 +120,7 @@ public class CompetitionService {
 			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
 		friendWithUserFriend.addCompetition(competition);
 
+		//TODO title,body,bodyTitle 분리
 		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
 		String body = "님이 대결을 수락했어요";
 		String bodyTitle = "대결 신청에 대한 응답을 받았어요";
