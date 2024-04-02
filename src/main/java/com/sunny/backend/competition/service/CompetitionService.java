@@ -74,12 +74,12 @@ public class CompetitionService {
 		String title = "[SUNNY] " + friend.getUsers().getNickname();
 		String body = "님으로부터 대결 신청을 받았어요.";
 		String bodyTitle = "대결 신청을 받았어요!";
-		sendNotifications(title, bodyTitle, body, friend, competition);
+		sendNotifications(title, body, bodyTitle, friend, competition);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionResponse,
 			"대결 신청이 됐습니다.");
 	}
 
-	private void sendNotifications(String title, String bodyTitle, String body, Friend friend,
+	private void sendNotifications(String title, String body, String bodyTitle, Friend friend,
 		Competition competition) {
 		Long postAuthor = friend.getUserFriend().getId();
 		CompetitionNotification competitionNotification = CompetitionNotification.builder()
