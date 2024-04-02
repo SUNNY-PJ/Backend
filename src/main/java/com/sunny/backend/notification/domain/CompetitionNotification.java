@@ -36,6 +36,9 @@ public class CompetitionNotification extends BaseTime {
 	private Users users;
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@JoinColumn(name = "user_friend_id")
+	private Users friend;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "competition_id")
 	private Competition competition; //대결 id
 

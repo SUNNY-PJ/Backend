@@ -7,7 +7,9 @@ import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.common.response.CommonResponse.SingleResponse;
 import com.sunny.backend.notification.dto.request.NotificationRequest.NotificationAllowRequest;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
@@ -85,20 +87,39 @@ public class NotificationService {
 	public ResponseEntity<ListResponse<AlarmListResponse>> getAlarmList(CustomUserPrincipal customUserPrincipal) {
 		List<CommentNotification> commentNotifications = commentNotificationRepository.findByUsers_Id(
 				customUserPrincipal.getUsers().getId());
-		List<CommentNotification> filteredCommentNotifications = commentNotifications.stream()
+//		List<CommentNotification> filteredCommentNotifications = commentNotifications.stream()
+//				.filter(notification -> {
+//					Comment comment = notification.getComment();
+//					// 유저가 존재& 댓글이 존재하고 삭제되지 않은 경우, 그리고 댓글을 작성한 사용자가 현재 사용자와 다른 경우에만 필터링
+//					return comment.getUsers()!=null&comment != null && !comment.getIsDeleted() && !comment.getUsers().getId().equals(customUserPrincipal.getUsers().getId());
+//				})
+//				.toList();
+		//		List<AlarmListResponse> commentNotificationResponse = AlarmListResponse.commentNotification(
+//				filteredCommentNotifications);
+		List<AlarmListResponse> commentNotificationResponse = commentNotifications.stream()
 				.filter(notification -> {
 					Comment comment = notification.getComment();
-					// 유저가 존재& 댓글이 존재하고 삭제되지 않은 경우, 그리고 댓글을 작성한 사용자가 현재 사용자와 다른 경우에만 필터링
-					return comment.getUsers()!=null&comment != null && !comment.getIsDeleted() && !comment.getUsers().getId().equals(customUserPrincipal.getUsers().getId());
+					return comment != null && comment.getUsers() != null &&
+							!comment.getIsDeleted() &&
+							!comment.getUsers().getId().equals(customUserPrincipal.getUsers().getId());
 				})
+				.map(notification -> new AlarmListResponse(
+						UUID.randomUUID().toString(), // Generate unique alarmId
+						notification.getId(),
+						notification.getComment().getUsers().getNickname(),
+						notification.getTitle(),
+						notification.getComment().getContent(),
+						notification.getComment().getUsers().getProfile(),
+						notification.getComment().getCreatedDate().toLocalDate()
+								.isEqual(LocalDate.now()),
+						notification.getComment().getCreatedDate()
+				))
 				.toList();
 		List<FriendsNotification> friendsNotifications = friendsNotificationRepository.findByUsers_Id(
 			customUserPrincipal.getUsers().getId());
 		List<CompetitionNotification> competitionNotifications = competitionNotificationRepository.findByUsers_Id(
 			customUserPrincipal.getUsers().getId());
 
-		List<AlarmListResponse> commentNotificationResponse = AlarmListResponse.commentNotification(
-				filteredCommentNotifications);
 		List<AlarmListResponse> friendsNotificationResponse = AlarmListResponse.friendsNotification.freindsFrom(
 			friendsNotifications);
 		List<AlarmListResponse> competitionNotificationResponse = AlarmListResponse.CompetitionNotificationResponse.competitionFrom(

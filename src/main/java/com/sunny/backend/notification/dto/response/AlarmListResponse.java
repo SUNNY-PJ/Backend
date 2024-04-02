@@ -7,11 +7,11 @@ import com.sunny.backend.notification.domain.FriendsNotification;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
+import java.util.UUID;
 
 
 public record AlarmListResponse(
-
+    String alarmId,
     Long id,
     String postAuthor,
     String title,
@@ -28,6 +28,7 @@ public record AlarmListResponse(
 
     return commentNotifications.stream()
         .map(commentNotification -> new AlarmListResponse(
+            UUID.randomUUID().toString(),
             commentNotification.getCommunity().getId(),
             commentNotification.getComment().getUsers().getNickname(),
             commentNotification.getTitle(),
@@ -41,6 +42,7 @@ public record AlarmListResponse(
   }
 
   public record friendsNotification(
+      String alarmId,
       Long id,
       Long friendsId,
       String postAuthor,
@@ -57,11 +59,12 @@ public record AlarmListResponse(
 
       return friendsNotifications.stream()
           .map(friendsNotification -> new AlarmListResponse(
+              UUID.randomUUID().toString(),
               friendsNotification.getFriend().getId(), //상대방꺼 id
-              friendsNotification.getFriend().getNickname(), //
+              friendsNotification.getFriend().getNickname(),
               friendsNotification.getTitle(),
-              friendsNotification.getBody(),
-              friendsNotification.getUsers().getProfile(),
+              friendsNotification.getFriend().getNickname()+friendsNotification.getBody(),
+              friendsNotification.getFriend().getProfile(),
               friendsNotification.getCreatedAt().toLocalDate().isEqual(LocalDate.now()),
               friendsNotification.getCreatedAt()
           ))
@@ -70,6 +73,7 @@ public record AlarmListResponse(
   }
 
   public record CompetitionNotificationResponse(
+      String alarmId,
       Long competitionId,
       String postAuthor,
       String title,
@@ -84,11 +88,12 @@ public record AlarmListResponse(
         List<CompetitionNotification> competitionNotifications) {
       return competitionNotifications.stream()
           .map(competitionNotification -> new AlarmListResponse(
+              UUID.randomUUID().toString(),
               competitionNotification.getCompetition().getId(),
               competitionNotification.getName(),
               competitionNotification.getTitle(),
-              competitionNotification.getBody(),
-              competitionNotification.getUsers().getProfile(),
+              competitionNotification.getName()+competitionNotification.getBody(),
+              competitionNotification.getFriend().getProfile(),
               competitionNotification.getCreatedAt().toLocalDate().isEqual(LocalDate.now()),
               LocalDateTime.now()
           ))

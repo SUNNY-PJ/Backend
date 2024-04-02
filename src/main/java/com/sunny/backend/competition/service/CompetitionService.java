@@ -72,7 +72,7 @@ public class CompetitionService {
 		CompetitionResponse competitionResponse = CompetitionResponse.from(friendWithUserFriend);
 
 		String title = "[SUNNY] " + friend.getUsers().getNickname();
-		String bodyTitle = friend.getUsers().getNickname() + "님이 대결을 신청했어요";
+		String bodyTitle = "님이 대결을 신청했어요";
 		String body = "대결 신청을 받았어요!";
 		sendNotifications(title, bodyTitle, body, friend, competition);
 
@@ -86,6 +86,7 @@ public class CompetitionService {
 		Long postAuthor = friend.getUserFriend().getId();
 		CompetitionNotification competitionNotification = CompetitionNotification.builder()
 			.users(friend.getUserFriend()) //상대방꺼
+			.friend(friend.getUsers())
 			.competition(competition)
 			.title(bodyTitle)
 			.body(body)
@@ -122,7 +123,7 @@ public class CompetitionService {
 		friendWithUserFriend.addCompetition(competition);
 
 		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
-		String bodyTitle = friendWithUser.getUsers().getNickname() + "님이 대결을 수락했어요";
+		String bodyTitle = "님이 대결을 수락했어요";
 		String body = "대결 신청에 대한 응답을 받았어요";
 		sendNotifications(title, bodyTitle, body, friendWithUser, competition);
 	}
@@ -138,7 +139,7 @@ public class CompetitionService {
 		friendRepository.updateCompetitionToNull(competition.getId());
 
 		String title = "[SUNNY] " + friend.getUsers().getNickname();
-		String bodyTitle = friend.getUsers().getNickname() + "님이 대결을 거절했어요";
+		String bodyTitle ="님이 대결을 거절했어요";
 		String body = "대결 신청에 대한 응답을 받았어요";
 		sendNotifications(title, bodyTitle, body, friend, competition);
 	}

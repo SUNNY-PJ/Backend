@@ -67,7 +67,7 @@ public class FriendService {
 		friendRepository.save(receiveFriend);
 
 		String title = "[SUNNY] " + sendFriend.getUsers().getNickname();
-		String body = sendFriend.getUsers().getNickname() + "님이 친구를 신청했어요!";
+		String body = "님이 친구를 신청했어요!";
 		String bodyTitle = "친구 신청을 받았어요";
 
 		sendNotifications(title, body, bodyTitle, sendFriend);
@@ -129,7 +129,7 @@ public class FriendService {
 			);
 
 		String title = "[SUNNY] " + receiveFriend.getUsers().getNickname();
-		String body = receiveFriend.getUsers().getNickname() + "님이 친구 신청을 수락했어요";
+		String body = "님이 친구 신청을 수락했어요";
 		String bodyTitle = "친구 신청 결과를 알려드려요";
 		sendNotifications(title, body, bodyTitle, receiveFriend);
 		receiveFriend.updateFriendStatus(FriendStatus.FRIEND);
@@ -155,7 +155,7 @@ public class FriendService {
 				}
 			);
 		String title = "[SUNNY] " + receiveFriend.getUsers().getNickname();
-		String body = receiveFriend.getUsers().getNickname() + "님이 친구 신청을 거절했어요";
+		String body = "님이 친구 신청을 거절했어요";
 		String bodyTitle = "친구 신청 결과를 알려드려요";
 		sendNotifications(title, body, bodyTitle, receiveFriend);
 
