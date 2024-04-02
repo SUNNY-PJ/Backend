@@ -4,6 +4,8 @@ import static com.sunny.backend.scrap.exception.ScrapErrorCode.*;
 
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ public class ScrapService {
 	private final CommunityRepository communityRepository;
 	private final ResponseService responseService;
 
+	@Transactional
 	public ResponseEntity<CommonResponse.GeneralResponse> addScrapToCommunity(CustomUserPrincipal customUserPrincipal,
 		Long communityId) {
 		Users user = customUserPrincipal.getUsers();
@@ -42,6 +45,7 @@ public class ScrapService {
 			.users(user)
 			.build();
 		scrapRepository.save(scrap);
+		user.addScrap(scrap);
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "스크랩하였습니다.");
 	}
 

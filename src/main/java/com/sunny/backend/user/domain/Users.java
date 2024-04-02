@@ -74,7 +74,7 @@ public class Users extends BaseTime {
 	private List<Save> saveList;
 
 	@OneToMany(mappedBy = "users")
-	private List<Scrap> scrapList;
+	private final List<Scrap> scraps = new ArrayList<>();
 
 	@Column
 	private String profile;
@@ -106,6 +106,15 @@ public class Users extends BaseTime {
 	public void addSave(Save save) {
 		this.saveList = new ArrayList<>();
 		this.saveList.add(save);
+	}
+
+	public void addScrap(Scrap scrap) {
+		scraps.add(scrap);
+	}
+
+	public boolean isScrapByCommunity(Long communityId) {
+		return scraps.stream()
+			.anyMatch(scrap -> scrap.isScrapByCommunityId(communityId));
 	}
 
 	@Builder

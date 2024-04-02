@@ -23,6 +23,7 @@ import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.SortType;
 import com.sunny.backend.community.dto.request.CommunityRequest;
 import com.sunny.backend.community.dto.response.CommunityResponse;
+import com.sunny.backend.community.dto.response.ViewAndCommentResponse;
 import com.sunny.backend.community.service.CommunityService;
 
 import io.swagger.annotations.ApiOperation;
@@ -85,7 +86,7 @@ public class CommunityController {
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 조회수/댓글수 확인")
 	@GetMapping("/count/{communityId}")
-	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse.ViewAndCommentResponse>> getCommentAndViewByCommunity(
+	public ResponseEntity<CommonResponse.SingleResponse<ViewAndCommentResponse>> getCommentAndViewByCommunity(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId) {
 		return communityService.getCommentAndViewByCommunity(customUserPrincipal, communityId);
 	}
