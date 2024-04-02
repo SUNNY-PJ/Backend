@@ -89,5 +89,4 @@ public class CommunityController {
 		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId) {
 		return communityService.getCommentAndViewByCommunity(customUserPrincipal, communityId);
 	}
-
 }
