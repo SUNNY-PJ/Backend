@@ -46,6 +46,7 @@ public class CommentService {
 	private final CommentNotificationRepository commentNotificationRepository;
 	private final NotificationRepository notificationRepository;
 
+
 	public CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
 		CommentResponse commentResponse;
 		if (comment.getUsers() != null && comment.getUsers().getId() != null) {
@@ -121,7 +122,6 @@ public class CommentService {
 				.filter(comment -> comment.getParent() == null)
 				.map(comment -> mapCommentToResponse(comment, user))
 				.toList();
-		System.out.println(commentResponses);
 		return responseService.getListResponse(HttpStatus.OK.value(), commentResponses, "댓글을 조회했습니다.");
 	}
 
