@@ -130,10 +130,7 @@ public class NotificationService {
 			notificationPushRequest.getPostAuthor());
 		if (notifications != null && !notifications.isEmpty()) {
 			OkHttpClient client = new OkHttpClient();
-
 			MediaType mediaType = MediaType.parse("application/json");
-			System.out.println(title);
-			System.out.println(notificationPushRequest.getTitle());
 			for (Notification notification : notifications) {
 				RequestBody body = RequestBody.create(mediaType,
 						"{\n" +
@@ -154,7 +151,6 @@ public class NotificationService {
 					throw new RuntimeException(e);
 				}
 			}
-
 			NotificationResponse notificationResponse = new NotificationResponse(
 				notificationPushRequest.getTitle(),
 				notificationPushRequest.getBody(),

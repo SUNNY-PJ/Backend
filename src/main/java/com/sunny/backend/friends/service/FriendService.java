@@ -75,7 +75,6 @@ public class FriendService {
 	private void sendNotifications(String title, String body, String bodyTitle, Friend friend) throws IOException {
 		if (friend != null && friend.getUsers() != null && friend.getUserFriend() != null) {
 			Long postAuthor = friend.getUserFriend().getId();
-
 			FriendsNotification friendsNotification = FriendsNotification.builder()
 				.users(friend.getUserFriend()) // 상대방꺼
 				.friend(friend.getUsers())
