@@ -10,7 +10,7 @@ public record ViewAndCommentResponse(
 	public static ViewAndCommentResponse from(Community community) {
 		return new ViewAndCommentResponse(
 			community.getViewCnt(),
-			community.getCommentList().size()
+			community.getCommentSize()
 		);
 	}
 }

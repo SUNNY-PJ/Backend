@@ -28,54 +28,77 @@ import com.sunny.backend.common.photo.Photo;
 import com.sunny.backend.community.dto.request.CommunityRequest;
 import com.sunny.backend.user.domain.Users;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Builder
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Community {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "community_id")
 	private Long id;
+
 	@Column
 	@Size(min = 1, max = 35)
 	private String title;
+
 	@Column
 	private String contents;
+
 	@ColumnDefault("0")
 	@Column
 	private int viewCnt;
-	@Column
-	private LocalDateTime createdAt;
-	@Column
-	private LocalDateTime modifiedAt;
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "users_id")
-	private Users users;
-	@OneToMany(mappedBy = "community")
-	@Builder.Default
-	private List<Photo> photoList = new ArrayList<>();
+
 	@Enumerated(EnumType.STRING)
 	@NotNull(message = "올바른 카테고리 값을 입력해야합니다.")
 	private BoardType boardType;
+
+	@Column
+	private LocalDateTime createdAt;
+
+	@Column
+	private LocalDateTime modifiedAt;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "users_id")
+	private Users users;
+
+	@OneToMany(mappedBy = "community")
+	private final List<Photo> photos = new ArrayList<>();
+
 	@OneToMany(mappedBy = "community", orphanRemoval = true)
-	@Builder.Default
-	private List<Comment> commentList = new ArrayList<>();
+	private final List<Comment> comments = new ArrayList<>();
+
+	private Community(String title, String contents, BoardType boardType, Users users) {
+		this.title = title;
+		this.contents = contents;
+		this.viewCnt = 0;
+		this.boardType = boardType;
+		this.createdAt = LocalDateTime.now();
+		this.modifiedAt = LocalDateTime.now();
+		this.users = users;
+	}
+
+	public static Community of(
+		String title,
+		String contents,
+		BoardType boardType,
+		Users users) {
+		return new Community(title, contents, boardType, users);
+	}
 
 	public int getCommentSize() {
-		return commentList.size();
+		return comments.size();
 	}
 
 	public void updateCommunity(CommunityRequest communityRequest) {
 		this.title = communityRequest.getTitle();
 		this.contents = communityRequest.getContents();
 		this.boardType = communityRequest.getType();
+		this.modifiedAt = LocalDateTime.now();
 	}
 
 	public void increaseView() {
@@ -86,16 +109,16 @@ public class Community {
 		return users.getId().equals(userId);
 	}
 
-	public boolean hasNotBeenModified(LocalDateTime createdAt, LocalDateTime modifiedAt) {
-		return !createdAt.isEqual(modifiedAt);
+	public boolean hasNotBeenModified() {
+		return !this.createdAt.isEqual(this.modifiedAt);
 	}
 
-	public void updateModifiedAt(LocalDateTime modifiedAt) {
-		this.modifiedAt = modifiedAt;
+	public void clearPhoto() {
+		this.photos.clear();
 	}
 
-	public void addPhoto(List<Photo> photoList) {
-		this.photoList = photoList;
+	public void addPhotos(List<Photo> photos) {
+		this.photos.addAll(photos);
 	}
 
 	public void validateByUserId(Long tokenUserId) {

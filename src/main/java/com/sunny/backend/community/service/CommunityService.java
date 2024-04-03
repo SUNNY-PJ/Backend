@@ -4,7 +4,6 @@ import static com.sunny.backend.common.ComnConstant.*;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,6 +23,7 @@ import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.domain.SortType;
 import com.sunny.backend.community.dto.request.CommunityRequest;
+import com.sunny.backend.community.dto.response.CommunityPageResponse;
 import com.sunny.backend.community.dto.response.CommunityResponse;
 import com.sunny.backend.community.dto.response.ViewAndCommentResponse;
 import com.sunny.backend.community.repository.CommunityRepository;
@@ -87,49 +87,49 @@ public class CommunityService {
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> createCommunity(
-		CustomUserPrincipal customUserPrincipal, CommunityRequest communityRequest,
-		List<MultipartFile> multipartFileList) {
+		CustomUserPrincipal customUserPrincipal,
+		CommunityRequest communityRequest,
+		List<MultipartFile> multipartFiles
+	) {
 		Users user = customUserPrincipal.getUsers();
-		Community community = Community.builder()
-			.title(communityRequest.getTitle())
-			.contents(communityRequest.getContents())
-			.boardType(communityRequest.getType())
-			.createdAt(LocalDateTime.now())
-			.users(user)
-			.build();
+		Community community = Community.of(
+			communityRequest.getTitle(),
+			communityRequest.getContents(),
+			communityRequest.getType(),
+			user
+		);
 
-		if (multipartFileList != null && !multipartFileList.isEmpty()) {
-			List<Photo> photoList = new ArrayList<>();
-			for (MultipartFile multipartFile : multipartFileList) {
-				Photo photo = Photo.builder()
-					.filename(multipartFile.getOriginalFilename())
-					.fileSize(multipartFile.getSize())
-					.fileUrl(s3Util.upload(multipartFile))
-					.community(community)
-					.build();
-				photoList.add(photo);
-			}
-			photoRepository.saveAll(photoList);
-			community.addPhoto(photoList);
+		if (multipartFiles != null && !multipartFiles.isEmpty()) {
+			savePhotoFromMultipartFile(multipartFiles, community);
 		}
 
 		communityRepository.save(community);
-		community.updateModifiedAt(community.getCreatedAt());
-		if (user.getCommunityList() == null) {
-			user.addCommunity(community);
-		}
+		user.addCommunity(community);
 
-		CommunityResponse communityResponse = CommunityResponse.from(community);
-		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
+		return responseService.getSingleResponse(HttpStatus.OK.value(), CommunityResponse.from(community),
 			"게시글을 성공적으로 작성했습니다.");
 	}
 
+	public void savePhotoFromMultipartFile(List<MultipartFile> multipartFileList, Community community) {
+		List<Photo> photos = multipartFileList.stream()
+			.map(multipartFile -> Photo.of(
+					community,
+					multipartFile.getOriginalFilename(),
+					s3Util.upload(multipartFile),
+					multipartFile.getSize()
+				)
+			)
+			.toList();
+		photoRepository.saveAll(photos);
+		community.addPhotos(photos);
+	}
+
 	@Transactional(readOnly = true)
-	public ResponseEntity<CommonResponse.SingleResponse<List<CommunityResponse.PageResponse>>> paginationNoOffsetBuilder(
+	public ResponseEntity<CommonResponse.SingleResponse<List<CommunityPageResponse>>> paginationNoOffsetBuilder(
 		CustomUserPrincipal customUserPrincipal, Long communityId,
-		SortType sortType, BoardType boardType, String searchText, int pageSize) {
+		SortType sortType, BoardType boardType, String searchText, Integer pageSize) {
 		Users users = customUserPrincipal.getUsers();
-		List<CommunityResponse.PageResponse> result = communityRepository.paginationNoOffsetBuilder(
+		List<CommunityPageResponse> result = communityRepository.paginationNoOffsetBuilder(
 			users, communityId, sortType, boardType, searchText, pageSize);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), result,
 			"게시판을 성공적으로 조회했습니다.");
@@ -138,31 +138,20 @@ public class CommunityService {
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> updateCommunity(
 		CustomUserPrincipal customUserPrincipal, Long communityId,
-		CommunityRequest communityRequest, List<MultipartFile> files) {
+		CommunityRequest communityRequest, List<MultipartFile> multipartFiles) {
 		Users user = customUserPrincipal.getUsers();
 		Community community = communityRepository.getById(communityId);
 		community.validateByUserId(user.getId());
-		community.getPhotoList().clear();
 		community.updateCommunity(communityRequest);
-		community.updateModifiedAt(LocalDateTime.now());
-		if (files != null && !files.isEmpty()) {
+
+		if (multipartFiles != null && !multipartFiles.isEmpty()) {
+			community.clearPhoto();
 			List<Photo> existingPhotos = photoRepository.findByCommunityId(communityId);
 			photoRepository.deleteAll(existingPhotos);
 			for (Photo photo : existingPhotos) {
 				s3Util.deleteFile(photo.getFileUrl());
 			}
-			List<Photo> photoList = new ArrayList<>();
-			for (MultipartFile multipartFile : files) {
-				Photo photo = Photo.builder()
-					.filename(multipartFile.getOriginalFilename())
-					.fileSize(multipartFile.getSize())
-					.fileUrl(s3Util.upload(multipartFile))
-					.community(community)
-					.build();
-				photoList.add(photo);
-			}
-			photoRepository.saveAll(photoList);
-			community.addPhoto(photoList);
+			savePhotoFromMultipartFile(multipartFiles, community);
 		}
 
 		return responseService.getSingleResponse(HttpStatus.OK.value(), CommunityResponse.from(community),

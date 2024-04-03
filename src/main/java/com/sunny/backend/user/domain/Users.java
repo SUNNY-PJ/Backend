@@ -68,7 +68,7 @@ public class Users extends BaseTime {
 
 	@OneToMany(mappedBy = "users")
 	@JsonIgnore
-	private List<Comment> commentList;
+	private final List<Comment> commentList = new ArrayList<>();
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Save> saveList;
@@ -89,7 +89,6 @@ public class Users extends BaseTime {
 	private List<Notification> notification;
 
 	public void addComment(Comment comment) {
-		this.commentList = new ArrayList<>();
 		this.commentList.add(comment);
 	}
 
