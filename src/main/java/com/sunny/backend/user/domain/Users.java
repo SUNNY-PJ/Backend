@@ -149,5 +149,9 @@ public class Users extends BaseTime {
 	public boolean isReportLimitReached() {
 		return this.userReport.isReportLimitReached();
 	}
+
+	public int getReportCount() {
+		return userReport.getReportCount();
+	}
 }
 
