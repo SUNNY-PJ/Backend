@@ -143,7 +143,7 @@ public class CompetitionService {
 		sendNotifications(title, body, bodyTitle, friend, competition);
 	}
 
-	//TODO 대결 포기 배너 알림 필요 여부
+	//TODO 대결 포기 배너 알림 필요 여부 논의 & 추가
 	@Transactional
 	public void giveUpCompetition(CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend friend = friendRepository.getById(friendId);

@@ -33,11 +33,8 @@ public class SaveService {
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> createSaveGoal(
 		CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
-		System.out.println("호출");
 		Users user = customUserPrincipal.getUsers();
 		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
-		System.out.println(saveRequest.getStartDate());
-
 		boolean allSavesExpired = saves.stream().allMatch(save -> save.checkExpired(save.getEndDate()));
 		if (allSavesExpired) {
 			Save save = Save.builder()
@@ -54,7 +51,7 @@ public class SaveService {
 			if (!saves.isEmpty()) {
 				Save lastSave = saves.get(saves.size() - 1);
 				SaveResponse saveResponse = SaveResponse.from(lastSave, checkSuccessed(user, lastSave));
-				return responseService.getSingleResponse(HttpStatus.OK.value(), saveResponse, "이미 등록된 절약 목표가 존재합니다.");
+				return responseService.getSingleResponse(HttpStatus.BAD_REQUEST.value(), null, "이미 등록된 절약 목표가 존재합니다.");
 			} else {
 				return responseService.getSingleResponse(HttpStatus.OK.value(), null, "등록된 절약 목표를 찾을 수 없습니다.");
 			}
@@ -77,17 +74,12 @@ public class SaveService {
 	public ResponseEntity<CommonResponse.ListResponse<SaveResponse.DetailSaveResponse>> getSaveGoal(
 		CustomUserPrincipal customUserPrincipal) {
 		Users user = customUserPrincipal.getUsers();
-		log.info("save user_id:" + user.getId());
 		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
-		log.info("save size:" + saves.size());
-
 		List<SaveResponse.DetailSaveResponse> saveResponses = saves.stream()
 			.map(save -> {
 				long remainingDays = save.calculateRemainingDays(save);
 				Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(),
 					save.getEndDate());
-				log.info("userMoney:" + userMoney);
-				log.info("save:" + save.getCost());
 				double percentageUsed = save.calculateSavePercentage(userMoney, save);
 				return SaveResponse.DetailSaveResponse.of(remainingDays, percentageUsed, save.getCost());
 			})
@@ -113,5 +105,4 @@ public class SaveService {
 		double percentageUsed = save.calculateSavePercentage(userMoney, save);
 		return percentageUsed >= 0;
 	}
-
 }
