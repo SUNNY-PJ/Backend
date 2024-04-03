@@ -3,7 +3,6 @@ package com.sunny.backend.friends.service;
 import static com.sunny.backend.friends.exception.FriendErrorCode.*;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -16,12 +15,7 @@ import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.FriendStatus;
 import com.sunny.backend.friends.dto.response.FriendListResponse;
 import com.sunny.backend.friends.repository.FriendRepository;
-import com.sunny.backend.notification.domain.FriendsNotification;
-import com.sunny.backend.notification.domain.Notification;
-import com.sunny.backend.notification.dto.request.NotificationPushRequest;
-import com.sunny.backend.notification.repository.FriendsNotificationRepository;
-import com.sunny.backend.notification.repository.NotificationRepository;
-import com.sunny.backend.notification.service.NotificationService;
+import com.sunny.backend.notification.service.FriendNotiService;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
 
@@ -33,9 +27,7 @@ public class FriendService {
 
 	private final FriendRepository friendRepository;
 	private final UserRepository userRepository;
-	private final NotificationRepository notificationRepository;
-	private final NotificationService notificationService;
-	private final FriendsNotificationRepository friendsNotificationRepository;
+	private final FriendNotiService friendNotiService;
 
 	public FriendListResponse getFriends(CustomUserPrincipal customUserPrincipal) {
 		Users users = customUserPrincipal.getUsers();
@@ -69,33 +61,7 @@ public class FriendService {
 		String title = "[SUNNY] " + sendFriend.getUsers().getNickname();
 		String body = "님이 친구를 신청했어요!";
 		String bodyTitle = "친구 신청을 받았어요";
-		sendNotifications(title, body, bodyTitle, sendFriend);
-	}
-
-	private void sendNotifications(String title, String body, String bodyTitle, Friend friend) throws IOException {
-		if (friend != null && friend.getUsers() != null && friend.getUserFriend() != null) {
-			Long postAuthor = friend.getUserFriend().getId();
-			FriendsNotification friendsNotification = FriendsNotification.builder()
-				.users(friend.getUserFriend()) // 상대방꺼
-				.friend(friend.getUsers())
-				.title(bodyTitle)
-				.body(body)
-				.createdAt(LocalDateTime.now())
-				.build();
-			friendsNotificationRepository.save(friendsNotification);
-			List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
-			String notificationBody=friend.getUsers().getNickname()+body;
-			if (notificationList.size() != 0) {
-				NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
-					postAuthor,
-					notificationBody,
-					bodyTitle
-				);
-				notificationService.sendNotificationToFriends(title, notificationPushRequest);
-			}
-		} else {
-			throw new IOException("유저나 친구가 존재하지 않습니다.");
-		}
+		friendNotiService.sendNotifications(title, body, bodyTitle, receiveFriend);
 	}
 
 	@Transactional
@@ -120,7 +86,7 @@ public class FriendService {
 		String title = "[SUNNY] " + receiveFriend.getUsers().getNickname();
 		String body = "님이 친구 신청을 수락했어요";
 		String bodyTitle = "친구 신청 결과를 알려드려요";
-		sendNotifications(title, body, bodyTitle, receiveFriend);
+		friendNotiService.sendNotifications(title, body, bodyTitle, receiveFriend);
 		receiveFriend.updateFriendStatus(FriendStatus.FRIEND);
 	}
 
@@ -145,11 +111,10 @@ public class FriendService {
 		String title = "[SUNNY] " + receiveFriend.getUsers().getNickname();
 		String body = "님이 친구 신청을 거절했어요";
 		String bodyTitle = "친구 신청 결과를 알려드려요";
-		sendNotifications(title, body, bodyTitle, receiveFriend);
+		friendNotiService.sendNotifications(title, body, bodyTitle, receiveFriend);
 
 		friendRepository.delete(receiveFriend);
 	}
-
 
 	@Transactional
 	public void deleteFriends(CustomUserPrincipal customUserPrincipal, Long friendId) {

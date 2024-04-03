@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserReport {
-	public final int USER_LIMIT_REPORT = 5;
+	public static final int USER_LIMIT_REPORT = 5;
 
 	int reportCount;
 

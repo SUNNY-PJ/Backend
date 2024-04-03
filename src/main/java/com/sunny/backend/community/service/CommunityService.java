@@ -30,6 +30,7 @@ import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.notification.domain.CommentNotification;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.repository.UserRepository;
 import com.sunny.backend.util.RedisUtil;
 import com.sunny.backend.util.S3Util;
 
@@ -46,11 +47,12 @@ public class CommunityService {
 	private final S3Util s3Util;
 	private final RedisUtil redisUtil;
 	private final CommentNotificationRepository commentNotificationRepository;
+	private final UserRepository userRepository;
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> findCommunity(
 		CustomUserPrincipal customUserPrincipal, Long communityId) {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		Community community = communityRepository.getById(communityId);
 
 		findByRedisAndSaveIfNotFound(user.getId(), community);
@@ -91,7 +93,7 @@ public class CommunityService {
 		CommunityRequest communityRequest,
 		List<MultipartFile> multipartFiles
 	) {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		Community community = Community.of(
 			communityRequest.getTitle(),
 			communityRequest.getContents(),
