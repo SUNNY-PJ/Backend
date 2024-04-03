@@ -64,7 +64,7 @@ public class CompetitionService {
 		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
 		String body = "님으로부터 대결 신청을 받았어요.";
 		String bodyTitle = "대결 신청을 받았어요!";
-		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUser);
+		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUserFriend);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionResponse,
 			"대결 신청이 됐습니다.");
 	}
@@ -89,7 +89,7 @@ public class CompetitionService {
 		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
 		String body = "님이 대결을 수락했어요";
 		String bodyTitle = "대결 신청에 대한 응답을 받았어요";
-		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUser);
+		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUserFriend);
 	}
 
 	@Transactional
@@ -101,11 +101,14 @@ public class CompetitionService {
 		competition.validateReceiveUser(friendWithUser.getUsers().getId());
 		competition.updateStatus(CompetitionStatus.NONE);
 		friendRepository.updateCompetitionToNull(competition.getId());
-		
+
+		Friend friendWithUserFriend = friendRepository
+			.findByUsersAndUserFriend(friendWithUser.getUserFriend(), friendWithUser.getUsers())
+			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
 		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
 		String body = "님이 대결을 거절했어요";
 		String bodyTitle = "대결 신청에 대한 응답을 받았어요";
-		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUser);
+		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUserFriend);
 	}
 
 	//TODO 대결 포기 배너 알림 필요 여부 논의 & 추가
