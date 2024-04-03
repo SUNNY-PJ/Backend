@@ -1,18 +1,18 @@
 package com.sunny.backend.report.service;
 
+import java.util.List;
+
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.report.domain.CommunityReport;
-import com.sunny.backend.report.domain.ReportStatus;
 import com.sunny.backend.report.domain.ReportType;
 import com.sunny.backend.report.dto.ReportCreateRequest;
-import com.sunny.backend.report.dto.ReportRequest;
 import com.sunny.backend.report.repository.CommunityReportRepository;
 import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.dto.response.ReportResponse;
 import com.sunny.backend.user.dto.response.UserReportResponse;
 import com.sunny.backend.user.dto.response.UserReportResultResponse;
 import com.sunny.backend.user.repository.UserRepository;
@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CommunityReportService implements ReportService {
+public class CommunityReportService implements ReportStrategy {
 	private final SimpMessagingTemplate template;
 	private final UserRepository userRepository;
 	private final CommunityRepository communityRepository;
@@ -29,47 +29,57 @@ public class CommunityReportService implements ReportService {
 	private final ReportNotificationService reportNotificationService;
 
 	@Override
-	public UserReportResponse report(CustomUserPrincipal customUserPrincipal, ReportCreateRequest reportCreateRequest) {
+	public UserReportResponse report(Users users, ReportCreateRequest reportCreateRequest) {
 		Community community = communityRepository.getById(reportCreateRequest.id());
-		CommunityReport communityReport = CommunityReport.builder()
-			.users(customUserPrincipal.getUsers())
-			.community(community)
-			.reason(reportCreateRequest.reason())
-			.status(ReportStatus.WAIT)
-			.build();
+		CommunityReport communityReport = CommunityReport.of(
+			users,
+			community,
+			reportCreateRequest.reason()
+		);
 		communityReportRepository.save(communityReport);
 		return UserReportResponse.fromCommunityReport(communityReport);
 	}
 
 	@Override
-	public void approveUserReport(ReportRequest reportRequest) {
-		CommunityReport communityReport = communityReportRepository.getById(reportRequest.id());
-		communityReport.isWait();
+	public void approveUserReport(Long communityId) {
+		CommunityReport communityReport = communityReportRepository.getById(communityId);
+		communityReport.validateWaitStatus();
 		communityReport.approveStatus();
 
 		Users reportUsers = communityReport.getUsers();
 		Users users = communityReport.getCommunity().getUsers();
-		if (users.getReportCount() == 4) {
-			userRepository.deleteById(users.getId());
-		} else {
-			users.increaseReportCount();
-			reportNotificationService.sendNotifications(users);
-		}
+		users.increaseReportCount();
+
+		reportNotificationService.sendNotifications(users);
+
 		template.convertAndSend("/sub/user/" + reportUsers.getId(),
 			UserReportResultResponse.ofCommunity(communityReport, true));
+
+		if (users.isReportLimitReached()) {
+			userRepository.deleteById(users.getId());
+		}
 	}
 
 	@Override
-	public void refuseUserReport(ReportRequest reportRequest) {
-		CommunityReport communityReport = communityReportRepository.getById(reportRequest.id());
-		communityReport.isWait();
-		communityReportRepository.deleteById(reportRequest.id());
+	public void refuseUserReport(Long communityId) {
+		CommunityReport communityReport = communityReportRepository.getById(communityId);
+		communityReport.validateWaitStatus();
+		communityReportRepository.deleteById(communityId);
 		template.convertAndSend("/sub/user/" + communityReport.getUsers().getId(),
 			UserReportResultResponse.ofCommunity(communityReport, false));
 	}
 
 	@Override
-	public boolean isReportType(ReportType reportType) {
-		return reportType == ReportType.COMMUNITY;
+	public List<ReportResponse> getUserReports(ReportType reportType) {
+		return communityReportRepository.findAll()
+			.stream()
+			.map(ReportResponse::fromCommunityReport)
+			.toList();
 	}
+
+	@Override
+	public ReportType getReportType() {
+		return ReportType.COMMUNITY;
+	}
+
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -14,7 +15,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -79,8 +79,8 @@ public class Users extends BaseTime {
 	@Column
 	private String profile;
 
-	@ColumnDefault("0")
-	private int reportCount;
+	@Embedded
+	private UserReport userReport;
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Friend> friends = new ArrayList<>();
@@ -132,10 +132,6 @@ public class Users extends BaseTime {
 		this.profile = profile;
 	}
 
-	public void increaseReportCount() {
-		reportCount++;
-	}
-
 	public boolean isOwner(Long id) {
 		return this.id.equals(id);
 	}
@@ -144,6 +140,14 @@ public class Users extends BaseTime {
 		if (this.id.equals(id)) {
 			throw new CustomException(UserErrorCode.CANNOT_MYSELF);
 		}
+	}
+
+	public void increaseReportCount() {
+		this.userReport.increase();
+	}
+
+	public boolean isReportLimitReached() {
+		return this.userReport.isReportLimitReached();
 	}
 }
 

@@ -17,30 +17,26 @@ import javax.persistence.ManyToOne;
 import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.common.exception.CustomException;
-import com.sunny.backend.friends.domain.FriendStatus;
 import com.sunny.backend.user.domain.Users;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommentReport extends BaseTime {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
-	@JoinColumn(name= "users_id")
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@JoinColumn(name = "users_id")
 	private Users users;
 
-	@ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
-	@JoinColumn(name= "comment_id")
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@JoinColumn(name = "comment_id")
 	private Comment comment;
 
 	@Column
@@ -50,8 +46,19 @@ public class CommentReport extends BaseTime {
 	@Enumerated(value = EnumType.STRING)
 	private ReportStatus status;
 
-	public void isWait() {
-		if(status != ReportStatus.WAIT) {
+	private CommentReport(Users users, Comment comment, String reason, ReportStatus status) {
+		this.users = users;
+		this.comment = comment;
+		this.reason = reason;
+		this.status = status;
+	}
+
+	public static CommentReport of(Users users, Comment comment, String reason) {
+		return new CommentReport(users, comment, reason, ReportStatus.WAIT);
+	}
+
+	public void validateWaitStatus() {
+		if (status != ReportStatus.WAIT) {
 			throw new CustomException(ALREADY_PROCESS);
 		}
 	}

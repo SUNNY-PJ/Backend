@@ -1,18 +1,24 @@
 package com.sunny.backend.user.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
+import com.sunny.backend.report.domain.ReportType;
 import com.sunny.backend.report.dto.ReportCreateRequest;
-import com.sunny.backend.report.dto.ReportRequest;
-import com.sunny.backend.report.service.ReportServiceImpl;
+import com.sunny.backend.report.service.ReportService;
+import com.sunny.backend.user.dto.response.ReportResponse;
 import com.sunny.backend.user.dto.response.UserReportResponse;
 
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +31,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserReportController {
 
-	private final ReportServiceImpl reportService;
+	private final ReportService reportService;
+
+	@ApiOperation(tags = "0. User", value = "유저 신고 목록 확인")
+	@GetMapping("/report")
+	public ResponseEntity<List<ReportResponse>> getUserReports(
+		@RequestParam ReportType reportType
+	) {
+		List<ReportResponse> response = reportService.getUserReports(reportType);
+		return ResponseEntity.ok().body(response);
+	}
 
 	@ApiOperation(tags = "0. User", value = "유저 신고")
 	@PostMapping("/report")
@@ -36,16 +51,22 @@ public class UserReportController {
 	}
 
 	@ApiOperation(tags = "0. User", value = "유저 신고 승인")
-	@PatchMapping("/report")
-	public ResponseEntity<Void> approveUserReport(@RequestBody ReportRequest reportRequest) {
-		reportService.approveUserReport(reportRequest);
+	@PatchMapping("/report/{id}")
+	public ResponseEntity<Void> approveUserReport(
+		@PathVariable(name = "id") Long id,
+		@RequestParam ReportType reportType
+	) {
+		reportService.approveUserReport(id, reportType);
 		return ResponseEntity.ok().build();
 	}
 
 	@ApiOperation(tags = "0. User", value = "유저 신고 거절")
-	@DeleteMapping("/report")
-	public ResponseEntity<Void> refuseUserReport(@RequestBody ReportRequest reportRequest) {
-		reportService.refuseUserReport(reportRequest);
+	@DeleteMapping("/report/{id}")
+	public ResponseEntity<Void> refuseUserReport(
+		@PathVariable(name = "id") Long id,
+		@RequestParam ReportType reportType
+	) {
+		reportService.refuseUserReport(id, reportType);
 		return ResponseEntity.ok().build();
 	}
 }
