@@ -39,4 +39,7 @@ public class Scrap {
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Community community;
 
+	public boolean isScrapByCommunityId(Long communityId) {
+		return id.equals(communityId);
+	}
 }

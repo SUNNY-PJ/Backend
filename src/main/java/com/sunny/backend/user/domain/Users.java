@@ -68,13 +68,13 @@ public class Users extends BaseTime {
 
 	@OneToMany(mappedBy = "users")
 	@JsonIgnore
-	private List<Comment> commentList;
+	private final List<Comment> commentList = new ArrayList<>();
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Save> saveList;
 
 	@OneToMany(mappedBy = "users")
-	private List<Scrap> scrapList;
+	private final List<Scrap> scraps = new ArrayList<>();
 
 	@Column
 	private String profile;
@@ -89,7 +89,6 @@ public class Users extends BaseTime {
 	private List<Notification> notification;
 
 	public void addComment(Comment comment) {
-		this.commentList = new ArrayList<>();
 		this.commentList.add(comment);
 	}
 
@@ -106,6 +105,15 @@ public class Users extends BaseTime {
 	public void addSave(Save save) {
 		this.saveList = new ArrayList<>();
 		this.saveList.add(save);
+	}
+
+	public void addScrap(Scrap scrap) {
+		scraps.add(scrap);
+	}
+
+	public boolean isScrapByCommunity(Long communityId) {
+		return scraps.stream()
+			.anyMatch(scrap -> scrap.isScrapByCommunityId(communityId));
 	}
 
 	@Builder
