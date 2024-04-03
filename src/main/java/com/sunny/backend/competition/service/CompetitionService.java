@@ -2,8 +2,6 @@ package com.sunny.backend.competition.service;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 
 import javax.transaction.Transactional;
 
@@ -25,12 +23,7 @@ import com.sunny.backend.consumption.repository.ConsumptionRepository;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.friends.repository.FriendRepository;
-import com.sunny.backend.notification.domain.CompetitionNotification;
-import com.sunny.backend.notification.domain.Notification;
-import com.sunny.backend.notification.dto.request.NotificationPushRequest;
-import com.sunny.backend.notification.repository.CompetitionNotificationRepository;
-import com.sunny.backend.notification.repository.NotificationRepository;
-import com.sunny.backend.notification.service.NotificationService;
+import com.sunny.backend.notification.service.FriendNotiService;
 import com.sunny.backend.user.domain.Users;
 
 import lombok.RequiredArgsConstructor;
@@ -38,14 +31,11 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CompetitionService {
-
 	private final ResponseService responseService;
 	private final CompetitionRepository competitionRepository;
 	private final FriendRepository friendRepository;
 	private final ConsumptionRepository consumptionRepository;
-	private final NotificationService notificationService;
-	private final CompetitionNotificationRepository competitionNotificationRepository;
-	private final NotificationRepository notificationRepository;
+	private final FriendNotiService friendNotiService;
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CompetitionResponse>> applyCompetition(
@@ -74,34 +64,9 @@ public class CompetitionService {
 		String title = "[SUNNY] " + friend.getUsers().getNickname();
 		String body = "님으로부터 대결 신청을 받았어요.";
 		String bodyTitle = "대결 신청을 받았어요!";
-		sendNotifications(title, body, bodyTitle, friend, competition);
+		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUserFriend);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), competitionResponse,
 			"대결 신청이 됐습니다.");
-	}
-
-	private void sendNotifications(String title, String body, String bodyTitle, Friend friend,
-		Competition competition) {
-		Long postAuthor = friend.getUserFriend().getId();
-		CompetitionNotification competitionNotification = CompetitionNotification.builder()
-			.users(friend.getUserFriend()) //상대방꺼
-			.friend(friend.getUsers())
-			.competition(competition)
-			.title(bodyTitle)
-			.body(body)
-			.name(friend.getUsers().getNickname())
-			.createdAt(LocalDateTime.now())
-			.build();
-		competitionNotificationRepository.save(competitionNotification);
-		List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
-		String notificationBody=friend.getUsers().getNickname()+body;
-		if (notificationList.size() != 0) {
-			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
-				postAuthor,
-				notificationBody,
-				bodyTitle
-			);
-			notificationService.sendNotificationToFriends(title, notificationPushRequest);
-		}
 	}
 
 	@Transactional
@@ -124,23 +89,26 @@ public class CompetitionService {
 		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
 		String body = "님이 대결을 수락했어요";
 		String bodyTitle = "대결 신청에 대한 응답을 받았어요";
-		sendNotifications(title, body, bodyTitle, friendWithUser, competition);
+		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUserFriend);
 	}
 
 	@Transactional
 	public void refuseFriend(CustomUserPrincipal customUserPrincipal, Long friendId) {
-		Friend friend = friendRepository.getById(friendId);
-		friend.validateUser(customUserPrincipal.getUsers().getId());
+		Friend friendWithUser = friendRepository.getById(friendId);
+		friendWithUser.validateUser(customUserPrincipal.getUsers().getId());
 
-		Competition competition = competitionRepository.getById(friend.getCompetition().getId());
-		competition.validateReceiveUser(friend.getUsers().getId());
+		Competition competition = competitionRepository.getById(friendWithUser.getCompetition().getId());
+		competition.validateReceiveUser(friendWithUser.getUsers().getId());
 		competition.updateStatus(CompetitionStatus.NONE);
 		friendRepository.updateCompetitionToNull(competition.getId());
 
-		String title = "[SUNNY] " + friend.getUsers().getNickname();
-		String body ="님이 대결을 거절했어요";
+		Friend friendWithUserFriend = friendRepository
+			.findByUsersAndUserFriend(friendWithUser.getUserFriend(), friendWithUser.getUsers())
+			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
+		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
+		String body = "님이 대결을 거절했어요";
 		String bodyTitle = "대결 신청에 대한 응답을 받았어요";
-		sendNotifications(title, body, bodyTitle, friend, competition);
+		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUserFriend);
 	}
 
 	//TODO 대결 포기 배너 알림 필요 여부 논의 & 추가
@@ -162,7 +130,6 @@ public class CompetitionService {
 
 		return responseService.getSingleResponse(HttpStatus.OK.value(), CompetitionResponse.from(friend), "결과 조회");
 	}
-
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CompetitionStatusResponse>> getCompetitionStatus(

@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -66,7 +67,7 @@ public class Community {
 	@JoinColumn(name = "users_id")
 	private Users users;
 
-	@OneToMany(mappedBy = "community")
+	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
 	private final List<Photo> photos = new ArrayList<>();
 
 	@OneToMany(mappedBy = "community", orphanRemoval = true)
