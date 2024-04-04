@@ -33,6 +33,7 @@ import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.notification.repository.FriendsNotificationRepository;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,11 +51,12 @@ public class NotificationService {
 	private final NotificationRepository notificationRepository;
 	private final CommentNotificationRepository commentNotificationRepository;
 	private final FriendsNotificationRepository friendsNotificationRepository;
+	private final UserRepository userRepository;
 
 	@Transactional
 	public ResponseEntity<SingleResponse<Boolean>> permissionAlarm(CustomUserPrincipal customUserPrincipal,
 		NotificationAllowRequest notificationAllowRequest) {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		if (notificationAllowRequest.isAllow()) {
 			if (notificationAllowRequest.getTargetToken() == null || notificationAllowRequest.getTargetToken()
 				.isEmpty()) {
@@ -74,7 +76,7 @@ public class NotificationService {
 
 	public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(CustomUserPrincipal customUserPrincipal,
 		NotificationRequest notificationRequest) {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		Notification notification = Notification.builder()
 			.deviceToken(notificationRequest.getTargetToken())
 			.users(user)
@@ -85,13 +87,13 @@ public class NotificationService {
 
 	public ResponseEntity<ListResponse<AlarmListResponse>> getAlarmList(CustomUserPrincipal customUserPrincipal) {
 		List<CommentNotification> commentNotifications = commentNotificationRepository.findByUsers_Id(
-			customUserPrincipal.getUsers().getId());
+			customUserPrincipal.getId());
 		List<AlarmListResponse> commentNotificationResponse = commentNotifications.stream()
 			.filter(notification -> {
 				Comment comment = notification.getComment();
 				return comment != null && comment.getUsers() != null &&
 					!comment.getIsDeleted() &&
-					!comment.getUsers().getId().equals(customUserPrincipal.getUsers().getId());
+					!comment.getUsers().getId().equals(customUserPrincipal.getId());
 			})
 			.map(notification -> new AlarmListResponse(
 				UUID.randomUUID().toString(),
@@ -106,7 +108,7 @@ public class NotificationService {
 			))
 			.toList();
 		List<FriendsNotification> friendsNotifications = friendsNotificationRepository.findByFriend_Users_Id(
-			customUserPrincipal.getUsers().getId());
+			customUserPrincipal.getId());
 
 		List<AlarmListResponse> friendsNotificationResponse = friendsNotifications.stream()
 			.map(AlarmListResponse::from)
@@ -160,8 +162,8 @@ public class NotificationService {
 
 	public ResponseEntity<CommonResponse.SingleResponse<Boolean>> getPermissionAlarm(
 		CustomUserPrincipal customUserPrincipal) {
-		Users users = customUserPrincipal.getUsers();
-		List<Notification> notificationList = notificationRepository.findByUsers_Id(users.getId());
+		Users user = userRepository.getById(customUserPrincipal.getId());
+		List<Notification> notificationList = notificationRepository.findByUsers_Id(user.getId());
 		if (notificationList.size() != 0) {
 			return responseService.getSingleResponse(HttpStatus.OK.value(), true, "알림 허용");
 		} else {

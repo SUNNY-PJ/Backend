@@ -130,7 +130,7 @@ public class CommunityService {
 	public ResponseEntity<CommonResponse.SingleResponse<List<CommunityPageResponse>>> paginationNoOffsetBuilder(
 		CustomUserPrincipal customUserPrincipal, Long communityId,
 		SortType sortType, BoardType boardType, String searchText, Integer pageSize) {
-		Users users = customUserPrincipal.getUsers();
+		Users users = userRepository.getById(customUserPrincipal.getId());
 		List<CommunityPageResponse> result = communityRepository.paginationNoOffsetBuilder(
 			users, communityId, sortType, boardType, searchText, pageSize);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), result,
@@ -141,9 +141,9 @@ public class CommunityService {
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> updateCommunity(
 		CustomUserPrincipal customUserPrincipal, Long communityId,
 		CommunityRequest communityRequest, List<MultipartFile> multipartFiles) {
-		Users user = customUserPrincipal.getUsers();
+		Users users = userRepository.getById(customUserPrincipal.getId());
 		Community community = communityRepository.getById(communityId);
-		community.validateByUserId(user.getId());
+		community.validateByUserId(users.getId());
 		community.updateCommunity(communityRequest);
 
 		if (multipartFiles != null && !multipartFiles.isEmpty()) {
@@ -165,9 +165,9 @@ public class CommunityService {
 	@Transactional
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteCommunity(
 		CustomUserPrincipal customUserPrincipal, Long communityId) {
-		Users user = customUserPrincipal.getUsers();
+		Users users = userRepository.getById(customUserPrincipal.getId());
 		Community community = communityRepository.getById(communityId);
-		community.validateByUserId(user.getId());
+		community.validateByUserId(users.getId());
 
 		List<CommentNotification> commentNotifications = commentNotificationRepository.findByCommunityId(communityId);
 		for (CommentNotification commentNotification : commentNotifications) {

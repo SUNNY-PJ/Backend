@@ -116,7 +116,7 @@ public class KakaoService {
 
 	@Transactional
 	public UserNameResponse changeNickname(CustomUserPrincipal customUserPrincipal, String name) {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		Optional<Users> optionalUsers = userRepository.findByNickname(name);
 		if (optionalUsers.isPresent()) {
 			throw new CustomException(UserErrorCode.NICKNAME_IN_USE);
@@ -126,18 +126,18 @@ public class KakaoService {
 		return new UserNameResponse(user.getNickname());
 	}
 
-	@Transactional
-	public void leave(CustomUserPrincipal customUserPrincipal) {
-		Users users = customUserPrincipal.getUsers();
-		commentNotificationRepository.deleteByUsersId(users.getId());
-		commentRepository.nullifyUsersId(users.getId());
-		userRepository.deleteById(users.getId());
-	}
-
-	public void logout(CustomUserPrincipal customUserPrincipal) {
-		Users users = customUserPrincipal.getUsers();
-		appAdminKeyMethod(users.getOauthId(), KAKAO_LOGOUT_URL);
-	}
+	// @Transactional
+	// public void leave(CustomUserPrincipal customUserPrincipal) {
+	// 	Users users = customUserPrincipal.getUsers();
+	// 	commentNotificationRepository.deleteByUsersId(users.getId());
+	// 	commentRepository.nullifyUsersId(users.getId());
+	// 	userRepository.deleteById(users.getId());
+	// }
+	//
+	// public void logout(CustomUserPrincipal customUserPrincipal) {
+	// 	Users users = customUserPrincipal.getUsers();
+	// 	appAdminKeyMethod(users.getOauthId(), KAKAO_LOGOUT_URL);
+	// }
 
 	public void appAdminKeyMethod(String oauthId, String url) {
 		RestTemplate rt = new RestTemplate();

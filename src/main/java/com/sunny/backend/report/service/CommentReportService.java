@@ -29,7 +29,8 @@ public class CommentReportService implements ReportStrategy {
 	private final ReportNotificationService reportNotificationService;
 
 	@Override
-	public UserReportResponse report(Users users, ReportCreateRequest reportCreateRequest) {
+	public UserReportResponse report(Long userId, ReportCreateRequest reportCreateRequest) {
+		Users users = userRepository.getById(userId);
 		Comment comment = commentRepository.getById(reportCreateRequest.id());
 		CommentReport commentReport = CommentReport.of(
 			users,

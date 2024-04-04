@@ -31,14 +31,14 @@ public class FriendService {
 	private final FriendNotiService friendNotiService;
 
 	public FriendListResponse getFriends(CustomUserPrincipal customUserPrincipal) {
-		Users users = customUserPrincipal.getUsers();
-		List<Friend> friends = friendRepository.findByUsers(users);
+		Users user = userRepository.getById(customUserPrincipal.getId());
+		List<Friend> friends = friendRepository.findByUsers(user);
 		return FriendListResponse.of(friends);
 	}
 
 	@Transactional
 	public void addFriend(CustomUserPrincipal customUserPrincipal, Long userFriendId) throws IOException {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		user.canNotMySelf(userFriendId);
 		Users userFriend = userRepository.getById(userFriendId);
 
@@ -67,11 +67,9 @@ public class FriendService {
 	}
 
 	@Transactional
-	public void approveFriend(CustomUserPrincipal customUserPrincipal, Long friendId)
-		throws IOException {
+	public void approveFriend(CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend receiveFriend = friendRepository.getById(friendId);
-		Long tokenUserId = customUserPrincipal.getUsers().getId();
-		receiveFriend.validateUser(tokenUserId);
+		receiveFriend.validateUser(customUserPrincipal.getId());
 
 		// 상대 친구 관계를 조회, 승인하는 경우
 		// 친구 관계가 존재하는 경우 SEND -> FRIEND
@@ -94,11 +92,9 @@ public class FriendService {
 	}
 
 	@Transactional
-	public void refuseFriend(CustomUserPrincipal customUserPrincipal, Long friendId)
-		throws IOException {
+	public void refuseFriend(CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend receiveFriend = friendRepository.getById(friendId);
-		Long tokenUserId = customUserPrincipal.getUsers().getId();
-		receiveFriend.validateUser(tokenUserId);
+		receiveFriend.validateUser(customUserPrincipal.getId());
 
 		// 상대 친구 관계를 조회, 거절하는 경우
 		// 친구 관계가 존재하는 경우 상대 친구 관계도 같이 삭제
@@ -123,7 +119,7 @@ public class FriendService {
 	@Transactional
 	public void deleteFriends(CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend friend = friendRepository.getById(friendId);
-		friend.validateUser(customUserPrincipal.getUsers().getId());
+		friend.validateUser(customUserPrincipal.getId());
 		if (friend.hasCompetition()) {
 			friendRepository.updateCompetitionToNull(friend.getCompetition().getId());
 		}

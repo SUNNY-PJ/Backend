@@ -19,12 +19,17 @@ import lombok.RequiredArgsConstructor;
 public class ReportService {
 	private final ReportFactory reportFactory;
 
-	public UserReportResponse userReport(
+	public List<ReportResponse> getUserReports(ReportType reportType) {
+		ReportStrategy reportStrategy = reportFactory.findReportStrategy(reportType);
+		return reportStrategy.getUserReports(reportType);
+	}
+
+	public UserReportResponse createUserReport(
 		CustomUserPrincipal customUserPrincipal,
 		ReportCreateRequest reportCreateRequest
 	) {
 		ReportStrategy reportStrategy = reportFactory.findReportStrategy(reportCreateRequest.reportType());
-		return reportStrategy.report(customUserPrincipal.getUsers(), reportCreateRequest);
+		return reportStrategy.report(customUserPrincipal.getId(), reportCreateRequest);
 	}
 
 	@Transactional
@@ -39,8 +44,4 @@ public class ReportService {
 		reportStrategy.refuseUserReport(id);
 	}
 
-	public List<ReportResponse> getUserReports(ReportType reportType) {
-		ReportStrategy reportStrategy = reportFactory.findReportStrategy(reportType);
-		return reportStrategy.getUserReports(reportType);
-	}
 }
