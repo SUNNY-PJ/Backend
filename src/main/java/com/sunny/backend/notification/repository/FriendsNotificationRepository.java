@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.sunny.backend.notification.domain.FriendsNotification;
 
 public interface FriendsNotificationRepository extends JpaRepository<FriendsNotification, Long> {
-	List<FriendsNotification> findByFriend_Users_Id(Long userId);
+	List<FriendsNotification> findByUsers_Id(Long userId);
 }

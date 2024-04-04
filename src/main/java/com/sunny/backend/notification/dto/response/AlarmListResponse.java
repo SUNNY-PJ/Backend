@@ -21,15 +21,14 @@ public record AlarmListResponse(
 ) {
 	public static AlarmListResponse from(FriendsNotification friendsNotification) {
 		return new AlarmListResponse(
-			UUID.randomUUID().toString(),
-			friendsNotification.getFriend().getUserFriend().getId(), //상대방꺼 id
-			friendsNotification.getFriend().getUserFriend().getNickname(),
-			friendsNotification.getTitle(),
-			friendsNotification.getFriend().getUserFriend().getNickname() + friendsNotification.getBody(),
-			friendsNotification.getFriend().getUserFriend().getProfile(),
-			friendsNotification.getCreatedDate().toLocalDate().isEqual(LocalDate.now()),
-			friendsNotification.getCreatedDate()
+				UUID.randomUUID().toString(),
+				friendsNotification.getFriend().getId(), //상대방꺼 id
+				friendsNotification.getFriend().getNickname(),
+				friendsNotification.getTitle(),
+				friendsNotification.getFriend().getNickname()+friendsNotification.getBody(),
+				friendsNotification.getFriend().getProfile(),
+				friendsNotification.getCreatedDate().toLocalDate().isEqual(LocalDate.now()),
+				friendsNotification.getCreatedDate()
 		);
 	}
-
 }

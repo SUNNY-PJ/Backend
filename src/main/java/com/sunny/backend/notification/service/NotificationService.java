@@ -107,9 +107,9 @@ public class NotificationService {
 				notification.getComment().getCreatedDate()
 			))
 			.toList();
-		List<FriendsNotification> friendsNotifications = friendsNotificationRepository.findByFriend_Users_Id(
-			customUserPrincipal.getId());
 
+		List<FriendsNotification> friendsNotifications = friendsNotificationRepository.findByUsers_Id(
+			customUserPrincipal.getId());
 		List<AlarmListResponse> friendsNotificationResponse = friendsNotifications.stream()
 			.map(AlarmListResponse::from)
 			.toList();
