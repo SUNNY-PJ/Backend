@@ -61,23 +61,22 @@ public class SaveService {
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> updateSaveGoal(
-		CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
+	public SaveResponse updateSaveGoal(CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
 		Save lastSave = saves.get(saves.size() - 1);
 		lastSave.updateSave(saveRequest);
 		boolean success = checkSuccessed(user, lastSave);
-		return responseService.getSingleResponse(HttpStatus.OK.value(), SaveResponse.from(lastSave, success),
-			"절약 목표를 수정했습니다.");
+		return SaveResponse.from(lastSave, success);
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.ListResponse<DetailSaveResponse>> getSaveGoal(
+	public List<DetailSaveResponse> getSaveGoal(
 		CustomUserPrincipal customUserPrincipal) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
-		List<DetailSaveResponse> saveResponses = saves.stream()
+
+		return saves.stream()
 			.map(save -> {
 				long remainingDays = save.calculateRemainingDays(save);
 				Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(),
@@ -86,19 +85,15 @@ public class SaveService {
 				return DetailSaveResponse.of(remainingDays, percentageUsed, save.getCost());
 			})
 			.toList();
-		return responseService.getListResponse(HttpStatus.OK.value(), saveResponses,
-			"절약 목표를 성공적으로 조회했습니다.");
 	}
 
-	public ResponseEntity<CommonResponse.ListResponse<SaveResponses>> getDetailSaveGoal(
+	public List<SaveResponses> getDetailSaveGoal(
 		CustomUserPrincipal customUserPrincipal) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
-		List<SaveResponses> saveResponses = saves.stream().map(save -> {
-			return SaveResponses.from(save, checkSuccessed(user, save));
-		}).toList();
-		return responseService.getListResponse(HttpStatus.OK.value(), saveResponses,
-			"절약 목표 성공적으로 조회했습니다.");
+		return saves.stream()
+			.map(save -> SaveResponses.from(save, checkSuccessed(user, save)))
+			.toList();
 	}
 
 	public boolean checkSuccessed(Users user, Save save) {

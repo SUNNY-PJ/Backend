@@ -1,5 +1,7 @@
 package com.sunny.backend.save.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.common.response.ServerResponse;
 import com.sunny.backend.save.dto.request.SaveRequest;
 import com.sunny.backend.save.dto.response.DetailSaveResponse;
 import com.sunny.backend.save.dto.response.SaveResponse;
@@ -40,24 +43,27 @@ public class SaveController {
 
 	@ApiOperation(tags = "6. Save", value = "절약 목표 수정")
 	@PatchMapping("")
-	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> updateSaveGoal(
+	public ResponseEntity<ServerResponse<SaveResponse>> updateSaveGoal(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@Valid @RequestBody SaveRequest saveRequest) {
-		return saveService.updateSaveGoal(customUserPrincipal, saveRequest);
+		SaveResponse response = saveService.updateSaveGoal(customUserPrincipal, saveRequest);
+		return ServerResponse.ok(response, "절약 목표를 수정했습니다.");
 	}
 
 	@ApiOperation(tags = "6. Save", value = "절약 목표 조회")
 	@GetMapping("")
-	public ResponseEntity<CommonResponse.ListResponse<DetailSaveResponse>> getSaveGaol(
+	public ResponseEntity<ServerResponse<List<DetailSaveResponse>>> getSaveGaol(
 		@AuthUser CustomUserPrincipal customUserPrincipal) {
-		return saveService.getSaveGoal(customUserPrincipal);
+		List<DetailSaveResponse> response = saveService.getSaveGoal(customUserPrincipal);
+		return ServerResponse.ok(response, "절약 목표를 성공적으로 조회했습니다.");
 	}
 
 	@ApiOperation(tags = "6. Save", value = "절약 목표 세부 조회")
 	@GetMapping("/detail")
-	public ResponseEntity<CommonResponse.ListResponse<SaveResponses>> getDetailSaveGaol(
+	public ResponseEntity<ServerResponse<List<SaveResponses>>> getDetailSaveGaol(
 		@AuthUser CustomUserPrincipal customUserPrincipal) {
-		return saveService.getDetailSaveGoal(customUserPrincipal);
+		List<SaveResponses> response = saveService.getDetailSaveGoal(customUserPrincipal);
+		return ServerResponse.ok(response, "절약 목표 성공적으로 조회했습니다.");
 	}
 
 }

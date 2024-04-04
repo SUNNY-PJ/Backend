@@ -37,7 +37,7 @@ public class ConsumptionService {
 	private final UserRepository userRepository;
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> createConsumption(
+	public ConsumptionResponse createConsumption(
 		CustomUserPrincipal customUserPrincipal, ConsumptionRequest consumptionRequest) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		Consumption consumption = Consumption.builder()
@@ -65,8 +65,7 @@ public class ConsumptionService {
 				.updateOutput(percentageUsed, friendsPercentageUsed, user.getId(), friend.getUserFriend().getId());
 		}
 
-		return responseService.getSingleResponse(HttpStatus.OK.value(),
-			consumptionResponse, "지출을 등록했습니다.");
+		return consumptionResponse;
 	}
 
 	public double calculateUserPercentage(Long userId, Competition competition) {
@@ -81,13 +80,11 @@ public class ConsumptionService {
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse>> getConsumptionList(
+	public List<ConsumptionResponse> getConsumptionList(
 		CustomUserPrincipal customUserPrincipal) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		List<Consumption> consumptions = consumptionRepository.findByUsersId(user.getId());
-		List<ConsumptionResponse> consumptionResponses = ConsumptionResponse.listFrom(consumptions);
-		return responseService.getListResponse(HttpStatus.OK.value(),
-			consumptionResponses, "지출 내역을 불러왔습니다.");
+		return ConsumptionResponse.listFrom(consumptions);
 	}
 
 	@Transactional
@@ -104,44 +101,35 @@ public class ConsumptionService {
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>> getSpendTypeStatistics(
+	public List<SpendTypeStatisticsResponse> getSpendTypeStatistics(
 		CustomUserPrincipal customUserPrincipal, Integer year, Integer month) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
-		List<SpendTypeStatisticsResponse> statistics = consumptionRepository.getSpendTypeStatistics(
-			user.getId(), year, month);
-		return responseService.getListResponse(HttpStatus.OK.value(),
-			statistics, "지출 통계 내역을 불러왔습니다.");
+		return consumptionRepository.getSpendTypeStatistics(user.getId(), year, month);
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumptionResponse>>
-	getDetailConsumption(CustomUserPrincipal customUserPrincipal, LocalDate dateField) {
+	public List<ConsumptionResponse.DetailConsumptionResponse> getDetailConsumption(
+		CustomUserPrincipal customUserPrincipal, LocalDate dateField) {
 		List<Consumption> detailConsumption =
 			consumptionRepository.findByUsersIdAndDateField(customUserPrincipal.getId(), dateField);
-		List<ConsumptionResponse.DetailConsumptionResponse> detailConsumptions =
-			ConsumptionResponse.DetailConsumptionResponse.listFrom(detailConsumption);
-		return responseService.getListResponse(HttpStatus.OK.value(),
-			detailConsumptions, dateField + "에 맞는 지출 내역을 불러왔습니다.");
+		return ConsumptionResponse.DetailConsumptionResponse.listFrom(detailConsumption);
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.GeneralResponse> deleteConsumption(
-		CustomUserPrincipal customUserPrincipal, Long consumptionId) {
+	public void deleteConsumption(CustomUserPrincipal customUserPrincipal, Long consumptionId) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		Consumption consumption = consumptionRepository.getById(consumptionId);
 		Consumption.validateConsumptionByUser(user.getId(), consumption.getUsers().getId());
 		consumptionRepository.deleteById(consumptionId);
-		return responseService.getGeneralResponse(HttpStatus.OK.value(),
-			"지출 내역을 삭제했습니다.");
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumptionResponse>>
-	getConsumptionByCategory(CustomUserPrincipal customUserPrincipal, SpendType spendType,
-		Integer year, Integer month) {
-		List<ConsumptionResponse.DetailConsumptionResponse> detailConsumptions =
-			consumptionRepository.getConsumptionByCategory(customUserPrincipal.getId(), spendType, year, month);
-		return responseService.getListResponse(HttpStatus.OK.value(),
-			detailConsumptions, spendType + "에 맞는 지출 내역을 불러왔습니다.");
+	public List<ConsumptionResponse.DetailConsumptionResponse> getConsumptionByCategory(
+		CustomUserPrincipal customUserPrincipal,
+		SpendType spendType,
+		Integer year,
+		Integer month
+	) {
+		return consumptionRepository.getConsumptionByCategory(customUserPrincipal.getId(), spendType, year, month);
 	}
 }
