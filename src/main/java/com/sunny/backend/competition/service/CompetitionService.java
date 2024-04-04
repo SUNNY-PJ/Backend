@@ -25,6 +25,7 @@ import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.notification.service.FriendNotiService;
 import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,12 +37,14 @@ public class CompetitionService {
 	private final FriendRepository friendRepository;
 	private final ConsumptionRepository consumptionRepository;
 	private final FriendNotiService friendNotiService;
+	private final UserRepository userRepository;
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CompetitionResponse>> applyCompetition(
 		CustomUserPrincipal customUserPrincipal, CompetitionRequest competitionRequest) {
+		Users users = userRepository.getById(customUserPrincipal.getId());
 		Friend friendWithUser = friendRepository.getById(competitionRequest.friendsId());
-		friendWithUser.validateUser(customUserPrincipal.getUsers().getId());
+		friendWithUser.validateUser(users.getId());
 
 		Friend friendWithUserFriend = friendRepository.findByUsersAndUserFriend(friendWithUser.getUserFriend(),
 				friendWithUser.getUsers())
@@ -71,8 +74,9 @@ public class CompetitionService {
 
 	@Transactional
 	public void acceptCompetition(CustomUserPrincipal customUserPrincipal, Long friendId) {
+		Users users = userRepository.getById(customUserPrincipal.getId());
 		Friend friendWithUser = friendRepository.getById(friendId);
-		friendWithUser.validateUser(customUserPrincipal.getUsers().getId());
+		friendWithUser.validateUser(users.getId());
 
 		Competition competition = competitionRepository.getById(friendWithUser.getCompetition().getId());
 		competition.validateReceiveUser(friendWithUser.getUsers().getId());
@@ -94,8 +98,9 @@ public class CompetitionService {
 
 	@Transactional
 	public void refuseFriend(CustomUserPrincipal customUserPrincipal, Long friendId) {
+		Users users = userRepository.getById(customUserPrincipal.getId());
 		Friend friendWithUser = friendRepository.getById(friendId);
-		friendWithUser.validateUser(customUserPrincipal.getUsers().getId());
+		friendWithUser.validateUser(users.getId());
 
 		Competition competition = competitionRepository.getById(friendWithUser.getCompetition().getId());
 		competition.validateReceiveUser(friendWithUser.getUsers().getId());
@@ -114,8 +119,9 @@ public class CompetitionService {
 	//TODO 대결 포기 배너 알림 필요 여부 논의 & 추가
 	@Transactional
 	public void giveUpCompetition(CustomUserPrincipal customUserPrincipal, Long friendId) {
+		Users users = userRepository.getById(customUserPrincipal.getId());
 		Friend friend = friendRepository.getById(friendId);
-		friend.validateUser(customUserPrincipal.getUsers().getId());
+		friend.validateUser(users.getId());
 
 		Competition competition = competitionRepository.getById(friend.getCompetition().getId());
 		competition.updateStatus(CompetitionStatus.GIVE_UP);
@@ -124,8 +130,9 @@ public class CompetitionService {
 
 	public ResponseEntity<CommonResponse.SingleResponse<CompetitionResponse>> getCompetition(
 		CustomUserPrincipal customUserPrincipal, Long friendId) {
+		Users users = userRepository.getById(customUserPrincipal.getId());
 		Friend friend = friendRepository.getById(friendId);
-		friend.validateUser(customUserPrincipal.getUsers().getId());
+		friend.validateUser(users.getId());
 		friend.validateCompetition();
 
 		return responseService.getSingleResponse(HttpStatus.OK.value(), CompetitionResponse.from(friend), "결과 조회");
@@ -134,8 +141,9 @@ public class CompetitionService {
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CompetitionStatusResponse>> getCompetitionStatus(
 		CustomUserPrincipal customUserPrincipal, Long friendId) {
+		Users users = userRepository.getById(customUserPrincipal.getId());
 		Friend friendWithUser = friendRepository.getById(friendId);
-		friendWithUser.validateUser(customUserPrincipal.getUsers().getId());
+		friendWithUser.validateUser(users.getId());
 		friendWithUser.validateCompetition();
 		Competition competition = friendWithUser.getCompetition();
 

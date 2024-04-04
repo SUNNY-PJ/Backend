@@ -1,7 +1,5 @@
 package com.sunny.backend.comment.controller;
 
-import java.io.IOException;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +35,7 @@ public class CommentController {
 	@PostMapping("/{communityId}")
 	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> createComment(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId,
-		@RequestBody CommentRequest commentRequestDTO) throws IOException {
+		@RequestBody CommentRequest commentRequestDTO) {
 		return commentService.createComment(customUserPrincipal, communityId, commentRequestDTO);
 	}
 

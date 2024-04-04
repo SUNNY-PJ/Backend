@@ -1,6 +1,7 @@
 package com.sunny.backend.user.domain;
 
 import static com.sunny.backend.common.ComnConstant.*;
+import static com.sunny.backend.scrap.exception.ScrapErrorCode.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,6 +122,21 @@ public class Users extends BaseTime {
 	public boolean isScrapByCommunity(Long communityId) {
 		return scraps.stream()
 			.anyMatch(scrap -> scrap.isScrapByCommunityId(communityId));
+	}
+
+	public Scrap findScrapByCommunity(Long communityId) {
+		return scraps.stream()
+			.filter(scrap -> scrap.isScrapByCommunityId(communityId))
+			.findAny()
+			.orElseThrow(() -> new CustomException(SCRAP_NOT_FOUND));
+	}
+
+	public void validateScrapByCommunity(Long communityId) {
+		for (Scrap scrap : scraps) {
+			if (scrap.isScrapByCommunityId(communityId)) {
+				throw new CustomException(SCRAP_ALREADY);
+			}
+		}
 	}
 
 	public void updateName(String name) {

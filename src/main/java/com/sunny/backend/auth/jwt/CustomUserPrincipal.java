@@ -14,9 +14,9 @@ import com.sunny.backend.user.domain.Users;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
 public class CustomUserPrincipal implements OAuth2User, UserDetails {
 	private final Users users;
+	@Getter
 	private final Long id;
 	private final Collection<GrantedAuthority> authorities;
 	@Setter

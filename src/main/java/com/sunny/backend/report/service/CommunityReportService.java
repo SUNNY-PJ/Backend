@@ -29,7 +29,8 @@ public class CommunityReportService implements ReportStrategy {
 	private final ReportNotificationService reportNotificationService;
 
 	@Override
-	public UserReportResponse report(Users users, ReportCreateRequest reportCreateRequest) {
+	public UserReportResponse report(Long userId, ReportCreateRequest reportCreateRequest) {
+		Users users = userRepository.getById(userId);
 		Community community = communityRepository.getById(reportCreateRequest.id());
 		CommunityReport communityReport = CommunityReport.of(
 			users,

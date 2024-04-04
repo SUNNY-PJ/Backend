@@ -44,9 +44,10 @@ public class UserReportController {
 
 	@ApiOperation(tags = "0. User", value = "유저 신고")
 	@PostMapping("/report")
-	public ResponseEntity<UserReportResponse> reportCommunity(
+	public ResponseEntity<UserReportResponse> createUserReport(
 		@AuthUser CustomUserPrincipal customUserPrincipal, @RequestBody ReportCreateRequest reportCreateRequest) {
-		UserReportResponse userReportResponse = reportService.userReport(customUserPrincipal, reportCreateRequest);
+		UserReportResponse userReportResponse = reportService.createUserReport(customUserPrincipal,
+			reportCreateRequest);
 		return ResponseEntity.ok().body(userReportResponse);
 	}
 

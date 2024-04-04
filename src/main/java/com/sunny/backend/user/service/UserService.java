@@ -49,23 +49,24 @@ public class UserService {
 	private final FriendRepository friendRepository;
 
 	public Users checkUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
+		Long id = customUserPrincipal.getId();
 		if (userId != null) {
-			return userRepository.getById(userId);
+			id = userId;
 		}
-		return customUserPrincipal.getUsers();
+		return userRepository.getById(id);
 	}
 
 	@Transactional(readOnly = true)
 	public ProfileResponse getUserProfile(CustomUserPrincipal customUserPrincipal, Long userId) {
-		if (!customUserPrincipal.getUsers().isOwner(userId) && userId != null) {
-			Users users = customUserPrincipal.getUsers();
+		Users users = userRepository.getById(customUserPrincipal.getId());
+		if (!users.isOwner(userId) && userId != null) {
 			Users findUser = userRepository.getById(userId);
 			return friendRepository.findByUsersAndUserFriend(users, findUser)
 				.map(friend -> ProfileResponse.of(findUser, friend.getStatus(), friend))
 				.orElse(ProfileResponse.fromNotFriend(findUser));
 		}
 
-		return ProfileResponse.from(customUserPrincipal.getUsers());
+		return ProfileResponse.from(users);
 	}
 
 	@Transactional(readOnly = true)
@@ -84,12 +85,12 @@ public class UserService {
 
 		return commentRepository.findAllByUsers_Id(user.getId())
 			.stream()
-			.map(comment -> UserCommentResponse.from(comment, customUserPrincipal.getUsers()))
+			.map(comment -> UserCommentResponse.from(comment, user))
 			.toList();
 	}
 
 	public List<UserScrapResponse> getScrapList(CustomUserPrincipal customUserPrincipal) {
-		return scrapRepository.findAllByUsers_Id(customUserPrincipal.getUsers().getId())
+		return scrapRepository.findAllByUsers_Id(customUserPrincipal.getId())
 			.stream()
 			.map(scrap -> UserScrapResponse.from(scrap.getCommunity()))
 			.toList();
@@ -97,8 +98,7 @@ public class UserService {
 
 	public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
 		CustomUserPrincipal customUserPrincipal, MultipartFile profile) {
-
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		// 새 프로필 업로드
 		if (profile != null && !profile.isEmpty()) {
 			String uploadedProfileUrl = s3Util.upload(profile);
