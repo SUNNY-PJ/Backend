@@ -51,7 +51,7 @@ public class CommunityController {
 	) {
 		List<CommunityPageResponse> response = communityService.paginationNoOffsetBuilder(
 			customUserPrincipal, communityId, sortType, boardType, search, pageSize);
-		return ServerResponse.ok(response, "게시판을 성공적으로 조회했습니다.");
+		return ServerResponse.ok(response);
 	}
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 상세 조회")
@@ -61,7 +61,7 @@ public class CommunityController {
 		@PathVariable Long communityId
 	) {
 		CommunityResponse response = communityService.findCommunity(customUserPrincipal, communityId);
-		return ServerResponse.ok(response, "게시글을 성공적으로 불러왔습니다.");
+		return ServerResponse.ok(response);
 	}
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 등록")
@@ -72,29 +72,30 @@ public class CommunityController {
 		@RequestPart(value = "files", required = false) List<MultipartFile> files
 	) {
 		CommunityResponse response = communityService.createCommunity(customUserPrincipal, communityRequest, files);
-		return ServerResponse.ok(response, "게시글을 성공적으로 작성했습니다.");
+		return ServerResponse.ok(response);
 	}
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 수정")
 	@PatchMapping("/{communityId}")
 	public ResponseEntity<ServerResponse<CommunityResponse>> updateCommunity(
-		@AuthUser CustomUserPrincipal customUserPrincipal, @PathVariable Long communityId,
+		@AuthUser CustomUserPrincipal customUserPrincipal,
+		@PathVariable Long communityId,
 		@Valid @RequestPart(value = "communityRequest") CommunityRequest communityRequest,
 		@RequestPart(required = false) List<MultipartFile> files
 	) {
 		CommunityResponse response = communityService.updateCommunity(customUserPrincipal, communityId,
 			communityRequest, files);
-		return ServerResponse.ok(response, "게시글 수정을 완료했습니다.");
+		return ServerResponse.ok(response);
 	}
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 게시글 삭제")
 	@DeleteMapping("/{communityId}")
-	public ResponseEntity<ServerResponse<Void>> deleteCommunity(
+	public ResponseEntity<Void> deleteCommunity(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@PathVariable Long communityId
 	) {
 		communityService.deleteCommunity(customUserPrincipal, communityId);
-		return ServerResponse.message("게시글을 삭제했습니다.");
+		return ResponseEntity.noContent().build();
 	}
 
 	@ApiOperation(tags = "2. Community", value = "커뮤니티 조회수/댓글수 확인")
@@ -104,6 +105,6 @@ public class CommunityController {
 		@PathVariable Long communityId
 	) {
 		ViewAndCommentResponse response = communityService.getCommentAndViewByCommunity(communityId);
-		return ServerResponse.ok(response, "게시글 조회수와 댓글수를 불러왔습니다.");
+		return ServerResponse.ok(response);
 	}
 }

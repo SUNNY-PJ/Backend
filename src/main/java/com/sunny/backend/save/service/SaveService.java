@@ -2,14 +2,10 @@ package com.sunny.backend.save.service;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
-import com.sunny.backend.common.response.CommonResponse;
-import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;
 import com.sunny.backend.save.domain.Save;
 import com.sunny.backend.save.dto.request.SaveRequest;
@@ -29,35 +25,48 @@ import lombok.extern.slf4j.Slf4j;
 public class SaveService {
 	private final UserRepository userRepository;
 	private final SaveRepository saveRepository;
-	private final ResponseService responseService;
 	private final ConsumptionRepository consumptionRepository;
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> createSaveGoal(
-		CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
+	public SaveResponse createSaveGoal(
+		CustomUserPrincipal customUserPrincipal,
+		SaveRequest saveRequest
+	) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
-		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
-		boolean allSavesExpired = saves.stream().allMatch(save -> save.checkExpired(save.getEndDate()));
-		if (allSavesExpired) {
-			Save save = Save.builder()
-				.cost(saveRequest.getCost())
-				.startDate(saveRequest.getStartDate())
-				.endDate(saveRequest.getEndDate())
-				.users(user)
-				.build();
-			saveRepository.save(save);
-			user.addSave(save);
-			return responseService.getSingleResponse(HttpStatus.OK.value(), SaveResponse.from(save, true),
-				"절약 목표를 등록했습니다.");
-		} else {
-			if (!saves.isEmpty()) {
-				Save lastSave = saves.get(saves.size() - 1);
-				SaveResponse saveResponse = SaveResponse.from(lastSave, checkSuccessed(user, lastSave));
-				return responseService.getSingleResponse(HttpStatus.BAD_REQUEST.value(), null, "이미 등록된 절약 목표가 존재합니다.");
-			} else {
-				return responseService.getSingleResponse(HttpStatus.OK.value(), null, "등록된 절약 목표를 찾을 수 없습니다.");
-			}
-		}
+		// List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
+		// boolean allSavesExpired = saves.stream().allMatch(save -> save.checkExpired(save.getEndDate()));
+		user.checkExpiredSave();
+
+		Save save = Save.builder()
+			.cost(saveRequest.getCost())
+			.startDate(saveRequest.getStartDate())
+			.endDate(saveRequest.getEndDate())
+			.users(user)
+			.build();
+		saveRepository.save(save);
+		user.addSave(save);
+		return SaveResponse.from(save, true);
+		//
+		// if (allSavesExpired) {
+		// 	Save save = Save.builder()
+		// 		.cost(saveRequest.getCost())
+		// 		.startDate(saveRequest.getStartDate())
+		// 		.endDate(saveRequest.getEndDate())
+		// 		.users(user)
+		// 		.build();
+		// 	saveRepository.save(save);
+		// 	user.addSave(save);
+		// 	return responseService.getSingleResponse(HttpStatus.OK.value(), SaveResponse.from(save, true),
+		// 		"절약 목표를 등록했습니다.");
+		// } else {
+		// 	if (!saves.isEmpty()) {
+		// 		Save lastSave = saves.get(saves.size() - 1);
+		// 		SaveResponse saveResponse = SaveResponse.from(lastSave, checkSuccessed(user, lastSave));
+		// 		throw new CustomException(SaveErrorCode.ALREADY_SAVE);
+		// 	} else {
+		// 		return responseService.getSingleResponse(HttpStatus.OK.value(), null, "등록된 절약 목표를 찾을 수 없습니다.");
+		// 	}
+		// }
 	}
 
 	@Transactional

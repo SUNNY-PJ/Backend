@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
-import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.user.dto.response.ProfileResponse;
 import com.sunny.backend.user.dto.response.UserCommentResponse;
 import com.sunny.backend.user.dto.response.UserCommunityResponse;
@@ -33,28 +32,31 @@ public class UserController {
 	private final UserService userService;
 
 	@ApiOperation(tags = "0. User", value = "프로필 조회")
-	@GetMapping("")
+	@GetMapping
 	public ResponseEntity<ProfileResponse> getUserProfile(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@RequestParam(name = "userId", required = false) Long userId) {
-		ProfileResponse profileResponse = userService.getUserProfile(customUserPrincipal, userId);
-		return ResponseEntity.ok().body(profileResponse);
+		@RequestParam(name = "userId", required = false) Long userId
+	) {
+		ProfileResponse response = userService.getUserProfile(customUserPrincipal, userId);
+		return ResponseEntity.ok().body(response);
 	}
 
 	@ApiOperation(tags = "0. User", value = "작성 글 가져오기")
 	@GetMapping("/community")
 	public ResponseEntity<List<UserCommunityResponse>> getUserCommunityList(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@RequestParam(name = "userId", required = false) Long userId) {
-		List<UserCommunityResponse> userCommunityResponses =
-			userService.getUserCommunityList(customUserPrincipal, userId);
-		return ResponseEntity.ok().body(userCommunityResponses);
+		@RequestParam(name = "userId", required = false) Long userId
+	) {
+		List<UserCommunityResponse> responses = userService.getUserCommunityList(customUserPrincipal,
+			userId);
+		return ResponseEntity.ok().body(responses);
 	}
 
 	@ApiOperation(tags = "0. User", value = "스크랩 글 가져오기")
 	@GetMapping("/scrap")
 	public ResponseEntity<List<UserScrapResponse>> getScrapList(
-		@AuthUser CustomUserPrincipal customUserPrincipal) {
+		@AuthUser CustomUserPrincipal customUserPrincipal
+	) {
 		List<UserScrapResponse> userScrapResponses = userService.getScrapList(customUserPrincipal);
 		return ResponseEntity.ok().body(userScrapResponses);
 	}
@@ -63,17 +65,20 @@ public class UserController {
 	@GetMapping("/comment")
 	public ResponseEntity<List<UserCommentResponse>> getCommentList(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@RequestParam(name = "userId", required = false) Long userId) {
-		List<UserCommentResponse> userCommentResponses = userService.getCommentByUserId(customUserPrincipal, userId);
-		return ResponseEntity.ok().body(userCommentResponses);
+		@RequestParam(name = "userId", required = false) Long userId
+	) {
+		List<UserCommentResponse> responses = userService.getCommentByUserId(customUserPrincipal, userId);
+		return ResponseEntity.ok().body(responses);
 	}
 
 	@ApiOperation(tags = "0. User", value = "프로필 설정")
 	@PostMapping("/profile")
-	public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
+	public ResponseEntity<ProfileResponse> updateProfile(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@RequestPart(value = "profile", required = false) MultipartFile profile) {
-		return userService.updateProfile(customUserPrincipal, profile);
+		@RequestPart(value = "profile", required = false) MultipartFile profile
+	) {
+		ProfileResponse response = userService.updateProfile(customUserPrincipal, profile);
+		return ResponseEntity.ok().body(response);
 	}
 
 }

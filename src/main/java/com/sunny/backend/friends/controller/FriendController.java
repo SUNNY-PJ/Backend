@@ -31,7 +31,7 @@ public class FriendController {
 		@AuthUser CustomUserPrincipal customUserPrincipal
 	) {
 		FriendListResponse friendListResponse = friendService.getFriends(customUserPrincipal);
-		return ServerResponse.ok(friendListResponse, "친구 목록 가져오기");
+		return ServerResponse.ok(friendListResponse);
 	}
 
 	@ApiOperation(tags = "5. Friends", value = "친구 신청하기")

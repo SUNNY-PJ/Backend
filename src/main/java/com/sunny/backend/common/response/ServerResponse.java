@@ -5,14 +5,10 @@ import org.springframework.http.ResponseEntity;
 
 public record ServerResponse<T>(
 	HttpStatus code,
-	T data,
-	String msg
+	T data
 ) {
-	public static <T> ResponseEntity<ServerResponse<T>> ok(T data, String msg) {
-		return ResponseEntity.ok(new ServerResponse<>(HttpStatus.OK, data, msg));
+	public static <T> ResponseEntity<ServerResponse<T>> ok(T data) {
+		return ResponseEntity.ok(new ServerResponse<>(HttpStatus.OK, data));
 	}
 
-	public static ResponseEntity<ServerResponse<Void>> message(String msg) {
-		return ResponseEntity.ok(new ServerResponse<>(HttpStatus.OK, null, msg));
-	}
 }

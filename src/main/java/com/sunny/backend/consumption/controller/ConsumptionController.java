@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
-import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ServerResponse;
 import com.sunny.backend.consumption.domain.SpendType;
 import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
@@ -46,7 +45,7 @@ public class ConsumptionController {
 	public ResponseEntity<ServerResponse<List<ConsumptionResponse>>> getConsumptionList(
 		@AuthUser CustomUserPrincipal customUserPrincipal) {
 		List<ConsumptionResponse> response = consumptionService.getConsumptionList(customUserPrincipal);
-		return ServerResponse.ok(response, "지출 내역을 불러왔습니다.");
+		return ServerResponse.ok(response);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "지출 등록")
@@ -55,7 +54,7 @@ public class ConsumptionController {
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@Valid @RequestBody ConsumptionRequest consumptionRequest) {
 		ConsumptionResponse response = consumptionService.createConsumption(customUserPrincipal, consumptionRequest);
-		return ServerResponse.ok(response, "지출을 등록했습니다.");
+		return ServerResponse.ok(response);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "지출 통계")
@@ -67,7 +66,7 @@ public class ConsumptionController {
 	) {
 		List<SpendTypeStatisticsResponse> response = consumptionService.getSpendTypeStatistics(customUserPrincipal,
 			year, month);
-		return ServerResponse.ok(response, "지출 통계 내역을 불러왔습니다.");
+		return ServerResponse.ok(response);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "날짜에 맞는 지출 내역 조회")
@@ -77,17 +76,18 @@ public class ConsumptionController {
 		@RequestParam("datefield") @DateTimeFormat(pattern = "yyyy.MM.dd") LocalDate dateField) {
 		List<ConsumptionResponse.DetailConsumptionResponse> response = consumptionService.getDetailConsumption(
 			customUserPrincipal, dateField);
-		return ServerResponse.ok(response, dateField + "에 맞는 지출 내역을 불러왔습니다.");
+		return ServerResponse.ok(response);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "지출 내역 수정")
 	@PatchMapping("/{consumptionId}")
-	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> updateConsumption(
+	public ResponseEntity<ServerResponse<ConsumptionResponse>> updateConsumption(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@Valid @RequestBody ConsumptionRequest consumtionRequest,
 		@PathVariable Long consumptionId) {
-		return consumptionService.updateConsumption(customUserPrincipal, consumtionRequest,
-			consumptionId);
+		ConsumptionResponse response = consumptionService.updateConsumption(customUserPrincipal,
+			consumtionRequest, consumptionId);
+		return ServerResponse.ok(response);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "지출 내역 삭제")
@@ -97,7 +97,6 @@ public class ConsumptionController {
 		@PathVariable Long consumptionId) {
 		consumptionService.deleteConsumption(customUserPrincipal, consumptionId);
 		return ResponseEntity.noContent().build();
-		// "지출 내역을 삭제했습니다.");
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "카테고리별 지출 내역 조회")
@@ -108,6 +107,6 @@ public class ConsumptionController {
 		@RequestParam(name = "year") Integer year, @RequestParam(name = "month") Integer month) {
 		List<DetailConsumptionResponse> response = consumptionService.getConsumptionByCategory(customUserPrincipal,
 			spendType, year, month);
-		return ServerResponse.ok(response, spendType + "에 맞는 지출 내역을 불러왔습니다.");
+		return ServerResponse.ok(response);
 	}
 }

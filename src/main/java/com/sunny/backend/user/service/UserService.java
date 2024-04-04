@@ -5,8 +5,6 @@ import static com.sunny.backend.common.ComnConstant.*;
 import java.io.IOException;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.comment.repository.CommentRepository;
-import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.friends.repository.FriendRepository;
@@ -96,8 +93,7 @@ public class UserService {
 			.toList();
 	}
 
-	public ResponseEntity<CommonResponse.SingleResponse<ProfileResponse>> updateProfile(
-		CustomUserPrincipal customUserPrincipal, MultipartFile profile) {
+	public ProfileResponse updateProfile(CustomUserPrincipal customUserPrincipal, MultipartFile profile) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		// 새 프로필 업로드
 		if (profile != null && !profile.isEmpty()) {
@@ -107,8 +103,7 @@ public class UserService {
 			user.updateProfile(SUNNY_DEFAULT_IMAGE);
 		}
 		userRepository.save(user);
-		ProfileResponse profileResponse = ProfileResponse.from(user);
-		return responseService.getSingleResponse(HttpStatus.OK.value(), profileResponse, "프로필 변경 완료");
+		return ProfileResponse.from(user);
 	}
 
 	// TODO 신고 결과 API 호출 수정해야 됨

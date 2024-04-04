@@ -3,13 +3,10 @@ package com.sunny.backend.consumption.service;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
-import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.competition.domain.CompetitionStatus;
@@ -80,24 +77,23 @@ public class ConsumptionService {
 	}
 
 	@Transactional
-	public List<ConsumptionResponse> getConsumptionList(
-		CustomUserPrincipal customUserPrincipal) {
+	public List<ConsumptionResponse> getConsumptionList(CustomUserPrincipal customUserPrincipal) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		List<Consumption> consumptions = consumptionRepository.findByUsersId(user.getId());
 		return ConsumptionResponse.listFrom(consumptions);
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> updateConsumption(
+	public ConsumptionResponse updateConsumption(
 		CustomUserPrincipal customUserPrincipal,
-		ConsumptionRequest consumptionRequest, Long consumptionId) {
+		ConsumptionRequest consumptionRequest,
+		Long consumptionId
+	) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		Consumption consumption = consumptionRepository.getById(consumptionId);
 		Consumption.validateConsumptionByUser(user.getId(), consumption.getUsers().getId());
 		consumption.updateConsumption(consumptionRequest);
-		ConsumptionResponse consumptionResponse = ConsumptionResponse.from(consumption);
-		return responseService.getSingleResponse(HttpStatus.OK.value(),
-			consumptionResponse, "지출을 수정했습니다.");
+		return ConsumptionResponse.from(consumption);
 	}
 
 	@Transactional

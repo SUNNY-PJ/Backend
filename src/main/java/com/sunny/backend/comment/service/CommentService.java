@@ -7,8 +7,6 @@ import static com.sunny.backend.comment.exception.CommentErrorCode.*;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +17,6 @@ import com.sunny.backend.comment.dto.request.CommentRequestMapper;
 import com.sunny.backend.comment.dto.response.CommentResponse;
 import com.sunny.backend.comment.repository.CommentRepository;
 import com.sunny.backend.common.exception.CustomException;
-import com.sunny.backend.common.response.CommonResponse;
-import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.notification.domain.CommentNotification;
@@ -41,7 +37,6 @@ public class CommentService {
 	private final CommentRepository commentRepository;
 	private final CommunityRepository communityRepository;
 	private final CommentRequestMapper commentRequestMapper;
-	private final ResponseService responseService;
 	private final NotificationService notificationService;
 	private final CommentNotificationRepository commentNotificationRepository;
 	private final NotificationRepository notificationRepository;
@@ -112,31 +107,28 @@ public class CommentService {
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.ListResponse<CommentResponse>> getCommentList(
-		CustomUserPrincipal customUserPrincipal, Long communityId) {
+	public List<CommentResponse> getCommentList(CustomUserPrincipal customUserPrincipal, Long communityId) {
 		Users users = userRepository.getById(customUserPrincipal.getId());
 		List<Comment> comments = commentRepository.findAllByCommunity_Id(communityId);
-		System.out.println(comments);
 		List<CommentResponse> commentResponses = comments.stream()
 			.filter(comment -> comment.getParent() == null)
 			.map(comment -> mapCommentToResponse(comment, users))
 			.toList();
-		System.out.println(commentResponses);
-		return responseService.getListResponse(HttpStatus.OK.value(), commentResponses, "댓글을 조회했습니다.");
+		return commentResponses;
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> createComment(
-		CustomUserPrincipal customUserPrincipal, Long communityId, CommentRequest commentRequestDTO) {
+	public CommentResponse createComment(CustomUserPrincipal customUserPrincipal, Long communityId,
+		CommentRequest commentRequest) {
 		Users users = userRepository.getById(customUserPrincipal.getId());
 		Community community = communityRepository.getById(communityId);
-		Comment comment = commentRequestMapper.toEntity(commentRequestDTO);
+		Comment comment = commentRequestMapper.toEntity(commentRequest);
 		Comment parentComment = null;
 		String title;
 		String bodyTitle;
-		String content = commentRequestDTO.getContent();
-		if (commentRequestDTO.getParentId() != null) {
-			parentComment = commentRepository.getById(commentRequestDTO.getParentId());
+		String content = commentRequest.getContent();
+		if (commentRequest.getParentId() != null) {
+			parentComment = commentRepository.getById(commentRequest.getParentId());
 			content = removeUserTag(content, parentComment);
 			comment.setContent(content);
 			if (parentComment.getParent() != null) {
@@ -144,11 +136,11 @@ public class CommentService {
 			}
 			comment.setParent(parentComment);
 		} else {
-			comment.setContent(commentRequestDTO.getContent());
+			comment.setContent(commentRequest.getContent());
 		}
 		comment.setCommunity(community);
 		comment.setUsers(users);
-		boolean isPrivate = commentRequestDTO.getIsPrivated();
+		boolean isPrivate = commentRequest.getIsPrivated();
 		comment.setIsPrivated(isPrivate);
 		boolean isAuthor = Objects.equals(users.getId(),
 			comment.getCommunity().getUsers().getId());
@@ -158,7 +150,7 @@ public class CommentService {
 		users.addComment(comment);
 		boolean commentAuthor = users.getId().equals(comment.getUsers().getId());
 		if (!community.getUsers().getId().equals(users.getId())) {
-			if (commentRequestDTO.getParentId() == null) {
+			if (commentRequest.getParentId() == null) {
 				title = "[SUNNY] " + users.getNickname();
 				bodyTitle = "새로운 댓글이 달렸어요.";
 				createCommentNotification(comment.getCommunity().getUsers(), comment, bodyTitle);
@@ -170,10 +162,9 @@ public class CommentService {
 				replySendNotifications(comment.getParent().getUsers(), comment, title, bodyTitle);
 			}
 		}
-		return responseService.getSingleResponse(HttpStatus.OK.value(),
-			new CommentResponse(comment.getId(), comment.getUsers().getId(), comment.getUsers().getNickname(),
-				addUserTag(comment), comment.getCreatedDate(), comment.getUsers().getProfile(), comment.getAuthor(),
-				commentAuthor, false, comment.getIsPrivated(), false), "댓글을 등록했습니다.");
+		return new CommentResponse(comment.getId(), comment.getUsers().getId(), comment.getUsers().getNickname(),
+			addUserTag(comment), comment.getCreatedDate(), comment.getUsers().getProfile(), comment.getAuthor(),
+			commentAuthor, false, comment.getIsPrivated(), false);
 	}
 
 	private String removeUserTag(String content, Comment parent) {
@@ -230,14 +221,12 @@ public class CommentService {
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> deleteComment(
-		CustomUserPrincipal customUserPrincipal, Long commentId) {
+	public CommentResponse deleteComment(CustomUserPrincipal customUserPrincipal, Long commentId) {
 		Users users = userRepository.getById(customUserPrincipal.getId());
 		Comment comment = commentRepository.getById(commentId);
 		validateCommentByUser(users.getId(), comment.getUsers().getId());
 		comment.changeIsDeleted(true);
-		CommentResponse commentResponse = convertCommentToDto(users, comment);
-		return responseService.getSingleResponse(HttpStatus.OK.value(), commentResponse, "댓글을 삭제 하였습니다.");
+		return convertCommentToDto(users, comment);
 	}
 
 	private Comment getDeletableAncestorComment(Comment comment) {
@@ -248,19 +237,18 @@ public class CommentService {
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<CommentResponse>> updateComment(
-		CustomUserPrincipal customUserPrincipal, Long commentId, CommentRequest commentRequestDTO) {
+	public CommentResponse updateComment(CustomUserPrincipal customUserPrincipal, Long commentId,
+		CommentRequest commentRequest) {
 		Users users = userRepository.getById(customUserPrincipal.getId());
 		Comment comment = commentRepository.getById(commentId);
 		validateCommentByUser(users.getId(), comment.getUsers().getId());
-		comment.updateContent(commentRequestDTO.getContent());
-		boolean isPrivate = commentRequestDTO.getIsPrivated();
+		comment.updateContent(commentRequest.getContent());
+		boolean isPrivate = commentRequest.getIsPrivated();
 		boolean commentAuthor = users.getId().equals(comment.getUsers().getId());
 		comment.setIsPrivated(isPrivate);
-		return responseService.getSingleResponse(HttpStatus.OK.value(),
-			new CommentResponse(comment.getId(), comment.getUsers().getId(), comment.getUsers().getNickname(),
-				comment.getContent(),
-				comment.getCreatedDate(), comment.getUsers().getProfile(), comment.getAuthor(), commentAuthor, false,
-				comment.getIsPrivated(), false), "댓글을 수정했습니다.");
+		return new CommentResponse(comment.getId(), comment.getUsers().getId(), comment.getUsers().getNickname(),
+			comment.getContent(),
+			comment.getCreatedDate(), comment.getUsers().getProfile(), comment.getAuthor(), commentAuthor, false,
+			comment.getIsPrivated(), false);
 	}
 }

@@ -29,6 +29,7 @@ import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.save.domain.Save;
+import com.sunny.backend.save.exception.SaveErrorCode;
 import com.sunny.backend.scrap.domain.Scrap;
 
 import lombok.AccessLevel;
@@ -69,7 +70,7 @@ public class Users extends BaseTime {
 	private final List<Comment> commentList = new ArrayList<>();
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
-	private final List<Save> saveList = new ArrayList<>();
+	private final List<Save> saves = new ArrayList<>();
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
 	private final List<Scrap> scraps = new ArrayList<>();
@@ -112,7 +113,15 @@ public class Users extends BaseTime {
 	}
 
 	public void addSave(Save save) {
-		this.saveList.add(save);
+		this.saves.add(save);
+	}
+
+	public void checkExpiredSave() {
+		for (Save save : saves) {
+			if (!save.checkExpired(save.getEndDate())) {
+				throw new CustomException(SaveErrorCode.ALREADY_SAVE);
+			}
+		}
 	}
 
 	public void addScrap(Scrap scrap) {
