@@ -15,6 +15,7 @@ import com.sunny.backend.chat.repository.ChatMessageRepository;
 import com.sunny.backend.chat.repository.ChatRoomRepository;
 import com.sunny.backend.chat.repository.ChatUserRepository;
 import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,17 +25,18 @@ public class ChatService {
 	private final ChatRoomRepository chatRoomRepository;
 	private final ChatUserRepository chatUserRepository;
 	private final ChatMessageRepository chatMessageRepository;
+	private final UserRepository userRepository;
 
 	@Transactional
 	public List<ChatMessageResponse> getChatMessageList(CustomUserPrincipal customUserPrincipal, Long chatRoomId,
 		Integer size, Long chatMessageId) {
-		Users users = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		List<ChatMessageResponse> responses =
 			chatMessageRepository.getChatMessageList(chatRoomId, size, chatMessageId);
 
 		for (ChatMessageResponse chatMessageResponse : responses) {
 			for (MessageResponse messageResponse : chatMessageResponse.getMessageResponses()) {
-				if (messageResponse.getReadCnt() == 1 && !messageResponse.getUserId().equals(users.getId())) {
+				if (messageResponse.getReadCnt() == 1 && !messageResponse.getUserId().equals(user.getId())) {
 					messageResponse.setReadCnt(0);
 					chatMessageRepository.readMessage(messageResponse.getId());
 				}
@@ -45,7 +47,7 @@ public class ChatService {
 	}
 
 	public List<ChatRoomRes> getChatRoomList(CustomUserPrincipal customUserPrincipal) {
-		return chatMessageRepository.findByChatRoomResponse(customUserPrincipal.getUsers().getId());
+		return chatMessageRepository.findByChatRoomResponse(customUserPrincipal.getId());
 		// return chatUserRepository.findByUsers_Id(customUserPrincipal.getUsers().getId())
 		// 	.stream()
 		// 	.map(ChatRoomResponse::from)

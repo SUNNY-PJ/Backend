@@ -13,10 +13,12 @@ import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;
 import com.sunny.backend.save.domain.Save;
 import com.sunny.backend.save.dto.request.SaveRequest;
+import com.sunny.backend.save.dto.response.DetailSaveResponse;
 import com.sunny.backend.save.dto.response.SaveResponse;
-import com.sunny.backend.save.dto.response.SaveResponse.SaveListResponse;
+import com.sunny.backend.save.dto.response.SaveResponses;
 import com.sunny.backend.save.repository.SaveRepository;
 import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class SaveService {
-
+	private final UserRepository userRepository;
 	private final SaveRepository saveRepository;
 	private final ResponseService responseService;
 	private final ConsumptionRepository consumptionRepository;
@@ -33,7 +35,7 @@ public class SaveService {
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> createSaveGoal(
 		CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
 		boolean allSavesExpired = saves.stream().allMatch(save -> save.checkExpired(save.getEndDate()));
 		if (allSavesExpired) {
@@ -61,7 +63,7 @@ public class SaveService {
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> updateSaveGoal(
 		CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
 		Save lastSave = saves.get(saves.size() - 1);
 		lastSave.updateSave(saveRequest);
@@ -71,29 +73,29 @@ public class SaveService {
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.ListResponse<SaveResponse.DetailSaveResponse>> getSaveGoal(
+	public ResponseEntity<CommonResponse.ListResponse<DetailSaveResponse>> getSaveGoal(
 		CustomUserPrincipal customUserPrincipal) {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
-		List<SaveResponse.DetailSaveResponse> saveResponses = saves.stream()
+		List<DetailSaveResponse> saveResponses = saves.stream()
 			.map(save -> {
 				long remainingDays = save.calculateRemainingDays(save);
 				Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(),
 					save.getEndDate());
 				double percentageUsed = save.calculateSavePercentage(userMoney, save);
-				return SaveResponse.DetailSaveResponse.of(remainingDays, percentageUsed, save.getCost());
+				return DetailSaveResponse.of(remainingDays, percentageUsed, save.getCost());
 			})
 			.toList();
 		return responseService.getListResponse(HttpStatus.OK.value(), saveResponses,
 			"절약 목표를 성공적으로 조회했습니다.");
 	}
 
-	public ResponseEntity<CommonResponse.ListResponse<SaveListResponse>> getDetailSaveGoal(
+	public ResponseEntity<CommonResponse.ListResponse<SaveResponses>> getDetailSaveGoal(
 		CustomUserPrincipal customUserPrincipal) {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
-		List<SaveListResponse> saveResponses = saves.stream().map(save -> {
-			return SaveListResponse.from(save, checkSuccessed(user, save));
+		List<SaveResponses> saveResponses = saves.stream().map(save -> {
+			return SaveResponses.from(save, checkSuccessed(user, save));
 		}).toList();
 		return responseService.getListResponse(HttpStatus.OK.value(), saveResponses,
 			"절약 목표 성공적으로 조회했습니다.");

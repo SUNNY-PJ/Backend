@@ -22,6 +22,7 @@ import com.sunny.backend.consumption.repository.ConsumptionRepository;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +34,12 @@ public class ConsumptionService {
 	private final ConsumptionRepository consumptionRepository;
 	private final ResponseService responseService;
 	private final FriendRepository friendRepository;
+	private final UserRepository userRepository;
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> createConsumption(
 		CustomUserPrincipal customUserPrincipal, ConsumptionRequest consumptionRequest) {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		Consumption consumption = Consumption.builder()
 			.name(consumptionRequest.getName())
 			.category(consumptionRequest.getCategory())
@@ -81,8 +83,8 @@ public class ConsumptionService {
 	@Transactional
 	public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse>> getConsumptionList(
 		CustomUserPrincipal customUserPrincipal) {
-		List<Consumption> consumptions = consumptionRepository.findByUsersId(
-			customUserPrincipal.getUsers().getId());
+		Users user = userRepository.getById(customUserPrincipal.getId());
+		List<Consumption> consumptions = consumptionRepository.findByUsersId(user.getId());
 		List<ConsumptionResponse> consumptionResponses = ConsumptionResponse.listFrom(consumptions);
 		return responseService.getListResponse(HttpStatus.OK.value(),
 			consumptionResponses, "지출 내역을 불러왔습니다.");
@@ -92,7 +94,7 @@ public class ConsumptionService {
 	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> updateConsumption(
 		CustomUserPrincipal customUserPrincipal,
 		ConsumptionRequest consumptionRequest, Long consumptionId) {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		Consumption consumption = consumptionRepository.getById(consumptionId);
 		Consumption.validateConsumptionByUser(user.getId(), consumption.getUsers().getId());
 		consumption.updateConsumption(consumptionRequest);
@@ -104,7 +106,7 @@ public class ConsumptionService {
 	@Transactional
 	public ResponseEntity<CommonResponse.ListResponse<SpendTypeStatisticsResponse>> getSpendTypeStatistics(
 		CustomUserPrincipal customUserPrincipal, Integer year, Integer month) {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		List<SpendTypeStatisticsResponse> statistics = consumptionRepository.getSpendTypeStatistics(
 			user.getId(), year, month);
 		return responseService.getListResponse(HttpStatus.OK.value(),
@@ -115,7 +117,7 @@ public class ConsumptionService {
 	public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse.DetailConsumptionResponse>>
 	getDetailConsumption(CustomUserPrincipal customUserPrincipal, LocalDate dateField) {
 		List<Consumption> detailConsumption =
-			consumptionRepository.findByUsersIdAndDateField(customUserPrincipal.getUsers().getId(), dateField);
+			consumptionRepository.findByUsersIdAndDateField(customUserPrincipal.getId(), dateField);
 		List<ConsumptionResponse.DetailConsumptionResponse> detailConsumptions =
 			ConsumptionResponse.DetailConsumptionResponse.listFrom(detailConsumption);
 		return responseService.getListResponse(HttpStatus.OK.value(),
@@ -125,7 +127,7 @@ public class ConsumptionService {
 	@Transactional
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteConsumption(
 		CustomUserPrincipal customUserPrincipal, Long consumptionId) {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		Consumption consumption = consumptionRepository.getById(consumptionId);
 		Consumption.validateConsumptionByUser(user.getId(), consumption.getUsers().getId());
 		consumptionRepository.deleteById(consumptionId);
@@ -138,8 +140,7 @@ public class ConsumptionService {
 	getConsumptionByCategory(CustomUserPrincipal customUserPrincipal, SpendType spendType,
 		Integer year, Integer month) {
 		List<ConsumptionResponse.DetailConsumptionResponse> detailConsumptions =
-			consumptionRepository.getConsumptionByCategory(customUserPrincipal.getUsers().getId(), spendType, year,
-				month);
+			consumptionRepository.getConsumptionByCategory(customUserPrincipal.getId(), spendType, year, month);
 		return responseService.getListResponse(HttpStatus.OK.value(),
 			detailConsumptions, spendType + "에 맞는 지출 내역을 불러왔습니다.");
 	}
