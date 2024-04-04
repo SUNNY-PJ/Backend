@@ -13,6 +13,7 @@ public class CompetitionOutput {
 
 	public static final Long COMPETITION_NONE_VALUE = -2L;
 	public static final Long COMPETITION_DRAW_VALUE = -1L;
+	
 	Long output;
 
 	private CompetitionOutput(Long output) {

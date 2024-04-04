@@ -38,8 +38,8 @@ public class Friend {
 	@JoinColumn(name = "user_friend_id")
 	private Users userFriend;
 
-	@Column(name = "friend_status")
 	@Enumerated(value = EnumType.STRING)
+	@Column(name = "friend_status")
 	private FriendStatus status;
 
 	@ManyToOne(fetch = FetchType.LAZY)

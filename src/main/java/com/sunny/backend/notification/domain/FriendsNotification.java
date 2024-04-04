@@ -1,7 +1,6 @@
 package com.sunny.backend.notification.domain;
 
-import java.time.LocalDateTime;
-
+import com.sunny.backend.user.domain.Users;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.sunny.backend.common.BaseTime;
-import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.friends.domain.Friend;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +24,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class FriendsNotification extends BaseTime {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,6 +43,4 @@ public class FriendsNotification extends BaseTime {
 	@Column
 	private String body;
 
-	@Column
-	private LocalDateTime createdAt;
 }
