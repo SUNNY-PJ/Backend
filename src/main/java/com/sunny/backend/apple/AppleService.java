@@ -13,12 +13,10 @@ import java.util.Optional;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import com.sunny.backend.auth.dto.AppleAuthClient;
 import com.sunny.backend.auth.dto.TokenResponse;
@@ -32,6 +30,9 @@ import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
+import com.sunny.backend.notification.repository.CompetitionNotificationRepository;
+import com.sunny.backend.notification.repository.FriendsNotificationRepository;
+import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
 import com.sunny.backend.util.RedisUtil;
@@ -51,11 +52,12 @@ public class AppleService {
 	private final UserRepository userRepository;
 	private final CommentRepository commentRepository;
 	private final CommentNotificationRepository commentNotificationRepository;
+	private final FriendsNotificationRepository friendsNotificationRepository;
+	private final CompetitionNotificationRepository competitionNotificationRepository;
+	private final NotificationRepository notificationRepository;
 	private final ResponseService responseService;
 	private final RedisUtil redisUtil;
 
-	@Autowired
-	private RestTemplate restTemplate;
 	private final TokenProvider tokenProvider;
 
 	public String generateClientSecret() throws IOException {
@@ -104,7 +106,7 @@ public class AppleService {
 				.build();
 			log.info("appleRevokeRequest={}", appleRevokeRequest);
 			appleAuthClient.revoke(appleRevokeRequest);
-			commentNotificationRepository.deleteByUsersId(users.getId());
+			commentNotificationRepository.deleteByUsers(users);
 			commentRepository.nullifyUsersId(users.getId());
 			userRepository.deleteById(users.getId());
 			return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");
@@ -220,7 +222,11 @@ public class AppleService {
 
 			if (response.getStatusCode().is2xxSuccessful()) {
 				log.info("Apple token 삭제 성공");
-				commentNotificationRepository.deleteByUsersId(users.getId());
+				notificationRepository.deleteByUsers(users);
+				competitionNotificationRepository.deleteByUsers(users);
+				friendsNotificationRepository.deleteByUsers(users);
+
+				commentNotificationRepository.deleteByUsers(users);
 				commentRepository.nullifyUsersId(users.getId());
 				userRepository.deleteById(users.getId());
 				log.info("Apple token 삭제 성공 code={}", HttpStatus.OK.value());

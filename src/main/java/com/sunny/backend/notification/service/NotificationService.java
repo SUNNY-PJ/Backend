@@ -68,7 +68,7 @@ public class NotificationService {
 				.build();
 			notificationRepository.save(notification);
 		} else {
-			notificationRepository.deleteByUsersId(user.getId());
+			notificationRepository.deleteByUsers(user);
 		}
 		return responseService.getSingleResponse(HttpStatus.OK.value(), notificationAllowRequest.isAllow(),
 			"알림 허용/거부 성공");
