@@ -18,6 +18,8 @@ public interface FriendRepository extends JpaRepository<Friend, Long>, FriendCus
 
 	List<Friend> findByUsersAndCompetitionIsNotNullAndCompetition_Status(Users users, CompetitionStatus status);
 
+	void deleteByUsersOrUserFriend(Users users, Users friend);
+
 	default Friend getById(Long id) {
 		return findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("친구가 존재하지 않습니다."));

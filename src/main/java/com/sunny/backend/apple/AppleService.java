@@ -29,8 +29,10 @@ import com.sunny.backend.comment.repository.CommentRepository;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
+import com.sunny.backend.competition.repository.CompetitionRepository;
+import com.sunny.backend.friends.domain.Friend;
+import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
-import com.sunny.backend.notification.repository.CompetitionNotificationRepository;
 import com.sunny.backend.notification.repository.FriendsNotificationRepository;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.user.domain.Users;
@@ -53,7 +55,8 @@ public class AppleService {
 	private final CommentRepository commentRepository;
 	private final CommentNotificationRepository commentNotificationRepository;
 	private final FriendsNotificationRepository friendsNotificationRepository;
-	private final CompetitionNotificationRepository competitionNotificationRepository;
+	private final FriendRepository friendRepository;
+	private final CompetitionRepository competitionRepository;
 	private final NotificationRepository notificationRepository;
 	private final ResponseService responseService;
 	private final RedisUtil redisUtil;
@@ -223,8 +226,15 @@ public class AppleService {
 			if (response.getStatusCode().is2xxSuccessful()) {
 				log.info("Apple token 삭제 성공");
 				notificationRepository.deleteByUsers(users);
-				friendsNotificationRepository.deleteByUsersOrFriend(users, users);
 
+				for (Friend friend : friendRepository.findByUsers(users)) {
+					if (friend.hasCompetition()) {
+						friendRepository.updateCompetitionToNull(friend.getCompetition().getId());
+						competitionRepository.delete(friend.getCompetition());
+					}
+				}
+				friendsNotificationRepository.deleteByUsersOrFriend(users, users);
+				friendRepository.deleteByUsersOrUserFriend(users, users);
 				commentNotificationRepository.deleteByUsers(users);
 				commentRepository.nullifyUsersId(users.getId());
 				userRepository.deleteById(users.getId());

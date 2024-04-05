@@ -56,7 +56,7 @@ public class CompetitionService {
 			competitionRequest.day(),
 			competitionRequest.price(),
 			competitionRequest.compensation(),
-			friendWithUser.getUsers()
+			friendWithUser
 		);
 		competitionRepository.save(competition);
 		friendWithUser.addCompetition(competition);

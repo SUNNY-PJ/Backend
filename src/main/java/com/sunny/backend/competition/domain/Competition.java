@@ -19,7 +19,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.sunny.backend.common.exception.CustomException;
-import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.friends.domain.Friend;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,8 +58,8 @@ public class Competition {
 	private CompetitionStatus status;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private Users users;
+	@JoinColumn(name = "friend_id")
+	private Friend friend;
 
 	public boolean isEqualToCompetitionStatus(CompetitionStatus competitionStatus) {
 		return status == competitionStatus;
@@ -70,7 +70,7 @@ public class Competition {
 	}
 
 	public void validateReceiveUser(Long userId) {
-		if (users.getId().equals(userId)) {
+		if (friend.getUsers().getId().equals(userId)) {
 			throw new CustomException(COMPETITION_NOT_MYSELF);
 		}
 	}
@@ -88,7 +88,7 @@ public class Competition {
 		if (this.status != CompetitionStatus.SEND) {
 			return this.status;
 		} else {
-			if (id.equals(users.getId())) {
+			if (friend.getUsers().getId().equals(id)) {
 				return CompetitionStatus.SEND;
 			}
 			return CompetitionStatus.RECEIVE;
@@ -101,14 +101,14 @@ public class Competition {
 	}
 
 	private Competition(String message, CompetitionOutput output, Integer period, Long price, String compensation,
-		CompetitionStatus status, Users users) {
+		CompetitionStatus status, Friend friend) {
 		this.message = message;
 		this.output = output;
 		this.period = period;
 		this.price = price;
 		this.compensation = compensation;
 		this.status = status;
-		this.users = users;
+		this.friend = friend;
 	}
 
 	public static Competition of(
@@ -116,10 +116,10 @@ public class Competition {
 		Integer period,
 		Long price,
 		String compensation,
-		Users users
+		Friend friend
 	) {
 		CompetitionOutput output = CompetitionOutput.from(COMPETITION_NONE_VALUE);
-		return new Competition(message, output, period, price, compensation, CompetitionStatus.SEND, users);
+		return new Competition(message, output, period, price, compensation, CompetitionStatus.SEND, friend);
 	}
 
 }
