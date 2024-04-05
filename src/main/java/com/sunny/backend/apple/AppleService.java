@@ -223,8 +223,7 @@ public class AppleService {
 			if (response.getStatusCode().is2xxSuccessful()) {
 				log.info("Apple token 삭제 성공");
 				notificationRepository.deleteByUsers(users);
-				competitionNotificationRepository.deleteByUsers(users);
-				friendsNotificationRepository.deleteByUsers(users);
+				friendsNotificationRepository.deleteByUsersOrFriend(users, users);
 
 				commentNotificationRepository.deleteByUsers(users);
 				commentRepository.nullifyUsersId(users.getId());

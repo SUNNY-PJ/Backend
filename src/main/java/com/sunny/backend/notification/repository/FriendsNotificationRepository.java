@@ -10,5 +10,5 @@ import com.sunny.backend.user.domain.Users;
 public interface FriendsNotificationRepository extends JpaRepository<FriendsNotification, Long> {
 	List<FriendsNotification> findByUsers_Id(Long userId);
 
-	void deleteByUsers(Users users);
+	void deleteByUsersOrFriend(Users users, Users friend);
 }
