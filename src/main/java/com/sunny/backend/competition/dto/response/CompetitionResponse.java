@@ -1,5 +1,7 @@
 package com.sunny.backend.competition.dto.response;
 
+import java.time.LocalDate;
+
 import com.sunny.backend.friends.domain.Friend;
 
 import lombok.Builder;
@@ -9,6 +11,8 @@ public record CompetitionResponse(
 	Long friendId,
 	String message,
 	String compensation,
+	LocalDate startDate,
+	LocalDate endDate,
 	Integer period,
 	Long price
 ) {
@@ -17,7 +21,8 @@ public record CompetitionResponse(
 			.friendId(friend.getId())
 			.message(friend.getCompetition().getMessage())
 			.compensation(friend.getCompetition().getCompensation())
-			.period(friend.getCompetition().getPeriod())
+			.startDate(friend.getCompetition().getStartDate())
+			.endDate(friend.getCompetition().getEndDate())
 			.price(friend.getCompetition().getPrice())
 			.build();
 	}

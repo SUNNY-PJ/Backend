@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,7 @@ public class ConsumptionService {
 	private final ResponseService responseService;
 	private final FriendRepository friendRepository;
 	private final UserRepository userRepository;
+	private final SimpMessagingTemplate template;
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> createConsumption(
@@ -64,6 +66,38 @@ public class ConsumptionService {
 				.getOutput()
 				.updateOutput(percentageUsed, friendsPercentageUsed, user.getId(), friend.getUserFriend().getId());
 		}
+
+		// if (!user.getSaveList().isEmpty()) {
+		// 	for (Save save : user.getSaveList()) {
+		// 		Long totalSpent = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(),
+		// 			save.getEndDate());
+		// 		System.out.println(totalSpent);
+		// 		double percentage;
+		// 		if (totalSpent == null) {
+		// 			percentage = 100.0;
+		// 		} else {
+		// 			percentage = 100.0 - ((totalSpent * 100.0) / save.getCost());
+		// 		}
+		// 		percentage = Math.round(percentage * 10) / 10.0;
+		// 		System.out.println(percentage);
+		// 		if (percentage <= 0) {
+		// 			template.convertAndSend("/sub/user/" + user.getId(),
+		// 				new SaveGoalAlertResponse(save.getCost(), percentage, "다 썼어요... \n 그렇다고 마음껏 낭비하시면 안돼요!"));
+		// 		} else if (percentage <= 20) {
+		// 			template.convertAndSend("/sub/user/" + user.getId(),
+		// 				new SaveGoalAlertResponse(save.getCost(), percentage,
+		// 					String.format("목표금액 %d원까지 %f % 남았어요! \n 이제 정말 아껴쓰세요!", save.getCost(), percentage)));
+		// 		} else if (percentage <= 50) {
+		// 			template.convertAndSend("/sub/user/" + user.getId(),
+		// 				new SaveGoalAlertResponse(save.getCost(), percentage,
+		// 					String.format("목표금액 %d원까지 %f % 남았어요! \n 지출을 주여볼까요?", save.getCost(), percentage)));
+		// 		} else if (percentage <= 80) {
+		// 			template.convertAndSend("/sub/user/" + user.getId(),
+		// 				new SaveGoalAlertResponse(save.getCost(), percentage,
+		// 					String.format("목표금액 %d원까지 %f % 남았어요! \n 그래도 방심은 금물!", save.getCost(), percentage)));
+		// 		}
+		// 	}
+		// }
 
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 			consumptionResponse, "지출을 등록했습니다.");

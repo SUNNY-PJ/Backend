@@ -80,7 +80,7 @@ public class Users extends BaseTime {
 	@Embedded
 	private UserReport userReport;
 
-	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "users")
 	private final List<Friend> friends = new ArrayList<>();
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)

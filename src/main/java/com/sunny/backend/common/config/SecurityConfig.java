@@ -67,9 +67,10 @@ public class SecurityConfig {
 			// HttpServletRequest를 사용하는 요청들에 대한 접근 제한 설정
 			.and()
 			.authorizeRequests()
-				.antMatchers("/auth/**").permitAll()
-				.antMatchers("/apple/**").permitAll()
-				.antMatchers("/stomp/chat").permitAll()
+			.antMatchers("/auth/**").permitAll()
+			.antMatchers("/apple/**").permitAll()
+			.antMatchers("/stomp/chat").permitAll()
+			.antMatchers("/stomp/**").permitAll()
 			.antMatchers(HttpMethod.PATCH, "/users/report").hasRole("ADMIN")
 			.antMatchers(HttpMethod.DELETE, "/users/report").hasRole("ADMIN")
 			.anyRequest().authenticated();
