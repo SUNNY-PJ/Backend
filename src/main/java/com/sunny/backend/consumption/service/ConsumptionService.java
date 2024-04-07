@@ -18,12 +18,10 @@ import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.consumption.domain.SpendType;
 import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
 import com.sunny.backend.consumption.dto.response.ConsumptionResponse;
-import com.sunny.backend.consumption.dto.response.SaveGoalAlertResponse;
 import com.sunny.backend.consumption.dto.response.SpendTypeStatisticsResponse;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.repository.FriendRepository;
-import com.sunny.backend.save.domain.Save;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
 
@@ -69,29 +67,37 @@ public class ConsumptionService {
 				.updateOutput(percentageUsed, friendsPercentageUsed, user.getId(), friend.getUserFriend().getId());
 		}
 
-		if (!user.getSaveList().isEmpty()) {
-			for (Save save : user.getSaveList()) {
-				double totalSpent = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(),
-					save.getEndDate());
-				double percentage = 100.0 - ((totalSpent * 100.0) / save.getCost());
-				if (percentage <= 0) {
-					template.convertAndSend("/sub/user/" + user.getId(),
-						new SaveGoalAlertResponse(save.getCost(), percentage, "다 썼어요... \n 그렇다고 마음껏 낭비하시면 안돼요!"));
-				} else if (percentage <= 20) {
-					template.convertAndSend("/sub/user/" + user.getId(),
-						new SaveGoalAlertResponse(save.getCost(), percentage,
-							String.format("목표금액 %d원까지 %f % 남았어요! \n 이제 정말 아껴쓰세요!", save.getCost(), percentage)));
-				} else if (percentage <= 50) {
-					template.convertAndSend("/sub/user/" + user.getId(),
-						new SaveGoalAlertResponse(save.getCost(), percentage,
-							String.format("목표금액 %d원까지 %f % 남았어요! \n 지출을 주여볼까요?", save.getCost(), percentage)));
-				} else if (percentage <= 80) {
-					template.convertAndSend("/sub/user/" + user.getId(),
-						new SaveGoalAlertResponse(save.getCost(), percentage,
-							String.format("목표금액 %d원까지 %f % 남았어요! \n 그래도 방심은 금물!", save.getCost(), percentage)));
-				}
-			}
-		}
+		// if (!user.getSaveList().isEmpty()) {
+		// 	for (Save save : user.getSaveList()) {
+		// 		Long totalSpent = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(),
+		// 			save.getEndDate());
+		// 		System.out.println(totalSpent);
+		// 		double percentage;
+		// 		if (totalSpent == null) {
+		// 			percentage = 100.0;
+		// 		} else {
+		// 			percentage = 100.0 - ((totalSpent * 100.0) / save.getCost());
+		// 		}
+		// 		percentage = Math.round(percentage * 10) / 10.0;
+		// 		System.out.println(percentage);
+		// 		if (percentage <= 0) {
+		// 			template.convertAndSend("/sub/user/" + user.getId(),
+		// 				new SaveGoalAlertResponse(save.getCost(), percentage, "다 썼어요... \n 그렇다고 마음껏 낭비하시면 안돼요!"));
+		// 		} else if (percentage <= 20) {
+		// 			template.convertAndSend("/sub/user/" + user.getId(),
+		// 				new SaveGoalAlertResponse(save.getCost(), percentage,
+		// 					String.format("목표금액 %d원까지 %f % 남았어요! \n 이제 정말 아껴쓰세요!", save.getCost(), percentage)));
+		// 		} else if (percentage <= 50) {
+		// 			template.convertAndSend("/sub/user/" + user.getId(),
+		// 				new SaveGoalAlertResponse(save.getCost(), percentage,
+		// 					String.format("목표금액 %d원까지 %f % 남았어요! \n 지출을 주여볼까요?", save.getCost(), percentage)));
+		// 		} else if (percentage <= 80) {
+		// 			template.convertAndSend("/sub/user/" + user.getId(),
+		// 				new SaveGoalAlertResponse(save.getCost(), percentage,
+		// 					String.format("목표금액 %d원까지 %f % 남았어요! \n 그래도 방심은 금물!", save.getCost(), percentage)));
+		// 		}
+		// 	}
+		// }
 
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 			consumptionResponse, "지출을 등록했습니다.");
