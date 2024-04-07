@@ -1,5 +1,6 @@
 package com.sunny.backend.community.dto.response;
 
+import com.sunny.backend.user.domain.Users;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,7 +26,7 @@ public record CommunityResponse(
 	boolean isAuthor
 ) {
 
-	public static CommunityResponse from(Community community) {
+	public static CommunityResponse from(Users users,Community community) {
 		return new CommunityResponse(
 			community.getId(),
 			community.getUsers().getId(),
@@ -44,7 +45,7 @@ public record CommunityResponse(
 			DatetimeUtil.timesAgo(community.getCreatedAt()),
 			community.hasNotBeenModified(),
 			community.getUsers().isScrapByCommunity(community.getId()),
-			community.isAuthor(community.getUsers().getId())
+			community.isAuthor(users.getId())
 		);
 	}
 
