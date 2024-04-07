@@ -1,7 +1,6 @@
 package com.sunny.backend.competition.service;
 
 import java.time.Duration;
-import java.time.LocalDate;
 
 import javax.transaction.Transactional;
 
@@ -53,7 +52,8 @@ public class CompetitionService {
 
 		Competition competition = Competition.of(
 			competitionRequest.message(),
-			competitionRequest.day(),
+			competitionRequest.startDate(),
+			competitionRequest.endDate(),
 			competitionRequest.price(),
 			competitionRequest.compensation(),
 			friendWithUser
@@ -82,8 +82,6 @@ public class CompetitionService {
 		competition.validateReceiveUser(friendWithUser.getUsers().getId());
 
 		competition.updateStatus(CompetitionStatus.PROCEEDING);
-		competition.addDate(LocalDate.now().plusDays(1),
-			LocalDate.now().plusDays(1).plusDays(competition.getPeriod()));
 		Friend friendWithUserFriend = friendRepository
 			.findByUsersAndUserFriend(friendWithUser.getUserFriend(), friendWithUser.getUsers())
 			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));

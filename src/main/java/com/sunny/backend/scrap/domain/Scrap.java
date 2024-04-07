@@ -48,6 +48,6 @@ public class Scrap {
 	}
 
 	public boolean isScrapByCommunityId(Long communityId) {
-		return id.equals(communityId);
+		return community.getId().equals(communityId);
 	}
 }

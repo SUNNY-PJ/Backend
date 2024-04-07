@@ -39,9 +39,6 @@ public class Competition {
 	private CompetitionOutput output; // 결과
 
 	@Column
-	private Integer period;
-
-	@Column
 	private LocalDate startDate; // 시작 기간
 
 	@Column
@@ -100,11 +97,13 @@ public class Competition {
 		this.endDate = endDate;
 	}
 
-	private Competition(String message, CompetitionOutput output, Integer period, Long price, String compensation,
+	private Competition(String message, CompetitionOutput output, LocalDate startDate, LocalDate endDate, Long price,
+		String compensation,
 		CompetitionStatus status, Friend friend) {
 		this.message = message;
 		this.output = output;
-		this.period = period;
+		this.startDate = startDate;
+		this.endDate = endDate;
 		this.price = price;
 		this.compensation = compensation;
 		this.status = status;
@@ -113,13 +112,15 @@ public class Competition {
 
 	public static Competition of(
 		String message,
-		Integer period,
+		LocalDate startDate,
+		LocalDate endDate,
 		Long price,
 		String compensation,
 		Friend friend
 	) {
 		CompetitionOutput output = CompetitionOutput.from(COMPETITION_NONE_VALUE);
-		return new Competition(message, output, period, price, compensation, CompetitionStatus.SEND, friend);
+		return new Competition(message, output, startDate, endDate, price, compensation, CompetitionStatus.SEND,
+			friend);
 	}
 
 }
