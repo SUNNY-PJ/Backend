@@ -75,7 +75,8 @@ public class Save {
 		return Math.round(percentage * 10) / 10.0; // 소수점 첫째 자리 반올림
 	}
 
-	public boolean checkExpired() {
-		return endDate != null && LocalDate.now().isAfter(endDate);
+	public boolean isValidSave() {
+		LocalDate currentDate = LocalDate.now();
+		return currentDate.equals(endDate) || endDate.isAfter(LocalDate.now());
 	}
 }

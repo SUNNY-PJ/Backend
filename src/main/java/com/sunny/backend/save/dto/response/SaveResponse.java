@@ -17,7 +17,7 @@ public record SaveResponse(
 		return new SaveResponse(
 			save.getId(),
 			save.getCost(),
-			save.checkExpired(),
+			!save.isValidSave(),
 			formatStartDateWithDayOfWeek(save.getStartDate()),
 			formatStartDateWithDayOfWeek(save.getEndDate())
 		);

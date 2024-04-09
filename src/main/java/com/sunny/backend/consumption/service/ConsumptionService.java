@@ -55,7 +55,7 @@ public class ConsumptionService {
 			.build();
 		consumptionRepository.save(consumption);
 		user.addConsumption(consumption);
-		
+
 		ConsumptionResponse consumptionResponse = ConsumptionResponse.from(consumption);
 
 		for (Friend friend : friendRepository.findByUsersAndCompetitionIsNotNullAndCompetition_Status(user,
@@ -76,6 +76,7 @@ public class ConsumptionService {
 			double percentage = calculateUserPercentage(user.getId(), save.getStartDate(), save.getEndDate(),
 				save.getCost());
 			if (percentage <= 80) {
+				System.out.println(percentage);
 				String message;
 				if (percentage <= 0) {
 					message = SAVE_MESSAGE_BELOW_0;

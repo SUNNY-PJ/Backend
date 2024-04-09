@@ -135,7 +135,7 @@ public class Users extends BaseTime {
 	public boolean isExistLastSave() {
 		if (!saves.isEmpty()) {
 			Save save = getSaves().get(getSaveSize() - 1);
-			return save.checkExpired();
+			return save.isValidSave();
 		}
 		return false;
 	}

@@ -39,14 +39,10 @@ public class SaveService {
 		SaveRequest saveRequest
 	) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
-		int saveSize = user.getSaveSize();
 
-		if (saveSize > 1) {
+		if (!user.getSaves().isEmpty()) {
 			Save save = user.getLastSaveOrException();
-			if (save.checkExpired()) {
-				Save newSave = createSave(saveRequest, user);
-				return newSave.getId();
-			} else {
+			if (save.isValidSave()) {
 				throw new CustomException(SaveErrorCode.SAVE_ALREADY);
 			}
 		}
@@ -84,7 +80,7 @@ public class SaveService {
 				Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(),
 					save.getEndDate());
 				double percentageUsed = save.calculateSavePercentage(userMoney, save);
-				return DetailSaveResponse.of(remainingDays, percentageUsed, save.getCost());
+				return DetailSaveResponse.of(save.getId(), remainingDays, percentageUsed, save.getCost());
 			})
 			.toList();
 	}
