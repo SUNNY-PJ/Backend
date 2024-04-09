@@ -50,7 +50,6 @@ public class TokenProvider {
 				.setExpiration(createExpiredDate(1))
 				.signWith(SignatureAlgorithm.HS512, tokenSecret)
 				.compact();
-		System.out.println("accessToken "+accessToken);
 		String refreshToken = Jwts.builder()
 				.setHeader(createHeader())
 				.setSubject("refreshToken")
@@ -153,7 +152,7 @@ public class TokenProvider {
 //		redisTemplate.opsForValue()
 //				.set( reissue.getRefreshToken(), email,getClaims(tokenInfo.refreshToken()).getExpiration().getTime(), TimeUnit.MILLISECONDS);
 //
-//		return responseService.getSingleResponse(HttpStatus.OK.value(), tokenInfo,"토큰 정복 갱신되었습니다.");
+//		return responseService.getSingleResponse(HttpStatus.OK.value(), tokenInfo,"토큰 갱신되었습니다.");
 //	}
 
 }

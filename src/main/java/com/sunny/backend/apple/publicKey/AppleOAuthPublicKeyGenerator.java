@@ -22,10 +22,8 @@ public class AppleOAuthPublicKeyGenerator {
   private static final int POSITIVE_SIGNUM = 1;
 
   public PublicKey generatePublicKey(Map<String, String> tokenHeaders, ApplePublicKeys applePublicKeys) {
-    System.out.println(applePublicKeys.getKeys().size());
     List<ApplePublicKey> publicKeys = applePublicKeys.getKeys();
     ApplePublicKey publicKey = publicKeys.stream()
-
         .filter(key -> key.getAlg().equals(tokenHeaders.get(ALG_HEADER_KEY)))
         .filter(key -> key.getKid().equals(tokenHeaders.get(KID_HEADER_KEY)))
         .findAny()
@@ -38,7 +36,6 @@ public class AppleOAuthPublicKeyGenerator {
     byte[] e = Base64Utils.decodeFromUrlSafeString(applePublicKey.getE());
     RSAPublicKeySpec publicKeySpec =
         new RSAPublicKeySpec(new BigInteger(POSITIVE_SIGNUM, n), new BigInteger(POSITIVE_SIGNUM, e));
-
     try {
       KeyFactory keyFactory = KeyFactory.getInstance(applePublicKey.getKty());
       return keyFactory.generatePublic(publicKeySpec);

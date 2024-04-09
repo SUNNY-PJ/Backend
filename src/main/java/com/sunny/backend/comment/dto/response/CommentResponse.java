@@ -20,25 +20,29 @@ public class CommentResponse {
 	private Long userId;
 	private String content;
 	private String writer;
+	private String profileImg;
 	private boolean isAuthor;
 	private boolean commentAuthor;
 	private boolean isDeleted;
 	private boolean isPrivated;
+	private boolean isRevokeUser;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
 	private LocalDateTime createdDate;
 	private List<CommentResponse> children = new ArrayList<>();
 
 	public CommentResponse(Long id, Long userId,String writer, String content, LocalDateTime createdDate,
-			boolean isAuthor,boolean commentAuthor,boolean isDeleted,boolean isPrivated) {
+			String profileImg,boolean isAuthor,boolean commentAuthor,boolean isDeleted,boolean isPrivated,boolean isRevokeUser) {
 		this.id = id;
 		this.userId=userId;
 		this.writer = writer;
 		this.content = content;
 		this.createdDate = createdDate;
+		this.profileImg=profileImg;
 		this.isAuthor = isAuthor;
 		this.commentAuthor=commentAuthor;
 		this.isDeleted=isDeleted;
 		this.isPrivated=isPrivated;
+		this.isRevokeUser=isRevokeUser;
 	}
 
 	//삭제된 댓글로 댓글 내용 수정하기 위한 객체 생성
@@ -51,9 +55,11 @@ public class CommentResponse {
 					null,
 					"삭제된 댓글입니다.",
 					null,
+					null,
 					comment.getAuthor(),
 					commentAuthor,
 					true,
+					false,
 					false
 			);
 		} else {
@@ -61,22 +67,25 @@ public class CommentResponse {
 			String content = comment.getContent();
 			LocalDateTime createdDate = comment.getCreatedDate();
 			boolean isAuthor =comment.getAuthor();
-			return new CommentResponse(comment.getId(),comment.getUsers().getId(), writer, content, createdDate, isAuthor,commentAuthor,false,comment.getIsPrivated());
+			return new CommentResponse(comment.getId(),comment.getUsers().getId(), writer, content, createdDate,
+					users.getProfile(), isAuthor,commentAuthor,false,comment.getIsPrivated(),false);
 		}
 	}
 
 	public static CommentResponse leaveCommentToDto(Users users, Comment comment) {
-		boolean commentAuthor = users.getId().equals(comment.getUsers().getId());
+
 			return new CommentResponse(
 					comment.getId(),
 					null,
 					"(알 수 없음)",
 					"탈퇴한 회원의 댓글입니다.",
 					null,
+					null,
 					comment.getAuthor(),
-					commentAuthor,
+					false,
 					comment.getIsDeleted(),
-					comment.getIsPrivated()
+					comment.getIsPrivated(),
+					true
 			);
 	}
 	@Getter

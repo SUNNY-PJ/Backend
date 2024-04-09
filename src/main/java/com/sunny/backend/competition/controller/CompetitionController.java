@@ -17,7 +17,6 @@ import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.competition.dto.request.CompetitionRequest;
-import com.sunny.backend.competition.dto.response.CompetitionApplyResponse;
 import com.sunny.backend.competition.dto.response.CompetitionResponse;
 import com.sunny.backend.competition.dto.response.CompetitionStatusResponse;
 import com.sunny.backend.competition.service.CompetitionService;
@@ -36,15 +35,16 @@ public class CompetitionController {
 	private final CompetitionService competitionService;
 
 	@ApiOperation(tags = "3. Competition", value = "대결 목록 확인")
-	@GetMapping
-	public ResponseEntity<CommonResponse.ListResponse<CompetitionResponse>> getCompetition(
-		@AuthUser CustomUserPrincipal customUserPrincipal) {
-		return competitionService.getCompetition(customUserPrincipal);
+	@GetMapping("/{friendId}")
+	public ResponseEntity<CommonResponse.SingleResponse<CompetitionResponse>> getCompetition(
+		@AuthUser CustomUserPrincipal customUserPrincipal,
+		@PathVariable(name = "friendId") Long friendId) {
+		return competitionService.getCompetition(customUserPrincipal, friendId);
 	}
 
 	@ApiOperation(tags = "3. Competition", value = "친구에게 대결 신청")
 	@PostMapping("")
-	public ResponseEntity<CommonResponse.SingleResponse<CompetitionApplyResponse>> applyCompetition(
+	public ResponseEntity<CommonResponse.SingleResponse<CompetitionResponse>> applyCompetition(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@Valid @RequestBody CompetitionRequest competitionRequest) {
 		return competitionService.applyCompetition(customUserPrincipal, competitionRequest);

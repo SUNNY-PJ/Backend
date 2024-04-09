@@ -1,7 +1,5 @@
 package com.sunny.backend.competition.domain;
 
-import java.util.Objects;
-
 import javax.persistence.Embeddable;
 
 import lombok.AccessLevel;
@@ -13,7 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CompetitionOutput {
 
-	public static final Long COMPETITION_DEFAULT_VALUE = -1L;
+	public static final Long COMPETITION_NONE_VALUE = -2L;
+	public static final Long COMPETITION_DRAW_VALUE = -1L;
+	
 	Long output;
 
 	private CompetitionOutput(Long output) {
@@ -25,12 +25,24 @@ public class CompetitionOutput {
 	}
 
 	public CompetitionOutputType isWinner(Long userId) {
-		if (Objects.equals(output, COMPETITION_DEFAULT_VALUE)) {
+		if (output.equals(COMPETITION_NONE_VALUE)) {
+			return CompetitionOutputType.NONE;
+		} else if (output.equals(COMPETITION_DRAW_VALUE)) {
 			return CompetitionOutputType.DRAW;
-		} else if (Objects.equals(userId, output)) {
+		} else if (userId.equals(output)) {
 			return CompetitionOutputType.WIN;
 		}
 
 		return CompetitionOutputType.LOSE;
+	}
+
+	public void updateOutput(double userPercent, double userFriendPercent, Long userId, Long userFriendId) {
+		if (userPercent > userFriendPercent) {
+			output = userId;
+		} else if (userPercent < userFriendPercent) {
+			output = userFriendId;
+		} else {
+			output = COMPETITION_DRAW_VALUE;
+		}
 	}
 }

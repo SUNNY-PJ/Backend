@@ -13,16 +13,18 @@ import com.sunny.backend.user.domain.Users;
 
 import lombok.Getter;
 import lombok.Setter;
-@Getter
+
 public class CustomUserPrincipal implements OAuth2User, UserDetails {
 	private final Users users;
-
+	@Getter
+	private final Long id;
 	private final Collection<GrantedAuthority> authorities;
 	@Setter
 	private Map<String, Object> attributes;
 
 	public CustomUserPrincipal(Users users) {
 		this.users = users;
+		this.id = users.getId();
 		authorities = new ArrayList<>();
 		GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + users.getRole());
 		authorities.add(authority);
@@ -73,8 +75,8 @@ public class CustomUserPrincipal implements OAuth2User, UserDetails {
 		return null;
 	}
 
-//	@Override
-//	public String getName() {
-//		return users.getName();
-//	}
+	//	@Override
+	//	public String getName() {
+	//		return users.getName();
+	//	}
 }

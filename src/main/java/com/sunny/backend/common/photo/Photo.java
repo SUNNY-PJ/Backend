@@ -4,14 +4,13 @@ import com.sunny.backend.community.domain.Community;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.security.core.parameters.P;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Photo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +24,21 @@ public class Photo {
 
     @Column
     private String filename;
+
     @Column
     private String fileUrl;
+
     @Column
     private Long fileSize;
+
+    private Photo(Community community, String filename, String fileUrl, Long fileSize) {
+        this.community = community;
+        this.filename = filename;
+        this.fileUrl = fileUrl;
+        this.fileSize = fileSize;
+    }
+
+    public static Photo of(Community community, String filename, String fileUrl, Long fileSize) {
+        return new Photo(community, filename, fileUrl, fileSize);
+    }
 }

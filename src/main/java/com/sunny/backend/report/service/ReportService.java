@@ -1,19 +1,47 @@
 package com.sunny.backend.report.service;
 
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import org.springframework.stereotype.Service;
+
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.report.domain.ReportType;
 import com.sunny.backend.report.dto.ReportCreateRequest;
-import com.sunny.backend.report.dto.ReportRequest;
+import com.sunny.backend.user.dto.response.ReportResponse;
 import com.sunny.backend.user.dto.response.UserReportResponse;
 
-public interface ReportService {
+import lombok.RequiredArgsConstructor;
 
-	UserReportResponse report(CustomUserPrincipal customUserPrincipal, ReportCreateRequest reportCreateRequest);
+@Service
+@RequiredArgsConstructor
+public class ReportService {
+	private final ReportFactory reportFactory;
 
-	void approveUserReport(ReportRequest reportRequest);
+	public List<ReportResponse> getUserReports(ReportType reportType) {
+		ReportStrategy reportStrategy = reportFactory.findReportStrategy(reportType);
+		return reportStrategy.getUserReports(reportType);
+	}
 
-	void refuseUserReport(ReportRequest reportRequest);
+	public UserReportResponse createUserReport(
+		CustomUserPrincipal customUserPrincipal,
+		ReportCreateRequest reportCreateRequest
+	) {
+		ReportStrategy reportStrategy = reportFactory.findReportStrategy(reportCreateRequest.reportType());
+		return reportStrategy.report(customUserPrincipal.getId(), reportCreateRequest);
+	}
 
-	boolean isReportType(ReportType reportType);
+	@Transactional
+	public void approveUserReport(Long id, ReportType reportType) {
+		ReportStrategy reportStrategy = reportFactory.findReportStrategy(reportType);
+		reportStrategy.approveUserReport(id);
+	}
+
+	@Transactional
+	public void refuseUserReport(Long id, ReportType reportType) {
+		ReportStrategy reportStrategy = reportFactory.findReportStrategy(reportType);
+		reportStrategy.refuseUserReport(id);
+	}
 
 }

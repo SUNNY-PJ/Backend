@@ -21,10 +21,4 @@ public class ApplePublicKeyResponse {
     private String e;
   }
 
-  public Optional<ApplePublicKeyResponse.Key> getMatchedKeyBy(String kid,String alg){
-    return this.keys.stream()
-        .filter(key->key.getKid().equals(kid)&& key.getAlg().equals(alg))
-        .findFirst();
-  }
-
 }

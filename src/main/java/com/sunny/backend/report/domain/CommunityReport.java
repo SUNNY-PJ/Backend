@@ -20,7 +20,6 @@ import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.user.domain.Users;
 
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -47,15 +46,18 @@ public class CommunityReport extends BaseTime {
 	@Enumerated(value = EnumType.STRING)
 	private ReportStatus status;
 
-	@Builder
-	public CommunityReport(Users users, Community community, String reason, ReportStatus status) {
+	private CommunityReport(Users users, Community community, String reason, ReportStatus status) {
 		this.users = users;
 		this.community = community;
 		this.reason = reason;
 		this.status = status;
 	}
 
-	public void isWait() {
+	public static CommunityReport of(Users users, Community community, String reason) {
+		return new CommunityReport(users, community, reason, ReportStatus.WAIT);
+	}
+
+	public void validateWaitStatus() {
 		if (status != ReportStatus.WAIT) {
 			throw new CustomException(ALREADY_PROCESS);
 		}

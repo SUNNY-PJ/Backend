@@ -1,41 +1,38 @@
 package com.sunny.backend.community.service;
 
-import com.sunny.backend.comment.repository.CommentRepository;
-import com.sunny.backend.common.photo.Photo;
-import com.sunny.backend.community.domain.BoardType;
-import com.sunny.backend.community.domain.Community;
-import com.sunny.backend.community.domain.SortType;
-import com.sunny.backend.community.dto.response.CommunityResponse.ViewAndCommentResponse;
-import com.sunny.backend.notification.domain.CommentNotification;
-import com.sunny.backend.notification.repository.CommentNotificationRepository;
-import com.sunny.backend.scrap.domain.Scrap;
-import com.sunny.backend.scrap.repository.ScrapRepository;
+import static com.sunny.backend.common.ComnConstant.*;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
-import com.nimbusds.oauth2.sdk.util.StringUtils;
-import javax.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.nimbusds.oauth2.sdk.util.StringUtils;
+import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.common.photo.Photo;
+import com.sunny.backend.common.photo.PhotoRepository;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
+import com.sunny.backend.community.domain.BoardType;
+import com.sunny.backend.community.domain.Community;
+import com.sunny.backend.community.domain.SortType;
 import com.sunny.backend.community.dto.request.CommunityRequest;
+import com.sunny.backend.community.dto.response.CommunityPageResponse;
 import com.sunny.backend.community.dto.response.CommunityResponse;
+import com.sunny.backend.community.dto.response.ViewAndCommentResponse;
 import com.sunny.backend.community.repository.CommunityRepository;
-import com.sunny.backend.common.photo.PhotoRepository;
-import com.sunny.backend.auth.jwt.CustomUserPrincipal;
-import com.sunny.backend.util.S3Util;
+import com.sunny.backend.notification.domain.CommentNotification;
+import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.repository.UserRepository;
 import com.sunny.backend.util.RedisUtil;
+import com.sunny.backend.util.S3Util;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,44 +43,45 @@ import lombok.extern.slf4j.Slf4j;
 public class CommunityService {
 	private final CommunityRepository communityRepository;
 	private final PhotoRepository photoRepository;
-	private final ScrapRepository scrapRepository;
 	private final ResponseService responseService;
 	private final S3Util s3Util;
 	private final RedisUtil redisUtil;
 	private final CommentNotificationRepository commentNotificationRepository;
+	private final UserRepository userRepository;
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> findCommunity(
-			CustomUserPrincipal customUserPrincipal, Long communityId) {
-		Users user = customUserPrincipal.getUsers();
+		CustomUserPrincipal customUserPrincipal, Long communityId) {
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		Community community = communityRepository.getById(communityId);
-		String viewCount = redisUtil.getData(String.valueOf(user.getId()));
-		if (StringUtils.isBlank(viewCount)) {
-			redisUtil.setValuesWithTimeout(String.valueOf(user.getId()), communityId + "_",
-					calculateTimeUntilMidnight());
-			community.increaseView();
-		} else {
-			List<String> redisBoardList = Arrays.asList(viewCount.split("_"));
-			boolean isViewed = redisBoardList.contains(String.valueOf(communityId));
-			if (!isViewed) {
-				viewCount += communityId + "_";
-				redisUtil.setValuesWithTimeout(String.valueOf(user.getId()), viewCount,
-						calculateTimeUntilMidnight());
-				community.updateView();
-			}
-		}
-		boolean isScrap = false;
-		boolean isAuthor=community.getUsers().getId().equals(user.getId());
-		Optional<Scrap> scrap = scrapRepository.findByUsersAndCommunity(user, community);
-		if(scrap.isPresent()) {
-			isScrap = true;
-		}
-		CommunityResponse communityResponse = CommunityResponse.of(community, isScrap,isAuthor);
-		return responseService.getSingleResponse(
-				HttpStatus.OK.value(), communityResponse, "게시글을 성공적으로 불러왔습니다.");
+
+		findByRedisAndSaveIfNotFound(user.getId(), community);
+
+		return responseService.getSingleResponse(HttpStatus.OK.value(), CommunityResponse.from(user,community),
+			"게시글을 성공적으로 불러왔습니다.");
 	}
 
-	public static long calculateTimeUntilMidnight() {
+	public void findByRedisAndSaveIfNotFound(Long userId, Community community) {
+		String redisUserKey = String.valueOf(userId);
+		String redisValues = redisUtil.getData(redisUserKey);
+		if (StringUtils.isBlank(redisValues)) {
+			saveRedisAndCommunityIncreaseView(redisUserKey, redisValues, community);
+		} else {
+			boolean isViewed = Arrays.stream(redisValues.split(REDIS_SEPARATOR))
+				.anyMatch(id -> id.equals(String.valueOf(community.getId())));
+			if (!isViewed) {
+				saveRedisAndCommunityIncreaseView(redisUserKey, redisValues, community);
+			}
+		}
+	}
+
+	public void saveRedisAndCommunityIncreaseView(String redisKey, String redisValues, Community community) {
+		redisValues += community.getId() + REDIS_SEPARATOR;
+		redisUtil.setValuesWithTimeout(redisKey, redisValues, calculateTimeUntilMidnight());
+		community.increaseView();
+	}
+
+	public long calculateTimeUntilMidnight() {
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime midnight = now.truncatedTo(ChronoUnit.DAYS).plusDays(1);
 		return ChronoUnit.SECONDS.between(now, midnight);
@@ -91,98 +89,85 @@ public class CommunityService {
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> createCommunity(
-			CustomUserPrincipal customUserPrincipal,
-			CommunityRequest communityRequest, List<MultipartFile> multipartFileList) {
-		Users user = customUserPrincipal.getUsers();
-		Community community = Community.builder()
-				.title(communityRequest.getTitle())
-				.contents(communityRequest.getContents())
-				.boardType(communityRequest.getType())
-				.createdAt(LocalDateTime.now())
-				.users(user)
-				.build();
-		if (multipartFileList != null && !multipartFileList.isEmpty()) {
-			List<Photo> photoList = new ArrayList<>();
-			for (MultipartFile multipartFile : multipartFileList) {
-				Photo photo = Photo.builder()
-						.filename(multipartFile.getOriginalFilename())
-						.fileSize(multipartFile.getSize())
-						.fileUrl(s3Util.upload(multipartFile))
-						.community(community)
-						.build();
-				photoList.add(photo);
-			}
-			photoRepository.saveAll(photoList);
-			community.addPhoto(photoList);
-		}
-		communityRepository.save(community);
-		community.updateModifiedAt(community.getCreatedAt());
-		if (user.getCommunityList() == null) {
-			user.addCommunity(community);
+		CustomUserPrincipal customUserPrincipal,
+		CommunityRequest communityRequest,
+		List<MultipartFile> multipartFiles
+	) {
+		Users user = userRepository.getById(customUserPrincipal.getId());
+		Community community = Community.of(
+			communityRequest.getTitle(),
+			communityRequest.getContents(),
+			communityRequest.getType(),
+			user
+		);
+
+		if (multipartFiles != null && !multipartFiles.isEmpty()) {
+			savePhotoFromMultipartFile(multipartFiles, community);
 		}
 
-		CommunityResponse communityResponse = CommunityResponse.of(community,  false,true);
-		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
-				"게시글을 성공적으로 작성했습니다.");
+		communityRepository.save(community);
+		user.addCommunity(community);
+
+		return responseService.getSingleResponse(HttpStatus.OK.value(), CommunityResponse.from(user,community),
+			"게시글을 성공적으로 작성했습니다.");
 	}
+
+	public void savePhotoFromMultipartFile(List<MultipartFile> multipartFileList, Community community) {
+		List<Photo> photos = multipartFileList.stream()
+			.map(multipartFile -> Photo.of(
+					community,
+					multipartFile.getOriginalFilename(),
+					s3Util.upload(multipartFile),
+					multipartFile.getSize()
+				)
+			)
+			.toList();
+		photoRepository.saveAll(photos);
+		community.addPhotos(photos);
+	}
+
 	@Transactional(readOnly = true)
-	public ResponseEntity<CommonResponse.SingleResponse<List<CommunityResponse.PageResponse>>> paginationNoOffsetBuilder(
-			CustomUserPrincipal customUserPrincipal,Long communityId,
-			SortType sortType, BoardType boardType, String searchText, int pageSize) {
-		Users users=customUserPrincipal.getUsers();
-		List<CommunityResponse.PageResponse> result = communityRepository.paginationNoOffsetBuilder(
-				users,communityId, sortType, boardType, searchText, pageSize);
+	public ResponseEntity<CommonResponse.SingleResponse<List<CommunityPageResponse>>> paginationNoOffsetBuilder(
+		CustomUserPrincipal customUserPrincipal, Long communityId,
+		SortType sortType, BoardType boardType, String searchText, Integer pageSize) {
+		Users users = userRepository.getById(customUserPrincipal.getId());
+		List<CommunityPageResponse> result = communityRepository.paginationNoOffsetBuilder(
+			users, communityId, sortType, boardType, searchText, pageSize);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), result,
-				"게시판을 성공적으로 조회했습니다.");
+			"게시판을 성공적으로 조회했습니다.");
 	}
 
 	@Transactional
 	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> updateCommunity(
-			CustomUserPrincipal customUserPrincipal, Long communityId,
-			CommunityRequest communityRequest, List<MultipartFile> files) {
-		Users user = customUserPrincipal.getUsers();
+		CustomUserPrincipal customUserPrincipal, Long communityId,
+		CommunityRequest communityRequest, List<MultipartFile> multipartFiles) {
+		Users users = userRepository.getById(customUserPrincipal.getId());
 		Community community = communityRepository.getById(communityId);
-		Community.validateCommunityByUser(community.getUsers().getId(), user.getId());
-		community.getPhotoList().clear();
+		community.validateByUserId(users.getId());
 		community.updateCommunity(communityRequest);
-		community.updateModifiedAt(LocalDateTime.now());
-		if (files != null && !files.isEmpty()) {
+
+		if (multipartFiles != null && !multipartFiles.isEmpty()) {
+			community.clearPhoto();
 			List<Photo> existingPhotos = photoRepository.findByCommunityId(communityId);
 			photoRepository.deleteAll(existingPhotos);
 			for (Photo photo : existingPhotos) {
 				s3Util.deleteFile(photo.getFileUrl());
 			}
-			List<Photo> photoList = new ArrayList<>();
-			for (MultipartFile multipartFile : files) {
-				Photo photo = Photo.builder()
-						.filename(multipartFile.getOriginalFilename())
-						.fileSize(multipartFile.getSize())
-						.fileUrl(s3Util.upload(multipartFile))
-						.community(community)
-						.build();
-				photoList.add(photo);
-			}
-			photoRepository.saveAll(photoList);
-			community.addPhoto(photoList);
+			savePhotoFromMultipartFile(multipartFiles, community);
 		}
 
-		boolean isScrap = false;
-		Optional<Scrap> scrap = scrapRepository.findByUsersAndCommunity(user, community);
-		if(scrap.isPresent()) {
-			isScrap = true;
-		}
-
-		CommunityResponse communityResponse = CommunityResponse.of(community, isScrap,true);
-		return responseService.getSingleResponse(HttpStatus.OK.value(), communityResponse,
-				"게시글 수정을 완료했습니다.");
+		return responseService.getSingleResponse(HttpStatus.OK.value(), CommunityResponse.from(users,community),
+			"게시글 수정을 완료했습니다.");
 	}
+
+	// TODO
+	// 관계 정리되면 변경될 가능성 존재
 	@Transactional
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteCommunity(
-			CustomUserPrincipal customUserPrincipal, Long communityId) {
-		Users user = customUserPrincipal.getUsers();
+		CustomUserPrincipal customUserPrincipal, Long communityId) {
+		Users users = userRepository.getById(customUserPrincipal.getId());
 		Community community = communityRepository.getById(communityId);
-
-		Community.validateCommunityByUser(community.getUsers().getId(), user.getId());
+		community.validateByUserId(users.getId());
 
 		List<CommentNotification> commentNotifications = commentNotificationRepository.findByCommunityId(communityId);
 		for (CommentNotification commentNotification : commentNotifications) {
@@ -198,11 +183,10 @@ public class CommunityService {
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse.ViewAndCommentResponse>> getCommentAndViewByCommunity(
-			CustomUserPrincipal customUserPrincipal, Long communityId) {
+	public ResponseEntity<CommonResponse.SingleResponse<ViewAndCommentResponse>> getCommentAndViewByCommunity(
+		CustomUserPrincipal customUserPrincipal, Long communityId) {
 		Community community = communityRepository.getById(communityId);
-		ViewAndCommentResponse viewAndCommentResponse = CommunityResponse.ViewAndCommentResponse.from(community);
-		return responseService.getSingleResponse(HttpStatus.OK.value(),viewAndCommentResponse,
-				"게시글 조회수와 댓글수를 불러왔습니다.");
+		return responseService.getSingleResponse(HttpStatus.OK.value(), ViewAndCommentResponse.from(community),
+			"게시글 조회수와 댓글수를 불러왔습니다.");
 	}
 }

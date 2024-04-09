@@ -51,23 +51,18 @@ public class KakaoService {
 	private final CommentNotificationRepository commentNotificationRepository;
 
 	public TokenResponse kakaoLogin(KakaoRequest kakaoRequest) {
-		//		KakaoRequest.kakaoRequest kakaoAccount = kakaoRequest.getKakaoAccount();
 		String email = kakaoRequest.getEmail();
 		String progile = kakaoRequest.getProfile();
 
 		Optional<Users> usersOptional = userRepository.findByEmail(email);
 		if (usersOptional.isEmpty()) {
-			Users users = Users.builder()
-          .email(email)
-          .oauthId(String.valueOf(kakaoRequest.getId()))
-          .role(Role.USER)
-          .build();
+			Users users = Users.of(email, String.valueOf(kakaoRequest.getId()));
 			userRepository.save(users);
-			TokenResponse t=tokenProvider.createToken(email, Role.USER.getRole(),false);
-			return tokenProvider.createToken(email, Role.USER.getRole(),false);
+			TokenResponse t = tokenProvider.createToken(email, Role.USER.getRole(), false);
+			return tokenProvider.createToken(email, Role.USER.getRole(), false);
 
 		} else {
-			return tokenProvider.createToken(email, usersOptional.get().getRole().getRole(),true);
+			return tokenProvider.createToken(email, usersOptional.get().getRole().getRole(), true);
 		}
 	}
 
@@ -111,21 +106,17 @@ public class KakaoService {
 
 		Optional<Users> usersOptional = userRepository.findByEmail(email);
 		if (usersOptional.isEmpty()) {
-			Users users = Users.builder()
-				.email(email)
-				.role(Role.USER)
-				.oauthId(String.valueOf(kakaoMemberResponse.getId()))
-				.build();
+			Users users = Users.of(email, String.valueOf(kakaoMemberResponse.getId()));
 			userRepository.save(users);
-			return tokenProvider.createToken(email, Role.USER.getRole(),false);
+			return tokenProvider.createToken(email, Role.USER.getRole(), false);
 		} else {
-			return tokenProvider.createToken(email, usersOptional.get().getRole().getRole(),true);
+			return tokenProvider.createToken(email, usersOptional.get().getRole().getRole(), true);
 		}
 	}
 
 	@Transactional
 	public UserNameResponse changeNickname(CustomUserPrincipal customUserPrincipal, String name) {
-		Users user = customUserPrincipal.getUsers();
+		Users user = userRepository.getById(customUserPrincipal.getId());
 		Optional<Users> optionalUsers = userRepository.findByNickname(name);
 		if (optionalUsers.isPresent()) {
 			throw new CustomException(UserErrorCode.NICKNAME_IN_USE);
@@ -135,18 +126,18 @@ public class KakaoService {
 		return new UserNameResponse(user.getNickname());
 	}
 
-	@Transactional
-	public void leave(CustomUserPrincipal customUserPrincipal) {
-		Users users = customUserPrincipal.getUsers();
-		commentNotificationRepository.deleteByUsersId(users.getId());
-		commentRepository.nullifyUsersId(users.getId());
-		userRepository.deleteById(users.getId());
-	}
-
-	public void logout(CustomUserPrincipal customUserPrincipal) {
-		Users users = customUserPrincipal.getUsers();
-		appAdminKeyMethod(users.getOauthId(), KAKAO_LOGOUT_URL);
-	}
+	// @Transactional
+	// public void leave(CustomUserPrincipal customUserPrincipal) {
+	// 	Users users = customUserPrincipal.getUsers();
+	// 	commentNotificationRepository.deleteByUsersId(users.getId());
+	// 	commentRepository.nullifyUsersId(users.getId());
+	// 	userRepository.deleteById(users.getId());
+	// }
+	//
+	// public void logout(CustomUserPrincipal customUserPrincipal) {
+	// 	Users users = customUserPrincipal.getUsers();
+	// 	appAdminKeyMethod(users.getOauthId(), KAKAO_LOGOUT_URL);
+	// }
 
 	public void appAdminKeyMethod(String oauthId, String url) {
 		RestTemplate rt = new RestTemplate();
@@ -186,15 +177,11 @@ public class KakaoService {
 
 		Optional<Users> usersOptional = userRepository.findByEmail(email);
 		if (usersOptional.isEmpty()) {
-			Users users = Users.builder()
-				.email(email)
-				.role(Role.USER)
-				.oauthId(String.valueOf(kakaoMemberResponse.getId()))
-				.build();
+			Users users = Users.of(email, String.valueOf(kakaoMemberResponse.getId()));
 			userRepository.save(users);
-			return tokenProvider.createToken(email, Role.USER.getRole(),false);
+			return tokenProvider.createToken(email, Role.USER.getRole(), false);
 		} else {
-			return tokenProvider.createToken(email, usersOptional.get().getRole().getRole(),true);
+			return tokenProvider.createToken(email, usersOptional.get().getRole().getRole(), true);
 		}
 	}
 }

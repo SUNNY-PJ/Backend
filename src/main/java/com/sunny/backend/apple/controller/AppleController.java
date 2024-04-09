@@ -1,6 +1,19 @@
 package com.sunny.backend.apple.controller;
+
 import com.sunny.backend.apple.service.AppleOAuthClient;
 import com.sunny.backend.apple.service.AppleService;
+import javax.validation.constraints.Size;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.sunny.backend.auth.dto.TokenResponse;
 import com.sunny.backend.auth.dto.UserNameResponse;
 import com.sunny.backend.auth.dto.UserRequest;
@@ -10,19 +23,8 @@ import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 
 import io.swagger.annotations.ApiOperation;
-import javax.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/apple/auth")
@@ -39,7 +41,6 @@ public class AppleController {
 	public ResponseEntity<CommonResponse.SingleResponse<TokenResponse>> verifyToken(
 			@RequestParam("code") String idToken) {
 		TokenResponse tokenResponse = appleOAuthClient.getOAuthMemberId(idToken);
-		log.info(String.valueOf(idToken));
 		log.info(String.valueOf(tokenResponse));
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 				tokenResponse, "애플 로그인 성공");
@@ -54,25 +55,27 @@ public class AppleController {
 		return responseService.getSingleResponse(HttpStatus.OK.value(), userDto, "닉네임 변경 성공");
 	}
 
-
-	@ApiOperation(tags = "0. Auth", value = "탈퇴")
+	@ApiOperation(tags = "0. Auth", value = "애플 탈퇴")
 	@GetMapping("/leave")
 	public ResponseEntity<CommonResponse.GeneralResponse> deleteAccount(
 			@AuthUser CustomUserPrincipal customUserPrincipal,
 			@RequestParam("code") String code) {
-		return appleService.revoke(customUserPrincipal, code);
+		ResponseEntity<CommonResponse.GeneralResponse> response = appleService.revokeToken(customUserPrincipal.getId(),
+				code);
+		log.info("revokeToken: {}", response);
+		return response;
 	}
 
-	@ApiOperation(tags = "0. Auth", value = "refresh 토큰으로 access 토큰 재발급")
+	@ApiOperation(tags = "0. Auth", value = "refresh 토큰으로 access 토큰 발급")
 	@GetMapping("/reissue")
 	public ResponseEntity<TokenResponse> reissue(@RequestParam(name = "refreshToken") String refreshToken) {
 		TokenResponse tokenResponse = appleService.reissue(refreshToken);
 		return ResponseEntity.ok().body(tokenResponse);
 	}
 
+	@ApiOperation(tags = "0. Auth", value = "애플 로그아웃")
 	@PostMapping("/logout")
 	public ResponseEntity<?> logout(@Validated @RequestBody UserRequest logout) {
 		return appleService.logout(logout);
 	}
 }
-

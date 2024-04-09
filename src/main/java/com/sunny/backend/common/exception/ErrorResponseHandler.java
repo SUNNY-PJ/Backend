@@ -13,7 +13,7 @@ public class ErrorResponseHandler {
 
 	public static ResponseEntity<ErrorResponseHandler> toResponseEntity(ErrorCode e) {
 		return ResponseEntity
-			.status(200)
+			.status(e.getHttpStatus())
 			.body(ErrorResponseHandler.builder()
 				.status(e.getHttpStatus().value())
 				.message(e.getMessage())
