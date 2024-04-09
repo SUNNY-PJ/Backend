@@ -105,13 +105,15 @@ public class AppleService {
 		return new UserNameResponse(user.getNickname());
 	}
 
+
 	public TokenResponse reissue(String refreshToken) {
 		redisUtil.isExistData(refreshToken);
 		String email = redisUtil.getData(refreshToken);
 		userRepository.getByEmail(email);
-		redisUtil.deleteData(refreshToken);
+		tokenProvider.reissue(refreshToken,email);
 		return tokenProvider.createToken(email, "ROLE_USER", true);
 	}
+
 
 	public ResponseEntity<CommonResponse.GeneralResponse> logout(UserRequest logout) {
 		int status =

@@ -73,6 +73,7 @@ public class AppleController {
 		return ResponseEntity.ok().body(tokenResponse);
 	}
 
+
 	@ApiOperation(tags = "0. Auth", value = "애플 로그아웃")
 	@PostMapping("/logout")
 	public ResponseEntity<?> logout(@Validated @RequestBody UserRequest logout) {
