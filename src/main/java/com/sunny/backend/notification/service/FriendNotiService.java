@@ -23,19 +23,19 @@ public class FriendNotiService {
 	public void sendNotifications(String title, String body, String bodyTitle, Friend friend) {
 		Long postAuthor = friend.getUserFriend().getId();
 		FriendsNotification friendsNotification = FriendsNotification.builder()
-				.users(friend.getUserFriend()) // 상대방꺼
-				.friend(friend.getUsers())
-				.title(bodyTitle)
-				.body(body)
-				.build();
+			.users(friend.getUserFriend()) // 상대방꺼
+			.friend(friend.getUsers())
+			.title(bodyTitle)
+			.body(body)
+			.build();
 		friendsNotificationRepository.save(friendsNotification);
 		List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
 		if (notificationList.size() != 0) {
-			String notificationBody=friend.getUsers().getNickname()+body;
+			String notificationBody = friend.getUsers().getNickname() + body;
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
-					postAuthor,
-					notificationBody,
-					bodyTitle
+				postAuthor,
+				notificationBody,
+				bodyTitle
 			);
 			notificationService.sendNotificationToFriends(title, notificationPushRequest);
 		}

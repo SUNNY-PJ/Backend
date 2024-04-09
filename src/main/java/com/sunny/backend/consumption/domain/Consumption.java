@@ -68,5 +68,5 @@ public class Consumption {
 			throw new CustomException(NO_USER_PERMISSION);
 		}
 	}
-    
+
 }

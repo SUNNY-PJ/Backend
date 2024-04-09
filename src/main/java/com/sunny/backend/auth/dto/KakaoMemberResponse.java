@@ -15,7 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class KakaoMemberResponse{
+public class KakaoMemberResponse {
 	Long id;
 	KakaoAccount kakaoAccount;
 

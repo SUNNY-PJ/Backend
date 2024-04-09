@@ -57,7 +57,7 @@ public class CommunityService {
 
 		findByRedisAndSaveIfNotFound(user.getId(), community);
 
-		return responseService.getSingleResponse(HttpStatus.OK.value(), CommunityResponse.from(user,community),
+		return responseService.getSingleResponse(HttpStatus.OK.value(), CommunityResponse.from(user, community),
 			"게시글을 성공적으로 불러왔습니다.");
 	}
 
@@ -108,7 +108,7 @@ public class CommunityService {
 		communityRepository.save(community);
 		user.addCommunity(community);
 
-		return responseService.getSingleResponse(HttpStatus.OK.value(), CommunityResponse.from(user,community),
+		return responseService.getSingleResponse(HttpStatus.OK.value(), CommunityResponse.from(user, community),
 			"게시글을 성공적으로 작성했습니다.");
 	}
 
@@ -156,7 +156,7 @@ public class CommunityService {
 			savePhotoFromMultipartFile(multipartFiles, community);
 		}
 
-		return responseService.getSingleResponse(HttpStatus.OK.value(), CommunityResponse.from(users,community),
+		return responseService.getSingleResponse(HttpStatus.OK.value(), CommunityResponse.from(users, community),
 			"게시글 수정을 완료했습니다.");
 	}
 

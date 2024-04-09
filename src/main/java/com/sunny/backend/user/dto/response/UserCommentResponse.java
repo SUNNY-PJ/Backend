@@ -1,10 +1,10 @@
 package com.sunny.backend.user.dto.response;
 
-import com.sunny.backend.user.domain.Users;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sunny.backend.comment.domain.Comment;
+import com.sunny.backend.user.domain.Users;
 
 import lombok.Builder;
 
@@ -19,26 +19,26 @@ public record UserCommentResponse(
 	LocalDateTime createdDate
 ) {
 
-		public static UserCommentResponse from(Comment comment, Users currentUser) {
-			String commentContent = "";
-			if (comment.getIsPrivated() && !(currentUser.getId().equals(comment.getUsers().getId()) ||
-					currentUser.getId().equals(comment.getCommunity().getUsers().getId()))) {
-				if (comment.getIsDeleted()) {
-					commentContent = "삭제된 댓글입니다.";
-				} else {
-					commentContent = "비밀 댓글입니다.";
-				}
+	public static UserCommentResponse from(Comment comment, Users currentUser) {
+		String commentContent = "";
+		if (comment.getIsPrivated() && !(currentUser.getId().equals(comment.getUsers().getId()) ||
+			currentUser.getId().equals(comment.getCommunity().getUsers().getId()))) {
+			if (comment.getIsDeleted()) {
+				commentContent = "삭제된 댓글입니다.";
 			} else {
-				commentContent = comment.getContent();
+				commentContent = "비밀 댓글입니다.";
 			}
-
-			return UserCommentResponse.builder()
-					.communityId(comment.getCommunity().getId())
-					.userId(comment.getUsers().getId())
-					.commentId(comment.getId())
-					.content(commentContent)
-					.writer(comment.getUsers().getNickname())
-					.createdDate(comment.getCreatedDate())
-					.build();
+		} else {
+			commentContent = comment.getContent();
 		}
+
+		return UserCommentResponse.builder()
+			.communityId(comment.getCommunity().getId())
+			.userId(comment.getUsers().getId())
+			.commentId(comment.getId())
+			.content(commentContent)
+			.writer(comment.getUsers().getNickname())
+			.createdDate(comment.getCreatedDate())
+			.build();
 	}
+}

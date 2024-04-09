@@ -1,6 +1,5 @@
 package com.sunny.backend.save.repository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +9,7 @@ import com.sunny.backend.save.domain.Save;
 
 public interface SaveRepository extends JpaRepository<Save, Long> {
 	Optional<Save> findByUsers_Id(Long userId);
+
 	List<Save> findAllByUsers_Id(Long userId);
 
 	default Save getById(Long id) {

@@ -1,6 +1,5 @@
 package com.sunny.backend.apple.service;
 
-import com.sunny.backend.common.config.AppleProperties;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.Security;
@@ -19,13 +18,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sunny.backend.auth.dto.TokenResponse;
 import com.sunny.backend.auth.dto.UserNameResponse;
 import com.sunny.backend.auth.dto.UserRequest;
 import com.sunny.backend.auth.exception.UserErrorCode;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.auth.jwt.TokenProvider;
 import com.sunny.backend.comment.repository.CommentRepository;
+import com.sunny.backend.common.config.AppleProperties;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
@@ -70,14 +69,14 @@ public class AppleService {
 		jwtHeader.put("alg", "ES256");
 
 		return Jwts.builder()
-				.setHeaderParams(jwtHeader)
-				.setIssuer(appleProperties.getTeamId())
-				.setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간 - UNIX 시간
-				.setExpiration(Date.from(expiration.atZone(ZoneId.systemDefault()).toInstant())) // 만료 시간
-				.setAudience("https://appleid.apple.com")
-				.setSubject(appleProperties.getClientId())
-				.signWith(SignatureAlgorithm.ES256, getPrivateKey())
-				.compact();
+			.setHeaderParams(jwtHeader)
+			.setIssuer(appleProperties.getTeamId())
+			.setIssuedAt(new Date(System.currentTimeMillis())) // 발행 시간 - UNIX 시간
+			.setExpiration(Date.from(expiration.atZone(ZoneId.systemDefault()).toInstant())) // 만료 시간
+			.setAudience("https://appleid.apple.com")
+			.setSubject(appleProperties.getClientId())
+			.signWith(SignatureAlgorithm.ES256, getPrivateKey())
+			.compact();
 	}
 
 	private PrivateKey getPrivateKey() {
@@ -92,7 +91,6 @@ public class AppleService {
 		}
 	}
 
-
 	@Transactional
 	public UserNameResponse changeNickname(CustomUserPrincipal customUserPrincipal, String name) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
@@ -105,32 +103,30 @@ public class AppleService {
 		return new UserNameResponse(user.getNickname());
 	}
 
-
-	public TokenResponse reissue(String refreshToken) {
+	public ResponseEntity<?> reissue(String refreshToken) {
 		redisUtil.isExistData(refreshToken);
 		String email = redisUtil.getData(refreshToken);
 		userRepository.getByEmail(email);
-		tokenProvider.reissue(refreshToken,email);
-		return tokenProvider.createToken(email, "ROLE_USER", true);
+		return tokenProvider.reissue(refreshToken, email);
 	}
-
 
 	public ResponseEntity<CommonResponse.GeneralResponse> logout(UserRequest logout) {
 		int status =
-				tokenProvider.logout(logout) ? HttpStatus.OK.value() : HttpStatus.BAD_REQUEST.value();
+			tokenProvider.logout(logout) ? HttpStatus.OK.value() : HttpStatus.BAD_REQUEST.value();
 		String message = tokenProvider.logout(logout) ? "logout 성공" : "logout 실패";
 		return responseService.getGeneralResponse(status, message);
 	}
+
 	@Transactional
 	public ResponseEntity<CommonResponse.GeneralResponse> revokeToken(Long userId, String code) {
 		Users users = userRepository.getById(userId);
 		log.info("code={}", code);
 		try {
 			ResponseEntity<String> response = appleAuthClient.revokeToken(
-					appleProperties.getClientId(),
-					generateClientSecret(),
-					code,
-					"access_token"
+				appleProperties.getClientId(),
+				generateClientSecret(),
+				code,
+				"access_token"
 			);
 
 			if (response.getStatusCode().is2xxSuccessful()) {

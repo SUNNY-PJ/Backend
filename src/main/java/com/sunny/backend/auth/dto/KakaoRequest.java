@@ -1,7 +1,5 @@
 package com.sunny.backend.auth.dto;
 
-import static com.sunny.backend.common.ComnConstant.*;
-
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -17,11 +15,11 @@ import lombok.Setter;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class KakaoRequest {
 
-  Long id;
-  String email;
-  //  KakaoAccount kakaoAccount;
-  String nickname;
-  String profile;
+	Long id;
+	String email;
+	//  KakaoAccount kakaoAccount;
+	String nickname;
+	String profile;
 }
 
 //  @Getter

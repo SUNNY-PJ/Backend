@@ -35,10 +35,10 @@ public class ChatSocketService {
 
 		ChatRoom chatRoom;
 		// 0인 경우 채팅방 생성
-		if(isZeroChatRoomId(chatSendMessage.chatRoomId())) {
+		if (isZeroChatRoomId(chatSendMessage.chatRoomId())) {
 			Optional<ChatUser> chatUserOptional = chatUserRepository
 				.findByFriend_IdAndUsers_Id(chatSendMessage.sendUserId(), user.getId());
-			if(chatUserOptional.isPresent()) {
+			if (chatUserOptional.isPresent()) {
 				chatRoom = chatUserOptional.get().getChatRoom(); // 친구의 채팅방이 있는 경우 해당 채팅방 사용
 			} else {
 				chatRoom = chatRoomRepository.save(new ChatRoom(2));
@@ -53,6 +53,7 @@ public class ChatSocketService {
 		chatMessageRepository.save(chatMessage);
 		template.convertAndSend("/sub/room/" + chatRoom.getId(), chatSendMessage.message());
 	}
+
 	private boolean isZeroChatRoomId(Long chatRoomId) {
 		return chatRoomId == 0;
 	}

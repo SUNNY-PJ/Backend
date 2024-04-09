@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NotificationResponse {
-    private String title;
-    private String body;
-    private String originalResponse;
+	private String title;
+	private String body;
+	private String originalResponse;
 
 }

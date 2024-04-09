@@ -1,12 +1,12 @@
 package com.sunny.backend.community.dto.response;
 
-import com.sunny.backend.user.domain.Users;
 import java.util.List;
 import java.util.Objects;
 
 import com.sunny.backend.common.photo.Photo;
 import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.Community;
+import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.util.DatetimeUtil;
 
 public record CommunityResponse(
@@ -26,7 +26,7 @@ public record CommunityResponse(
 	boolean isAuthor
 ) {
 
-	public static CommunityResponse from(Users users,Community community) {
+	public static CommunityResponse from(Users users, Community community) {
 		return new CommunityResponse(
 			community.getId(),
 			community.getUsers().getId(),

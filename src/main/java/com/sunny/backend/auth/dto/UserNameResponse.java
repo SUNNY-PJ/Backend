@@ -1,6 +1,6 @@
 package com.sunny.backend.auth.dto;
 
-public record UserNameResponse (
+public record UserNameResponse(
 	String name
-){
+) {
 }
