@@ -29,6 +29,7 @@ import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.save.domain.Save;
+import com.sunny.backend.save.exception.SaveErrorCode;
 import com.sunny.backend.scrap.domain.Scrap;
 
 import lombok.AccessLevel;
@@ -69,7 +70,7 @@ public class Users extends BaseTime {
 	private final List<Comment> commentList = new ArrayList<>();
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
-	private final List<Save> saveList = new ArrayList<>();
+	private final List<Save> saves = new ArrayList<>();
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
 	private final List<Scrap> scraps = new ArrayList<>();
@@ -112,11 +113,31 @@ public class Users extends BaseTime {
 	}
 
 	public void addSave(Save save) {
-		this.saveList.add(save);
+		this.saves.add(save);
 	}
 
 	public void addScrap(Scrap scrap) {
 		scraps.add(scrap);
+	}
+
+	public int getSaveSize() {
+		return saves.size();
+	}
+
+	public Save getLastSaveOrException() {
+		if (getSaveSize() <= 0) {
+			throw new CustomException(SaveErrorCode.SAVE_NOT_FOUND);
+		}
+
+		return getSaves().get(getSaveSize() - 1);
+	}
+
+	public boolean isExistLastSave() {
+		if (!saves.isEmpty()) {
+			Save save = getSaves().get(getSaveSize() - 1);
+			return save.checkExpired();
+		}
+		return false;
 	}
 
 	public boolean isScrapByCommunity(Long communityId) {

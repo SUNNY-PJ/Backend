@@ -16,16 +16,13 @@ import javax.validation.constraints.PositiveOrZero;
 import com.sunny.backend.save.dto.request.SaveRequest;
 import com.sunny.backend.user.domain.Users;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Save {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,6 +45,17 @@ public class Save {
 	@JoinColumn(name = "user_id")
 	private Users users;
 
+	private Save(Long cost, LocalDate startDate, LocalDate endDate, Users users) {
+		this.cost = cost;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.users = users;
+	}
+
+	public static Save of(Long cost, LocalDate startDate, LocalDate endDate, Users users) {
+		return new Save(cost, startDate, endDate, users);
+	}
+
 	public void updateSave(SaveRequest saveRequest) {
 		this.cost = saveRequest.getCost();
 		this.startDate = saveRequest.getStartDate();
@@ -67,7 +75,7 @@ public class Save {
 		return Math.round(percentage * 10) / 10.0; // 소수점 첫째 자리 반올림
 	}
 
-	public boolean checkExpired(LocalDate expirationDate) {
-		return expirationDate != null && LocalDate.now().isAfter(expirationDate);
+	public boolean checkExpired() {
+		return endDate != null && LocalDate.now().isAfter(endDate);
 	}
 }
