@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;
@@ -15,7 +16,7 @@ import com.sunny.backend.save.domain.Save;
 import com.sunny.backend.save.dto.request.SaveRequest;
 import com.sunny.backend.save.dto.response.DetailSaveResponse;
 import com.sunny.backend.save.dto.response.SaveResponse;
-import com.sunny.backend.save.dto.response.SaveResponses;
+import com.sunny.backend.save.exception.SaveErrorCode;
 import com.sunny.backend.save.repository.SaveRepository;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
@@ -33,51 +34,51 @@ public class SaveService {
 	private final ConsumptionRepository consumptionRepository;
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> createSaveGoal(
-		CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
+	public Long createSaveGoal(
+		CustomUserPrincipal customUserPrincipal,
+		SaveRequest saveRequest
+	) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
-		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
-		boolean allSavesExpired = saves.stream().allMatch(save -> save.checkExpired(save.getEndDate()));
-		if (allSavesExpired) {
-			Save save = Save.builder()
-				.cost(saveRequest.getCost())
-				.startDate(saveRequest.getStartDate())
-				.endDate(saveRequest.getEndDate())
-				.users(user)
-				.build();
-			saveRepository.save(save);
-			user.addSave(save);
-			return responseService.getSingleResponse(HttpStatus.OK.value(), SaveResponse.from(save, true),
-				"절약 목표를 등록했습니다.");
-		} else {
-			if (!saves.isEmpty()) {
-				Save lastSave = saves.get(saves.size() - 1);
-				SaveResponse saveResponse = SaveResponse.from(lastSave, checkSuccessed(user, lastSave));
-				return responseService.getSingleResponse(HttpStatus.BAD_REQUEST.value(), null, "이미 등록된 절약 목표가 존재합니다.");
+		int saveSize = user.getSaveSize();
+
+		if (saveSize > 1) {
+			Save save = user.getLastSaveOrException();
+			if (save.checkExpired()) {
+				Save newSave = createSave(saveRequest, user);
+				return newSave.getId();
 			} else {
-				return responseService.getSingleResponse(HttpStatus.OK.value(), null, "등록된 절약 목표를 찾을 수 없습니다.");
+				throw new CustomException(SaveErrorCode.SAVE_ALREADY);
 			}
 		}
+		Save newSave = createSave(saveRequest, user);
+		return newSave.getId();
+	}
+
+	public Save createSave(SaveRequest saveRequest, Users users) {
+		Save newSave = Save.of(
+			saveRequest.getCost(),
+			saveRequest.getStartDate(),
+			saveRequest.getEndDate(),
+			users
+		);
+		users.addSave(newSave);
+		return saveRepository.save(newSave);
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> updateSaveGoal(
-		CustomUserPrincipal customUserPrincipal, SaveRequest saveRequest) {
+	public void updateSaveGoal(
+		CustomUserPrincipal customUserPrincipal,
+		SaveRequest saveRequest
+	) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
-		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
-		Save lastSave = saves.get(saves.size() - 1);
-		lastSave.updateSave(saveRequest);
-		boolean success = checkSuccessed(user, lastSave);
-		return responseService.getSingleResponse(HttpStatus.OK.value(), SaveResponse.from(lastSave, success),
-			"절약 목표를 수정했습니다.");
+		Save save = user.getLastSaveOrException();
+		save.updateSave(saveRequest);
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.ListResponse<DetailSaveResponse>> getSaveGoal(
-		CustomUserPrincipal customUserPrincipal) {
+	public List<DetailSaveResponse> getSaveGoal(CustomUserPrincipal customUserPrincipal) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
-		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
-		List<DetailSaveResponse> saveResponses = saves.stream()
+		return user.getSaves().stream()
 			.map(save -> {
 				long remainingDays = save.calculateRemainingDays(save);
 				Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(),
@@ -86,25 +87,23 @@ public class SaveService {
 				return DetailSaveResponse.of(remainingDays, percentageUsed, save.getCost());
 			})
 			.toList();
-		return responseService.getListResponse(HttpStatus.OK.value(), saveResponses,
-			"절약 목표를 성공적으로 조회했습니다.");
 	}
 
-	public ResponseEntity<CommonResponse.ListResponse<SaveResponses>> getDetailSaveGoal(
+	//TODO 삭제 예정
+	public ResponseEntity<CommonResponse.ListResponse<SaveResponse>> getDetailSaveGoal(
 		CustomUserPrincipal customUserPrincipal) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
-		List<Save> saves = saveRepository.findAllByUsers_Id(user.getId());
-		List<SaveResponses> saveResponses = saves.stream().map(save -> {
-			return SaveResponses.from(save, checkSuccessed(user, save));
-		}).toList();
+		List<Save> saves = user.getSaves();
+		List<SaveResponse> saveResponses = saves.stream()
+			.map(SaveResponse::from)
+			.toList();
 		return responseService.getListResponse(HttpStatus.OK.value(), saveResponses,
 			"절약 목표 성공적으로 조회했습니다.");
 	}
 
-	public boolean checkSuccessed(Users user, Save save) {
-		Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(),
-			save.getEndDate());
-		double percentageUsed = save.calculateSavePercentage(userMoney, save);
-		return percentageUsed >= 0;
+	public SaveResponse getDetailSave(CustomUserPrincipal customUserPrincipal, Long saveId) {
+		Save save = saveRepository.getById(saveId);
+		return SaveResponse.from(save);
 	}
+
 }

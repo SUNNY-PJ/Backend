@@ -1,5 +1,7 @@
 package com.sunny.backend.consumption.service;
 
+import static com.sunny.backend.common.ComnConstant.*;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -52,54 +54,41 @@ public class ConsumptionService {
 			.users(user)
 			.build();
 		consumptionRepository.save(consumption);
-		// TODO 로직 맞는지 확인 부탁
-		if (user.getConsumptionList() == null) {
-			user.addConsumption(consumption);
-		}
+		user.addConsumption(consumption);
+		
 		ConsumptionResponse consumptionResponse = ConsumptionResponse.from(consumption);
 
 		for (Friend friend : friendRepository.findByUsersAndCompetitionIsNotNullAndCompetition_Status(user,
 			CompetitionStatus.PROCEEDING)) {
-			double percentageUsed = calculateUserPercentage(user.getId(), friend.getCompetition());
+			Competition competition = friend.getCompetition();
+			double percentageUsed = calculateUserPercentage(user.getId(), competition.getStartDate(),
+				competition.getEndDate(), competition.getPrice());
 			double friendsPercentageUsed = calculateUserPercentage(friend.getUserFriend().getId(),
-				friend.getCompetition());
+				competition.getStartDate(), competition.getEndDate(), competition.getPrice());
 
 			friend.getCompetition()
 				.getOutput()
 				.updateOutput(percentageUsed, friendsPercentageUsed, user.getId(), friend.getUserFriend().getId());
 		}
 
-		if (!user.getSaveList().isEmpty()) {
-			for (Save save : user.getSaveList()) {
-				Long totalSpent = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(),
-					save.getEndDate());
-				double percentage;
-				if (totalSpent == null) {
-					percentage = 100.0;
-				} else {
-					percentage = 100.0 - ((totalSpent * 100.0) / save.getCost());
-				}
-				percentage = Math.round(percentage * 10) / 10.0;
+		if (user.isExistLastSave()) {
+			Save save = user.getLastSaveOrException();
+			double percentage = calculateUserPercentage(user.getId(), save.getStartDate(), save.getEndDate(),
+				save.getCost());
+			if (percentage <= 80) {
+				String message;
 				if (percentage <= 0) {
-					try {
-						template.convertAndSend("/sub/user/" + user.getId(),
-							new SaveGoalAlertResponse(save.getCost(), percentage, "다 썼어요... \n 그렇다고 마음껏 낭비하시면 안돼요!"));
-					} catch (Exception e) {
-						log.info(e.getMessage());
-					}
+					message = SAVE_MESSAGE_BELOW_0;
 				} else if (percentage <= 20) {
-					template.convertAndSend("/sub/user/" + user.getId(),
-						new SaveGoalAlertResponse(save.getCost(), percentage,
-							String.format("목표금액 %d원까지 %f % 남았어요! \n 이제 정말 아껴쓰세요!", save.getCost(), percentage)));
+					message = SAVE_MESSAGE_BELOW_20;
 				} else if (percentage <= 50) {
-					template.convertAndSend("/sub/user/" + user.getId(),
-						new SaveGoalAlertResponse(save.getCost(), percentage,
-							String.format("목표금액 %d원까지 %f % 남았어요! \n 지출을 주여볼까요?", save.getCost(), percentage)));
-				} else if (percentage <= 80) {
-					template.convertAndSend("/sub/user/" + user.getId(),
-						new SaveGoalAlertResponse(save.getCost(), percentage,
-							String.format("목표금액 %d원까지 %f % 남았어요! \n 그래도 방심은 금물!", save.getCost(), percentage)));
+					message = SAVE_MESSAGE_BELOW_50;
+				} else {
+					message = SAVE_MESSAGE_BELOW_80;
 				}
+				message = String.format("목표금액 %d원까지 %.2f%% 남았어요! %s", save.getCost(), percentage, message);
+				template.convertAndSend("/sub/user/" + user.getId(),
+					new SaveGoalAlertResponse(save.getCost(), percentage, message));
 			}
 		}
 
@@ -107,14 +96,13 @@ public class ConsumptionService {
 			consumptionResponse, "지출을 등록했습니다.");
 	}
 
-	public double calculateUserPercentage(Long userId, Competition competition) {
-		Long totalSpent = consumptionRepository.getComsumptionMoney(userId, competition.getStartDate(),
-			competition.getEndDate());
+	public double calculateUserPercentage(Long userId, LocalDate startDate, LocalDate endDate, Long price) {
+		Long totalSpent = consumptionRepository.getComsumptionMoney(userId, startDate, endDate);
 		if (totalSpent == null) {
 			return 100.0;
 		}
 
-		double percentage = 100.0 - ((totalSpent * 100.0) / competition.getPrice());
+		double percentage = 100.0 - ((totalSpent * 100.0) / price);
 		return Math.round(percentage * 10) / 10.0; // 소수점 첫째 자리 반올림
 	}
 
