@@ -1,4 +1,4 @@
-package com.sunny.backend.auth.dto;
+package com.sunny.backend.apple.dto.response;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,12 +19,6 @@ public class ApplePublicKeyResponse {
     private String alg;
     private String n;
     private String e;
-  }
-
-  public Optional<ApplePublicKeyResponse.Key> getMatchedKeyBy(String kid,String alg){
-    return this.keys.stream()
-        .filter(key->key.getKid().equals(kid)&& key.getAlg().equals(alg))
-        .findFirst();
   }
 
 }

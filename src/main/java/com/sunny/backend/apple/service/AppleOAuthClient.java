@@ -1,5 +1,18 @@
-package com.sunny.backend.apple;
+package com.sunny.backend.apple.service;
 
+import com.sunny.backend.apple.publicKey.AppleOAuthPublicKeyGenerator;
+import com.sunny.backend.apple.publicKey.ApplePublicKeys;
+import com.sunny.backend.apple.jwt.JwtParser;
+import com.sunny.backend.auth.UnauthorizedException;
+import com.sunny.backend.auth.dto.TokenResponse;
+import com.sunny.backend.auth.jwt.TokenProvider;
+import com.sunny.backend.user.domain.Role;
+import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.repository.UserRepository;
+import io.jsonwebtoken.Claims;
+
+
+import io.jsonwebtoken.Jwts;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -10,7 +23,6 @@ import java.security.PublicKey;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
-
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
@@ -19,16 +31,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sunny.backend.auth.UnauthorizedException;
-import com.sunny.backend.auth.dto.AppleAuthClient;
-import com.sunny.backend.auth.dto.TokenResponse;
-import com.sunny.backend.auth.jwt.TokenProvider;
-import com.sunny.backend.user.domain.Role;
-import com.sunny.backend.user.domain.Users;
-import com.sunny.backend.user.repository.UserRepository;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,18 +52,14 @@ public class AppleOAuthClient implements OAuth2Client {
 	@Override
 	@Transactional
 	public TokenResponse getOAuthMemberId(String idToken) {
-
 		ApplePublicKeys applePublicKeys = appleAuthClient.getAppleAuthPublicKey();
-		System.out.println(applePublicKeys.getKeys().size());
 		Map<String, String> headers = jwtParser.parseHeaders(idToken);
 		PublicKey publicKey = appleOAuthPublicKeyGenerator.generatePublicKey(headers,
 			applePublicKeys);
-
 		Claims claims = jwtParser.parseClaims(idToken, publicKey);
 		String oAuthId = claims.getSubject();
 		String email = claims.get("email", String.class);
 		Optional<Users> usersOptional = userRepository.findByEmail(email);
-		log.info("usersOptional={}", usersOptional);
 		if (usersOptional.isEmpty()) {
 			Users users = Users.of(email, oAuthId);
 			userRepository.save(users);
@@ -70,7 +68,6 @@ public class AppleOAuthClient implements OAuth2Client {
 			return tokenProvider.createToken(email, usersOptional.get().getRole().getRole(), true);
 		}
 	}
-
 	private void validateClaims(Claims claims) {
 		// 클레임에서 필요한 정보 추출
 		String subject = claims.getSubject(); // 서브젝트
@@ -89,14 +86,12 @@ public class AppleOAuthClient implements OAuth2Client {
 			throw new UnauthorizedException("Invalid issuer in JWT claims");
 		}
 	}
-
 	public Claims getClaims(String token) {
 		return Jwts.parser()
 			.setSigningKey(tokenSecret)
 			.parseClaimsJws(token)
 			.getBody();
 	}
-
 	public PrivateKey getPrivateKey() throws IOException {
 		ClassPathResource resource = new ClassPathResource("static/AuthKey_R76G46JCNL.p8"); // .p8 key파일 위치
 		String privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
@@ -107,7 +102,6 @@ public class AppleOAuthClient implements OAuth2Client {
 		PrivateKeyInfo object = (PrivateKeyInfo)pemParser.readObject();
 		return converter.getPrivateKey(object);
 	}
-
 }
 
 

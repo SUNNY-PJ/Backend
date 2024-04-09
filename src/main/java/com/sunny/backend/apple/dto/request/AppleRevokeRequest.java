@@ -1,4 +1,4 @@
-package com.sunny.backend.apple;
+package com.sunny.backend.apple.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

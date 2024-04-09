@@ -1,11 +1,7 @@
-package com.sunny.backend.auth.dto;
+package com.sunny.backend.apple.service;
 
-
-
-import com.sunny.backend.apple.AppleFeignClientConfiguration;
-import com.sunny.backend.apple.ApplePublicKeys;
-import com.sunny.backend.apple.AppleRevokeRequest;
-import com.sunny.backend.apple.AppleSocialTokenInfoResponse;
+import com.sunny.backend.common.config.AppleFeignClientConfiguration;
+import com.sunny.backend.apple.publicKey.ApplePublicKeys;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,17 +19,6 @@ public interface AppleAuthClient {
 
     @GetMapping(value = "/keys")
     ApplePublicKeys getAppleAuthPublicKey();
-
-    @PostMapping(value = "/token", consumes = "application/x-www-form-urlencoded")
-    AppleSocialTokenInfoResponse getIdToken(
-        @RequestParam("client_id") String clientId,
-        @RequestParam("client_secret") String clientSecret,
-        @RequestParam("grant_type") String grantType,
-        @RequestParam("code") String code
-    );
-
-    @PostMapping(value = "/revoke",consumes = "application/x-www-form-urlencoded" )
-    void revoke(AppleRevokeRequest appleRevokeRequest);
 
     @PostMapping(value = "/revoke", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     ResponseEntity<String> revokeToken(@RequestParam("client_id") String clientId,
