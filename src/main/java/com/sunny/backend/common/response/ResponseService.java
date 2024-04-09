@@ -6,16 +6,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.sunny.backend.common.CommonErrorCode;
-import com.sunny.backend.common.response.CommonResponse;
 
 @Service
 public class ResponseService extends RuntimeException {
 	public CommonResponse.ErrorResponse getErrorResponse(int status, CommonErrorCode commonErrorCode) {
 		return new CommonResponse.ErrorResponse(status, commonErrorCode);
 	}
+
 	public CommonResponse.GeneralErrorResponse getGeneralErrorResponse(int status, String msg) {
 		return new CommonResponse.GeneralErrorResponse(status, msg);
 	}
+
 	public ResponseEntity<CommonResponse.GeneralResponse> getGeneralResponse(int status, String msg) {
 		return ResponseEntity.ok().body(new CommonResponse.GeneralResponse(status, msg));
 	}

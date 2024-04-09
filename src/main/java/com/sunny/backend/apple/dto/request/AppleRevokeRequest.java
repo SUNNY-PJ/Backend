@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppleRevokeRequest {
-  private String client_id;
-  private String client_secert;
-  private String token;
-  private String token_type_hint;
+	private String client_id;
+	private String client_secert;
+	private String token;
+	private String token_type_hint;
 }

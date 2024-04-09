@@ -47,7 +47,6 @@ public class CommentService {
 	private final NotificationRepository notificationRepository;
 	private final UserRepository userRepository;
 
-
 	public CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
 		CommentResponse commentResponse;
 		if (comment.getUsers() != null && comment.getUsers().getId() != null) {

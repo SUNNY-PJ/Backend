@@ -23,6 +23,6 @@ public class AuthService {
 		String email = redisUtil.getData(refreshToken);
 		userRepository.getByEmail(email);
 		redisUtil.deleteData(refreshToken);
-		return tokenProvider.createToken(email, "ROLE_USER",true);
+		return tokenProvider.createToken(email, "ROLE_USER", true);
 	}
 }

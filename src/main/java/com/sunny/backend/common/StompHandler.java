@@ -21,7 +21,7 @@ public class StompHandler implements ChannelInterceptor {
 	public Message<?> preSend(Message<?> message, MessageChannel channel) {
 		final StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
-		if(StompCommand.CONNECT == accessor.getCommand()) {
+		if (StompCommand.CONNECT == accessor.getCommand()) {
 			String authorization = accessor.getFirstNativeHeader("Authorization");
 
 			tokenProvider.validateToken(authorization);

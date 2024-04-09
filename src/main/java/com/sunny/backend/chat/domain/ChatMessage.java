@@ -11,8 +11,6 @@ import javax.persistence.ManyToOne;
 import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.user.domain.Users;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

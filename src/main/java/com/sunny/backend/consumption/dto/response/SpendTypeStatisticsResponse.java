@@ -1,6 +1,7 @@
 package com.sunny.backend.consumption.dto.response;
 
 import com.sunny.backend.consumption.domain.SpendType;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,8 +10,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class SpendTypeStatisticsResponse {
-    private SpendType category;
-    private long totalCount;
-    private long totalMoney;
-    private double percentage;
+	private SpendType category;
+	private long totalCount;
+	private long totalMoney;
+	private double percentage;
 }
