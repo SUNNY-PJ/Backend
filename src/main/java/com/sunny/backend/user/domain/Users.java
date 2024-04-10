@@ -64,7 +64,7 @@ public class Users extends BaseTime {
 	private final List<Community> communityList = new ArrayList<>();
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
-	private final List<Consumption> consumptionList = new ArrayList<>();
+	private final List<Consumption> consumptions = new ArrayList<>();
 
 	@OneToMany(mappedBy = "users")
 	private final List<Comment> commentList = new ArrayList<>();
@@ -109,7 +109,7 @@ public class Users extends BaseTime {
 	}
 
 	public void addConsumption(Consumption consumption) {
-		this.consumptionList.add(consumption);
+		this.consumptions.add(consumption);
 	}
 
 	public void addSave(Save save) {

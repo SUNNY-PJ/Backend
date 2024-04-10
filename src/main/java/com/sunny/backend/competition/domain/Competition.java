@@ -92,9 +92,8 @@ public class Competition {
 		}
 	}
 
-	public void addDate(LocalDate startDate, LocalDate endDate) {
-		this.startDate = startDate;
-		this.endDate = endDate;
+	public void updateOutput(double userPercent, double userFriendPercent, Long userId, Long userFriendId) {
+		this.output.updateOutput(userPercent, userFriendPercent, userId, userFriendId);
 	}
 
 	private Competition(String message, CompetitionOutput output, LocalDate startDate, LocalDate endDate, Long price,

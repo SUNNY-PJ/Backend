@@ -74,13 +74,12 @@ public class SaveService {
 	@Transactional
 	public List<DetailSaveResponse> getSaveGoal(CustomUserPrincipal customUserPrincipal) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
-		return user.getSaves().stream()
+		return user.getSaves()
+			.stream()
 			.map(save -> {
-				long remainingDays = save.calculateRemainingDays(save);
 				Long userMoney = consumptionRepository.getComsumptionMoney(user.getId(), save.getStartDate(),
 					save.getEndDate());
-				double percentageUsed = save.calculateSavePercentage(userMoney, save);
-				return DetailSaveResponse.of(save.getId(), remainingDays, percentageUsed, save.getCost());
+				return DetailSaveResponse.of(save, userMoney);
 			})
 			.toList();
 	}

@@ -62,16 +62,16 @@ public class Save {
 		this.endDate = saveRequest.getEndDate();
 	}
 
-	public long calculateRemainingDays(Save save) {
+	public long calculateRemainingDays() {
 		LocalDate currentDate = LocalDate.now();
-		return ChronoUnit.DAYS.between(currentDate, save.getEndDate());
+		return ChronoUnit.DAYS.between(currentDate, endDate);
 	}
 
-	public double calculateSavePercentage(Long userMoney, Save save) {
+	public double calculateSavePercentage(Long userMoney) {
 		if (userMoney == null) {
 			return 100.0;
 		}
-		double percentage = 100.0 - ((userMoney * 100.0) / save.getCost());
+		double percentage = 100.0 - ((userMoney * 100.0) / cost);
 		return Math.round(percentage * 10) / 10.0; // 소수점 첫째 자리 반올림
 	}
 
