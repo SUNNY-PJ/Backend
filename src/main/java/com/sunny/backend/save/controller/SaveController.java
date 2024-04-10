@@ -36,7 +36,7 @@ public class SaveController {
 
 	@ApiOperation(tags = "6. Save", value = "절약 목표 등록")
 	@PostMapping
-	public ResponseEntity<CommonResponse.SingleResponse<SaveResponse>> createSaveGoal(
+	public ResponseEntity<Void> createSaveGoal(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@Valid @RequestBody SaveRequest saveRequest) {
 		Long id = saveService.createSaveGoal(customUserPrincipal, saveRequest);
