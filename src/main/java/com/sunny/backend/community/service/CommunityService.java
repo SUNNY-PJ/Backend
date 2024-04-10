@@ -7,8 +7,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,8 +15,6 @@ import com.nimbusds.oauth2.sdk.util.StringUtils;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.photo.Photo;
 import com.sunny.backend.common.photo.PhotoRepository;
-import com.sunny.backend.common.response.CommonResponse;
-import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.community.domain.BoardType;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.community.domain.SortType;
@@ -43,22 +39,22 @@ import lombok.extern.slf4j.Slf4j;
 public class CommunityService {
 	private final CommunityRepository communityRepository;
 	private final PhotoRepository photoRepository;
-	private final ResponseService responseService;
 	private final S3Util s3Util;
 	private final RedisUtil redisUtil;
 	private final CommentNotificationRepository commentNotificationRepository;
 	private final UserRepository userRepository;
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> findCommunity(
-		CustomUserPrincipal customUserPrincipal, Long communityId) {
+	public CommunityResponse findCommunity(
+		CustomUserPrincipal customUserPrincipal,
+		Long communityId
+	) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		Community community = communityRepository.getById(communityId);
 
 		findByRedisAndSaveIfNotFound(user.getId(), community);
 
-		return responseService.getSingleResponse(HttpStatus.OK.value(), CommunityResponse.from(user, community),
-			"게시글을 성공적으로 불러왔습니다.");
+		return CommunityResponse.of(user, community);
 	}
 
 	public void findByRedisAndSaveIfNotFound(Long userId, Community community) {
@@ -88,7 +84,7 @@ public class CommunityService {
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> createCommunity(
+	public Long createCommunity(
 		CustomUserPrincipal customUserPrincipal,
 		CommunityRequest communityRequest,
 		List<MultipartFile> multipartFiles
@@ -108,8 +104,7 @@ public class CommunityService {
 		communityRepository.save(community);
 		user.addCommunity(community);
 
-		return responseService.getSingleResponse(HttpStatus.OK.value(), CommunityResponse.from(user, community),
-			"게시글을 성공적으로 작성했습니다.");
+		return community.getId();
 	}
 
 	public void savePhotoFromMultipartFile(List<MultipartFile> multipartFileList, Community community) {
@@ -127,20 +122,26 @@ public class CommunityService {
 	}
 
 	@Transactional(readOnly = true)
-	public ResponseEntity<CommonResponse.SingleResponse<List<CommunityPageResponse>>> paginationNoOffsetBuilder(
-		CustomUserPrincipal customUserPrincipal, Long communityId,
-		SortType sortType, BoardType boardType, String searchText, Integer pageSize) {
+	public List<CommunityPageResponse> paginationNoOffsetBuilder(
+		CustomUserPrincipal customUserPrincipal,
+		Long communityId,
+		SortType sortType,
+		BoardType boardType,
+		String searchText,
+		Integer pageSize
+	) {
 		Users users = userRepository.getById(customUserPrincipal.getId());
-		List<CommunityPageResponse> result = communityRepository.paginationNoOffsetBuilder(
-			users, communityId, sortType, boardType, searchText, pageSize);
-		return responseService.getSingleResponse(HttpStatus.OK.value(), result,
-			"게시판을 성공적으로 조회했습니다.");
+		return communityRepository.paginationNoOffsetBuilder(users, communityId, sortType, boardType, searchText,
+			pageSize);
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<CommunityResponse>> updateCommunity(
-		CustomUserPrincipal customUserPrincipal, Long communityId,
-		CommunityRequest communityRequest, List<MultipartFile> multipartFiles) {
+	public void updateCommunity(
+		CustomUserPrincipal customUserPrincipal,
+		Long communityId,
+		CommunityRequest communityRequest,
+		List<MultipartFile> multipartFiles
+	) {
 		Users users = userRepository.getById(customUserPrincipal.getId());
 		Community community = communityRepository.getById(communityId);
 		community.validateByUserId(users.getId());
@@ -155,15 +156,12 @@ public class CommunityService {
 			}
 			savePhotoFromMultipartFile(multipartFiles, community);
 		}
-
-		return responseService.getSingleResponse(HttpStatus.OK.value(), CommunityResponse.from(users, community),
-			"게시글 수정을 완료했습니다.");
 	}
 
 	// TODO
 	// 관계 정리되면 변경될 가능성 존재
 	@Transactional
-	public ResponseEntity<CommonResponse.GeneralResponse> deleteCommunity(
+	public void deleteCommunity(
 		CustomUserPrincipal customUserPrincipal, Long communityId) {
 		Users users = userRepository.getById(customUserPrincipal.getId());
 		Community community = communityRepository.getById(communityId);
@@ -179,14 +177,11 @@ public class CommunityService {
 		}
 		photoRepository.deleteByCommunityId(communityId);
 		communityRepository.deleteById(communityId);
-		return responseService.getGeneralResponse(HttpStatus.OK.value(), "게시글을 삭제했습니다.");
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<ViewAndCommentResponse>> getCommentAndViewByCommunity(
-		CustomUserPrincipal customUserPrincipal, Long communityId) {
+	public ViewAndCommentResponse getCommentAndViewByCommunity(Long communityId) {
 		Community community = communityRepository.getById(communityId);
-		return responseService.getSingleResponse(HttpStatus.OK.value(), ViewAndCommentResponse.from(community),
-			"게시글 조회수와 댓글수를 불러왔습니다.");
+		return ViewAndCommentResponse.from(community);
 	}
 }

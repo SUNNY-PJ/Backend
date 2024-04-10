@@ -189,5 +189,9 @@ public class Users extends BaseTime {
 	public int getReportCount() {
 		return userReport.getReportCount();
 	}
+
+	public void deleteScrap(Scrap scrap) {
+		this.scraps.remove(scrap);
+	}
 }
 

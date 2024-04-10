@@ -43,13 +43,7 @@ public class ScrapService {
 		CustomUserPrincipal customUserPrincipal, Long communityId) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		Scrap scrap = user.findScrapByCommunity(communityId);
-		scrapRepository.delete(scrap);
+		user.deleteScrap(scrap);
 		return responseService.getGeneralResponse(HttpStatus.OK.value(), "스크랩 게시글이 삭제 되었습니다.");
 	}
 }
-
-
-
-
-
-
