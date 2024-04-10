@@ -109,9 +109,9 @@ public class ConsumptionService {
 
 	@Transactional
 	public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse>> getConsumptionList(
-		CustomUserPrincipal customUserPrincipal) {
+		CustomUserPrincipal customUserPrincipal, Long consumptionId) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
-		List<Consumption> consumptions = consumptionRepository.findByUsersId(user.getId());
+		List<Consumption> consumptions = consumptionRepository.getConsumption(user.getId(), consumptionId);
 		List<ConsumptionResponse> consumptionResponses = ConsumptionResponse.listFrom(consumptions);
 		return responseService.getListResponse(HttpStatus.OK.value(),
 			consumptionResponses, "지출 내역을 불러왔습니다.");
