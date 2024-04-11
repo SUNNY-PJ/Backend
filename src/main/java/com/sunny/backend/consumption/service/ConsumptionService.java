@@ -1,13 +1,10 @@
 package com.sunny.backend.consumption.service;
 
-import static com.sunny.backend.common.ComnConstant.*;
-
 import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +17,6 @@ import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.consumption.domain.SpendType;
 import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
 import com.sunny.backend.consumption.dto.response.ConsumptionResponse;
-import com.sunny.backend.consumption.dto.response.SaveGoalAlertResponse;
 import com.sunny.backend.consumption.dto.response.SpendTypeStatisticsResponse;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;
 import com.sunny.backend.friends.domain.Friend;
@@ -28,6 +24,8 @@ import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.save.domain.Save;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
+import com.sunny.backend.util.MathUtil;
+import com.sunny.backend.util.SockMessageUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,94 +38,90 @@ public class ConsumptionService {
 	private final ResponseService responseService;
 	private final FriendRepository friendRepository;
 	private final UserRepository userRepository;
-	private final SimpMessagingTemplate template;
+	private final SockMessageUtil sockMessageUtil;
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> createConsumption(
-		CustomUserPrincipal customUserPrincipal, ConsumptionRequest consumptionRequest) {
+	public ConsumptionResponse createConsumption(
+		CustomUserPrincipal customUserPrincipal,
+		ConsumptionRequest consumptionRequest
+	) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
-		Consumption consumption = Consumption.builder()
-			.name(consumptionRequest.getName())
-			.category(consumptionRequest.getCategory())
-			.money(consumptionRequest.getMoney())
-			.dateField(consumptionRequest.getDateField())
-			.users(user)
-			.build();
+		Consumption consumption = Consumption.of(
+			consumptionRequest.getCategory(),
+			consumptionRequest.getName(),
+			consumptionRequest.getMoney(),
+			consumptionRequest.getDateField(),
+			user
+		);
 		consumptionRepository.save(consumption);
-		user.addConsumption(consumption);
 
-		ConsumptionResponse consumptionResponse = ConsumptionResponse.from(consumption);
+		reflectCompetitionResultIfCompeting(user);
 
+		checkSaveAndSendMessage(user);
+
+		return ConsumptionResponse.from(consumption);
+	}
+
+	public void reflectCompetitionResultIfCompeting(Users user) {
 		for (Friend friend : friendRepository.findByUsersAndCompetitionIsNotNullAndCompetition_Status(user,
 			CompetitionStatus.PROCEEDING)) {
 			Competition competition = friend.getCompetition();
-			double percentageUsed = calculateUserPercentage(user.getId(), competition.getStartDate(),
-				competition.getEndDate(), competition.getPrice());
-			double friendsPercentageUsed = calculateUserPercentage(friend.getUserFriend().getId(),
-				competition.getStartDate(), competition.getEndDate(), competition.getPrice());
+			Users userFriend = friend.getUserFriend();
 
-			friend.getCompetition()
-				.getOutput()
-				.updateOutput(percentageUsed, friendsPercentageUsed, user.getId(), friend.getUserFriend().getId());
-		}
+			Long userId = user.getId();
+			Long userFriendId = userFriend.getId();
+			LocalDate startDate = competition.getStartDate();
+			LocalDate endDate = competition.getEndDate();
+			Long userUsedMoney = consumptionRepository.getComsumptionMoney(userId, startDate, endDate);
+			Long friendUsedMoney = consumptionRepository.getComsumptionMoney(userFriendId, startDate, endDate);
 
-		if (user.isExistLastSave()) {
-			Save save = user.getLastSaveOrException();
-			double percentage = calculateUserPercentage(user.getId(), save.getStartDate(), save.getEndDate(),
-				save.getCost());
-			if (percentage <= 80) {
-				System.out.println(percentage);
-				String message;
-				if (percentage <= 0) {
-					message = SAVE_MESSAGE_BELOW_0;
-				} else if (percentage <= 20) {
-					message = SAVE_MESSAGE_BELOW_20;
-				} else if (percentage <= 50) {
-					message = SAVE_MESSAGE_BELOW_50;
-				} else {
-					message = SAVE_MESSAGE_BELOW_80;
-				}
-				message = String.format("목표금액 %d원까지 %.2f%% 남았어요! %s", save.getCost(), percentage, message);
-				template.convertAndSend("/sub/user/" + user.getId(),
-					new SaveGoalAlertResponse(save.getCost(), percentage, message));
+			double percentageUsed = MathUtil.calculatePercentage(userUsedMoney, competition.getPrice());
+			double friendsPercentageUsed = MathUtil.calculatePercentage(friendUsedMoney, competition.getPrice());
+
+			competition.updateOutput(percentageUsed, friendsPercentageUsed, userId, userFriendId);
+
+			if (friendsPercentageUsed <= 0) {
+				competition.updateStatus(CompetitionStatus.COMPLETE);
+				sockMessageUtil.sendCompetitionUserWinner(user, userFriend, competition);
+			} else if (percentageUsed <= 0) {
+				competition.updateStatus(CompetitionStatus.COMPLETE);
+				sockMessageUtil.sendCompetitionUserFriendWinner(user, userFriend, competition);
 			}
 		}
-
-		return responseService.getSingleResponse(HttpStatus.OK.value(),
-			consumptionResponse, "지출을 등록했습니다.");
 	}
 
-	public double calculateUserPercentage(Long userId, LocalDate startDate, LocalDate endDate, Long price) {
-		Long totalSpent = consumptionRepository.getComsumptionMoney(userId, startDate, endDate);
-		if (totalSpent == null) {
-			return 100.0;
+	public void checkSaveAndSendMessage(Users users) {
+		if (users.isExistLastSave()) {
+			Save save = users.getLastSaveOrException();
+			Long userUsedMoney = consumptionRepository.getComsumptionMoney(users.getId(), save.getStartDate(),
+				save.getEndDate());
+			double percentage = MathUtil.calculatePercentage(userUsedMoney, save.getCost());
+			sockMessageUtil.sendWaringSavingGoal(percentage, users, save);
 		}
-
-		double percentage = 100.0 - ((totalSpent * 100.0) / price);
-		return Math.round(percentage * 10) / 10.0; // 소수점 첫째 자리 반올림
 	}
 
 	@Transactional
 	public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse>> getConsumptionList(
 		CustomUserPrincipal customUserPrincipal, Long consumptionId) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
+
 		List<Consumption> consumptions = consumptionRepository.getConsumption(user.getId(), consumptionId);
 		List<ConsumptionResponse> consumptionResponses = ConsumptionResponse.listFrom(consumptions);
+
 		return responseService.getListResponse(HttpStatus.OK.value(),
 			consumptionResponses, "지출 내역을 불러왔습니다.");
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.SingleResponse<ConsumptionResponse>> updateConsumption(
+	public void updateConsumption(
 		CustomUserPrincipal customUserPrincipal,
-		ConsumptionRequest consumptionRequest, Long consumptionId) {
+		ConsumptionRequest consumptionRequest,
+		Long consumptionId
+	) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		Consumption consumption = consumptionRepository.getById(consumptionId);
 		Consumption.validateConsumptionByUser(user.getId(), consumption.getUsers().getId());
 		consumption.updateConsumption(consumptionRequest);
-		ConsumptionResponse consumptionResponse = ConsumptionResponse.from(consumption);
-		return responseService.getSingleResponse(HttpStatus.OK.value(),
-			consumptionResponse, "지출을 수정했습니다.");
 	}
 
 	@Transactional
@@ -152,14 +146,14 @@ public class ConsumptionService {
 	}
 
 	@Transactional
-	public ResponseEntity<CommonResponse.GeneralResponse> deleteConsumption(
-		CustomUserPrincipal customUserPrincipal, Long consumptionId) {
+	public void deleteConsumption(
+		CustomUserPrincipal customUserPrincipal,
+		Long consumptionId
+	) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		Consumption consumption = consumptionRepository.getById(consumptionId);
 		Consumption.validateConsumptionByUser(user.getId(), consumption.getUsers().getId());
 		consumptionRepository.deleteById(consumptionId);
-		return responseService.getGeneralResponse(HttpStatus.OK.value(),
-			"지출 내역을 삭제했습니다.");
 	}
 
 	@Transactional
