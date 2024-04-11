@@ -1,12 +1,12 @@
 package com.sunny.backend.notification.service;
 
 import static com.sunny.backend.common.ComnConstant.*;
+import static com.sunny.backend.notification.dto.response.AlarmListResponse.*;
 import static com.sunny.backend.notification.exception.NotificationErrorCode.*;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
-import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.CommonResponse.ListResponse;
@@ -25,10 +24,8 @@ import com.sunny.backend.notification.domain.CommentNotification;
 import com.sunny.backend.notification.domain.FriendsNotification;
 import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.notification.dto.request.NotificationPushRequest;
-import com.sunny.backend.notification.dto.request.NotificationRequest;
 import com.sunny.backend.notification.dto.request.NotificationRequest.NotificationAllowRequest;
 import com.sunny.backend.notification.dto.response.AlarmListResponse;
-import com.sunny.backend.notification.dto.response.NotificationResponse;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.notification.repository.FriendsNotificationRepository;
 import com.sunny.backend.notification.repository.NotificationRepository;
@@ -74,54 +71,26 @@ public class NotificationService {
 			"알림 허용/거부 성공");
 	}
 
-	public ResponseEntity<CommonResponse.GeneralResponse> allowNotification(CustomUserPrincipal customUserPrincipal,
-		NotificationRequest notificationRequest) {
-		Users user = userRepository.getById(customUserPrincipal.getId());
-		Notification notification = Notification.builder()
-			.deviceToken(notificationRequest.getTargetToken())
-			.users(user)
-			.build();
-		notificationRepository.save(notification);
-		return responseService.getGeneralResponse(HttpStatus.OK.value(), "토큰 저장 성공");
-	}
-
 	public ResponseEntity<ListResponse<AlarmListResponse>> getAlarmList(CustomUserPrincipal customUserPrincipal) {
 		List<CommentNotification> commentNotifications = commentNotificationRepository.findByUsers_Id(
 			customUserPrincipal.getId());
-		List<AlarmListResponse> commentNotificationResponse = commentNotifications.stream()
-			.filter(notification -> {
-				Comment comment = notification.getComment();
-				return comment != null && comment.getUsers() != null &&
-					!comment.getIsDeleted() &&
-					!comment.getUsers().getId().equals(customUserPrincipal.getId());
-			})
-			.map(notification -> new AlarmListResponse(
-				UUID.randomUUID().toString(),
-				notification.getId(),
-				notification.getComment().getUsers().getNickname(),
-				notification.getTitle(),
-				notification.getComment().getContent(),
-				notification.getComment().getUsers().getProfile(),
-				notification.getComment().getCreatedDate().toLocalDate()
-					.isEqual(LocalDate.now()),
-				notification.getComment().getCreatedDate()
-			))
-			.toList();
+		List<AlarmListResponse> commentNotificationResponse = fromCommentNotifications(commentNotifications,
+			customUserPrincipal.getId());
 
 		List<FriendsNotification> friendsNotifications = friendsNotificationRepository.findByUsers_Id(
 			customUserPrincipal.getId());
 		List<AlarmListResponse> friendsNotificationResponse = friendsNotifications.stream()
-			.map(AlarmListResponse::from)
+			.map(AlarmListResponse::fromFriendsAlert)
 			.toList();
 
 		List<AlarmListResponse> combinedList = Stream.concat(commentNotificationResponse.stream(),
 				friendsNotificationResponse.stream())
+			.sorted(Comparator.comparing(AlarmListResponse::createdAt).reversed())
 			.toList();
-
 		return responseService.getListResponse(HttpStatus.OK.value(), combinedList, "알림 조회 저장 성공");
 	}
 
-	public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> sendNotificationToFriends(
+	public void sendNotificationToFriends(
 		String title, NotificationPushRequest notificationPushRequest) {
 		List<Notification> notifications = notificationRepository.findByUsers_Id(
 			notificationPushRequest.getPostAuthor());
@@ -148,13 +117,6 @@ public class NotificationService {
 					throw new RuntimeException(e);
 				}
 			}
-			NotificationResponse notificationResponse = new NotificationResponse(
-				notificationPushRequest.getTitle(),
-				notificationPushRequest.getBody(),
-				"알림을 성공적으로 전송했습니다."
-			);
-			return responseService.getSingleResponse(HttpStatus.OK.value(), notificationResponse,
-				"알림 성공");
 		} else {
 			throw new CustomException(NOTIFICATIONS_NOT_SENT);
 		}
@@ -171,7 +133,7 @@ public class NotificationService {
 		}
 	}
 
-	public ResponseEntity<CommonResponse.SingleResponse<NotificationResponse>> commentSendNotificationToFriends(
+	public void commentSendNotificationToFriends(
 		String title, NotificationPushRequest notificationPushRequest) {
 		List<Notification> notifications = notificationRepository.findByUsers_Id(
 			notificationPushRequest.getPostAuthor());
@@ -200,15 +162,7 @@ public class NotificationService {
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
-
 			}
-			NotificationResponse notificationResponse = new NotificationResponse(
-				notificationPushRequest.getTitle(),
-				notificationPushRequest.getBody(),
-				"알림을 성공적으로 전송했습니다."
-			);
-			return responseService.getSingleResponse(HttpStatus.OK.value(), notificationResponse,
-				"알림 성공");
 		} else {
 			throw new CustomException(NOTIFICATIONS_NOT_SENT);
 		}
