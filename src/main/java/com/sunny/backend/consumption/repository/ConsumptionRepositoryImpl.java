@@ -14,6 +14,7 @@ import java.util.Map;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sunny.backend.consumption.domain.Consumption;
@@ -82,6 +83,20 @@ public class ConsumptionRepositoryImpl extends QuerydslRepositorySupport impleme
 				consumption.dateField.between(startDate, endDate)
 			)
 			.fetchOne();
+	}
+
+	@Override
+	public List<Consumption> getConsumption(Long userId, Long consumptionId) {
+		return queryFactory.selectFrom(consumption)
+			.where(users.id.eq(userId), eqConsumptionId(consumptionId))
+			.fetch();
+	}
+
+	private BooleanExpression eqConsumptionId(Long consumptionId) {
+		if (consumptionId == null) {
+			return null;
+		}
+		return consumption.id.eq(consumptionId);
 	}
 
 	private Long getTotalSpendingByYearMonth(Long userId, Integer year, Integer month) {

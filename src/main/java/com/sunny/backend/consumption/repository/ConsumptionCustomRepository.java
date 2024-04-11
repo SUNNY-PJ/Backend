@@ -3,6 +3,7 @@ package com.sunny.backend.consumption.repository;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.consumption.domain.SpendType;
 import com.sunny.backend.consumption.dto.response.ConsumptionResponse;
 import com.sunny.backend.consumption.dto.response.SpendTypeStatisticsResponse;
@@ -15,4 +16,6 @@ public interface ConsumptionCustomRepository {
 		SpendType spendType, Integer year, Integer month);
 
 	Long getComsumptionMoney(Long id, LocalDate startDate, LocalDate endDate);
+
+	List<Consumption> getConsumption(Long userId, Long consumptionId);
 }

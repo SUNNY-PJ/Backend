@@ -8,9 +8,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.user.domain.Users;
 
@@ -28,12 +25,10 @@ public class Scrap {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Users users;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "community_id")
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Community community;
 
 	private Scrap(Users users, Community community) {

@@ -42,8 +42,10 @@ public class ConsumptionController {
 	@ApiOperation(tags = "4. Consumption", value = "지출 조회")
 	@GetMapping
 	public ResponseEntity<CommonResponse.ListResponse<ConsumptionResponse>> getConsumptionList(
-		@AuthUser CustomUserPrincipal customUserPrincipal) {
-		return consumptionService.getConsumptionList(customUserPrincipal);
+		@AuthUser CustomUserPrincipal customUserPrincipal,
+		@RequestParam(required = false) Long consumptionId
+	) {
+		return consumptionService.getConsumptionList(customUserPrincipal, consumptionId);
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "지출 등록")

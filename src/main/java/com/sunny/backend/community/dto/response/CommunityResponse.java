@@ -26,7 +26,7 @@ public record CommunityResponse(
 	boolean isAuthor
 ) {
 
-	public static CommunityResponse from(Users users, Community community) {
+	public static CommunityResponse of(Users users, Community community) {
 		return new CommunityResponse(
 			community.getId(),
 			community.getUsers().getId(),
@@ -44,7 +44,7 @@ public record CommunityResponse(
 			community.getUsers().getProfile(),
 			DatetimeUtil.timesAgo(community.getCreatedAt()),
 			community.hasNotBeenModified(),
-			community.getUsers().isScrapByCommunity(community.getId()),
+			users.isScrapByCommunity(community.getId()),
 			community.isAuthor(users.getId())
 		);
 	}
