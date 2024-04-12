@@ -8,6 +8,7 @@ import java.time.ZoneId;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,6 +31,8 @@ import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.competition.repository.CompetitionRepository;
 import com.sunny.backend.friends.domain.Friend;
+import com.sunny.backend.friends.domain.FriendCompetition;
+import com.sunny.backend.friends.repository.FriendCompetitionRepository;
 import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.notification.repository.FriendsNotificationRepository;
@@ -59,6 +62,7 @@ public class AppleService {
 	private final NotificationRepository notificationRepository;
 	private final ResponseService responseService;
 	private final RedisUtil redisUtil;
+	private final FriendCompetitionRepository friendCompetitionRepository;
 
 	private final TokenProvider tokenProvider;
 
@@ -134,10 +138,13 @@ public class AppleService {
 				notificationRepository.deleteByUsers(users);
 
 				for (Friend friend : friendRepository.findByUsers(users)) {
-					if (friend.hasCompetition()) {
-						friendRepository.updateCompetitionToNull(friend.getCompetition().getId());
-						competitionRepository.delete(friend.getCompetition());
-					}
+					List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByFriendAndCompetition(
+						friend.getId(), null);
+					friendCompetitionRepository.deleteAllByFriend(friend);
+					List<Long> competitionIds = friendCompetitions.stream()
+						.map(friendCompetition -> friendCompetition.getCompetition().getId())
+						.toList();
+					competitionRepository.deleteAllById(competitionIds);
 				}
 				friendsNotificationRepository.deleteByUsersOrFriend(users, users);
 				friendRepository.deleteByUsersOrUserFriend(users, users);

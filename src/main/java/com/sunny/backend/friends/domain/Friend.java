@@ -1,6 +1,5 @@
 package com.sunny.backend.friends.domain;
 
-import static com.sunny.backend.friends.exception.FriendErrorCode.*;
 import static lombok.AccessLevel.*;
 
 import javax.persistence.Column;
@@ -16,7 +15,6 @@ import javax.persistence.ManyToOne;
 
 import com.sunny.backend.common.CommonErrorCode;
 import com.sunny.backend.common.exception.CustomException;
-import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.user.domain.Users;
 
 import lombok.Getter;
@@ -42,9 +40,8 @@ public class Friend {
 	@Column(name = "friend_status")
 	private FriendStatus status;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "competition_id")
-	private Competition competition;
+	// @OneToMany(mappedBy = "friend", cascade = CascadeType.ALL, orphanRemoval = true)
+	// private final List<FriendCompetition> friendCompetitions = new ArrayList<>();
 
 	private Friend(Users users, Users userFriend, FriendStatus status) {
 		this.users = users;
@@ -56,10 +53,6 @@ public class Friend {
 		return new Friend(users, userFriend, status);
 	}
 
-	public void addCompetition(Competition competition) {
-		this.competition = competition;
-	}
-
 	public void updateFriendStatus(FriendStatus friendStatus) {
 		status = friendStatus;
 	}
@@ -68,25 +61,10 @@ public class Friend {
 		return status == friendStatus;
 	}
 
-	public boolean hasCompetition() {
-		return competition != null;
-	}
-
-	public void validateCompetition() {
-		if (competition == null) {
-			throw new CustomException(FRIEND_NOT_COMPETITION);
-		}
-	}
-
 	public void validateUser(Long tokenUserId) {
 		if (!users.getId().equals(tokenUserId)) {
 			throw new CustomException(CommonErrorCode.TOKEN_INVALID);
 		}
 	}
 
-	public void validateCompetitionStatus() {
-		if (competition != null) {
-			competition.validateStatus();
-		}
-	}
 }

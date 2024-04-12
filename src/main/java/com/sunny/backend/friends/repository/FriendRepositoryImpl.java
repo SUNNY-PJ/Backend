@@ -1,13 +1,10 @@
 package com.sunny.backend.friends.repository;
 
-import static com.sunny.backend.friends.domain.QFriend.*;
-
 import java.util.List;
 
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.competition.dto.response.CompetitionResultDto;
 import com.sunny.backend.friends.domain.Friend;
 
@@ -43,14 +40,14 @@ public class FriendRepositoryImpl extends QuerydslRepositorySupport implements F
 	// 		.fetch();
 	// }
 
-	@Override
-	public void updateCompetitionToNull(Long competitionId) {
-		queryFactory
-			.update(friend)
-			.set(friend.competition, (Competition)null)
-			.where(friend.competition.id.eq(competitionId))
-			.execute();
-	}
+	// @Override
+	// public void updateCompetitionToNull(Long competitionId) {
+	// 	queryFactory
+	// 		.update(friend)
+	// 		.set(friend.competition, (Competition)null)
+	// 		.where(friend.competition.id.eq(competitionId))
+	// 		.execute();
+	// }
 
 	@Override
 	public List<CompetitionResultDto> getCompetitionResult() {
