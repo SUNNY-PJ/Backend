@@ -41,7 +41,7 @@ public class ConsumptionService {
 	private final SockMessageUtil sockMessageUtil;
 
 	@Transactional
-	public ConsumptionResponse createConsumption(
+	public void createConsumption(
 		CustomUserPrincipal customUserPrincipal,
 		ConsumptionRequest consumptionRequest
 	) {
@@ -58,8 +58,6 @@ public class ConsumptionService {
 		reflectCompetitionResultIfCompeting(user);
 
 		checkSaveAndSendMessage(user);
-
-		return ConsumptionResponse.from(consumption);
 	}
 
 	public void reflectCompetitionResultIfCompeting(Users user) {

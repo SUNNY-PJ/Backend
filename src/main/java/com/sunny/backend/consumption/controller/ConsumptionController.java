@@ -54,8 +54,8 @@ public class ConsumptionController {
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@Valid @RequestBody ConsumptionRequest consumptionRequest
 	) {
-		ConsumptionResponse response = consumptionService.createConsumption(customUserPrincipal, consumptionRequest);
-		return ResponseEntity.ok(response);
+		consumptionService.createConsumption(customUserPrincipal, consumptionRequest);
+		return ResponseEntity.ok().build();
 	}
 
 	@ApiOperation(tags = "4. Consumption", value = "지출 통계")
