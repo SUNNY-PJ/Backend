@@ -12,6 +12,7 @@ import com.sunny.backend.friends.domain.FriendCompetition;
 import com.sunny.backend.friends.domain.QFriend;
 import com.sunny.backend.friends.domain.QFriendCompetition;
 import com.sunny.backend.friends.dto.response.FriendCompetitionDto;
+import com.sunny.backend.user.domain.QUsers;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,19 +32,22 @@ public class FriendCompetitionRepositoryImpl implements FriendCompetitionCustomR
 		QFriendCompetition friendCompetition = QFriendCompetition.friendCompetition;
 		QCompetition competition = QCompetition.competition;
 		QFriend friend = QFriend.friend;
+		QUsers users = QUsers.users;
+		QUsers userFriend = QUsers.users;
 		return jpaQueryFactory.select(
 				Projections.constructor(FriendCompetitionDto.class, friend.id, friend.userFriend.id,
 					friend.userFriend.nickname, friend.userFriend.profile, friend.status,
-					friendCompetition.competition.id, friendCompetition.competition.message,
-					friendCompetition.competition.startDate, friendCompetition.competition.endDate,
-					friendCompetition.competition.price, friendCompetition.competition.compensation,
-					friendCompetition.friendCompetitionStatus, friendCompetition.competitionOutputStatus,
-					friendCompetition.competitionStatus)
+					competition.id, competition.message,
+					competition.startDate, competition.endDate,
+					competition.price, competition.compensation,
+					friendCompetition.friendCompetitionStatus, friendCompetition.competitionOutputStatus)
 			)
 			.from(friend)
-			.leftJoin(friendCompetition).on(friendCompetition.friend.id.eq(friend.id)).fetchJoin()
+			.leftJoin(friendCompetition).on(friendCompetition.friend.id.eq(friend.id))
 			.leftJoin(competition).on(competition.id.eq(friendCompetition.competition.id))
-			.where(friend.users.id.eq(userId))
+			.innerJoin(users).on(friend.users.id.eq(users.id))
+			.innerJoin(userFriend).on(friend.userFriend.id.eq(userFriend.id))
+			.where(users.id.eq(userId))
 			.fetch();
 	}
 
@@ -58,6 +62,6 @@ public class FriendCompetitionRepositoryImpl implements FriendCompetitionCustomR
 		if (competitionId == null) {
 			return null;
 		}
-		return null;
+		return friendCompetition.competition.id.eq(competitionId);
 	}
 }

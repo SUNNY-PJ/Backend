@@ -3,10 +3,6 @@ package com.sunny.backend.friends.domain;
 import static com.sunny.backend.competition.exception.CompetitionErrorCode.*;
 import static lombok.AccessLevel.*;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -20,7 +16,6 @@ import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.competition.domain.CompetitionOutputStatus;
-import com.sunny.backend.competition.domain.CompetitionStatus;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,9 +42,6 @@ public class FriendCompetition extends BaseTime {
 	@Enumerated(value = EnumType.STRING)
 	private CompetitionOutputStatus competitionOutputStatus; // 결과
 
-	@Enumerated(value = EnumType.STRING)
-	private CompetitionStatus competitionStatus;
-
 	private FriendCompetition(
 		Friend friend,
 		Competition competition,
@@ -62,24 +54,28 @@ public class FriendCompetition extends BaseTime {
 		this.competitionOutputStatus = competitionOutputStatus;
 	}
 
-	public static List<FriendCompetition> of(
-		Friend fromFriend,
-		Friend toFriend,
-		String message,
-		LocalDate startDate,
-		LocalDate endDate,
-		Long price,
-		String compensation
+	public static FriendCompetition of(
+		Friend friend,
+		Competition competition,
+		FriendCompetitionStatus friendCompetitionStatus,
+		CompetitionOutputStatus competitionOutputStatus
 	) {
-		List<FriendCompetition> friendCompetitions = new ArrayList<>();
-		Competition competition = Competition.of(message, startDate, endDate, price, compensation);
-		friendCompetitions.add(
-			new FriendCompetition(fromFriend, competition, FriendCompetitionStatus.SEND, CompetitionOutputStatus.DRAW));
-		friendCompetitions.add(
-			new FriendCompetition(toFriend, competition, FriendCompetitionStatus.RECEIVE,
-				CompetitionOutputStatus.DRAW));
-		return friendCompetitions;
+		return new FriendCompetition(friend, competition, friendCompetitionStatus, competitionOutputStatus);
 	}
+
+	// public static List<FriendCompetition> of(
+	// 	Friend fromFriend,
+	// 	Friend toFriend,
+	// 	Competition competition
+	// ) {
+	// 	List<FriendCompetition> friendCompetitions = new ArrayList<>();
+	// 	friendCompetitions.add(
+	// 		new FriendCompetition(fromFriend, competition, FriendCompetitionStatus.SEND, CompetitionOutputStatus.NONE));
+	// 	friendCompetitions.add(
+	// 		new FriendCompetition(toFriend, competition, FriendCompetitionStatus.RECEIVE,
+	// 			CompetitionOutputStatus.NONE));
+	// 	return friendCompetitions;
+	// }
 
 	public void validateIsCompeting() {
 		if (friendCompetitionStatus == FriendCompetitionStatus.SEND) {

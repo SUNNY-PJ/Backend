@@ -3,7 +3,6 @@ package com.sunny.backend.friends.dto.response;
 import java.time.LocalDate;
 
 import com.sunny.backend.competition.domain.CompetitionOutputStatus;
-import com.sunny.backend.competition.domain.CompetitionStatus;
 import com.sunny.backend.friends.domain.FriendCompetitionStatus;
 import com.sunny.backend.friends.domain.FriendStatus;
 
@@ -32,5 +31,4 @@ public class FriendCompetitionDto {
 	private String compensation;
 	private FriendCompetitionStatus friendCompetitionStatus;
 	private CompetitionOutputStatus competitionOutputStatus;
-	private CompetitionStatus competitionStatus;
 }

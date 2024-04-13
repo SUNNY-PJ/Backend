@@ -1,7 +1,5 @@
 package com.sunny.backend.competition.controller;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
+import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.competition.dto.request.CompetitionRequest;
 import com.sunny.backend.competition.dto.response.CompetitionStatusResponse;
 import com.sunny.backend.competition.service.CompetitionService;
@@ -34,25 +33,27 @@ public class CompetitionController {
 
 	@ApiOperation(tags = "3. Competition", value = "대결 목록 확인")
 	@GetMapping("/{friendId}")
-	public ResponseEntity<List<FriendCompetitionResponses>> getCompetition(
+	public ResponseEntity<CommonResponse.ListResponse<FriendCompetitionResponses>> getCompetition(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@PathVariable(name = "friendId") Long friendId,
-		@RequestParam(name = "competitionId") Long competitionId
+		@RequestParam(name = "competitionId", required = false) Long competitionId
 	) {
-		List<FriendCompetitionResponses> responses = competitionService.getCompetition(customUserPrincipal, friendId,
-			competitionId);
-		return ResponseEntity.ok(responses);
+		return competitionService.getCompetition(customUserPrincipal, friendId, competitionId);
+		// List<FriendCompetitionResponses> responses = competitionService.getCompetition(customUserPrincipal, friendId,
+		// 	competitionId);
+		// return ResponseEntity.ok(responses);
 	}
 
 	@ApiOperation(tags = "3. Competition", value = "친구에게 대결 신청")
 	@PostMapping("")
-	public ResponseEntity<FriendCompetitionResponses> applyCompetition(
+	public ResponseEntity<CommonResponse.SingleResponse<FriendCompetitionResponses>> applyCompetition(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@Valid @RequestBody CompetitionRequest competitionRequest
 	) {
-		FriendCompetitionResponses response = competitionService.applyCompetition(customUserPrincipal,
-			competitionRequest);
-		return ResponseEntity.ok(response);
+		return competitionService.applyCompetition(customUserPrincipal, competitionRequest);
+		// FriendCompetitionResponses response = competitionService.applyCompetition(customUserPrincipal,
+		// 	competitionRequest);
+		// return ResponseEntity.ok(response);
 	}
 
 	@ApiOperation(tags = "3. Competition", value = "대결 승인하기")
@@ -75,14 +76,15 @@ public class CompetitionController {
 
 	@ApiOperation(tags = "3. Competition", value = "대결 상태 가져오기")
 	@GetMapping("/status/{friendId}")
-	public ResponseEntity<CompetitionStatusResponse> getCompetitionStatus(
+	public ResponseEntity<CommonResponse.SingleResponse<CompetitionStatusResponse>> getCompetitionStatus(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
 		@PathVariable(name = "friendId") Long friendId,
 		@RequestParam(name = "competitionId") Long competitionId
 	) {
-		CompetitionStatusResponse response = competitionService.getCompetitionStatus(customUserPrincipal, friendId,
-			competitionId);
-		return ResponseEntity.ok().body(response);
+		return competitionService.getCompetitionStatus(customUserPrincipal, friendId, competitionId);
+		// CompetitionStatusResponse response = competitionService.getCompetitionStatus(customUserPrincipal, friendId,
+		// 	competitionId);
+		// return ResponseEntity.ok().body(response);
 	}
 
 	@ApiOperation(tags = "3. Competition", value = "대결 포기하기")

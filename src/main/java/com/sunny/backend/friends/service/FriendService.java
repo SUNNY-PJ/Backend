@@ -2,7 +2,6 @@ package com.sunny.backend.friends.service;
 
 import static com.sunny.backend.friends.exception.FriendErrorCode.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +36,7 @@ public class FriendService {
 
 	public FriendListResponse getFriends(CustomUserPrincipal customUserPrincipal) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
+		System.out.println(customUserPrincipal.getId());
 		List<FriendCompetitionDto> friends = friendCompetitionRepository.getByFriendLeftJoinFriend(user.getId());
 		for (FriendCompetitionDto friend : friends) {
 			System.out.println(friend);
@@ -45,7 +45,7 @@ public class FriendService {
 	}
 
 	@Transactional
-	public void addFriend(CustomUserPrincipal customUserPrincipal, Long userFriendId) throws IOException {
+	public void addFriend(CustomUserPrincipal customUserPrincipal, Long userFriendId) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		user.canNotMySelf(userFriendId);
 		Users userFriend = userRepository.getById(userFriendId);

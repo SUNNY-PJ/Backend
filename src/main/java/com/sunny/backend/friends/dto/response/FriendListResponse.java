@@ -2,7 +2,6 @@ package com.sunny.backend.friends.dto.response;
 
 import java.util.List;
 
-import com.sunny.backend.competition.domain.CompetitionStatus;
 import com.sunny.backend.friends.domain.FriendCompetitionStatus;
 import com.sunny.backend.friends.domain.FriendStatus;
 
@@ -14,7 +13,8 @@ public record FriendListResponse(
 	public static FriendListResponse of(List<FriendCompetitionDto> friendCompetitions) {
 		List<FriendCompetitionResponse> competitions = friendCompetitions.stream()
 			.filter(friendCompetition -> friendCompetition.getCompetitionId() != null)
-			.filter(friendCompetition -> friendCompetition.getCompetitionStatus() == CompetitionStatus.PROCEEDING)
+			.filter(friendCompetition -> friendCompetition.getFriendCompetitionStatus()
+				== FriendCompetitionStatus.PROCEEDING)
 			.map(FriendCompetitionResponse::from)
 			.toList();
 
@@ -23,15 +23,16 @@ public record FriendListResponse(
 				(friendCompetition.getCompetitionId() == null
 					&& friendCompetition.getFriendStatus() == FriendStatus.FRIEND) || (
 					friendCompetition.getCompetitionId() != null
-						&& friendCompetition.getFriendCompetitionStatus() != FriendCompetitionStatus.PROCEEDING)
+						&& (friendCompetition.getFriendCompetitionStatus() == FriendCompetitionStatus.SEND
+						|| friendCompetition.getFriendCompetitionStatus() == FriendCompetitionStatus.RECEIVE))
 			)
 			.map(FriendCompetitionResponse::from)
 			.toList();
 
 		List<FriendResponse> waitList = friendCompetitions.stream()
-			.filter(friendCompetition -> friendCompetition.getCompetitionId() != null)
+			.filter(friendCompetition -> friendCompetition.getCompetitionId() == null)
 			.filter(
-				friendCompetition -> friendCompetition.getFriendCompetitionStatus() == FriendCompetitionStatus.RECEIVE)
+				friendCompetition -> friendCompetition.getFriendStatus() == FriendStatus.RECEIVE)
 			.map(FriendResponse::from)
 			.toList();
 

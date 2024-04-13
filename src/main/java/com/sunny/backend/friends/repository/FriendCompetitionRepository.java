@@ -16,7 +16,7 @@ public interface FriendCompetitionRepository
 
 	Optional<FriendCompetition> findByFriendAndCompetition(Friend friend, Competition competition);
 
-	Optional<FriendCompetition> findByFriendOrderByCreatedDateDesc(Friend friend);
+	Optional<FriendCompetition> findFirstByFriendOrderByCreatedDateDesc(Friend friend);
 
 	List<FriendCompetition> findByFriend_Users(Users users);
 }
