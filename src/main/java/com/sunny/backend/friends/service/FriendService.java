@@ -2,7 +2,6 @@ package com.sunny.backend.friends.service;
 
 import static com.sunny.backend.friends.exception.FriendErrorCode.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,9 +11,12 @@ import org.springframework.stereotype.Service;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.exception.CustomException;
+import com.sunny.backend.competition.repository.CompetitionRepository;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.FriendStatus;
+import com.sunny.backend.friends.dto.response.FriendCompetitionDto;
 import com.sunny.backend.friends.dto.response.FriendListResponse;
+import com.sunny.backend.friends.repository.FriendCompetitionRepository;
 import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.notification.service.FriendNotiService;
 import com.sunny.backend.user.domain.Users;
@@ -27,17 +29,23 @@ import lombok.RequiredArgsConstructor;
 public class FriendService {
 
 	private final FriendRepository friendRepository;
+	private final FriendCompetitionRepository friendCompetitionRepository;
+	private final CompetitionRepository competitionRepository;
 	private final UserRepository userRepository;
 	private final FriendNotiService friendNotiService;
 
 	public FriendListResponse getFriends(CustomUserPrincipal customUserPrincipal) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
-		List<Friend> friends = friendRepository.findByUsers(user);
+		System.out.println(customUserPrincipal.getId());
+		List<FriendCompetitionDto> friends = friendCompetitionRepository.getByFriendLeftJoinFriend(user.getId());
+		for (FriendCompetitionDto friend : friends) {
+			System.out.println(friend);
+		}
 		return FriendListResponse.of(friends);
 	}
 
 	@Transactional
-	public void addFriend(CustomUserPrincipal customUserPrincipal, Long userFriendId) throws IOException {
+	public void addFriend(CustomUserPrincipal customUserPrincipal, Long userFriendId) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		user.canNotMySelf(userFriendId);
 		Users userFriend = userRepository.getById(userFriendId);
@@ -120,9 +128,9 @@ public class FriendService {
 	public void deleteFriends(CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend friend = friendRepository.getById(friendId);
 		friend.validateUser(customUserPrincipal.getId());
-		if (friend.hasCompetition()) {
-			friendRepository.updateCompetitionToNull(friend.getCompetition().getId());
-		}
+
+		// friendCompetitionRepository.deleteAllByFriend(friend);
+		// competitionRepository.de
 		// 상대편 친구 관계 삭제
 		friendRepository.findByUsersAndUserFriend(friend.getUserFriend(), friend.getUsers())
 			.ifPresent(friendRepository::delete);

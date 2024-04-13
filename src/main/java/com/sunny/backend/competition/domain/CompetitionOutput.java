@@ -24,16 +24,16 @@ public class CompetitionOutput {
 		return new CompetitionOutput(output);
 	}
 
-	public CompetitionOutputType isWinner(Long userId) {
+	public CompetitionOutputStatus isWinner(Long userId) {
 		if (output.equals(COMPETITION_NONE_VALUE)) {
-			return CompetitionOutputType.NONE;
+			return CompetitionOutputStatus.NONE;
 		} else if (output.equals(COMPETITION_DRAW_VALUE)) {
-			return CompetitionOutputType.DRAW;
+			return CompetitionOutputStatus.DRAW;
 		} else if (userId.equals(output)) {
-			return CompetitionOutputType.WIN;
+			return CompetitionOutputStatus.WIN;
 		}
 
-		return CompetitionOutputType.LOSE;
+		return CompetitionOutputStatus.LOSE;
 	}
 
 	public void updateOutput(double userPercent, double userFriendPercent, Long userId, Long userFriendId) {

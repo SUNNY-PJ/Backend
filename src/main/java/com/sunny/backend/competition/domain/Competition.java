@@ -11,15 +11,11 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 import com.sunny.backend.common.exception.CustomException;
-import com.sunny.backend.friends.domain.Friend;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -54,10 +50,6 @@ public class Competition {
 	@Enumerated(value = EnumType.STRING)
 	private CompetitionStatus status;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "friend_id")
-	private Friend friend;
-
 	public boolean isEqualToCompetitionStatus(CompetitionStatus competitionStatus) {
 		return status == competitionStatus;
 	}
@@ -66,11 +58,11 @@ public class Competition {
 		this.status = status;
 	}
 
-	public void validateReceiveUser(Long userId) {
-		if (friend.getUsers().getId().equals(userId)) {
-			throw new CustomException(COMPETITION_NOT_MYSELF);
-		}
-	}
+	// public void validateReceiveUser(Long userId) {
+	// 	if (friend.getUsers().getId().equals(userId)) {
+	// 		throw new CustomException(COMPETITION_NOT_MYSELF);
+	// 	}
+	// }
 
 	public void validateStatus() {
 		if (status == CompetitionStatus.SEND) {
@@ -81,16 +73,16 @@ public class Competition {
 		}
 	}
 
-	public CompetitionStatus getStatus(Long id) {
-		if (this.status != CompetitionStatus.SEND) {
-			return this.status;
-		} else {
-			if (friend.getUsers().getId().equals(id)) {
-				return CompetitionStatus.SEND;
-			}
-			return CompetitionStatus.RECEIVE;
-		}
-	}
+	// public CompetitionStatus getStatus(Long id) {
+	// 	if (this.status != CompetitionStatus.SEND) {
+	// 		return this.status;
+	// 	} else {
+	// 		if (friend.getUsers().getId().equals(id)) {
+	// 			return CompetitionStatus.SEND;
+	// 		}
+	// 		return CompetitionStatus.RECEIVE;
+	// 	}
+	// }
 
 	public void updateOutput(double userPercent, double userFriendPercent, Long userId, Long userFriendId) {
 		this.output.updateOutput(userPercent, userFriendPercent, userId, userFriendId);
@@ -98,7 +90,7 @@ public class Competition {
 
 	private Competition(String message, CompetitionOutput output, LocalDate startDate, LocalDate endDate, Long price,
 		String compensation,
-		CompetitionStatus status, Friend friend) {
+		CompetitionStatus status) {
 		this.message = message;
 		this.output = output;
 		this.startDate = startDate;
@@ -106,7 +98,6 @@ public class Competition {
 		this.price = price;
 		this.compensation = compensation;
 		this.status = status;
-		this.friend = friend;
 	}
 
 	public static Competition of(
@@ -114,12 +105,10 @@ public class Competition {
 		LocalDate startDate,
 		LocalDate endDate,
 		Long price,
-		String compensation,
-		Friend friend
+		String compensation
 	) {
 		CompetitionOutput output = CompetitionOutput.from(COMPETITION_NONE_VALUE);
-		return new Competition(message, output, startDate, endDate, price, compensation, CompetitionStatus.SEND,
-			friend);
+		return new Competition(message, output, startDate, endDate, price, compensation, CompetitionStatus.SEND);
 	}
 
 }

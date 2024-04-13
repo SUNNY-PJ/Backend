@@ -2,8 +2,7 @@ package com.sunny.backend.friends.dto.response;
 
 import java.util.List;
 
-import com.sunny.backend.competition.domain.CompetitionStatus;
-import com.sunny.backend.friends.domain.Friend;
+import com.sunny.backend.friends.domain.FriendCompetitionStatus;
 import com.sunny.backend.friends.domain.FriendStatus;
 
 public record FriendListResponse(
@@ -11,23 +10,29 @@ public record FriendListResponse(
 	List<FriendCompetitionResponse> approveList,
 	List<FriendResponse> waitList
 ) {
-	public static FriendListResponse of(List<Friend> friends) {
-		List<FriendCompetitionResponse> competitions = friends.stream()
-			.filter(Friend::hasCompetition)
-			.filter(friend -> friend.getCompetition().isEqualToCompetitionStatus(CompetitionStatus.PROCEEDING))
+	public static FriendListResponse of(List<FriendCompetitionDto> friendCompetitions) {
+		List<FriendCompetitionResponse> competitions = friendCompetitions.stream()
+			.filter(friendCompetition -> friendCompetition.getCompetitionId() != null)
+			.filter(friendCompetition -> friendCompetition.getFriendCompetitionStatus()
+				== FriendCompetitionStatus.PROCEEDING)
 			.map(FriendCompetitionResponse::from)
 			.toList();
 
-		List<FriendCompetitionResponse> approveList = friends.stream()
-			.filter(friend -> (!friend.hasCompetition() && friend.isEqualToFriendStatus(FriendStatus.FRIEND))
-				|| (friend.hasCompetition() && !friend.getCompetition()
-				.isEqualToCompetitionStatus(CompetitionStatus.PROCEEDING)))
+		List<FriendCompetitionResponse> approveList = friendCompetitions.stream()
+			.filter(friendCompetition ->
+				(friendCompetition.getCompetitionId() == null
+					&& friendCompetition.getFriendStatus() == FriendStatus.FRIEND) || (
+					friendCompetition.getCompetitionId() != null
+						&& (friendCompetition.getFriendCompetitionStatus() == FriendCompetitionStatus.SEND
+						|| friendCompetition.getFriendCompetitionStatus() == FriendCompetitionStatus.RECEIVE))
+			)
 			.map(FriendCompetitionResponse::from)
 			.toList();
 
-		List<FriendResponse> waitList = friends.stream()
-			.filter(friend -> !friend.hasCompetition())
-			.filter(friend -> friend.isEqualToFriendStatus(FriendStatus.RECEIVE))
+		List<FriendResponse> waitList = friendCompetitions.stream()
+			.filter(friendCompetition -> friendCompetition.getCompetitionId() == null)
+			.filter(
+				friendCompetition -> friendCompetition.getFriendStatus() == FriendStatus.RECEIVE)
 			.map(FriendResponse::from)
 			.toList();
 

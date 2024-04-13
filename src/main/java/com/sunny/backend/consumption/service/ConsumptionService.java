@@ -19,8 +19,9 @@ import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
 import com.sunny.backend.consumption.dto.response.ConsumptionResponse;
 import com.sunny.backend.consumption.dto.response.SpendTypeStatisticsResponse;
 import com.sunny.backend.consumption.repository.ConsumptionRepository;
-import com.sunny.backend.friends.domain.Friend;
-import com.sunny.backend.friends.repository.FriendRepository;
+import com.sunny.backend.friends.domain.FriendCompetition;
+import com.sunny.backend.friends.domain.FriendCompetitionStatus;
+import com.sunny.backend.friends.repository.FriendCompetitionRepository;
 import com.sunny.backend.save.domain.Save;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
@@ -35,8 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ConsumptionService {
 	private final ConsumptionRepository consumptionRepository;
+	private final FriendCompetitionRepository friendCompetitionRepository;
 	private final ResponseService responseService;
-	private final FriendRepository friendRepository;
 	private final UserRepository userRepository;
 	private final SockMessageUtil sockMessageUtil;
 
@@ -61,29 +62,30 @@ public class ConsumptionService {
 	}
 
 	public void reflectCompetitionResultIfCompeting(Users user) {
-		for (Friend friend : friendRepository.findByUsersAndCompetitionIsNotNullAndCompetition_Status(user,
-			CompetitionStatus.PROCEEDING)) {
-			Competition competition = friend.getCompetition();
-			Users userFriend = friend.getUserFriend();
+		for (FriendCompetition friendCompetition : friendCompetitionRepository.findByFriend_Users(user)) {
+			if (friendCompetition.isFriendCompetitionStatus(FriendCompetitionStatus.PROCEEDING)) {
+				Competition competition = friendCompetition.getCompetition();
+				Users userFriend = friendCompetition.getFriend().getUserFriend();
 
-			Long userId = user.getId();
-			Long userFriendId = userFriend.getId();
-			LocalDate startDate = competition.getStartDate();
-			LocalDate endDate = competition.getEndDate();
-			Long userUsedMoney = consumptionRepository.getComsumptionMoney(userId, startDate, endDate);
-			Long friendUsedMoney = consumptionRepository.getComsumptionMoney(userFriendId, startDate, endDate);
+				Long userId = user.getId();
+				Long userFriendId = userFriend.getId();
+				LocalDate startDate = competition.getStartDate();
+				LocalDate endDate = competition.getEndDate();
+				Long userUsedMoney = consumptionRepository.getComsumptionMoney(userId, startDate, endDate);
+				Long friendUsedMoney = consumptionRepository.getComsumptionMoney(userFriendId, startDate, endDate);
 
-			double percentageUsed = MathUtil.calculatePercentage(userUsedMoney, competition.getPrice());
-			double friendsPercentageUsed = MathUtil.calculatePercentage(friendUsedMoney, competition.getPrice());
+				double percentageUsed = MathUtil.calculatePercentage(userUsedMoney, competition.getPrice());
+				double friendsPercentageUsed = MathUtil.calculatePercentage(friendUsedMoney, competition.getPrice());
 
-			competition.updateOutput(percentageUsed, friendsPercentageUsed, userId, userFriendId);
+				competition.updateOutput(percentageUsed, friendsPercentageUsed, userId, userFriendId);
 
-			if (friendsPercentageUsed <= 0) {
-				competition.updateStatus(CompetitionStatus.COMPLETE);
-				sockMessageUtil.sendCompetitionUserWinner(user, userFriend, competition);
-			} else if (percentageUsed <= 0) {
-				competition.updateStatus(CompetitionStatus.COMPLETE);
-				sockMessageUtil.sendCompetitionUserFriendWinner(user, userFriend, competition);
+				if (friendsPercentageUsed <= 0) {
+					competition.updateStatus(CompetitionStatus.COMPLETE);
+					sockMessageUtil.sendCompetitionUserWinner(user, userFriend, competition);
+				} else if (percentageUsed <= 0) {
+					competition.updateStatus(CompetitionStatus.COMPLETE);
+					sockMessageUtil.sendCompetitionUserFriendWinner(user, userFriend, competition);
+				}
 			}
 		}
 	}

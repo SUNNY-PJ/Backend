@@ -5,6 +5,6 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum CompetitionOutputType {
+public enum CompetitionOutputStatus {
 	NONE, WIN, LOSE, DRAW;
 }
