@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 import javax.transaction.Transactional;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.sunny.backend.common.exception.CustomException;
@@ -19,6 +20,7 @@ import com.sunny.backend.friends.domain.FriendCompetitionStatus;
 import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.friends.repository.FriendCompetitionRepository;
 import com.sunny.backend.friends.repository.FriendRepository;
+import com.sunny.backend.notification.service.FriendNotiService;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.util.MathUtil;
 import com.sunny.backend.util.SockMessageUtil;
@@ -34,8 +36,9 @@ public class CompetitionScheduleService {
 	private final ConsumptionRepository consumptionRepository;
 	private final FriendCompetitionRepository friendCompetitionRepository;
 	private final FriendRepository friendRepository;
+	private final FriendNotiService friendNotiService;
 
-	// @Scheduled(cron = "0 0 00 * * ?")
+	@Scheduled(cron = "0 0 00 * * ?")
 	@Transactional
 	public void checkCompetition() {
 		for (Competition competition : competitionRepository.findByEndDate(LocalDate.now().minusDays(1))) {
@@ -60,17 +63,33 @@ public class CompetitionScheduleService {
 				double percentageUsed = MathUtil.calculatePercentage(userUsedMoney, competition.getPrice());
 				double friendsPercentageUsed = MathUtil.calculatePercentage(friendUsedMoney, competition.getPrice());
 
+				String bodyTitle = "대결 결과를 알려드려요";
+				String winBody = "님과의 대결에서 승리했어요!";
+				String loseBody = "님과의 대결에서 패배했어요!";
+				String drawBody = "님과의 대결에서 비겼어요!";
+				String winTitle = "[SUNNY] " + user.getNickname();
+				String loseTitle = "[SUNNY] " + userFriend.getNickname();
+
 				if (friendsPercentageUsed < percentageUsed) {
 					friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.WIN);
 					friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.LOSE);
+
+					friendNotiService.sendCompetitionNotifications(loseTitle, winBody, bodyTitle, user, userFriend);
+					friendNotiService.sendCompetitionNotifications(winTitle, loseBody, bodyTitle, userFriend, user);
 					sockMessageUtil.sendCompetitionUserWinner(user, userFriend, competition);
 				} else if (friendsPercentageUsed > percentageUsed) {
 					friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.LOSE);
 					friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.WIN);
+
+					friendNotiService.sendCompetitionNotifications(winTitle, winBody, bodyTitle, userFriend, user);
+					friendNotiService.sendCompetitionNotifications(loseTitle, loseBody, bodyTitle, user, userFriend);
 					sockMessageUtil.sendCompetitionUserWinner(userFriend, user, competition);
 				} else {
 					friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.DRAW);
 					friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.DRAW);
+
+					friendNotiService.sendCompetitionNotifications(winTitle, drawBody, bodyTitle, userFriend, user);
+					friendNotiService.sendCompetitionNotifications(loseTitle, drawBody, bodyTitle, user, userFriend);
 					sockMessageUtil.sendCompetitionDraw(user, userFriend, competition);
 				}
 
