@@ -106,6 +106,7 @@ public class ConsumptionController {
 
 	@GetMapping("/test")
 	public void test() {
+		System.out.println("test api 호출");
 		competitionScheduleService.checkCompetition();
 	}
 }

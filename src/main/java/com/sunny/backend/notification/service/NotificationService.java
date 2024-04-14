@@ -21,12 +21,14 @@ import com.sunny.backend.common.response.CommonResponse.ListResponse;
 import com.sunny.backend.common.response.CommonResponse.SingleResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.notification.domain.CommentNotification;
+import com.sunny.backend.notification.domain.CompetitionNotification;
 import com.sunny.backend.notification.domain.FriendsNotification;
 import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.notification.dto.request.NotificationPushRequest;
 import com.sunny.backend.notification.dto.request.NotificationRequest.NotificationAllowRequest;
 import com.sunny.backend.notification.dto.response.AlarmListResponse;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
+import com.sunny.backend.notification.repository.CompetitionNotificationRepository;
 import com.sunny.backend.notification.repository.FriendsNotificationRepository;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.user.domain.Users;
@@ -49,6 +51,7 @@ public class NotificationService {
 	private final CommentNotificationRepository commentNotificationRepository;
 	private final FriendsNotificationRepository friendsNotificationRepository;
 	private final UserRepository userRepository;
+	private final CompetitionNotificationRepository competitionNotificationRepository;
 
 	@Transactional
 	public ResponseEntity<SingleResponse<Boolean>> permissionAlarm(CustomUserPrincipal customUserPrincipal,
@@ -72,6 +75,7 @@ public class NotificationService {
 	}
 
 	public ResponseEntity<ListResponse<AlarmListResponse>> getAlarmList(CustomUserPrincipal customUserPrincipal) {
+
 		List<CommentNotification> commentNotifications = commentNotificationRepository.findByUsers_Id(
 			customUserPrincipal.getId());
 		List<AlarmListResponse> commentNotificationResponse = fromCommentNotifications(commentNotifications,
@@ -83,8 +87,15 @@ public class NotificationService {
 			.map(AlarmListResponse::fromFriendsAlert)
 			.toList();
 
-		List<AlarmListResponse> combinedList = Stream.concat(commentNotificationResponse.stream(),
-				friendsNotificationResponse.stream())
+		List<CompetitionNotification> competitionNotifications = competitionNotificationRepository.findByUsers_Id(
+			customUserPrincipal.getId());
+		List<AlarmListResponse> competitionNotificationResponse = competitionNotifications.stream()
+			.map(AlarmListResponse::fromCompetitionAlert)
+			.toList();
+
+		List<AlarmListResponse> combinedList = Stream.concat(
+				Stream.concat(commentNotificationResponse.stream(), friendsNotificationResponse.stream()),
+				competitionNotificationResponse.stream())
 			.sorted(Comparator.comparing(AlarmListResponse::createdAt).reversed())
 			.toList();
 		return responseService.getListResponse(HttpStatus.OK.value(), combinedList, "알림 조회 저장 성공");
