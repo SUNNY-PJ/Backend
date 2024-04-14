@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.exception.CustomException;
-import com.sunny.backend.competition.repository.CompetitionRepository;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.FriendStatus;
 import com.sunny.backend.friends.dto.response.FriendCompetitionDto;
@@ -30,17 +29,12 @@ public class FriendService {
 
 	private final FriendRepository friendRepository;
 	private final FriendCompetitionRepository friendCompetitionRepository;
-	private final CompetitionRepository competitionRepository;
 	private final UserRepository userRepository;
 	private final FriendNotiService friendNotiService;
 
 	public FriendListResponse getFriends(CustomUserPrincipal customUserPrincipal) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
-		System.out.println(customUserPrincipal.getId());
 		List<FriendCompetitionDto> friends = friendCompetitionRepository.getByFriendLeftJoinFriend(user.getId());
-		for (FriendCompetitionDto friend : friends) {
-			System.out.println(friend);
-		}
 		return FriendListResponse.of(friends);
 	}
 
