@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.competition.service.CompetitionScheduleService;
 import com.sunny.backend.consumption.domain.SpendType;
 import com.sunny.backend.consumption.dto.request.ConsumptionRequest;
 import com.sunny.backend.consumption.dto.response.ConsumptionResponse;
@@ -38,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/consumption")
 public class ConsumptionController {
 	private final ConsumptionService consumptionService;
+	private final CompetitionScheduleService competitionScheduleService;
 
 	@ApiOperation(tags = "4. Consumption", value = "지출 조회")
 	@GetMapping
@@ -100,5 +102,10 @@ public class ConsumptionController {
 		@Valid @RequestParam SpendType spendType,
 		@RequestParam(name = "year") Integer year, @RequestParam(name = "month") Integer month) {
 		return consumptionService.getConsumptionByCategory(customUserPrincipal, spendType, year, month);
+	}
+
+	@GetMapping("/test")
+	public void test() {
+		competitionScheduleService.checkCompetition();
 	}
 }

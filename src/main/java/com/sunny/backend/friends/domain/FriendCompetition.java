@@ -97,11 +97,11 @@ public class FriendCompetition extends BaseTime {
 		return this.friendCompetitionStatus == friendCompetitionStatus;
 	}
 
-	public boolean isCompetitionOutputStatus(CompetitionOutputStatus competitionOutputStatus) {
-		return this.competitionOutputStatus == competitionOutputStatus;
-	}
-
 	public void updateFriendCompetitionStatus(FriendCompetitionStatus friendCompetitionStatus) {
 		this.friendCompetitionStatus = friendCompetitionStatus;
+	}
+
+	public void updateCompetitionOutputStatus(CompetitionOutputStatus competitionOutputStatus) {
+		this.competitionOutputStatus = competitionOutputStatus;
 	}
 }
