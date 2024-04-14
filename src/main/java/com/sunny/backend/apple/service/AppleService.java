@@ -35,8 +35,10 @@ import com.sunny.backend.friends.domain.FriendCompetition;
 import com.sunny.backend.friends.repository.FriendCompetitionRepository;
 import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
+import com.sunny.backend.notification.repository.CompetitionNotificationRepository;
 import com.sunny.backend.notification.repository.FriendsNotificationRepository;
 import com.sunny.backend.notification.repository.NotificationRepository;
+import com.sunny.backend.report.repository.CommentReportRepository;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
 import com.sunny.backend.util.RedisUtil;
@@ -64,6 +66,8 @@ public class AppleService {
 	private final RedisUtil redisUtil;
 	private final FriendCompetitionRepository friendCompetitionRepository;
 
+	private final CompetitionNotificationRepository competitionNotificationRepository;
+	private final CommentReportRepository commentReportRepository;
 	private final TokenProvider tokenProvider;
 
 	public String generateClientSecret() throws IOException {
@@ -140,16 +144,17 @@ public class AppleService {
 				for (Friend friend : friendRepository.findByUsers(users)) {
 					List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByFriendAndCompetition(
 						friend.getId(), null);
+					competitionNotificationRepository.deleteAllByFriendCompetitionIn(friendCompetitions);
 					friendCompetitionRepository.deleteAllByFriend(friend);
 					List<Long> competitionIds = friendCompetitions.stream()
 						.map(friendCompetition -> friendCompetition.getCompetition().getId())
 						.toList();
 					competitionRepository.deleteAllById(competitionIds);
 				}
-				friendsNotificationRepository.deleteByUsersOrFriend(users, users);
 				friendRepository.deleteByUsersOrUserFriend(users, users);
 				commentNotificationRepository.deleteByUsers(users);
 				commentRepository.nullifyUsersId(users.getId());
+				commentReportRepository.nullifyUsersId(users.getId());
 				userRepository.deleteById(users.getId());
 				log.info("Apple token 삭제 성공 code={}", HttpStatus.OK.value());
 				return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");

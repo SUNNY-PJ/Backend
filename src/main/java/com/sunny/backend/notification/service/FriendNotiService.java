@@ -50,7 +50,7 @@ public class FriendNotiService {
 		FriendCompetition friendCompetition) {
 		Long postAuthor = users.getId();
 		CompetitionNotification competitionNotification = CompetitionNotification.builder()
-			.users(users) // 상대방꺼
+			.users(users)
 			.friend(friend)
 			.friendCompetition(friendCompetition)
 			.title(bodyTitle)

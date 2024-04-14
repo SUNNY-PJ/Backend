@@ -76,7 +76,7 @@ public class CompetitionScheduleService {
 					friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.LOSE);
 
 					friendNotiService.sendCompetitionNotifications(loseTitle, winBody, bodyTitle, user, userFriend,
-						friendCompetitionUserFriend);
+						friendCompetition);
 					friendNotiService.sendCompetitionNotifications(winTitle, loseBody, bodyTitle, userFriend, user,
 						friendCompetitionUserFriend);
 					sockMessageUtil.sendCompetitionUserWinner(user, userFriend, competition);
@@ -87,14 +87,14 @@ public class CompetitionScheduleService {
 					friendNotiService.sendCompetitionNotifications(winTitle, winBody, bodyTitle, userFriend, user,
 						friendCompetitionUserFriend);
 					friendNotiService.sendCompetitionNotifications(loseTitle, loseBody, bodyTitle, user, userFriend,
-						friendCompetitionUserFriend);
+						friendCompetition);
 					sockMessageUtil.sendCompetitionUserWinner(userFriend, user, competition);
 				} else {
 					friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.DRAW);
 					friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.DRAW);
 
 					friendNotiService.sendCompetitionNotifications(winTitle, drawBody, bodyTitle, userFriend, user,
-						friendCompetitionUserFriend);
+						friendCompetition);
 					friendNotiService.sendCompetitionNotifications(loseTitle, drawBody, bodyTitle, user, userFriend,
 						friendCompetitionUserFriend);
 					sockMessageUtil.sendCompetitionDraw(user, userFriend, competition);
