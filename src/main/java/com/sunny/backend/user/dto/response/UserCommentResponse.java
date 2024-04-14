@@ -25,13 +25,13 @@ public record UserCommentResponse(
 		if (currentUser.getId().equals(comment.getUsers().getId())
 			|| currentUser.getId().equals(comment.getCommunity().getId())) {
 			commentContent = comment.getContent();
-		} else {
-			if (comment.getIsPrivated()) {
-				commentContent = "비밀 댓글입니다.";
-				if (comment.getIsDeleted()) {
-					commentContent = "삭제된 댓글입니다.";
-				}
+		} else if (comment.getIsPrivated()) {
+			commentContent = "비밀 댓글입니다.";
+			if (comment.getIsDeleted()) {
+				commentContent = "삭제된 댓글입니다.";
 			}
+		} else {
+			commentContent = comment.getContent();
 		}
 		//
 		// if (comment.getIsPrivated() && (currentUser.getId().equals(comment.getUsers().getId()) ||
