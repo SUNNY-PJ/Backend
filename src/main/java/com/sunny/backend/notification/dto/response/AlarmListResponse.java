@@ -34,7 +34,7 @@ public record AlarmListResponse(
 
 		return new AlarmListResponse(
 			UUID.randomUUID().toString(),
-			commentNotification.getId(),
+			commentNotification.getCommunity().getId(),
 			commentUser.getNickname(),
 			commentNotification.getTitle(),
 			comment.getContent(),
