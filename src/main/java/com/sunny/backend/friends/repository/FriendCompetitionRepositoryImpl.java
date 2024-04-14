@@ -58,6 +58,15 @@ public class FriendCompetitionRepositoryImpl implements FriendCompetitionCustomR
 			.fetch();
 	}
 
+	@Override
+	public List<FriendCompetition> getByUserOrUserFriend(Long userId) {
+		QFriend friend = QFriend.friend;
+		return jpaQueryFactory.selectFrom(friendCompetition)
+			.join(friend).on(friendCompetition.friend.id.eq(friend.id))
+			.where(friend.users.id.eq(userId).or(friend.userFriend.id.eq(userId)))
+			.fetch();
+	}
+
 	public BooleanExpression eqCompetitionId(Long competitionId) {
 		if (competitionId == null) {
 			return null;

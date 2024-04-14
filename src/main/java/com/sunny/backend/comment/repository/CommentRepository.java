@@ -29,6 +29,11 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, Comment
 	@Query("UPDATE Comment c SET c.users = null WHERE c.users.id = :userId")
 	void nullifyUsersId(Long userId);
 
+	@Transactional
+	@Modifying
+	@Query("UPDATE CommentReport c SET c.users = null WHERE c.users.id = :userId")
+	void nullifyCommentReportUsersId(Long userId);
+
 }
 
 

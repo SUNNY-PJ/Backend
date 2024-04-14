@@ -2,7 +2,6 @@ package com.sunny.backend.notification.domain;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,13 +30,13 @@ public class CompetitionNotification extends BaseTime {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE) //상대방꺼
+	@ManyToOne(fetch = FetchType.LAZY) //상대방꺼
 	@JoinColumn(name = "users_id")
 	private Users users;
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_friend_id")
 	private Users friend;
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "friend_competition_id")
 	private FriendCompetition friendCompetition;
 
