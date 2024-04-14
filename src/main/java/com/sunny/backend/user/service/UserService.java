@@ -80,8 +80,12 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public List<UserCommentResponse> getCommentByUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
+		Long searchId = customUserPrincipal.getId();
+		if (userId != null) {
+			searchId = userId;
+		}
 
-		return commentRepository.findAllByUsers_Id(userId)
+		return commentRepository.findAllByUsers_Id(searchId)
 			.stream()
 			.map(comment -> UserCommentResponse.from(comment, user))
 			.toList();
