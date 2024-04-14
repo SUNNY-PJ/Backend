@@ -28,6 +28,7 @@ import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.consumption.domain.Consumption;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.notification.domain.Notification;
+import com.sunny.backend.report.domain.CommunityReport;
 import com.sunny.backend.save.domain.Save;
 import com.sunny.backend.save.exception.SaveErrorCode;
 import com.sunny.backend.scrap.domain.Scrap;
@@ -86,6 +87,9 @@ public class Users extends BaseTime {
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
 	private final List<Notification> notification = new ArrayList<>();
+
+	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+	private final List<CommunityReport> communityReports = new ArrayList<>();
 
 	public Users(String email, String oauthId, String nickname, Role role, String profile, UserReport userReport) {
 		this.email = email;

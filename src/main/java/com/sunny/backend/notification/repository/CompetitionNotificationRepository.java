@@ -11,6 +11,4 @@ public interface CompetitionNotificationRepository extends JpaRepository<Competi
 	List<CompetitionNotification> findByUsers_Id(Long userId);
 
 	void deleteAllByFriendCompetition(FriendCompetition friendCompetition);
-
-	void deleteAllByFriendCompetitionIn(List<FriendCompetition> friendCompetitions);
 }

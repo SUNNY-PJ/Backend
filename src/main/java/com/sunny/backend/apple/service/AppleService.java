@@ -70,7 +70,6 @@ public class AppleService {
 	private final CompetitionNotificationRepository competitionNotificationRepository;
 	private final CommentReportRepository commentReportRepository;
 	private final CommunityReportRepository communityReportRepository;
-
 	private final TokenProvider tokenProvider;
 
 	public String generateClientSecret() throws IOException {
@@ -155,11 +154,12 @@ public class AppleService {
 				if (!competitionIds.isEmpty()) {
 					competitionRepository.deleteAllById(competitionIds);
 				}
-				
+
 				friendsNotificationRepository.deleteByUsersOrFriend(users, users);
 				friendRepository.deleteByUsersOrUserFriend(users, users);
 				communityReportRepository.deleteAllByCommunityInOrUsers(users.getCommunityList(), users);
 				commentReportRepository.deleteAllByCommentInOrUsers(users.getCommentList(), users);
+
 				commentRepository.nullifyUsersId(users.getId());
 				userRepository.deleteById(users.getId());
 				log.info("Apple token 삭제 성공 code={}", HttpStatus.OK.value());

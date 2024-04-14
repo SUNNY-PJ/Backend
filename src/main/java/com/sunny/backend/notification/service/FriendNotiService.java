@@ -28,7 +28,7 @@ public class FriendNotiService {
 	public void sendNotifications(String title, String body, String bodyTitle, Friend friend) {
 		Long postAuthor = friend.getUserFriend().getId();
 		FriendsNotification friendsNotification = FriendsNotification.builder()
-			.users(friend.getUserFriend()) // 상대방꺼
+			.users(friend.getUserFriend())
 			.friend(friend.getUsers())
 			.title(bodyTitle)
 			.body(body)
@@ -50,7 +50,7 @@ public class FriendNotiService {
 		FriendCompetition friendCompetition) {
 		Long postAuthor = users.getId();
 		CompetitionNotification competitionNotification = CompetitionNotification.builder()
-			.users(users) // 상대방꺼
+			.users(users)
 			.friend(friend)
 			.friendCompetition(friendCompetition)
 			.title(bodyTitle)
