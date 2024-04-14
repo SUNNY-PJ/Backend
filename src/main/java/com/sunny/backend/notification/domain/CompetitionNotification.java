@@ -13,7 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.sunny.backend.common.BaseTime;
-import com.sunny.backend.competition.domain.Competition;
+import com.sunny.backend.friends.domain.FriendCompetition;
 import com.sunny.backend.user.domain.Users;
 
 import lombok.AllArgsConstructor;
@@ -38,8 +38,8 @@ public class CompetitionNotification extends BaseTime {
 	@JoinColumn(name = "user_friend_id")
 	private Users friend;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-	@JoinColumn(name = "competition_id")
-	private Competition competition; //대결 id
+	@JoinColumn(name = "friend_competition_id")
+	private FriendCompetition friendCompetition;
 
 	@Column
 	private String title; //제목

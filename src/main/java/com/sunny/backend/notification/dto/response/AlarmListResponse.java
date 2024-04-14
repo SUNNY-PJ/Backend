@@ -1,5 +1,7 @@
 package com.sunny.backend.notification.dto.response;
 
+import static com.sunny.backend.notification.domain.NotificationType.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,7 +10,9 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.notification.domain.CommentNotification;
+import com.sunny.backend.notification.domain.CompetitionNotification;
 import com.sunny.backend.notification.domain.FriendsNotification;
+import com.sunny.backend.notification.domain.NotificationType;
 import com.sunny.backend.user.domain.Users;
 
 public record AlarmListResponse(
@@ -18,7 +22,7 @@ public record AlarmListResponse(
 	String title,
 	String notificationContent,
 	String profileImg,
-
+	NotificationType notificationType,
 	boolean isToday,
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
 	LocalDateTime createdAt
@@ -35,6 +39,7 @@ public record AlarmListResponse(
 			commentNotification.getTitle(),
 			comment.getContent(),
 			commentUser.getProfile(),
+			COMMENT,
 			isToday,
 			comment.getCreatedDate()
 		);
@@ -48,8 +53,23 @@ public record AlarmListResponse(
 			friendsNotification.getTitle(),
 			friendsNotification.getFriend().getNickname() + friendsNotification.getBody(),
 			friendsNotification.getFriend().getProfile(),
+			FRIEND,
 			friendsNotification.getCreatedDate().toLocalDate().isEqual(LocalDate.now()),
 			friendsNotification.getCreatedDate()
+		);
+	}
+
+	public static AlarmListResponse fromCompetitionAlert(CompetitionNotification competitionNotification) {
+		return new AlarmListResponse(
+			UUID.randomUUID().toString(),
+			competitionNotification.getFriendCompetition().getCompetition().getId(),
+			competitionNotification.getFriend().getNickname(),
+			competitionNotification.getTitle(),
+			competitionNotification.getFriend().getNickname() + competitionNotification.getBody(),
+			competitionNotification.getFriend().getProfile(),
+			COMPETITION,
+			competitionNotification.getCreatedDate().toLocalDate().isEqual(LocalDate.now()),
+			competitionNotification.getCreatedDate()
 		);
 	}
 

@@ -92,7 +92,9 @@ public class CompetitionService {
 		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
 		String body = "님으로부터 대결 신청을 받았어요.";
 		String bodyTitle = "대결 신청을 받았어요!";
-		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUser);
+		friendNotiService.sendCompetitionNotifications(title, body, bodyTitle, friendWithUser.getUserFriend(),
+			friendWithUser.getUsers(),
+			friendCompetitionToUserFriend);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 			FriendCompetitionResponses.from(friendCompetition), "");
 	}
@@ -142,6 +144,7 @@ public class CompetitionService {
 		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
 		String body = "님이 대결을 수락했어요";
 		String bodyTitle = "대결 신청에 대한 응답을 받았어요";
+
 		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUser);
 	}
 
