@@ -10,6 +10,7 @@ import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.notification.dto.request.NotificationPushRequest;
 import com.sunny.backend.notification.repository.FriendsNotificationRepository;
 import com.sunny.backend.notification.repository.NotificationRepository;
+import com.sunny.backend.user.domain.Users;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +33,27 @@ public class FriendNotiService {
 		List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
 		if (notificationList.size() != 0) {
 			String notificationBody = friend.getUsers().getNickname() + body;
+			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
+				postAuthor,
+				notificationBody,
+				bodyTitle
+			);
+			notificationService.sendNotificationToFriends(title, notificationPushRequest);
+		}
+	}
+
+	public void sendCompetitionNotifications(String title, String body, String bodyTitle, Users users, Users friend) {
+		Long postAuthor = users.getId();
+		FriendsNotification friendsNotification = FriendsNotification.builder()
+			.users(users) // 상대방꺼
+			.friend(friend)
+			.title(bodyTitle)
+			.body(body)
+			.build();
+		friendsNotificationRepository.save(friendsNotification);
+		List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
+		if (notificationList.size() != 0) {
+			String notificationBody = friend.getNickname() + body;
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
 				postAuthor,
 				notificationBody,
