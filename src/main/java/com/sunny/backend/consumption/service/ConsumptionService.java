@@ -27,7 +27,9 @@ import com.sunny.backend.friends.domain.FriendCompetition;
 import com.sunny.backend.friends.domain.FriendCompetitionStatus;
 import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.friends.repository.FriendCompetitionRepository;
+
 import com.sunny.backend.friends.repository.FriendRepository;
+import com.sunny.backend.notification.service.FriendNotiService;
 import com.sunny.backend.save.domain.Save;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
@@ -46,10 +48,14 @@ public class ConsumptionService {
 	private final ResponseService responseService;
 	private final UserRepository userRepository;
 	private final SockMessageUtil sockMessageUtil;
+
 	private final FriendRepository friendRepository;
 
+	private final FriendNotiService friendNotiService;
+
+
 	@Transactional
-	public ConsumptionResponse createConsumption(
+	public void createConsumption(
 		CustomUserPrincipal customUserPrincipal,
 		ConsumptionRequest consumptionRequest
 	) {
@@ -66,8 +72,6 @@ public class ConsumptionService {
 		reflectCompetitionResultIfCompeting(user);
 
 		checkSaveAndSendMessage(user);
-
-		return ConsumptionResponse.from(consumption);
 	}
 
 	public void reflectCompetitionResultIfCompeting(Users user) {
@@ -92,6 +96,7 @@ public class ConsumptionService {
 				double percentageUsed = MathUtil.calculatePercentage(userUsedMoney, competition.getPrice());
 				double friendsPercentageUsed = MathUtil.calculatePercentage(friendUsedMoney, competition.getPrice());
 
+
 				if (friendsPercentageUsed < percentageUsed) {
 					friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.WIN);
 					friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.LOSE);
@@ -112,6 +117,26 @@ public class ConsumptionService {
 				} else if (percentageUsed <= 0) {
 					friendCompetition.updateFriendCompetitionStatus(FriendCompetitionStatus.COMPLETE);
 					friendCompetitionUserFriend.updateFriendCompetitionStatus(FriendCompetitionStatus.COMPLETE);
+
+// 				competition.updateOutput(percentageUsed, friendsPercentageUsed, userId, userFriendId);
+// 				String bodyTitle = "대결 결과를 알려드려요";
+// 				String winBody = "님과의 대결에서 승리했어요!";
+// 				String loseBody = "님과의 대결에서 패배했어요!";
+// 				String winTitle = "[SUNNY] " + user.getNickname();
+// 				String loseTitle = "[SUNNY] " + userFriend.getNickname();
+// 				if (friendsPercentageUsed <= 0) { //친구가 진 경우
+// 					competition.updateStatus(CompetitionStatus.COMPLETE);
+
+// 					friendNotiService.sendCompetitionNotifications(winTitle, winBody, bodyTitle, userFriend, user);
+// 					friendNotiService.sendCompetitionNotifications(loseTitle, loseBody, bodyTitle, user, userFriend);
+
+// 					sockMessageUtil.sendCompetitionUserWinner(user, userFriend, competition);
+// 				} else if (percentageUsed <= 0) { //내가 진 경우
+// 					competition.updateStatus(CompetitionStatus.COMPLETE);
+					 
+// 					friendNotiService.sendCompetitionNotifications(loseTitle, winBody, bodyTitle, user, userFriend);
+// 					friendNotiService.sendCompetitionNotifications(winTitle, loseBody, bodyTitle, userFriend, user);
+
 					sockMessageUtil.sendCompetitionUserFriendWinner(user, userFriend, competition);
 				}
 			}
