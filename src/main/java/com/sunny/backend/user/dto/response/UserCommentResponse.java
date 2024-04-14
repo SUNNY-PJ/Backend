@@ -21,7 +21,20 @@ public record UserCommentResponse(
 
 	public static UserCommentResponse from(Comment comment, Users currentUser) {
 		String commentContent = "";
-		if (comment.getIsPrivated() && !(currentUser.getId().equals(comment.getUsers().getId()) ||
+
+		// if (currentUser.getId().equals(comment.getUsers().getId())
+		// 	|| currentUser.getId().equals(comment.getCommunity().getId())) {
+		// 	commentContent = comment.getContent();
+		// } else {
+		// 	if (comment.getIsPrivated()) {
+		// 		commentContent = "비밀 댓글입니다.";
+		// 		if (comment.getIsDeleted()) {
+		// 			commentContent = "삭제된 댓글입니다.";
+		// 		}
+		// 	}
+		// }
+		//
+		if (comment.getIsPrivated() && (currentUser.getId().equals(comment.getUsers().getId()) ||
 			currentUser.getId().equals(comment.getCommunity().getUsers().getId()))) {
 			if (comment.getIsDeleted()) {
 				commentContent = "삭제된 댓글입니다.";

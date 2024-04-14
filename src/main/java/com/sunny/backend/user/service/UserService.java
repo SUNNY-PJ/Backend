@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,13 +43,12 @@ public class UserService {
 	private final ScrapRepository scrapRepository;
 	private final NotificationRepository notificationRepository;
 	private final NotificationService notificationService;
-	private final SimpMessagingTemplate template;
 	private final S3Util s3Util;
 	private final FriendRepository friendRepository;
 
 	public Users checkUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
 		Long id = customUserPrincipal.getId();
-		if (userId != null) {
+		if (userId != null && !customUserPrincipal.getId().equals(userId)) {
 			id = userId;
 		}
 		return userRepository.getById(id);
@@ -81,9 +79,9 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public List<UserCommentResponse> getCommentByUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
-		Users user = checkUserId(customUserPrincipal, userId);
+		Users user = userRepository.getById(customUserPrincipal.getId());
 
-		return commentRepository.findAllByUsers_Id(user.getId())
+		return commentRepository.findAllByUsers_Id(userId)
 			.stream()
 			.map(comment -> UserCommentResponse.from(comment, user))
 			.toList();

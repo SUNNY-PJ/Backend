@@ -10,6 +10,7 @@ import lombok.Builder;
 public record FriendCompetitionResponse(
 	Long friendId,
 	Long userFriendId,
+	Long competitionId,
 	String nickname,
 	String profile,
 	FriendStatus friendStatus,
@@ -20,6 +21,7 @@ public record FriendCompetitionResponse(
 		return FriendCompetitionResponse.builder()
 			.friendId(friendCompetitionDto.getFriendId())
 			.userFriendId(friendCompetitionDto.getUserFriendId())
+			.competitionId(friendCompetitionDto.getCompetitionId())
 			.nickname(friendCompetitionDto.getNickname())
 			.profile(friendCompetitionDto.getProfile())
 			.friendStatus(friendCompetitionDto.getFriendStatus())
