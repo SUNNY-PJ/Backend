@@ -1,6 +1,7 @@
 package com.sunny.backend.competition.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,8 @@ import com.sunny.backend.competition.domain.Competition;
 public interface CompetitionRepository extends JpaRepository<Competition, Long> {
 
 	// Optional<Competition> findByUsers_IdAndUserFriend_Id(Long userId, Long userFriendId);
+
+	List<Competition> findByEndDate(LocalDate localDate);
 
 	default Competition getById(Long id) {
 		return findById(id)

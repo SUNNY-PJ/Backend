@@ -33,6 +33,11 @@ public class SockMessageUtil {
 			"님이 대결에서 졌어요! \n 다음에는 조금 더 노력해 보아요!", competition);
 	}
 
+	public void sendCompetitionDraw(Users users, Users userFriend, Competition competition) {
+		sendCompetitionResult(users.getId(), users.getNickname(), userFriend.getNickname(), "비겼습니다", competition);
+		sendCompetitionResult(userFriend.getId(), userFriend.getNickname(), users.getNickname(), "비겼습니다", competition);
+	}
+
 	@Async
 	public void sendCompetitionResult(Long id, String userName, String friendName, String message,
 		Competition competition) {

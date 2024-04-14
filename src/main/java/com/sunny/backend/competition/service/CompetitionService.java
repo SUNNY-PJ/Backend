@@ -209,7 +209,14 @@ public class CompetitionService {
 
 		Competition competition = competitionRepository.getById(competitionId);
 
-		friendCompetitionRepository.findByFriendAndCompetition(friendWithUser, competition)
+		FriendCompetition friendCompetition = friendCompetitionRepository.findByFriendAndCompetition(friendWithUser,
+				competition)
+			.orElseThrow(() -> new CustomException(COMPETITION_NOT_FOUND));
+		Friend friendWithUserFriend = friendRepository.findByUsersAndUserFriend(friendWithUser.getUserFriend(),
+				friendWithUser.getUsers())
+			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
+		FriendCompetition friendCompetitionUserFriend = friendCompetitionRepository.findByFriendAndCompetition(
+				friendWithUserFriend, competition)
 			.orElseThrow(() -> new CustomException(COMPETITION_NOT_FOUND));
 
 		Users user = friendWithUser.getUsers();
@@ -219,7 +226,16 @@ public class CompetitionService {
 		double percentageUsed = calculateUserPercentage(user.getId(), competition);
 		double friendsPercentageUsed = calculateUserPercentage(userFriend.getId(), competition);
 
-		competition.getOutput().updateOutput(percentageUsed, friendsPercentageUsed, user.getId(), userFriend.getId());
+		if (friendsPercentageUsed < percentageUsed) {
+			friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.WIN);
+			friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.LOSE);
+		} else if (friendsPercentageUsed > percentageUsed) {
+			friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.LOSE);
+			friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.WIN);
+		} else {
+			friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.DRAW);
+			friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.DRAW);
+		}
 
 		return responseService.getSingleResponse(HttpStatus.OK.value(), CompetitionStatusResponse.builder()
 			.competitionId(competition.getId())

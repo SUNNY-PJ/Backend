@@ -1,21 +1,14 @@
 package com.sunny.backend.competition.domain;
 
-import static com.sunny.backend.competition.domain.CompetitionOutput.*;
-import static com.sunny.backend.competition.exception.CompetitionErrorCode.*;
 import static lombok.AccessLevel.*;
 
 import java.time.LocalDate;
 
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import com.sunny.backend.common.exception.CustomException;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,9 +24,6 @@ public class Competition {
 	@Column
 	private String message; // 도발 메세지
 
-	@Embedded
-	private CompetitionOutput output; // 결과
-
 	@Column
 	private LocalDate startDate; // 시작 기간
 
@@ -46,17 +36,20 @@ public class Competition {
 	@Column
 	private String compensation; // 대결 보상
 
-	@Column(name = "competition_status")
-	@Enumerated(value = EnumType.STRING)
-	private CompetitionStatus status;
+	// @Embedded
+	// private CompetitionOutput output; // 결과
+	//
+	// @Column(name = "competition_status")
+	// @Enumerated(value = EnumType.STRING)
+	// private CompetitionStatus status;
 
-	public boolean isEqualToCompetitionStatus(CompetitionStatus competitionStatus) {
-		return status == competitionStatus;
-	}
-
-	public void updateStatus(CompetitionStatus status) {
-		this.status = status;
-	}
+	// public boolean isEqualToCompetitionStatus(CompetitionStatus competitionStatus) {
+	// 	return status == competitionStatus;
+	// }
+	//
+	// public void updateStatus(CompetitionStatus status) {
+	// 	this.status = status;
+	// }
 
 	// public void validateReceiveUser(Long userId) {
 	// 	if (friend.getUsers().getId().equals(userId)) {
@@ -64,14 +57,14 @@ public class Competition {
 	// 	}
 	// }
 
-	public void validateStatus() {
-		if (status == CompetitionStatus.SEND) {
-			throw new CustomException(COMPETITION_SEND);
-		}
-		if (status == CompetitionStatus.PROCEEDING) {
-			throw new CustomException(COMPETITION_EXIST);
-		}
-	}
+	// public void validateStatus() {
+	// 	if (status == CompetitionStatus.SEND) {
+	// 		throw new CustomException(COMPETITION_SEND);
+	// 	}
+	// 	if (status == CompetitionStatus.PROCEEDING) {
+	// 		throw new CustomException(COMPETITION_EXIST);
+	// 	}
+	// }
 
 	// public CompetitionStatus getStatus(Long id) {
 	// 	if (this.status != CompetitionStatus.SEND) {
@@ -84,20 +77,17 @@ public class Competition {
 	// 	}
 	// }
 
-	public void updateOutput(double userPercent, double userFriendPercent, Long userId, Long userFriendId) {
-		this.output.updateOutput(userPercent, userFriendPercent, userId, userFriendId);
-	}
+	// public void updateOutput(double userPercent, double userFriendPercent, Long userId, Long userFriendId) {
+	// 	this.output.updateOutput(userPercent, userFriendPercent, userId, userFriendId);
+	// }
 
-	private Competition(String message, CompetitionOutput output, LocalDate startDate, LocalDate endDate, Long price,
-		String compensation,
-		CompetitionStatus status) {
+	private Competition(String message, LocalDate startDate, LocalDate endDate, Long price,
+		String compensation) {
 		this.message = message;
-		this.output = output;
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.price = price;
 		this.compensation = compensation;
-		this.status = status;
 	}
 
 	public static Competition of(
@@ -107,8 +97,7 @@ public class Competition {
 		Long price,
 		String compensation
 	) {
-		CompetitionOutput output = CompetitionOutput.from(COMPETITION_NONE_VALUE);
-		return new Competition(message, output, startDate, endDate, price, compensation, CompetitionStatus.SEND);
+		return new Competition(message, startDate, endDate, price, compensation);
 	}
 
 }
