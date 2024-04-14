@@ -29,6 +29,7 @@ import com.sunny.backend.common.config.AppleProperties;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
+import com.sunny.backend.competition.domain.Competition;
 import com.sunny.backend.competition.repository.CompetitionRepository;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.FriendCompetition;
@@ -140,21 +141,25 @@ public class AppleService {
 			if (response.getStatusCode().is2xxSuccessful()) {
 				log.info("Apple token 삭제 성공");
 				notificationRepository.deleteByUsers(users);
-
 				for (Friend friend : friendRepository.findByUsers(users)) {
-					List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByFriendAndCompetition(
-						friend.getId(), null);
+					// Find all FriendCompetition records related to the current friend
+					List<FriendCompetition> friendCompetitions = friendCompetitionRepository.findByFriend(friend);
+
+					// Delete all CompetitionNotification records related to the FriendCompetition records
 					competitionNotificationRepository.deleteAllByFriendCompetitionIn(friendCompetitions);
-					friendCompetitionRepository.deleteAllByFriend(friend);
-					List<Long> competitionIds = friendCompetitions.stream()
-						.map(friendCompetition -> friendCompetition.getCompetition().getId())
-						.toList();
-					competitionRepository.deleteAllById(competitionIds);
+
+					// Delete all FriendCompetition records related to the current friend
+					friendCompetitionRepository.deleteAll(friendCompetitions);
 				}
+
+				// After deleting all related FriendCompetition records, delete the Competitions
+				List<Competition> competitionsToDelete = competitionRepository.findAll();
+				competitionRepository.deleteAll(competitionsToDelete);
+				friendsNotificationRepository.deleteByUsersOrFriend(users, users);
 				friendRepository.deleteByUsersOrUserFriend(users, users);
+				commentReportRepository.nullifyUsersId(users.getId());
 				commentNotificationRepository.deleteByUsers(users);
 				commentRepository.nullifyUsersId(users.getId());
-				commentReportRepository.nullifyUsersId(users.getId());
 				userRepository.deleteById(users.getId());
 				log.info("Apple token 삭제 성공 code={}", HttpStatus.OK.value());
 				return responseService.getGeneralResponse(HttpStatus.OK.value(), "탈퇴 성공");

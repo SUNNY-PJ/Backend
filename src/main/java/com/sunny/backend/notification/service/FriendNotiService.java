@@ -28,7 +28,7 @@ public class FriendNotiService {
 	public void sendNotifications(String title, String body, String bodyTitle, Friend friend) {
 		Long postAuthor = friend.getUserFriend().getId();
 		FriendsNotification friendsNotification = FriendsNotification.builder()
-			.users(friend.getUserFriend()) // 상대방꺼
+			.users(friend.getUserFriend())
 			.friend(friend.getUsers())
 			.title(bodyTitle)
 			.body(body)

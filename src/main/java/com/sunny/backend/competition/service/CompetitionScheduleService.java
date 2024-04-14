@@ -41,7 +41,6 @@ public class CompetitionScheduleService {
 	@Scheduled(cron = "0 0 00 * * ?")
 	@Transactional
 	public void checkCompetition() {
-		System.out.println("competition test!!!!!");
 		for (Competition competition : competitionRepository.findByEndDate(LocalDate.now().minusDays(1))) {
 			FriendCompetition friendCompetition = friendCompetitionRepository.findFirstByCompetition(competition);
 			if (friendCompetition.isFriendCompetitionStatus(FriendCompetitionStatus.PROCEEDING)) {
@@ -63,7 +62,7 @@ public class CompetitionScheduleService {
 
 				double percentageUsed = MathUtil.calculatePercentage(userUsedMoney, competition.getPrice());
 				double friendsPercentageUsed = MathUtil.calculatePercentage(friendUsedMoney, competition.getPrice());
-				System.out.println("competition test2222222!!!!!");
+				
 				String bodyTitle = "대결 결과를 알려드려요";
 				String winBody = "님과의 대결에서 승리했어요!";
 				String loseBody = "님과의 대결에서 패배했어요!";

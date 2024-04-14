@@ -20,5 +20,7 @@ public interface FriendCompetitionRepository
 
 	List<FriendCompetition> findByFriend_Users(Users users);
 
+	List<FriendCompetition> findByFriend(Friend friend);
+
 	FriendCompetition findFirstByCompetition(Competition competition);
 }

@@ -180,6 +180,13 @@ public class CompetitionService {
 		FriendCompetition friendCompetitionUserFriend = friendCompetitionRepository.findFirstByFriendOrderByCreatedDateDesc(
 				friendWithUserFriend)
 			.orElseThrow(() -> new CustomException(COMPETITION_NOT_FOUND));
+
+		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
+		String body = "님이 대결을 포기했어요";
+		String bodyTitle = "대결 결과를 알려드려요";
+		friendNotiService.sendCompetitionNotifications(title, body, bodyTitle, friendWithUser.getUserFriend(),
+			friendWithUser.getUsers(), friendCompetitionUserFriend);
+
 		friendCompetitionUserFriend.updateFriendCompetitionStatus(FriendCompetitionStatus.NONE);
 	}
 

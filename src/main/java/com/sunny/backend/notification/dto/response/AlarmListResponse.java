@@ -18,6 +18,7 @@ import com.sunny.backend.user.domain.Users;
 public record AlarmListResponse(
 	String alarmId,
 	Long id,
+	Long userId,
 	String postAuthor,
 	String title,
 	String notificationContent,
@@ -35,6 +36,7 @@ public record AlarmListResponse(
 		return new AlarmListResponse(
 			UUID.randomUUID().toString(),
 			commentNotification.getCommunity().getId(),
+			commentNotification.getUsers().getId(),
 			commentUser.getNickname(),
 			commentNotification.getTitle(),
 			comment.getContent(),
@@ -49,6 +51,7 @@ public record AlarmListResponse(
 		return new AlarmListResponse(
 			UUID.randomUUID().toString(),
 			friendsNotification.getFriend().getId(), //상대방꺼 id
+			friendsNotification.getUsers().getId(),
 			friendsNotification.getFriend().getNickname(),
 			friendsNotification.getTitle(),
 			friendsNotification.getFriend().getNickname() + friendsNotification.getBody(),
@@ -63,6 +66,7 @@ public record AlarmListResponse(
 		return new AlarmListResponse(
 			UUID.randomUUID().toString(),
 			competitionNotification.getFriendCompetition().getCompetition().getId(),
+			competitionNotification.getUsers().getId(),
 			competitionNotification.getFriend().getNickname(),
 			competitionNotification.getTitle(),
 			competitionNotification.getFriend().getNickname() + competitionNotification.getBody(),
