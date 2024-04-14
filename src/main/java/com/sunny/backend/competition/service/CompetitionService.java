@@ -226,15 +226,18 @@ public class CompetitionService {
 		double percentageUsed = calculateUserPercentage(user.getId(), competition);
 		double friendsPercentageUsed = calculateUserPercentage(userFriend.getId(), competition);
 
-		if (friendsPercentageUsed < percentageUsed) {
-			friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.WIN);
-			friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.LOSE);
-		} else if (friendsPercentageUsed > percentageUsed) {
-			friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.LOSE);
-			friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.WIN);
-		} else {
-			friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.DRAW);
-			friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.DRAW);
+		if (friendCompetition.getFriendCompetitionStatus() == FriendCompetitionStatus.PROCEEDING
+			&& friendCompetitionUserFriend.getFriendCompetitionStatus() == FriendCompetitionStatus.PROCEEDING) {
+			if (friendsPercentageUsed < percentageUsed) {
+				friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.WIN);
+				friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.LOSE);
+			} else if (friendsPercentageUsed > percentageUsed) {
+				friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.LOSE);
+				friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.WIN);
+			} else {
+				friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.DRAW);
+				friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.DRAW);
+			}
 		}
 
 		return responseService.getSingleResponse(HttpStatus.OK.value(), CompetitionStatusResponse.builder()
