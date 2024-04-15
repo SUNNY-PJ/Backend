@@ -80,7 +80,6 @@ public class NotificationService {
 			customUserPrincipal.getId());
 		List<AlarmListResponse> commentNotificationResponse = fromCommentNotifications(commentNotifications,
 			customUserPrincipal.getId());
-
 		List<FriendsNotification> friendsNotifications = friendsNotificationRepository.findByUsers_Id(
 			customUserPrincipal.getId());
 		List<AlarmListResponse> friendsNotificationResponse = friendsNotifications.stream()

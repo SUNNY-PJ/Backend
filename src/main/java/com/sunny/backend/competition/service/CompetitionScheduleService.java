@@ -20,6 +20,7 @@ import com.sunny.backend.friends.domain.FriendCompetitionStatus;
 import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.friends.repository.FriendCompetitionRepository;
 import com.sunny.backend.friends.repository.FriendRepository;
+import com.sunny.backend.notification.domain.NotifiacationSubType;
 import com.sunny.backend.notification.service.FriendNotiService;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.util.MathUtil;
@@ -43,6 +44,7 @@ public class CompetitionScheduleService {
 	public void checkCompetition() {
 		for (Competition competition : competitionRepository.findByEndDate(LocalDate.now().minusDays(1))) {
 			FriendCompetition friendCompetition = friendCompetitionRepository.findFirstByCompetition(competition);
+			System.out.println(competition.getId());
 			if (friendCompetition.isFriendCompetitionStatus(FriendCompetitionStatus.PROCEEDING)) {
 				Users user = friendCompetition.getFriend().getUsers();
 				Users userFriend = friendCompetition.getFriend().getUserFriend();
@@ -62,7 +64,7 @@ public class CompetitionScheduleService {
 
 				double percentageUsed = MathUtil.calculatePercentage(userUsedMoney, competition.getPrice());
 				double friendsPercentageUsed = MathUtil.calculatePercentage(friendUsedMoney, competition.getPrice());
-				
+
 				String bodyTitle = "대결 결과를 알려드려요";
 				String winBody = "님과의 대결에서 승리했어요!";
 				String loseBody = "님과의 대결에서 패배했어요!";
@@ -75,27 +77,27 @@ public class CompetitionScheduleService {
 					friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.LOSE);
 
 					friendNotiService.sendCompetitionNotifications(loseTitle, winBody, bodyTitle, user, userFriend,
-						friendCompetition);
+						friendCompetition, NotifiacationSubType.WIN);
 					friendNotiService.sendCompetitionNotifications(winTitle, loseBody, bodyTitle, userFriend, user,
-						friendCompetitionUserFriend);
+						friendCompetitionUserFriend, NotifiacationSubType.LOSE);
 					sockMessageUtil.sendCompetitionUserWinner(user, userFriend, competition);
 				} else if (friendsPercentageUsed > percentageUsed) {
 					friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.LOSE);
 					friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.WIN);
 
 					friendNotiService.sendCompetitionNotifications(winTitle, winBody, bodyTitle, userFriend, user,
-						friendCompetitionUserFriend);
+						friendCompetitionUserFriend, NotifiacationSubType.LOSE);
 					friendNotiService.sendCompetitionNotifications(loseTitle, loseBody, bodyTitle, user, userFriend,
-						friendCompetition);
+						friendCompetition, NotifiacationSubType.WIN);
 					sockMessageUtil.sendCompetitionUserWinner(userFriend, user, competition);
 				} else {
 					friendCompetition.updateCompetitionOutputStatus(CompetitionOutputStatus.DRAW);
 					friendCompetitionUserFriend.updateCompetitionOutputStatus(CompetitionOutputStatus.DRAW);
 
 					friendNotiService.sendCompetitionNotifications(winTitle, drawBody, bodyTitle, userFriend, user,
-						friendCompetition);
+						friendCompetition, NotifiacationSubType.DRAW);
 					friendNotiService.sendCompetitionNotifications(loseTitle, drawBody, bodyTitle, user, userFriend,
-						friendCompetitionUserFriend);
+						friendCompetitionUserFriend, NotifiacationSubType.DRAW);
 					sockMessageUtil.sendCompetitionDraw(user, userFriend, competition);
 				}
 
