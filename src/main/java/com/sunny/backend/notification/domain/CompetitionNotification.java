@@ -1,7 +1,5 @@
 package com.sunny.backend.notification.domain;
 
-import java.time.LocalDateTime;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -46,9 +44,6 @@ public class CompetitionNotification extends BaseTime {
 	private String body; //내용
 
 	@Column
-	private String name; //신청자 이름
-
-	@Column
-	private LocalDateTime createdAt;
+	private NotifiacationSubType subType;
 
 }

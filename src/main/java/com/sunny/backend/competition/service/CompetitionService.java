@@ -27,6 +27,7 @@ import com.sunny.backend.friends.dto.response.FriendCompetitionResponses;
 import com.sunny.backend.friends.exception.FriendErrorCode;
 import com.sunny.backend.friends.repository.FriendCompetitionRepository;
 import com.sunny.backend.friends.repository.FriendRepository;
+import com.sunny.backend.notification.domain.NotifiacationSubType;
 import com.sunny.backend.notification.service.FriendNotiService;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
@@ -92,9 +93,10 @@ public class CompetitionService {
 		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
 		String body = "님으로부터 대결 신청을 받았어요.";
 		String bodyTitle = "대결 신청을 받았어요!";
+		NotifiacationSubType subType = NotifiacationSubType.APPLY;
 		friendNotiService.sendCompetitionNotifications(title, body, bodyTitle, friendWithUser.getUserFriend(),
 			friendWithUser.getUsers(),
-			friendCompetitionToUserFriend);
+			friendCompetitionToUserFriend, subType);
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 			FriendCompetitionResponses.from(friendCompetition), "");
 	}
@@ -139,24 +141,29 @@ public class CompetitionService {
 	public void acceptCompetition(CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend friendWithUser = updateCompetitionReturnFriend(customUserPrincipal.getId(), friendId,
 			FriendCompetitionStatus.PROCEEDING, FriendCompetitionStatus.PROCEEDING);
-
+		Friend friendWithUserFriend = friendRepository.findByUsersAndUserFriend(friendWithUser.getUserFriend(),
+				friendWithUser.getUsers())
+			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
 		//TODO title,body,bodyTitle 분리
 		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
 		String body = "님이 대결을 수락했어요";
 		String bodyTitle = "대결 신청에 대한 응답을 받았어요";
-
-		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUser);
+		NotifiacationSubType subType = NotifiacationSubType.APPROVE;
+		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUserFriend, subType);
 	}
 
 	@Transactional
 	public void refuseFriend(CustomUserPrincipal customUserPrincipal, Long friendId) {
 		Friend friendWithUser = updateCompetitionReturnFriend(customUserPrincipal.getId(), friendId,
 			FriendCompetitionStatus.REFUSE, FriendCompetitionStatus.NONE);
-
+		Friend friendWithUserFriend = friendRepository.findByUsersAndUserFriend(friendWithUser.getUserFriend(),
+				friendWithUser.getUsers())
+			.orElseThrow(() -> new CustomException(FriendErrorCode.FRIEND_NOT_FOUND));
 		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
 		String body = "님이 대결을 거절했어요";
 		String bodyTitle = "대결 신청에 대한 응답을 받았어요";
-		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUser);
+		NotifiacationSubType subType = NotifiacationSubType.REFUSE;
+		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUserFriend, subType);
 	}
 
 	//TODO 대결 포기 배너 알림 필요 여부 논의 & 추가
@@ -184,8 +191,9 @@ public class CompetitionService {
 		String title = "[SUNNY] " + friendWithUser.getUsers().getNickname();
 		String body = "님이 대결을 포기했어요";
 		String bodyTitle = "대결 결과를 알려드려요";
+		NotifiacationSubType subType = NotifiacationSubType.GIVE_UP;
 		friendNotiService.sendCompetitionNotifications(title, body, bodyTitle, friendWithUser.getUserFriend(),
-			friendWithUser.getUsers(), friendCompetitionUserFriend);
+			friendWithUser.getUsers(), friendCompetitionUserFriend, subType);
 
 		friendCompetitionUserFriend.updateFriendCompetitionStatus(FriendCompetitionStatus.NONE);
 	}
