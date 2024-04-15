@@ -28,7 +28,7 @@ public class FriendNotiService {
 
 	public void sendNotifications(String title, String body, String bodyTitle, Friend friend,
 		NotifiacationSubType subType) {
-		Long postAuthor = friend.getUserFriend().getId();
+		Long postAuthor = friend.getUsers().getId();
 		System.out.println(friend.getId());
 		FriendsNotification friendsNotification = FriendsNotification.builder()
 			.users(friend.getUsers())
@@ -41,7 +41,7 @@ public class FriendNotiService {
 		friendsNotificationRepository.save(friendsNotification);
 		List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
 		if (notificationList.size() != 0) {
-			String notificationBody = friend.getUsers().getNickname() + body;
+			String notificationBody = friend.getUserFriend().getNickname() + body;
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
 				postAuthor,
 				notificationBody,
