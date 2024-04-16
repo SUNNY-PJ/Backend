@@ -37,6 +37,10 @@ public class FriendsNotification extends BaseTime {
 
 	@Column
 	private String title;
+	@Column
+	private Long friendId;
+	@Column
+	private NotifiacationSubType subType;
 
 	@Column
 	private String body;
