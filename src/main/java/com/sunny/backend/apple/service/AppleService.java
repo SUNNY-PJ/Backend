@@ -143,7 +143,7 @@ public class AppleService {
 				log.info("Apple token 삭제 성공");
 				notificationRepository.deleteByUsers(users);
 
-				List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriend(userId);
+				List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriendByUserId(userId);
 				for (FriendCompetition friendCompetition : friendCompetitions) {
 					competitionNotificationRepository.deleteAllByFriendCompetition(friendCompetition);
 					friendCompetitionRepository.deleteById(friendCompetition.getId());

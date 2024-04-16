@@ -10,16 +10,19 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.exception.CustomException;
+import com.sunny.backend.competition.domain.CompetitionOutputStatus;
 import com.sunny.backend.competition.repository.CompetitionRepository;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.FriendCompetition;
 import com.sunny.backend.friends.domain.FriendCompetitionStatus;
 import com.sunny.backend.friends.domain.FriendStatus;
 import com.sunny.backend.friends.dto.response.FriendCompetitionDto;
+import com.sunny.backend.friends.dto.response.FriendCompetitionQuery;
 import com.sunny.backend.friends.dto.response.FriendCompetitionResponse;
 import com.sunny.backend.friends.dto.response.FriendListResponse;
 import com.sunny.backend.friends.dto.response.FriendResponse;
@@ -47,25 +50,43 @@ public class FriendService {
 
 	public FriendListResponse getFriends(CustomUserPrincipal customUserPrincipal) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
-		List<FriendCompetitionDto> friendCompetitions = friendCompetitionRepository.getByFriendLeftJoinFriend(user.getId());
-		List<FriendCompetitionResponse> competitions = new ArrayList<>();
-		List<FriendCompetitionResponse> approveList = new ArrayList<>();
-		List<FriendResponse> waitList = new ArrayList<>();
-		for (FriendCompetitionDto friendCompetition : friendCompetitions) {
-			if (friendCompetition.getFriendStatus() == FriendStatus.FRIEND) {
-				if (friendCompetition.getFriendCompetitionStatus() == FriendCompetitionStatus.PROCEEDING) {
-					competitions.add(FriendCompetitionResponse.from(friendCompetition));
-				} else if (friendCompetition.getFriendCompetitionStatus() == FriendCompetitionStatus.SEND
-					|| friendCompetition.getFriendCompetitionStatus() == FriendCompetitionStatus.RECEIVE) {
-					approveList.add(FriendCompetitionResponse.from(friendCompetition));
-				} else {
-					approveList.add(FriendCompetitionResponse.from(friendCompetition));
-				}
-			} else if(friendCompetition.getFriendStatus() == FriendStatus.RECEIVE) {
-				waitList.add(FriendResponse.from(friendCompetition));
-			}
-		}
+		// List<Long> id = user.getFriends()
+		// 	.stream()
+		// 	.map(friend -> friend.getUsers().getId())
+		// 	.toList();
+		// for (Friend friend : user.getFriends()) {
+		// 	friendCompetitionRepository.findFirstByFriendAndFriendCompetitionStatusOrderByCreatedDateDesc()
+		// }
+		//
+		//
+		// List<FriendCompetitionDto> friendCompetitions = friendCompetitionRepository.getByFriendLeftJoinFriend(user.getId());
+		// List<FriendCompetitionResponse> competitions = new ArrayList<>();
+		// List<FriendCompetitionResponse> approveList = new ArrayList<>();
+		// List<FriendResponse> waitList = new ArrayList<>();
+		// for (FriendCompetitionDto friendCompetition : friendCompetitions) {
+		// 	if (friendCompetition.getFriendStatus() == FriendStatus.FRIEND) {
+		// 		if (friendCompetition.getFriendCompetitionStatus() == FriendCompetitionStatus.PROCEEDING) {
+		// 			competitions.add(FriendCompetitionResponse.from(friendCompetition));
+		// 		} else if(friendCompetition.getCompetitionOutputStatus() == CompetitionOutputStatus.NONE) {
+		// 			approveList.add(FriendCompetitionResponse.from(friendCompetition));
+		// 		}
+		// 	} else if(friendCompetition.getFriendStatus() == FriendStatus.RECEIVE) {
+		// 		waitList.add(FriendResponse.from(friendCompetition));
+		// 	}
+		// }
 
+		List<FriendCompetitionResponse> competitions = friendCompetitionRepository.getFriendCompetitionProceeding(user.getId())
+			.stream()
+			.map(FriendCompetitionResponse::from)
+			.toList();
+		List<FriendCompetitionResponse> approveList = friendCompetitionRepository.getFriendCompetitionFriend(user.getId())
+			.stream()
+			.map(FriendCompetitionResponse::from)
+			.toList();
+		List<FriendResponse> waitList = friendRepository.findByUsersAndStatus(user, FriendStatus.RECEIVE)
+			.stream()
+			.map(FriendResponse::from)
+			.toList();
 		return new FriendListResponse(competitions, approveList, waitList);
 	}
 
@@ -155,20 +176,20 @@ public class FriendService {
 		Users users = friend.getUsers();
 		friend.validateUser(customUserPrincipal.getId());
 
-		List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriend(users.getId());
-		for (FriendCompetition friendCompetition : friendCompetitions) {
-			competitionNotificationRepository.deleteAllByFriendCompetition(friendCompetition);
-			friendCompetitionRepository.deleteById(friendCompetition.getId());
-		}
-		Set<Long> competitionIds = friendCompetitions.stream()
-			.map(friendCompetition -> friendCompetition.getCompetition().getId())
-			.collect(Collectors.toSet());
-		if (!competitionIds.isEmpty()) {
-			competitionRepository.deleteAllById(competitionIds);
-		}
-
-		friendsNotificationRepository.deleteByUsersOrFriend(users, users);
-		friendRepository.deleteByUsersOrUserFriend(users, users);
+		// List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriend(users.getId());
+		// for (FriendCompetition friendCompetition : friendCompetitions) {
+		// 	competitionNotificationRepository.deleteAllByFriendCompetition(friendCompetition);
+		// 	friendCompetitionRepository.deleteById(friendCompetition.getId());
+		// }
+		// Set<Long> competitionIds = friendCompetitions.stream()
+		// 	.map(friendCompetition -> friendCompetition.getCompetition().getId())
+		// 	.collect(Collectors.toSet());
+		// if (!competitionIds.isEmpty()) {
+		// 	competitionRepository.deleteAllById(competitionIds);
+		// }
+		//
+		// friendsNotificationRepository.deleteByUsersOrFriend(users, users);
+		// friendRepository.deleteByUsersOrUserFriend(users, users);
 	}
 
 }

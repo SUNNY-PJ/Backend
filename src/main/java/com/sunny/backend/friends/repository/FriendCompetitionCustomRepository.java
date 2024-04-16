@@ -12,5 +12,7 @@ public interface FriendCompetitionCustomRepository {
 
 	List<FriendCompetition> getByUserId(Long userId);
 
-	List<FriendCompetition> getByUserOrUserFriend(Long userId);
+	List<FriendCompetition> getByUserOrUserFriendByUserId(Long userId);
+
+	List<FriendCompetition> getByUserOrUserFriend(Long userId, Long userFriendId);
 }

@@ -66,7 +66,7 @@ public record AlarmListResponse(
 		return new AlarmListResponse(
 			UUID.randomUUID().toString(),
 			competitionNotification.getFriendCompetition().getCompetition().getId(),
-			competitionNotification.getUsers().getId(),
+			competitionNotification.getFriend().getId(),
 			competitionNotification.getFriend().getNickname(),
 			competitionNotification.getTitle(),
 			competitionNotification.getFriend().getNickname() + competitionNotification.getBody(),

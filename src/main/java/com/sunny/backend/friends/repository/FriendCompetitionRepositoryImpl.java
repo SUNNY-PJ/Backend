@@ -59,12 +59,22 @@ public class FriendCompetitionRepositoryImpl implements FriendCompetitionCustomR
 	}
 
 	@Override
-	public List<FriendCompetition> getByUserOrUserFriend(Long userId) {
+	public List<FriendCompetition> getByUserOrUserFriendByUserId(Long userId) {
 		QFriend friend = QFriend.friend;
 		return jpaQueryFactory.selectFrom(friendCompetition)
 			.join(friend).on(friendCompetition.friend.id.eq(friend.id))
 			.where(friend.users.id.eq(userId).or(friend.userFriend.id.eq(userId)))
 			.fetch();
+	}
+
+	@Override
+	public List<FriendCompetition> getByUserOrUserFriend(Long userId, Long userFriendId) {
+		QFriend friend = QFriend.friend;
+		// return jpaQueryFactory.selectFrom(friendCompetition)
+		// 	.join(friend).on(friendCompetition.friend.id.eq(friend.id))
+		// 	.where(friend.users.id.eq(userId),(friend.userFriend.id.eq(userId)))
+		// 	.fetch();
+		return null;
 	}
 
 	public BooleanExpression eqCompetitionId(Long competitionId) {

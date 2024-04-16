@@ -17,20 +17,35 @@ public record FriendCompetitionResponse(
 	FriendCompetitionStatus competitionStatus,
 	CompetitionOutputStatus output
 ) {
-	public static FriendCompetitionResponse from(FriendCompetitionDto friendCompetitionDto) {
+	// public static FriendCompetitionResponse from(FriendCompetitionDto friendCompetitionDto) {
+	// 	return FriendCompetitionResponse.builder()
+	// 		.friendId(friendCompetitionDto.getFriendId())
+	// 		.userFriendId(friendCompetitionDto.getUserFriendId())
+	// 		.competitionId(friendCompetitionDto.getCompetitionId())
+	// 		.nickname(friendCompetitionDto.getNickname())
+	// 		.profile(friendCompetitionDto.getProfile())
+	// 		.friendStatus(friendCompetitionDto.getFriendStatus())
+	// 		.competitionStatus(
+	// 			friendCompetitionDto.getCompetitionId() != null ? friendCompetitionDto.getFriendCompetitionStatus()
+	// 				: FriendCompetitionStatus.NONE)
+	// 		.output(friendCompetitionDto.getCompetitionId() != null ?
+	// 			friendCompetitionDto.getCompetitionOutputStatus() : CompetitionOutputStatus.NONE)
+	// 		.build();
+	// }
+
+	public static FriendCompetitionResponse from(FriendCompetitionQuery friendCompetitionQuery) {
 		return FriendCompetitionResponse.builder()
-			.friendId(friendCompetitionDto.getFriendId())
-			.userFriendId(friendCompetitionDto.getUserFriendId())
-			.competitionId(friendCompetitionDto.getCompetitionId())
-			.nickname(friendCompetitionDto.getNickname())
-			.profile(friendCompetitionDto.getProfile())
-			.friendStatus(friendCompetitionDto.getFriendStatus())
+			.friendId(friendCompetitionQuery.getFriendId())
+			.userFriendId(friendCompetitionQuery.getUserFriend())
+			.competitionId(friendCompetitionQuery.getCompetitionId())
+			.nickname(friendCompetitionQuery.getNickname())
+			.profile(friendCompetitionQuery.getProfile())
+			.friendStatus(friendCompetitionQuery.getFriendStatus())
 			.competitionStatus(
-				friendCompetitionDto.getCompetitionId() != null ? friendCompetitionDto.getFriendCompetitionStatus()
+				friendCompetitionQuery.getCompetitionId() != null ? friendCompetitionQuery.getCompetitionStatus()
 					: FriendCompetitionStatus.NONE)
-			.output(friendCompetitionDto.getCompetitionId() != null ?
-				friendCompetitionDto.getCompetitionOutputStatus() : CompetitionOutputStatus.NONE)
+			.output(friendCompetitionQuery.getCompetitionId() != null ?
+				friendCompetitionQuery.getOutput() : CompetitionOutputStatus.NONE)
 			.build();
 	}
-
 }
