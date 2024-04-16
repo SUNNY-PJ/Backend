@@ -180,20 +180,20 @@ public class FriendService {
 		Users users = friend.getUsers();
 		friend.validateUser(customUserPrincipal.getId());
 
-		// List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriend(users.getId());
-		// for (FriendCompetition friendCompetition : friendCompetitions) {
-		// 	competitionNotificationRepository.deleteAllByFriendCompetition(friendCompetition);
-		// 	friendCompetitionRepository.deleteById(friendCompetition.getId());
-		// }
-		// Set<Long> competitionIds = friendCompetitions.stream()
-		// 	.map(friendCompetition -> friendCompetition.getCompetition().getId())
-		// 	.collect(Collectors.toSet());
-		// if (!competitionIds.isEmpty()) {
-		// 	competitionRepository.deleteAllById(competitionIds);
-		// }
-		//
-		// friendsNotificationRepository.deleteByUsersOrFriend(users, users);
-		// friendRepository.deleteByUsersOrUserFriend(users, users);
+		List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriend(users.getId(), friend.getUserFriend().getId());
+		for (FriendCompetition friendCompetition : friendCompetitions) {
+			competitionNotificationRepository.deleteAllByFriendCompetition(friendCompetition);
+			friendCompetitionRepository.deleteById(friendCompetition.getId());
+		}
+		Set<Long> competitionIds = friendCompetitions.stream()
+			.map(friendCompetition -> friendCompetition.getCompetition().getId())
+			.collect(Collectors.toSet());
+		if (!competitionIds.isEmpty()) {
+			competitionRepository.deleteAllById(competitionIds);
+		}
+
+		friendsNotificationRepository.deleteByUsersOrFriend(users, users);
+		friendRepository.deleteByUsersOrUserFriend(users, users);
 	}
 
 }
