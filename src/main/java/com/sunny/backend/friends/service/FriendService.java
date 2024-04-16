@@ -182,6 +182,7 @@ public class FriendService {
 
 		List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriend(users.getId(), friend.getUserFriend().getId());
 		for (FriendCompetition friendCompetition : friendCompetitions) {
+			System.out.println(friendCompetition);
 			competitionNotificationRepository.deleteAllByFriendCompetition(friendCompetition);
 			friendCompetitionRepository.deleteById(friendCompetition.getId());
 		}
@@ -192,8 +193,10 @@ public class FriendService {
 			competitionRepository.deleteAllById(competitionIds);
 		}
 
-		friendsNotificationRepository.deleteByUsersOrFriend(users, users);
-		friendRepository.deleteByUsersOrUserFriend(users, users);
+		friendsNotificationRepository.deleteByUsersAndFriend(users, friend.getUserFriend());
+		friendsNotificationRepository.deleteByUsersAndFriend(friend.getUserFriend(), users);
+		friendRepository.deleteByUsersAndUserFriend(users, friend.getUserFriend());
+		friendRepository.deleteByUsersAndUserFriend(friend.getUserFriend(), users);
 	}
 
 }

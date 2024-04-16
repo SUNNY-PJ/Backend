@@ -21,6 +21,7 @@ public interface FriendRepository extends JpaRepository<Friend, Long>, FriendCus
 	// List<Friend> findByUsersAndCompetitionIsNotNullAndCompetition_Status(Users users, CompetitionStatus status);
 
 	void deleteByUsersOrUserFriend(Users users, Users friend);
+	void deleteByUsersAndUserFriend(Users users, Users friend);
 
 	default Friend getById(Long id) {
 		return findById(id)

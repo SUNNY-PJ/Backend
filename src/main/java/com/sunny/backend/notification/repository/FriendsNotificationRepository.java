@@ -11,4 +11,5 @@ public interface FriendsNotificationRepository extends JpaRepository<FriendsNoti
 	List<FriendsNotification> findByUsers_Id(Long userId);
 
 	void deleteByUsersOrFriend(Users users, Users friend);
+	void deleteByUsersAndFriend(Users users, Users friend);
 }

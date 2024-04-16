@@ -19,9 +19,11 @@ import com.sunny.backend.competition.domain.CompetitionOutputStatus;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @Entity
+@ToString
 @NoArgsConstructor(access = PROTECTED)
 public class FriendCompetition extends BaseTime {
 	@Id
