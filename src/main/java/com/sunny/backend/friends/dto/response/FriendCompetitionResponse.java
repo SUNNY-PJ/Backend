@@ -42,7 +42,7 @@ public record FriendCompetitionResponse(
 			.profile(friendCompetitionQuery.getProfile())
 			.friendStatus(friendCompetitionQuery.getFriendStatus())
 			.competitionStatus(
-				friendCompetitionQuery.getCompetitionId() != null ? friendCompetitionQuery.getCompetitionStatus()
+				friendCompetitionQuery.getCompetitionId() != null ? friendCompetitionQuery.getFriendCompetitionStatus()
 					: FriendCompetitionStatus.NONE)
 			.output(friendCompetitionQuery.getCompetitionId() != null ?
 				friendCompetitionQuery.getOutput() : CompetitionOutputStatus.NONE)
