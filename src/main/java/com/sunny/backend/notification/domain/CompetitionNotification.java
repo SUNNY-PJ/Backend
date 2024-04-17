@@ -1,5 +1,7 @@
 package com.sunny.backend.notification.domain;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -9,7 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.friends.domain.FriendCompetition;
 import com.sunny.backend.user.domain.Users;
 
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class CompetitionNotification extends BaseTime {
+public class CompetitionNotification {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -45,5 +46,7 @@ public class CompetitionNotification extends BaseTime {
 
 	@Column
 	private NotifiacationSubType subType;
+	@Column
+	private LocalDateTime createdAt;
 
 }

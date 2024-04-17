@@ -4,6 +4,7 @@ import static com.sunny.backend.comment.domain.Comment.*;
 import static com.sunny.backend.comment.dto.response.CommentResponse.*;
 import static com.sunny.backend.comment.exception.CommentErrorCode.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -195,6 +196,7 @@ public class CommentService {
 			.comment(comment)
 			.parent_id(comment.getParent())
 			.title(bodyTitle)
+			.createdAt(LocalDateTime.now())
 			.build();
 		commentNotificationRepository.save(commentNotification);
 
