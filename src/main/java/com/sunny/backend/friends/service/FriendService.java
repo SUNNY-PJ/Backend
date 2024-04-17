@@ -74,13 +74,13 @@ public class FriendService {
 		List<FriendCompetitionResponse> competitions = friendCompetitionRepository.getFriendCompetitionProceeding(
 				user.getId())
 			.stream()
-			.map(FriendCompetitionResponse::from)
+			.map(FriendCompetitionResponse::fromCompetition)
 			.toList();
 		List<FriendCompetitionResponse> approveList = new ArrayList<>(
 			friendCompetitionRepository.getFriendCompetitionFriend(
 					user.getId())
 				.stream()
-				.map(FriendCompetitionResponse::from)
+				.map(FriendCompetitionResponse::fromFriend)
 				.toList());
 		approveList.addAll(friendCompetitionRepository.getByFriendLeftJoinFriend(user.getId()));
 
