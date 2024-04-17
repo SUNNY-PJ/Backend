@@ -59,7 +59,7 @@ public interface FriendCompetitionRepository
 				+ "join users u on f.user_id = u.user_id "
 				+ "join users u2 on f.user_friend_id = u2.user_id "
 				+ "left join friend_competition fc ON fc.friend_id = f.id "
-				+ "where u.user_id = :userId and f.friend_status = 'FRIEND' and fc.friend_competition_status != 'PROCEEDING'"
+				+ "where u.user_id = :userId and f.friend_status = 'FRIEND' "
 				+ "group by f.id)", nativeQuery = true
 	)
 	List<FriendCompetitionQuery> getFriendCompetitionFriend(@Param(value = "userId") Long userId);

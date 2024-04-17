@@ -28,7 +28,7 @@ public record FriendCompetitionResponse(
 			.friendStatus(friendCompetitionQuery.getFriendStatus())
 			.competitionStatus(friendCompetitionQuery.getFriendCompetitionStatus())
 			.output(friendCompetitionQuery.getCompetitionId() != null ?
-				friendCompetitionQuery.getOutput() : CompetitionOutputStatus.NONE)
+				friendCompetitionQuery.getCompetitionOutputStatus() : CompetitionOutputStatus.NONE)
 			.build();
 	}
 
@@ -47,7 +47,7 @@ public record FriendCompetitionResponse(
 					? friendCompetitionQuery.getFriendCompetitionStatus()
 					: FriendCompetitionStatus.NONE)
 			.output(friendCompetitionQuery.getCompetitionId() != null ?
-				friendCompetitionQuery.getOutput() : CompetitionOutputStatus.NONE)
+				friendCompetitionQuery.getCompetitionOutputStatus() : CompetitionOutputStatus.NONE)
 			.build();
 	}
 }

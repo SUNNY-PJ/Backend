@@ -12,5 +12,5 @@ public interface FriendCompetitionQuery {
 	String getProfile();
 	FriendStatus getFriendStatus();
 	FriendCompetitionStatus getFriendCompetitionStatus();
-	CompetitionOutputStatus getOutput();
+	CompetitionOutputStatus getCompetitionOutputStatus();
 }

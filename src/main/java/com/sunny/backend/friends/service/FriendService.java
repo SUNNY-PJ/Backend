@@ -17,7 +17,9 @@ import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.competition.repository.CompetitionRepository;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.FriendCompetition;
+import com.sunny.backend.friends.domain.FriendCompetitionStatus;
 import com.sunny.backend.friends.domain.FriendStatus;
+import com.sunny.backend.friends.dto.response.FriendCompetitionQuery;
 import com.sunny.backend.friends.dto.response.FriendCompetitionResponse;
 import com.sunny.backend.friends.dto.response.FriendListResponse;
 import com.sunny.backend.friends.dto.response.FriendResponse;
@@ -70,18 +72,28 @@ public class FriendService {
 		// 		waitList.add(FriendResponse.from(friendCompetition));
 		// 	}
 		// }
-
-		List<FriendCompetitionResponse> competitions = friendCompetitionRepository.getFriendCompetitionProceeding(
-				user.getId())
-			.stream()
-			.map(FriendCompetitionResponse::fromCompetition)
-			.toList();
-		List<FriendCompetitionResponse> approveList = new ArrayList<>(
-			friendCompetitionRepository.getFriendCompetitionFriend(
-					user.getId())
-				.stream()
-				.map(FriendCompetitionResponse::fromFriend)
-				.toList());
+		List<FriendCompetitionResponse> competitions = new ArrayList<>();
+		List<FriendCompetitionResponse> approveList = new ArrayList<>();
+		for (FriendCompetitionQuery friendCompetitionQuery : friendCompetitionRepository.getFriendCompetitionFriend(
+			user.getId())) {
+			if(friendCompetitionQuery.getFriendCompetitionStatus() == FriendCompetitionStatus.PROCEEDING) {
+				competitions.add(FriendCompetitionResponse.fromCompetition(friendCompetitionQuery));
+			} else {
+				approveList.add(FriendCompetitionResponse.fromFriend(friendCompetitionQuery));
+			}
+		}
+		//
+		// List<FriendCompetitionResponse> competitions = friendCompetitionRepository.getFriendCompetitionProceeding(
+		// 		user.getId())
+		// 	.stream()
+		// 	.map(FriendCompetitionResponse::fromCompetition)
+		// 	.toList();
+		// List<FriendCompetitionResponse> approveList = new ArrayList<>(
+		// 	friendCompetitionRepository.getFriendCompetitionFriend(
+		// 			user.getId())
+		// 		.stream()
+		// 		.map(FriendCompetitionResponse::fromFriend)
+		// 		.toList());
 		approveList.addAll(friendCompetitionRepository.getByFriendLeftJoinFriend(user.getId()));
 
 		List<FriendResponse> waitList = friendRepository.findByUsersAndStatus(user, FriendStatus.RECEIVE)
