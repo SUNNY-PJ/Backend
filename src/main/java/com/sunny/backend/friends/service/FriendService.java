@@ -10,19 +10,14 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.exception.CustomException;
-import com.sunny.backend.competition.domain.CompetitionOutputStatus;
 import com.sunny.backend.competition.repository.CompetitionRepository;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.FriendCompetition;
-import com.sunny.backend.friends.domain.FriendCompetitionStatus;
 import com.sunny.backend.friends.domain.FriendStatus;
-import com.sunny.backend.friends.dto.response.FriendCompetitionDto;
-import com.sunny.backend.friends.dto.response.FriendCompetitionQuery;
 import com.sunny.backend.friends.dto.response.FriendCompetitionResponse;
 import com.sunny.backend.friends.dto.response.FriendListResponse;
 import com.sunny.backend.friends.dto.response.FriendResponse;
@@ -76,14 +71,23 @@ public class FriendService {
 		// 	}
 		// }
 
-		List<FriendCompetitionResponse> competitions = friendCompetitionRepository.getFriendCompetitionProceeding(user.getId())
+		List<FriendCompetitionResponse> competitions = friendCompetitionRepository.getFriendCompetitionProceeding(
+				user.getId())
 			.stream()
 			.map(FriendCompetitionResponse::from)
 			.toList();
-		List<FriendCompetitionResponse> approveList = friendCompetitionRepository.getFriendCompetitionFriend(user.getId())
-			.stream()
-			.map(FriendCompetitionResponse::from)
-			.toList();
+		List<FriendCompetitionResponse> approveList = new ArrayList<>(
+			friendCompetitionRepository.getFriendCompetitionFriend(
+					user.getId())
+				.stream()
+				.map(FriendCompetitionResponse::from)
+				.toList());
+		for (FriendCompetitionResponse friendCompetitionResponse : friendCompetitionRepository.getByFriendLeftJoinFriend(
+			user.getId())) {
+			System.out.println(friendCompetitionResponse);
+		}
+		approveList.addAll(friendCompetitionRepository.getByFriendLeftJoinFriend(user.getId()));
+
 		List<FriendResponse> waitList = friendRepository.findByUsersAndStatus(user, FriendStatus.RECEIVE)
 			.stream()
 			.map(FriendResponse::from)
@@ -180,7 +184,8 @@ public class FriendService {
 		Users users = friend.getUsers();
 		friend.validateUser(customUserPrincipal.getId());
 
-		List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriend(users.getId(), friend.getUserFriend().getId());
+		List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriend(users.getId(),
+			friend.getUserFriend().getId());
 		for (FriendCompetition friendCompetition : friendCompetitions) {
 			System.out.println(friendCompetition);
 			competitionNotificationRepository.deleteAllByFriendCompetition(friendCompetition);

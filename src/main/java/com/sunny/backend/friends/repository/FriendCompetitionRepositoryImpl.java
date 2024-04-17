@@ -9,9 +9,10 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sunny.backend.competition.domain.QCompetition;
 import com.sunny.backend.friends.domain.FriendCompetition;
+import com.sunny.backend.friends.domain.FriendStatus;
 import com.sunny.backend.friends.domain.QFriend;
 import com.sunny.backend.friends.domain.QFriendCompetition;
-import com.sunny.backend.friends.dto.response.FriendCompetitionDto;
+import com.sunny.backend.friends.dto.response.FriendCompetitionResponse;
 import com.sunny.backend.user.domain.QUsers;
 
 import lombok.RequiredArgsConstructor;
@@ -28,26 +29,25 @@ public class FriendCompetitionRepositoryImpl implements FriendCompetitionCustomR
 	}
 
 	@Override
-	public List<FriendCompetitionDto> getByFriendLeftJoinFriend(Long userId) {
+	public List<FriendCompetitionResponse> getByFriendLeftJoinFriend(Long userId) {
 		QFriendCompetition friendCompetition = QFriendCompetition.friendCompetition;
 		QCompetition competition = QCompetition.competition;
 		QFriend friend = QFriend.friend;
 		QUsers users = QUsers.users;
 		QUsers userFriend = QUsers.users;
 		return jpaQueryFactory.select(
-				Projections.constructor(FriendCompetitionDto.class, friend.id, friend.userFriend.id,
-					friend.userFriend.nickname, friend.userFriend.profile, friend.status,
-					competition.id, competition.message,
-					competition.startDate, competition.endDate,
-					competition.price, competition.compensation,
-					friendCompetition.friendCompetitionStatus, friendCompetition.competitionOutputStatus)
+				Projections.constructor(FriendCompetitionResponse.class, friend.id, friend.userFriend.id,
+					competition.id, friend.userFriend.nickname, friend.userFriend.profile, friend.status,
+					friendCompetition.friendCompetitionStatus, friendCompetition.competitionOutputStatus
+				)
 			)
 			.from(friend)
 			.leftJoin(friendCompetition).on(friendCompetition.friend.id.eq(friend.id))
 			.leftJoin(competition).on(competition.id.eq(friendCompetition.competition.id))
 			.innerJoin(users).on(friend.users.id.eq(users.id))
 			.innerJoin(userFriend).on(friend.userFriend.id.eq(userFriend.id))
-			.where(users.id.eq(userId))
+			.where(users.id.eq(userId), friend.status.eq(FriendStatus.FRIEND),
+				friendCompetition.friendCompetitionStatus.isNull())
 			.fetch();
 	}
 
@@ -73,8 +73,8 @@ public class FriendCompetitionRepositoryImpl implements FriendCompetitionCustomR
 		return jpaQueryFactory.selectFrom(friendCompetition)
 			.join(friend).on(friendCompetition.friend.id.eq(friend.id))
 			.where((friend.users.id.eq(userId).and(friend.userFriend.id.eq(userFriendId))).or(
-					friend.users.id.eq(userFriendId).and(friend.userFriend.id.eq(userId))
-				))
+				friend.users.id.eq(userFriendId).and(friend.userFriend.id.eq(userId))
+			))
 			.fetch();
 	}
 

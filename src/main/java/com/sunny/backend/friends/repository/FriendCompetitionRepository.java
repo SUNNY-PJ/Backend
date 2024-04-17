@@ -28,33 +28,39 @@ public interface FriendCompetitionRepository
 
 	FriendCompetition findFirstByCompetition(Competition competition);
 
-	FriendCompetition findFirstByFriendAndFriendCompetitionStatusOrderByCreatedDateDesc(Friend friend, FriendCompetitionStatus friendCompetitionStatus);
+	FriendCompetition findFirstByFriendAndFriendCompetitionStatusOrderByCreatedDateDesc(Friend friend,
+		FriendCompetitionStatus friendCompetitionStatus);
 
 	@Query(
-		value = "select f.id as friendId, f.user_friend_id as userFriendId, fc.id as competitionId, u2.nickname, u2.profile, "
-			+ "f.friend_status as friendStatus, fc.friend_competition_status as friendCompetitionStatus, "
-			+ "fc.competition_output_status as output "
-			+ "from friend f "
-			+ "join users u on f.user_id = u.user_id "
-			+ "join users u2 on f.user_friend_id = u2.user_id "
-			+ "left join friend_competition fc ON fc.friend_id = f.id "
-			+ "where u.user_id = :userId "
-			+ "and f.friend_status = 'FRIEND' "
-			+ "and fc.friend_competition_status = 'PROCEEDING'", nativeQuery = true
+		value =
+			"select f.id as friendId, f.user_friend_id as userFriend, fc.competition_id as competitionId, u2.nickname, u2.profile, "
+				+ "f.friend_status as friendStatus, fc.friend_competition_status as friendCompetitionStatus, "
+				+ "fc.competition_output_status as output "
+				+ "from friend f "
+				+ "join users u on f.user_id = u.user_id "
+				+ "join users u2 on f.user_friend_id = u2.user_id "
+				+ "left join friend_competition fc ON fc.friend_id = f.id "
+				+ "where u.user_id = :userId "
+				+ "and f.friend_status = 'FRIEND' "
+				+ "and fc.friend_competition_status = 'PROCEEDING'", nativeQuery = true
 	)
 	List<FriendCompetitionQuery> getFriendCompetitionProceeding(@Param(value = "userId") Long userId);
 
 	@Query(
-		value = "select * "
-			+ "from (select f.id as friendId, f.user_friend_id as userFriendId, fc.id as competitionId, u2.nickname, u2.profile, "
-			+ "f.friend_status as friendStatus, fc.friend_competition_status as friendCompetitionStatus, "
-			+ "fc.competition_output_status as competitionOutputStatus "
-			+ "from friend f "
-			+ "join users u on f.user_id = u.user_id "
-			+ "join users u2 on f.user_friend_id = u2.user_id "
-			+ "left join friend_competition fc ON fc.friend_id = f.id "
-			+ "where u.user_id = :userId and f.friend_status = 'FRIEND') as t "
-			+ "where t.friendCompetitionStatus = 'SEND' or t.friendCompetitionStatus = 'RECEIVE' or t.friendCompetitionStatus is null", nativeQuery = true
+		value =
+			"select f.id as friendId, f.user_friend_id as userFriend, fc.competition_id as competitionId, u2.nickname, u2.profile, f.friend_status as friendStatus, fc.friend_competition_status as friendCompetitionStatus, fc.competition_output_status as competitionOutputStatus "
+				+ "from friend f "
+				+ "join users u on f.user_id = u.user_id "
+				+ "join users u2 on f.user_friend_id = u2.user_id "
+				+ "left join friend_competition fc on fc.friend_id = f.id "
+				+ "where (f.id, fc.id) in ( "
+				+ "select f.id, max(fc.id) "
+				+ "from friend f "
+				+ "join users u on f.user_id = u.user_id "
+				+ "join users u2 on f.user_friend_id = u2.user_id "
+				+ "left join friend_competition fc ON fc.friend_id = f.id "
+				+ "where u.user_id = :userId and f.friend_status = 'FRIEND' "
+				+ "group by f.id)", nativeQuery = true
 	)
 	List<FriendCompetitionQuery> getFriendCompetitionFriend(@Param(value = "userId") Long userId);
 
