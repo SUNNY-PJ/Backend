@@ -38,7 +38,7 @@ public class BatchConfig extends QuartzJobBean {
 		//    }
 		LocalDateTime thirtyDaysAgo = LocalDateTime.now().minus(1, ChronoUnit.DAYS);
 		//30일 이후 check , 근데 자정 이후에 삭제 되도록 함 ?(LocalDateTime까지 맞춰야 됨 ? ?)
-		List<CommentNotification> notifications = commentNotificationRepository.findByCreatedDateAfter(thirtyDaysAgo);
+		List<CommentNotification> notifications = commentNotificationRepository.findByCreatedAtAfter(thirtyDaysAgo);
 		System.out.println(notifications);
 		for (CommentNotification record : notifications) {
 			log.info("댓글 notification delete");

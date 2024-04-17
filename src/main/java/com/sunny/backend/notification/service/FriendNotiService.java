@@ -1,5 +1,6 @@
 package com.sunny.backend.notification.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class FriendNotiService {
 		NotifiacationSubType subType) {
 		Long postAuthor = friend.getUsers().getId();
 		System.out.println(friend.getId());
+
 		FriendsNotification friendsNotification = FriendsNotification.builder()
 			.users(friend.getUsers())
 			.friend(friend.getUserFriend())
@@ -37,6 +39,7 @@ public class FriendNotiService {
 			.title(bodyTitle)
 			.subType(subType)
 			.body(body)
+			.createdAt(LocalDateTime.now())
 			.build();
 		friendsNotificationRepository.save(friendsNotification);
 		List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
@@ -62,6 +65,7 @@ public class FriendNotiService {
 			.title(bodyTitle)
 			.body(body)
 			.subType(subType)
+			.createdAt(LocalDateTime.now())
 			.build();
 		competitionNotificationRepository.save(competitionNotification);
 		List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);

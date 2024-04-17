@@ -1,5 +1,7 @@
 package com.sunny.backend.notification.domain;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,7 +12,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.sunny.backend.comment.domain.Comment;
-import com.sunny.backend.common.BaseTime;
 import com.sunny.backend.community.domain.Community;
 import com.sunny.backend.user.domain.Users;
 
@@ -24,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentNotification extends BaseTime {
+public class CommentNotification {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -47,5 +48,7 @@ public class CommentNotification extends BaseTime {
 
 	@Column
 	private String title;
+	@Column
+	private LocalDateTime createdAt;
 
 }

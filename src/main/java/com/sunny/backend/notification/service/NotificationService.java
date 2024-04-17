@@ -1,6 +1,7 @@
 package com.sunny.backend.notification.service;
 
 import static com.sunny.backend.common.ComnConstant.*;
+import static com.sunny.backend.friends.domain.FriendStatus.*;
 import static com.sunny.backend.notification.dto.response.AlarmListResponse.*;
 import static com.sunny.backend.notification.exception.NotificationErrorCode.*;
 
@@ -20,6 +21,8 @@ import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.CommonResponse.ListResponse;
 import com.sunny.backend.common.response.CommonResponse.SingleResponse;
 import com.sunny.backend.common.response.ResponseService;
+import com.sunny.backend.friends.domain.Friend;
+import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.notification.domain.CommentNotification;
 import com.sunny.backend.notification.domain.CompetitionNotification;
 import com.sunny.backend.notification.domain.FriendsNotification;
@@ -52,6 +55,7 @@ public class NotificationService {
 	private final FriendsNotificationRepository friendsNotificationRepository;
 	private final UserRepository userRepository;
 	private final CompetitionNotificationRepository competitionNotificationRepository;
+	private final FriendRepository friendRepository;
 
 	@Transactional
 	public ResponseEntity<SingleResponse<Boolean>> permissionAlarm(CustomUserPrincipal customUserPrincipal,
@@ -82,9 +86,23 @@ public class NotificationService {
 			customUserPrincipal.getId());
 		List<FriendsNotification> friendsNotifications = friendsNotificationRepository.findByUsers_Id(
 			customUserPrincipal.getId());
+		Users users = userRepository.getById(customUserPrincipal.getId());
+		List<Friend> friends = friendRepository.findByUsers(users);
+
 		List<AlarmListResponse> friendsNotificationResponse = friendsNotifications.stream()
-			.map(AlarmListResponse::fromFriendsAlert)
+			.map(friendsNotification -> {
+				Friend friend = friends.stream()
+					.filter(f -> f.getId().equals(friendsNotification.getFriendId()))
+					.findFirst()
+					.orElse(null);
+				boolean isFriend = friend != null && friend.getStatus() == FRIEND;
+				return AlarmListResponse.fromFriendsAlert(friendsNotification, isFriend);
+			})
 			.toList();
+
+		// List<AlarmListResponse> friendsNotificationResponse = friendsNotifications.stream()
+		// 	.map(AlarmListResponse::fromFriendsAlert)
+		// 	.toList();
 
 		List<CompetitionNotification> competitionNotifications = competitionNotificationRepository.findByUsers_Id(
 			customUserPrincipal.getId());

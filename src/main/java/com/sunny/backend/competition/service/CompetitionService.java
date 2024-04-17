@@ -149,7 +149,12 @@ public class CompetitionService {
 		String body = "님이 대결을 수락했어요";
 		String bodyTitle = "대결 신청에 대한 응답을 받았어요";
 		NotifiacationSubType subType = NotifiacationSubType.APPROVE;
-		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUserFriend, subType);
+		FriendCompetition friendCompetition = friendCompetitionRepository.findFirstByFriendOrderByCreatedDateDesc(
+				friendWithUser)
+			.orElseThrow(() -> new CustomException(COMPETITION_NOT_FOUND));
+
+		friendNotiService.sendCompetitionNotifications(title, body, bodyTitle, friendWithUserFriend.getUsers(),
+			friendWithUser.getUsers(), friendCompetition, subType);
 	}
 
 	@Transactional
@@ -163,7 +168,12 @@ public class CompetitionService {
 		String body = "님이 대결을 거절했어요";
 		String bodyTitle = "대결 신청에 대한 응답을 받았어요";
 		NotifiacationSubType subType = NotifiacationSubType.REFUSE;
-		friendNotiService.sendNotifications(title, body, bodyTitle, friendWithUserFriend, subType);
+		FriendCompetition friendCompetition = friendCompetitionRepository.findFirstByFriendOrderByCreatedDateDesc(
+				friendWithUser)
+			.orElseThrow(() -> new CustomException(COMPETITION_NOT_FOUND));
+
+		friendNotiService.sendCompetitionNotifications(title, body, bodyTitle, friendWithUserFriend.getUsers(),
+			friendWithUser.getUsers(), friendCompetition, subType);
 	}
 
 	//TODO 대결 포기 배너 알림 필요 여부 논의 & 추가
