@@ -34,6 +34,7 @@ public record FriendCompetitionResponse(
 	// }
 
 	public static FriendCompetitionResponse from(FriendCompetitionQuery friendCompetitionQuery) {
+		FriendCompetitionStatus friendCompetitionStatus = friendCompetitionQuery.getFriendCompetitionStatus();
 		return FriendCompetitionResponse.builder()
 			.friendId(friendCompetitionQuery.getFriendId())
 			.userFriendId(friendCompetitionQuery.getUserFriend())
@@ -42,7 +43,9 @@ public record FriendCompetitionResponse(
 			.profile(friendCompetitionQuery.getProfile())
 			.friendStatus(friendCompetitionQuery.getFriendStatus())
 			.competitionStatus(
-				friendCompetitionQuery.getCompetitionId() != null ? friendCompetitionQuery.getFriendCompetitionStatus()
+				(friendCompetitionStatus == FriendCompetitionStatus.RECEIVE
+					|| friendCompetitionStatus == FriendCompetitionStatus.RECEIVE)
+					? friendCompetitionQuery.getFriendCompetitionStatus()
 					: FriendCompetitionStatus.NONE)
 			.output(friendCompetitionQuery.getCompetitionId() != null ?
 				friendCompetitionQuery.getOutput() : CompetitionOutputStatus.NONE)
