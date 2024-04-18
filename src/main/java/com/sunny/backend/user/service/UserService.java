@@ -22,13 +22,15 @@ import com.sunny.backend.notification.dto.request.NotificationPushRequest;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.notification.service.NotificationService;
 import com.sunny.backend.scrap.repository.ScrapRepository;
-import com.sunny.backend.user.domain.Block;
+import com.sunny.backend.user.domain.UserBlock;
 import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.dto.request.UserBlockRequest;
 import com.sunny.backend.user.dto.response.ProfileResponse;
+import com.sunny.backend.user.dto.response.UserBlockResponse;
 import com.sunny.backend.user.dto.response.UserCommentResponse;
 import com.sunny.backend.user.dto.response.UserCommunityResponse;
 import com.sunny.backend.user.dto.response.UserScrapResponse;
-import com.sunny.backend.user.repository.BlockRepository;
+import com.sunny.backend.user.repository.UserBlockRepository;
 import com.sunny.backend.user.repository.UserRepository;
 import com.sunny.backend.util.S3Util;
 
@@ -47,7 +49,7 @@ public class UserService {
 	private final NotificationService notificationService;
 	private final S3Util s3Util;
 	private final FriendRepository friendRepository;
-	private final BlockRepository blockRepository;
+	private final UserBlockRepository userBlockRepository;
 
 	public Users checkUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
 		Long id = customUserPrincipal.getId();
@@ -134,19 +136,33 @@ public class UserService {
 		}
 	}
 
-	@Transactional
-	public void blockUser(
-		CustomUserPrincipal customUserPrincipal, Long userIdToBlock) {
+	public List<UserBlockResponse> getBlockUser(CustomUserPrincipal customUserPrincipal) {
 		Users users = userRepository.getById(customUserPrincipal.getId());
-		Users blockUser = userRepository.getById(userIdToBlock);
 
-		Block block = Block.builder()
+		return users.getBlockedUsers()
+			.stream()
+			.map(UserBlockResponse::from)
+			.toList();
+	}
+
+	@Transactional
+	public void blockUser(CustomUserPrincipal customUserPrincipal, UserBlockRequest userBlockRequest) {
+		Users users = userRepository.getById(customUserPrincipal.getId());
+		Users blockUser = userRepository.getById(userBlockRequest.userId());
+
+		UserBlock userBlock = UserBlock.builder()
 			.user(users)
 			.blockedUser(blockUser)
 			.build();
-		blockRepository.save(block);
-		users.addBlock(block);
-
+		userBlockRepository.save(userBlock);
+		users.addBlock(userBlock);
 	}
 
+	@Transactional
+	public void cancelBlockUser(CustomUserPrincipal customUserPrincipal, Long userId) {
+		Users users = userRepository.getById(customUserPrincipal.getId());
+		Users blockUser = userRepository.getById(userId);
+
+		userBlockRepository.deleteByUserAndBlockedUser(users, blockUser);
+	}
 }
