@@ -22,11 +22,13 @@ import com.sunny.backend.notification.dto.request.NotificationPushRequest;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.notification.service.NotificationService;
 import com.sunny.backend.scrap.repository.ScrapRepository;
+import com.sunny.backend.user.domain.Block;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.dto.response.ProfileResponse;
 import com.sunny.backend.user.dto.response.UserCommentResponse;
 import com.sunny.backend.user.dto.response.UserCommunityResponse;
 import com.sunny.backend.user.dto.response.UserScrapResponse;
+import com.sunny.backend.user.repository.BlockRepository;
 import com.sunny.backend.user.repository.UserRepository;
 import com.sunny.backend.util.S3Util;
 
@@ -45,6 +47,7 @@ public class UserService {
 	private final NotificationService notificationService;
 	private final S3Util s3Util;
 	private final FriendRepository friendRepository;
+	private final BlockRepository blockRepository;
 
 	public Users checkUserId(CustomUserPrincipal customUserPrincipal, Long userId) {
 		Long id = customUserPrincipal.getId();
@@ -129,6 +132,21 @@ public class UserService {
 			);
 			notificationService.sendNotificationToFriends(title, notificationPushRequest);
 		}
+	}
+
+	@Transactional
+	public void blockUser(
+		CustomUserPrincipal customUserPrincipal, Long userIdToBlock) {
+		Users users = userRepository.getById(customUserPrincipal.getId());
+		Users blockUser = userRepository.getById(userIdToBlock);
+
+		Block block = Block.builder()
+			.user(users)
+			.blockedUser(blockUser)
+			.build();
+		blockRepository.save(block);
+		users.addBlock(block);
+
 	}
 
 }
