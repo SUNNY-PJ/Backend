@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -76,4 +77,12 @@ public class UserController {
 		return userService.updateProfile(customUserPrincipal, profile);
 	}
 
+	@ApiOperation(tags = "0. User", value = "사용자 차단")
+	@PostMapping("/{userId}/block")
+	public ResponseEntity<Void> blockUser(
+		@AuthUser CustomUserPrincipal customUserPrincipal,
+		@PathVariable("userId") Long userIdToBlock) {
+		userService.blockUser(customUserPrincipal, userIdToBlock);
+		return ResponseEntity.noContent().build();
+	}
 }

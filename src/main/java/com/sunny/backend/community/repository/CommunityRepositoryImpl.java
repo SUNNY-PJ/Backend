@@ -27,16 +27,20 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
 	public List<CommunityPageResponse> paginationNoOffsetBuilder(Users users, @Nullable Long communityId,
 		SortType sortType, BoardType boardType, String searchText, int pageSize) {
 
+		List<Users> blockedUsers = users.getBlockedUsers();
+		
+		BooleanExpression notBlockedUsers = community.users.notIn(blockedUsers);
+
 		List<Community> results = queryFactory.selectFrom(community)
-			.where(ltCommunityId(communityId), eqSearchText(searchText), eqBoardType(boardType))
-			.orderBy(sortType == SortType.VIEW ? community.viewCnt.desc()
-				: community.createdAt.desc())
+			.where(ltCommunityId(communityId), eqSearchText(searchText), eqBoardType(boardType), notBlockedUsers)
+			.orderBy(sortType == SortType.VIEW ? community.viewCnt.desc() : community.createdAt.desc())
 			.limit(pageSize)
 			.fetch();
 
 		return results.stream()
 			.map(community -> CommunityPageResponse.of(users, community))
 			.toList();
+
 	}
 
 	private BooleanExpression ltCommunityId(Long communityId) {
