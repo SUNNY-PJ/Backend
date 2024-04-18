@@ -76,8 +76,9 @@ public class Users extends BaseTime {
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
 	private final List<Scrap> scraps = new ArrayList<>();
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private final List<Block> blockList = new ArrayList<>();
+	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+	private final List<UserBlock> userBlocks = new ArrayList<>();
+
 	@Column
 	private String profile;
 
@@ -110,8 +111,8 @@ public class Users extends BaseTime {
 		this.commentList.add(comment);
 	}
 
-	public void addBlock(Block block) {
-		this.blockList.add(block);
+	public void addBlock(UserBlock userBlock) {
+		this.userBlocks.add(userBlock);
 	}
 
 	public void addCommunity(Community community) {
@@ -205,8 +206,8 @@ public class Users extends BaseTime {
 	}
 
 	public List<Users> getBlockedUsers() {
-		return blockList.stream()
-			.map(Block::getBlockedUser)
+		return userBlocks.stream()
+			.map(UserBlock::getBlockedUser)
 			.toList();
 	}
 }
