@@ -1,6 +1,8 @@
 package com.sunny.backend.community.repository;
 
 import static com.sunny.backend.community.domain.QCommunity.*;
+import static com.sunny.backend.user.domain.QUsers.*;
+import static com.sunny.backend.user.domain.QUsersBlock.*;
 
 import java.util.List;
 
@@ -24,21 +26,26 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
 		this.queryFactory = jpaQueryFactory;
 	}
 
-	public List<CommunityPageResponse> paginationNoOffsetBuilder(Users users, @Nullable Long communityId,
+	public List<CommunityPageResponse> paginationNoOffsetBuilder(Users user, @Nullable Long communityId,
 		SortType sortType, BoardType boardType, String searchText, int pageSize) {
 
-		List<Users> blockedUsers = users.getBlockedUsers();
+		List<Users> blockedUsers = user.getBlockedUsers();
 		
 		BooleanExpression notBlockedUsers = community.users.notIn(blockedUsers);
 
 		List<Community> results = queryFactory.selectFrom(community)
-			.where(ltCommunityId(communityId), eqSearchText(searchText), eqBoardType(boardType), notBlockedUsers)
+			.where(ltCommunityId(communityId), eqSearchText(searchText), eqBoardType(boardType), notBlockedUsers,
+				community.id.notIn(queryFactory.select(community.id)
+					.from(community)
+					.join(users).on(community.users.id.eq(users.id))
+					.join(usersBlock).on(users.id.eq(usersBlock.users.id))
+					.where(usersBlock.blockedUser.id.eq(user.getId()))))
 			.orderBy(sortType == SortType.VIEW ? community.viewCnt.desc() : community.createdAt.desc())
 			.limit(pageSize)
 			.fetch();
 
 		return results.stream()
-			.map(community -> CommunityPageResponse.of(users, community))
+			.map(community -> CommunityPageResponse.of(user, community))
 			.toList();
 
 	}

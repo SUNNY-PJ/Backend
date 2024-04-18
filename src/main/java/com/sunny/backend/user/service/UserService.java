@@ -22,7 +22,7 @@ import com.sunny.backend.notification.dto.request.NotificationPushRequest;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.notification.service.NotificationService;
 import com.sunny.backend.scrap.repository.ScrapRepository;
-import com.sunny.backend.user.domain.UserBlock;
+import com.sunny.backend.user.domain.UsersBlock;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.dto.request.UserBlockRequest;
 import com.sunny.backend.user.dto.response.ProfileResponse;
@@ -150,12 +150,9 @@ public class UserService {
 		Users users = userRepository.getById(customUserPrincipal.getId());
 		Users blockUser = userRepository.getById(userBlockRequest.userId());
 
-		UserBlock userBlock = UserBlock.builder()
-			.user(users)
-			.blockedUser(blockUser)
-			.build();
-		userBlockRepository.save(userBlock);
-		users.addBlock(userBlock);
+		UsersBlock usersBlock = UsersBlock.of(users, blockUser);
+		userBlockRepository.save(usersBlock);
+		users.addBlock(usersBlock);
 	}
 
 	@Transactional
@@ -163,6 +160,6 @@ public class UserService {
 		Users users = userRepository.getById(customUserPrincipal.getId());
 		Users blockUser = userRepository.getById(userId);
 
-		userBlockRepository.deleteByUserAndBlockedUser(users, blockUser);
+		userBlockRepository.deleteByUsersAndBlockedUser(users, blockUser);
 	}
 }
