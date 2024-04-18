@@ -85,4 +85,5 @@ public class UserController {
 		userService.blockUser(customUserPrincipal, userIdToBlock);
 		return ResponseEntity.noContent().build();
 	}
+	
 }

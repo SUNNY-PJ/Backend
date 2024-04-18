@@ -30,13 +30,17 @@ import com.sunny.backend.notification.dto.request.NotificationPushRequest;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.notification.service.NotificationService;
+import com.sunny.backend.user.domain.Block;
 import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.repository.BlockRepository;
 import com.sunny.backend.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CommentService {
 
 	private final CommentRepository commentRepository;
@@ -47,27 +51,68 @@ public class CommentService {
 	private final CommentNotificationRepository commentNotificationRepository;
 	private final NotificationRepository notificationRepository;
 	private final UserRepository userRepository;
+	private final BlockRepository blockRepository;
 
 	public CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
 		CommentResponse commentResponse;
+		// 사용자가 차단한 유저들을 알기 위한 blockList
+		List<Block> blockList = blockRepository.findAllByUser_Id(currentUser.getId());
+		List<Block> userBlockList = blockRepository.findAllByBlockedUser_Id(currentUser.getId());
+		boolean isCommentBlocked = blockList.stream()
+			.anyMatch(block -> block.getBlockedUser().getId().equals(comment.getUsers().getId()));
+		//사용자가 차단 당한 경우를 알기 위한 값
+		boolean isUserBlocked = userBlockList.stream()
+			.anyMatch(block -> block.getUser().getId().equals(comment.getUsers().getId()));
 		if (comment.getUsers() != null && comment.getUsers().getId() != null) {
-
 			boolean isPrivate = comment.getIsPrivated();
-			boolean commentAuthor = currentUser.getId().equals(comment.getUsers().getId());
+			boolean commentAuthor = currentUser.getBlockedUsers().equals(comment.getUsers().getId());
 			String writer = comment.getUsers().getNickname();
 
 			String content = comment.getContent();
 			if (comment.getParent() != null) {
-				// Check if parent comment exists
 				Users parentUser = comment.getParent().getUsers();
 				if (parentUser != null && parentUser.getNickname() != null) {
 					content = "@" + parentUser.getNickname() + " " + content;
 				}
 			}
 
-			if (isPrivate && !(currentUser.getId().equals(comment.getUsers().getId()) ||
+			if (isCommentBlocked) {
+				log.info(String.valueOf(isCommentBlocked));
+				writer = "차단한 사용자";
+				content = "해당 사용자가 차단되어 댓글을 볼 수 없습니다.";
+				commentResponse = new CommentResponse(
+					comment.getId(),
+					comment.getUsers().getId(),
+					writer,
+					content,
+					comment.getCreatedDate(),
+					comment.getUsers().getProfile(),
+					comment.getAuthor(),
+					commentAuthor,
+					false,
+					comment.getIsPrivated(),
+					false
+				);
+			}
+			if (isUserBlocked) {
+				writer = "(알 수 없음)";
+				content = "댓글을 확인할 수 없습니다.";
+				commentResponse = new CommentResponse(
+					comment.getId(),
+					comment.getUsers().getId(),
+					writer,
+					content,
+					comment.getCreatedDate(),
+					comment.getUsers().getProfile(),
+					comment.getAuthor(),
+					commentAuthor,
+					false,
+					comment.getIsPrivated(),
+					false
+				);
+			} else if (isPrivate && !(currentUser.getId().equals(comment.getUsers().getId()) ||
 				currentUser.getId().equals(comment.getCommunity().getUsers().getId()))) {
-
+				// Set response for private comment
 				commentResponse = new CommentResponse(
 					comment.getId(),
 					comment.getUsers().getId(),
@@ -82,6 +127,7 @@ public class CommentService {
 					false
 				);
 			} else {
+				// Set response for normal comment
 				if (comment.getIsDeleted()) {
 					commentResponse = convertCommentToDto(currentUser, comment);
 				} else {
