@@ -60,7 +60,7 @@ public class CommentReportService implements ReportStrategy {
 		String reasonContent = commentReport.getReason();
 		String reportContent = "부적절한 컨텐츠를 포함하고 있습니다";
 
-		reportNotificationService.sendUserReportNotifications(reportUserBodyTitle, body, reportUserBodyTitle,
+		reportNotificationService.sendUserNotifications(reportUserBodyTitle, body, reportUserBodyTitle,
 			cotents,
 			reasonContent,
 			reportUsers, //신고한 사람
@@ -69,8 +69,8 @@ public class CommentReportService implements ReportStrategy {
 		reportNotificationService.sendUserReportNotifications(reportUserBodyTitle, reportUserBody, UserBodyTitle,
 			cotents,
 			reportContent,
-			users, //신고한 사람
-			reportUsers,
+			reportUsers, //신고한 사람
+			users,
 			NotifiacationSubType.WARN, commentReport.getCreatedDate()); //신고 한 사람
 
 		template.convertAndSend("/sub/user/" + reportUsers.getId(),

@@ -24,7 +24,7 @@ public class ReportNotificationService {
 	private final UserReportNotificationRepository userReportNotificationRepository;
 
 	//신고 한 사람
-	public void sendUserReportNotifications(String title, String body, String bodyTitle, String content,
+	public void sendUserNotifications(String title, String body, String bodyTitle, String content,
 		String reportContnet,
 		Users reportUsers, Users users,
 		NotifiacationSubType subType,
@@ -45,6 +45,37 @@ public class ReportNotificationService {
 		List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
 		if (notificationList.size() != 0) {
 			String notificationBody = "신고 결과를 알려드려요";
+			String notificationBodyTitle = "써니";
+			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
+				postAuthor,
+				notificationBody,
+				notificationBodyTitle
+			);
+			notificationService.sendNotificationToFriends(notificationBodyTitle, notificationPushRequest);
+		}
+	}
+
+	public void sendUserReportNotifications(String title, String body, String bodyTitle, String content,
+		String reportContnet,
+		Users reportUsers, Users users,
+		NotifiacationSubType subType,
+		LocalDateTime createdAt) {
+		Long postAuthor = users.getId();
+		UserReportNotification userReportNotification = UserReportNotification.builder()
+			.users(users) //신고한 사람
+			.warnUser(reportUsers) // 신고 받은 사람
+			.title(bodyTitle)
+			.body(body)
+			.content(content)
+			.reportContent(reportContnet)
+			.subType(subType)
+			.reportCreatedAt(createdAt)
+			.createdAt(LocalDateTime.now())
+			.build();
+		userReportNotificationRepository.save(userReportNotification);
+		List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
+		if (notificationList.size() != 0) {
+			String notificationBody = users.getReportCount() + "번째 경고를 받았습니다.";
 			String notificationBodyTitle = "써니";
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
 				postAuthor,
