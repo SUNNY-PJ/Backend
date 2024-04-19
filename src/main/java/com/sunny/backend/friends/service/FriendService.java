@@ -31,6 +31,7 @@ import com.sunny.backend.notification.repository.FriendsNotificationRepository;
 import com.sunny.backend.notification.service.FriendNotiService;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
+import com.sunny.backend.user.service.UserDeleteService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,33 +46,11 @@ public class FriendService {
 	private final CompetitionNotificationRepository competitionNotificationRepository;
 	private final CompetitionRepository competitionRepository;
 	private final FriendsNotificationRepository friendsNotificationRepository;
+	private final UserDeleteService userDeleteService;
 
 	public FriendListResponse getFriends(CustomUserPrincipal customUserPrincipal) {
 		Users user = userRepository.getById(customUserPrincipal.getId());
-		// List<Long> id = user.getFriends()
-		// 	.stream()
-		// 	.map(friend -> friend.getUsers().getId())
-		// 	.toList();
-		// for (Friend friend : user.getFriends()) {
-		// 	friendCompetitionRepository.findFirstByFriendAndFriendCompetitionStatusOrderByCreatedDateDesc()
-		// }
-		//
-		//
-		// List<FriendCompetitionDto> friendCompetitions = friendCompetitionRepository.getByFriendLeftJoinFriend(user.getId());
-		// List<FriendCompetitionResponse> competitions = new ArrayList<>();
-		// List<FriendCompetitionResponse> approveList = new ArrayList<>();
-		// List<FriendResponse> waitList = new ArrayList<>();
-		// for (FriendCompetitionDto friendCompetition : friendCompetitions) {
-		// 	if (friendCompetition.getFriendStatus() == FriendStatus.FRIEND) {
-		// 		if (friendCompetition.getFriendCompetitionStatus() == FriendCompetitionStatus.PROCEEDING) {
-		// 			competitions.add(FriendCompetitionResponse.from(friendCompetition));
-		// 		} else if(friendCompetition.getCompetitionOutputStatus() == CompetitionOutputStatus.NONE) {
-		// 			approveList.add(FriendCompetitionResponse.from(friendCompetition));
-		// 		}
-		// 	} else if(friendCompetition.getFriendStatus() == FriendStatus.RECEIVE) {
-		// 		waitList.add(FriendResponse.from(friendCompetition));
-		// 	}
-		// }
+
 		List<FriendCompetitionResponse> competitions = new ArrayList<>();
 		List<FriendCompetitionResponse> approveList = new ArrayList<>();
 		for (FriendCompetitionQuery friendCompetitionQuery : friendCompetitionRepository.getFriendCompetitionFriend(
@@ -82,18 +61,7 @@ public class FriendService {
 				approveList.add(FriendCompetitionResponse.fromFriend(friendCompetitionQuery));
 			}
 		}
-		//
-		// List<FriendCompetitionResponse> competitions = friendCompetitionRepository.getFriendCompetitionProceeding(
-		// 		user.getId())
-		// 	.stream()
-		// 	.map(FriendCompetitionResponse::fromCompetition)
-		// 	.toList();
-		// List<FriendCompetitionResponse> approveList = new ArrayList<>(
-		// 	friendCompetitionRepository.getFriendCompetitionFriend(
-		// 			user.getId())
-		// 		.stream()
-		// 		.map(FriendCompetitionResponse::fromFriend)
-		// 		.toList());
+
 		approveList.addAll(friendCompetitionRepository.getByFriendLeftJoinFriend(user.getId()));
 
 		List<FriendResponse> waitList = friendRepository.findByUsersAndStatus(user, FriendStatus.RECEIVE)
@@ -194,22 +162,7 @@ public class FriendService {
 
 		List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriend(users.getId(),
 			friend.getUserFriend().getId());
-		for (FriendCompetition friendCompetition : friendCompetitions) {
-			System.out.println(friendCompetition);
-			competitionNotificationRepository.deleteAllByFriendCompetition(friendCompetition);
-			friendCompetitionRepository.deleteById(friendCompetition.getId());
-		}
-		Set<Long> competitionIds = friendCompetitions.stream()
-			.map(friendCompetition -> friendCompetition.getCompetition().getId())
-			.collect(Collectors.toSet());
-		if (!competitionIds.isEmpty()) {
-			competitionRepository.deleteAllById(competitionIds);
-		}
-
-		friendsNotificationRepository.deleteByUsersAndFriend(users, friend.getUserFriend());
-		friendsNotificationRepository.deleteByUsersAndFriend(friend.getUserFriend(), users);
-		friendRepository.deleteByUsersAndUserFriend(users, friend.getUserFriend());
-		friendRepository.deleteByUsersAndUserFriend(friend.getUserFriend(), users);
+		userDeleteService.deleteFriendRelationshipsByUser(friendCompetitions, users, friend.getUserFriend());
 	}
 
 }
