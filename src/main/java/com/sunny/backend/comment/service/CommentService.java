@@ -66,7 +66,7 @@ public class CommentService {
 			boolean isUserBlocked = userBlockList.stream()
 				.anyMatch(block -> block.getUsers().getId().equals(comment.getUsers().getId()));
 			boolean isPrivate = comment.getIsPrivated();
-			boolean commentAuthor = currentUser.getBlockedUsers().equals(comment.getUsers().getId());
+			boolean commentAuthor = currentUser.getId().equals(comment.getUsers().getId());
 			String writer = comment.getUsers().getNickname();
 
 			String content = comment.getContent();
