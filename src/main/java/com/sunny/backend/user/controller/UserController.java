@@ -19,6 +19,7 @@ import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.user.dto.request.UserBlockRequest;
 import com.sunny.backend.user.dto.response.ProfileResponse;
+import com.sunny.backend.user.dto.response.UserBlockResponse;
 import com.sunny.backend.user.dto.response.UserCommentResponse;
 import com.sunny.backend.user.dto.response.UserCommunityResponse;
 import com.sunny.backend.user.dto.response.UserScrapResponse;
@@ -82,11 +83,11 @@ public class UserController {
 
 	@ApiOperation(tags = "0. User", value = "사용자 차단 목록 가져오기")
 	@GetMapping("block")
-	public ResponseEntity<Void> blockUser(
+	public ResponseEntity<List<UserBlockResponse>> blockUser(
 		@AuthUser CustomUserPrincipal customUserPrincipal
 	) {
-		userService.getBlockUser(customUserPrincipal);
-		return ResponseEntity.noContent().build();
+		List<UserBlockResponse> userBlockResponses = userService.getBlockedUser(customUserPrincipal);
+		return ResponseEntity.ok(userBlockResponses);
 	}
 
 	@ApiOperation(tags = "0. User", value = "사용자 차단")
