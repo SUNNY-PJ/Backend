@@ -8,6 +8,7 @@ import static com.sunny.backend.notification.exception.NotificationErrorCode.*;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ import com.sunny.backend.notification.domain.CommentNotification;
 import com.sunny.backend.notification.domain.CompetitionNotification;
 import com.sunny.backend.notification.domain.FriendsNotification;
 import com.sunny.backend.notification.domain.Notification;
+import com.sunny.backend.notification.domain.UserReportNotification;
 import com.sunny.backend.notification.dto.request.NotificationPushRequest;
 import com.sunny.backend.notification.dto.request.NotificationRequest.NotificationAllowRequest;
 import com.sunny.backend.notification.dto.response.AlarmListResponse;
@@ -34,6 +36,7 @@ import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.notification.repository.CompetitionNotificationRepository;
 import com.sunny.backend.notification.repository.FriendsNotificationRepository;
 import com.sunny.backend.notification.repository.NotificationRepository;
+import com.sunny.backend.notification.repository.UserReportNotificationRepository;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
 
@@ -56,6 +59,7 @@ public class NotificationService {
 	private final UserRepository userRepository;
 	private final CompetitionNotificationRepository competitionNotificationRepository;
 	private final FriendRepository friendRepository;
+	private final UserReportNotificationRepository userReportNotificationRepository;
 
 	@Transactional
 	public ResponseEntity<SingleResponse<Boolean>> permissionAlarm(CustomUserPrincipal customUserPrincipal,
@@ -106,13 +110,20 @@ public class NotificationService {
 
 		List<CompetitionNotification> competitionNotifications = competitionNotificationRepository.findByUsers_Id(
 			customUserPrincipal.getId());
+		List<UserReportNotification> userReportNotifications = userReportNotificationRepository.findByUsers_Id(
+			customUserPrincipal.getId());
 		List<AlarmListResponse> competitionNotificationResponse = competitionNotifications.stream()
 			.map(AlarmListResponse::fromCompetitionAlert)
 			.toList();
+		List<AlarmListResponse> userReportNotificationResponse = userReportNotifications.stream()
+			.map(AlarmListResponse::fromUserReportAlert)
+			.toList();
 
-		List<AlarmListResponse> combinedList = Stream.concat(
-				Stream.concat(commentNotificationResponse.stream(), friendsNotificationResponse.stream()),
-				competitionNotificationResponse.stream())
+		List<AlarmListResponse> combinedList = Stream.of(commentNotificationResponse.stream(),
+				friendsNotificationResponse.stream(),
+				competitionNotificationResponse.stream(),
+				userReportNotificationResponse.stream())
+			.flatMap(Function.identity())
 			.sorted(Comparator.comparing(AlarmListResponse::createdAt).reversed())
 			.toList();
 		return responseService.getListResponse(HttpStatus.OK.value(), combinedList, "알림 조회 저장 성공");

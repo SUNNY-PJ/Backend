@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 public enum NotificationType {
-	COMMENT("댓글"), FRIEND("친구"), COMPETITION("대결");
+	COMMENT("댓글"), FRIEND("친구"), COMPETITION("대결"),USER_REPORT("신고");
 
 	private final String value;
 

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.comment.repository.CommentRepository;
+import com.sunny.backend.notification.domain.NotifiacationSubType;
 import com.sunny.backend.report.domain.CommentReport;
 import com.sunny.backend.report.domain.ReportType;
 import com.sunny.backend.report.dto.ReportCreateRequest;
@@ -51,7 +52,25 @@ public class CommentReportService implements ReportStrategy {
 		Users users = commentReport.getComment().getUsers();
 		users.increaseReportCount();
 
-		reportNotificationService.sendNotifications(users);
+		String reportUserBodyTitle = "써니";
+		String reportUserBody = users.getReportCount() + "번째 경고를 받았습니다.";
+		String body = "회원님의 신고에 대한 결과를 알려드려요";
+		String cotents = commentReport.getComment().getContent();
+		String reasonContent = commentReport.getReason();
+		String reportContent = "부적절한 컨텐츠를 포함하고 있습니다";
+
+		reportNotificationService.sendUserReportNotifications(reportUserBodyTitle, body, reportUserBodyTitle,
+			cotents,
+			reasonContent,
+			reportUsers, //신고한 사람
+			users,
+			NotifiacationSubType.APPROVE, commentReport.getCreatedDate()); //신고 한 사람
+		reportNotificationService.sendUserReportNotifications(reportUserBodyTitle, reportUserBody, reportUserBodyTitle,
+			cotents,
+			reportContent,
+			users, //신고한 사람
+			reportUsers,
+			NotifiacationSubType.WARN, commentReport.getCreatedDate()); //신고 한 사람
 
 		template.convertAndSend("/sub/user/" + reportUsers.getId(),
 			UserReportResultResponse.ofCommentReport(commentReport, true));
@@ -65,6 +84,19 @@ public class CommentReportService implements ReportStrategy {
 	public void refuseUserReport(Long commentId) {
 		CommentReport commentReport = commentReportRepository.getById(commentId);
 		commentReport.validateWaitStatus();
+		Users users = commentReport.getComment().getUsers();
+		Users reportUsers = commentReport.getUsers();
+		//신고 거절 된 경우
+		String reportUserBodyTitle = "써니";
+		String body = "회원님의 신고에 대한 결과를 알려드려요";
+		String cotents = commentReport.getComment().getContent();
+		String reportContent = commentReport.getReason(); //신고 사유
+
+		reportNotificationService.sendUserReportNotifications(reportUserBodyTitle, body, reportUserBodyTitle, cotents,
+			reportContent,
+			reportUsers, //신고한 사람
+			users,
+			NotifiacationSubType.REFUSE, commentReport.getCreatedDate()); //신고 한 사람
 		commentReportRepository.deleteById(commentId);
 		template.convertAndSend("/sub/user/" + commentReport.getUsers().getId(),
 			UserReportResultResponse.ofCommentReport(commentReport, false));

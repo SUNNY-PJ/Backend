@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 public enum NotifiacationSubType {
 	REGISTER("등록"), APPROVE("승인"), REFUSE("거절"),
-	APPLY("신청"), GIVE_UP("포기"), WIN("승리"), DRAW("무승부"), LOSE("패배");
+	APPLY("신청"), GIVE_UP("포기"), WIN("승리"), DRAW("무승부"), LOSE("패배"), WARN("경고");
 
 	private final String value;
 

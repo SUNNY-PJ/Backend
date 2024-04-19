@@ -16,6 +16,7 @@ import com.sunny.backend.notification.domain.CompetitionNotification;
 import com.sunny.backend.notification.domain.FriendsNotification;
 import com.sunny.backend.notification.domain.NotifiacationSubType;
 import com.sunny.backend.notification.domain.NotificationType;
+import com.sunny.backend.notification.domain.UserReportNotification;
 import com.sunny.backend.user.domain.Users;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,10 @@ public record AlarmListResponse(
 	Boolean isCompetition,
 	Boolean isRecieveCompetition,
 	boolean isToday,
+	String reportContent,
+	String ReportReason,
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+	LocalDateTime reportCreatedAt,
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
 	LocalDateTime createdAt
 ) {
@@ -57,6 +62,9 @@ public record AlarmListResponse(
 			null,
 			null,
 			isToday,
+			null,
+			null,
+			null,
 			comment.getCreatedDate()
 		);
 	}
@@ -77,7 +85,35 @@ public record AlarmListResponse(
 			null,
 			null,
 			friendsNotification.getCreatedAt().toLocalDate().isEqual(LocalDate.now()),
+			null,
+			null,
+			null,
 			friendsNotification.getCreatedAt()
+		);
+	}
+
+	public static AlarmListResponse fromUserReportAlert(UserReportNotification userReportNotification) {
+		String postAuthor =
+			userReportNotification.getSubType() != NotifiacationSubType.WARN ?
+				userReportNotification.getWarnUser().getNickname() : null;
+		return new AlarmListResponse(
+			UUID.randomUUID().toString(),
+			userReportNotification.getId(), //상대방꺼 id
+			userReportNotification.getUsers().getId(),
+			postAuthor,
+			userReportNotification.getTitle(),
+			userReportNotification.getBody(),
+			userReportNotification.getUsers().getProfile(),
+			USER_REPORT,
+			userReportNotification.getSubType(),
+			null,
+			null,
+			null,
+			userReportNotification.getCreatedAt().toLocalDate().isEqual(LocalDate.now()),
+			userReportNotification.getContent(),
+			userReportNotification.getReportContent(),
+			userReportNotification.getCreatedAt(),
+			userReportNotification.getCreatedAt() //수정
 		);
 	}
 
@@ -99,6 +135,9 @@ public record AlarmListResponse(
 			competitionNotification.getFriendCompetition().getFriendCompetitionStatus()
 				== FriendCompetitionStatus.RECEIVE,
 			competitionNotification.getCreatedAt().toLocalDate().isEqual(LocalDate.now()),
+			null,
+			null,
+			null,
 			competitionNotification.getCreatedAt()
 		);
 	}
