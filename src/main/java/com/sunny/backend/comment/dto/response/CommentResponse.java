@@ -28,13 +28,14 @@ public class CommentResponse {
 	private boolean isDeleted;
 	private boolean isPrivated;
 	private boolean isRevokeUser;
+	private boolean isBlockedUser;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
 	private LocalDateTime createdDate;
 	private List<CommentResponse> children = new ArrayList<>();
 
 	public CommentResponse(Long id, Long userId, String writer, String content, LocalDateTime createdDate,
 		String profileImg, boolean isAuthor, boolean commentAuthor, boolean isDeleted, boolean isPrivated,
-		boolean isRevokeUser) {
+		boolean isRevokeUser, boolean isBlockedUser) {
 		this.id = id;
 		this.userId = userId;
 		this.writer = writer;
@@ -46,12 +47,13 @@ public class CommentResponse {
 		this.isDeleted = isDeleted;
 		this.isPrivated = isPrivated;
 		this.isRevokeUser = isRevokeUser;
+		this.isBlockedUser = isBlockedUser;
 	}
 
 	//삭제된 댓글로 댓글 내용 수정하기 위한 객체 생성
 	public static CommentResponse convertCommentToDto(Users users, Comment comment) {
-		boolean commentAuthor = users.getId().equals(comment.getUsers().getId());
-		if (comment.getIsDeleted()) {
+		{
+			boolean commentAuthor = users.getId().equals(comment.getUsers().getId());
 			return new CommentResponse(
 				comment.getId(),
 				null,
@@ -63,15 +65,10 @@ public class CommentResponse {
 				commentAuthor,
 				true,
 				false,
-				false
+				false,
+				true
+
 			);
-		} else {
-			String writer = comment.getUsers() != null ? comment.getUsers().getNickname() : null;
-			String content = comment.getContent();
-			LocalDateTime createdDate = comment.getCreatedDate();
-			boolean isAuthor = comment.getAuthor();
-			return new CommentResponse(comment.getId(), comment.getUsers().getId(), writer, content, createdDate,
-				users.getProfile(), isAuthor, commentAuthor, false, comment.getIsPrivated(), false);
 		}
 	}
 
@@ -88,6 +85,7 @@ public class CommentResponse {
 			false,
 			comment.getIsDeleted(),
 			comment.getIsPrivated(),
+			true,
 			true
 		);
 	}

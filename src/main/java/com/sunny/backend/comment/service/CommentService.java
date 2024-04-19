@@ -86,12 +86,13 @@ public class CommentService {
 					writer,
 					content,
 					null,
-					comment.getUsers().getProfile(),
+					null,
 					comment.getAuthor(),
 					commentAuthor,
 					false,
 					comment.getIsPrivated(),
-					false
+					false,
+					isUserBlocked
 				);
 			}
 			if (isUserBlocked) {
@@ -103,12 +104,13 @@ public class CommentService {
 					writer,
 					content,
 					null,
-					comment.getUsers().getProfile(),
+					null,
 					comment.getAuthor(),
 					commentAuthor,
 					false,
 					comment.getIsPrivated(),
-					false
+					false,
+					isUserBlocked
 				);
 			} else if (isPrivate && !(currentUser.getId().equals(comment.getUsers().getId()) ||
 				currentUser.getId().equals(comment.getCommunity().getUsers().getId()))) {
@@ -124,10 +126,10 @@ public class CommentService {
 					commentAuthor,
 					false,
 					comment.getIsPrivated(),
-					false
+					false,
+					isUserBlocked
 				);
 			} else {
-				// Set response for normal comment
 				if (comment.getIsDeleted()) {
 					commentResponse = convertCommentToDto(currentUser, comment);
 				} else {
@@ -142,7 +144,8 @@ public class CommentService {
 						commentAuthor,
 						false,
 						comment.getIsPrivated(),
-						false
+						false,
+						isUserBlocked
 					);
 				}
 			}
@@ -219,7 +222,7 @@ public class CommentService {
 		return responseService.getSingleResponse(HttpStatus.OK.value(),
 			new CommentResponse(comment.getId(), comment.getUsers().getId(), comment.getUsers().getNickname(),
 				addUserTag(comment), comment.getCreatedDate(), comment.getUsers().getProfile(), comment.getAuthor(),
-				commentAuthor, false, comment.getIsPrivated(), false), "댓글을 등록했습니다.");
+				commentAuthor, false, comment.getIsPrivated(), false, false), "댓글을 등록했습니다.");
 	}
 
 	private String removeUserTag(String content, Comment parent) {
@@ -283,7 +286,7 @@ public class CommentService {
 		Comment comment = commentRepository.getById(commentId);
 		validateCommentByUser(users.getId(), comment.getUsers().getId());
 		comment.changeIsDeleted(true);
-		CommentResponse commentResponse = convertCommentToDto(users, comment);
+		CommentResponse commentResponse = mapCommentToResponse(comment, users);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), commentResponse, "댓글을 삭제 하였습니다.");
 	}
 
@@ -308,6 +311,6 @@ public class CommentService {
 			new CommentResponse(comment.getId(), comment.getUsers().getId(), comment.getUsers().getNickname(),
 				comment.getContent(),
 				comment.getCreatedDate(), comment.getUsers().getProfile(), comment.getAuthor(), commentAuthor, false,
-				comment.getIsPrivated(), false), "댓글을 수정했습니다.");
+				comment.getIsPrivated(), false, false), "댓글을 수정했습니다.");
 	}
 }
