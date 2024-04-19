@@ -131,6 +131,7 @@ public class CommunityService {
 		Integer pageSize
 	) {
 		Users users = userRepository.getById(customUserPrincipal.getId());
+		// Users communityUser = communityRepository.getById(communityId).getUsers();
 		return communityRepository.paginationNoOffsetBuilder(users, communityId, sortType, boardType, searchText,
 			pageSize);
 	}

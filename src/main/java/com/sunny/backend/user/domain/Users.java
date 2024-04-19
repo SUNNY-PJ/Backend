@@ -210,5 +210,11 @@ public class Users extends BaseTime {
 			.map(UsersBlock::getBlockedUser)
 			.toList();
 	}
+
+	public List<Users> getdUsersBlockList() {
+		return usersBlocks.stream()
+			.map(UsersBlock::getUsers)
+			.toList();
+	}
 }
 

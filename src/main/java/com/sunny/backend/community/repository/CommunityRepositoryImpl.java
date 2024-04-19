@@ -30,7 +30,7 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
 		SortType sortType, BoardType boardType, String searchText, int pageSize) {
 
 		List<Users> blockedUsers = user.getBlockedUsers();
-		
+
 		BooleanExpression notBlockedUsers = community.users.notIn(blockedUsers);
 
 		List<Community> results = queryFactory.selectFrom(community)
@@ -74,5 +74,11 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
 			return community.boardType.eq(BoardType.FREE);
 		}
 		return null;
+	}
+
+	public List<Long> extractUserIds(List<CommunityPageResponse> communityResponses) {
+		return communityResponses.stream()
+			.map(CommunityPageResponse::userId)
+			.toList();
 	}
 }
