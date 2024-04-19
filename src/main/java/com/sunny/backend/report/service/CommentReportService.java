@@ -52,7 +52,8 @@ public class CommentReportService implements ReportStrategy {
 		Users users = commentReport.getComment().getUsers();
 		users.increaseReportCount();
 
-		String reportUserBodyTitle = "써니";
+		String reportUserBodyTitle = "신고 결과를 알려드려요.";
+		String UserBodyTitle = "신고가 접수되었어요.";
 		String reportUserBody = users.getReportCount() + "번째 경고를 받았습니다.";
 		String body = "회원님의 신고에 대한 결과를 알려드려요";
 		String cotents = commentReport.getComment().getContent();
@@ -65,7 +66,7 @@ public class CommentReportService implements ReportStrategy {
 			reportUsers, //신고한 사람
 			users,
 			NotifiacationSubType.APPROVE, commentReport.getCreatedDate()); //신고 한 사람
-		reportNotificationService.sendUserReportNotifications(reportUserBodyTitle, reportUserBody, reportUserBodyTitle,
+		reportNotificationService.sendUserReportNotifications(reportUserBodyTitle, reportUserBody, UserBodyTitle,
 			cotents,
 			reportContent,
 			users, //신고한 사람
@@ -87,7 +88,7 @@ public class CommentReportService implements ReportStrategy {
 		Users users = commentReport.getComment().getUsers();
 		Users reportUsers = commentReport.getUsers();
 		//신고 거절 된 경우
-		String reportUserBodyTitle = "써니";
+		String reportUserBodyTitle = "신고 결과를 알려드려요";
 		String body = "회원님의 신고에 대한 결과를 알려드려요";
 		String cotents = commentReport.getComment().getContent();
 		String reportContent = commentReport.getReason(); //신고 사유
