@@ -27,12 +27,23 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
 	public List<CommunityPageResponse> paginationNoOffsetBuilder(Users users, @Nullable Long communityId,
 		SortType sortType, BoardType boardType, String searchText, int pageSize) {
 
-		List<Users> blockedUsers = users.getBlockedUsers();
-		
-		BooleanExpression notBlockedUsers = community.users.notIn(blockedUsers);
+		// List<Users> blockedUsers = blockList.stream()
+		// 	.map(Block::getBlockedUser)
+		// 	.toList();
 
+		// List<Users> usersBlockList = userBlockList.stream()
+		// 	.map(Block::getUser)
+		// 	.toList();
+		//
+		// // Combine the two lists
+		// List<Users> combinedBlockList = new ArrayList<>();
+		// combinedBlockList.addAll(blockedUsers);
+		// combinedBlockList.addAll(usersBlockList);
+
+		// Use combinedBlockList in your BooleanExpression
+		// BooleanExpression notBlockedUsers = community.users.notIn(combinedBlockList);
 		List<Community> results = queryFactory.selectFrom(community)
-			.where(ltCommunityId(communityId), eqSearchText(searchText), eqBoardType(boardType), notBlockedUsers)
+			.where(ltCommunityId(communityId), eqSearchText(searchText), eqBoardType(boardType))
 			.orderBy(sortType == SortType.VIEW ? community.viewCnt.desc() : community.createdAt.desc())
 			.limit(pageSize)
 			.fetch();
@@ -67,5 +78,11 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
 			return community.boardType.eq(BoardType.FREE);
 		}
 		return null;
+	}
+
+	public List<Long> extractUserIds(List<CommunityPageResponse> communityResponses) {
+		return communityResponses.stream()
+			.map(CommunityPageResponse::userId)
+			.toList();
 	}
 }

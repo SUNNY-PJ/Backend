@@ -26,7 +26,7 @@ public class Block extends BaseTime {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "users_id")
 	private Users user;
 
 	@ManyToOne(fetch = FetchType.LAZY)

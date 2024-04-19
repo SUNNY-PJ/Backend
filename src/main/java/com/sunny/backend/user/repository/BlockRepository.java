@@ -20,4 +20,5 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
 		return findById(id)
 			.orElseThrow(() -> new CustomException(BLOCK_LIST_NOT_FOUND));
 	}
+
 }
