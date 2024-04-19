@@ -1,6 +1,7 @@
 package com.sunny.backend.friends.dto.response;
 
 import com.sunny.backend.competition.domain.CompetitionOutputStatus;
+import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.FriendCompetitionStatus;
 import com.sunny.backend.friends.domain.FriendStatus;
 
@@ -54,6 +55,18 @@ public record FriendCompetitionResponse(
 			.friendStatus(friendCompetitionQuery.getFriendStatus())
 			.competitionStatus(friendCompetitionStatus)
 			.output(output)
+			.build();
+	}
+
+	public static FriendCompetitionResponse from(Friend friend) {
+		return FriendCompetitionResponse.builder()
+			.friendId(friend.getId())
+			.userFriendId(friend.getUserFriend().getId())
+			.nickname(friend.getUserFriend().getNickname())
+			.profile(friend.getUserFriend().getProfile())
+			.friendStatus(FriendStatus.FRIEND)
+			.competitionStatus(FriendCompetitionStatus.NONE)
+			.output(CompetitionOutputStatus.NONE)
 			.build();
 	}
 }
