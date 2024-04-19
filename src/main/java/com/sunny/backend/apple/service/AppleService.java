@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
@@ -31,14 +29,12 @@ import com.sunny.backend.common.config.AppleProperties;
 import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
-import com.sunny.backend.competition.repository.CompetitionRepository;
 import com.sunny.backend.friends.domain.FriendCompetition;
 import com.sunny.backend.friends.repository.FriendCompetitionRepository;
 import com.sunny.backend.friends.repository.FriendRepository;
-import com.sunny.backend.notification.repository.CommentNotificationRepository;
-import com.sunny.backend.notification.repository.CompetitionNotificationRepository;
 import com.sunny.backend.notification.repository.FriendsNotificationRepository;
 import com.sunny.backend.notification.repository.NotificationRepository;
+import com.sunny.backend.notification.repository.UserReportNotificationRepository;
 import com.sunny.backend.report.repository.CommentReportRepository;
 import com.sunny.backend.report.repository.CommunityReportRepository;
 import com.sunny.backend.user.domain.Users;
@@ -68,6 +64,7 @@ public class AppleService {
 	private final FriendCompetitionRepository friendCompetitionRepository;
 	private final CommentReportRepository commentReportRepository;
 	private final CommunityReportRepository communityReportRepository;
+	private final UserReportNotificationRepository userReportNotificationRepository;
 	private final TokenProvider tokenProvider;
 	private final UserDeleteService userDeleteService;
 
@@ -141,8 +138,10 @@ public class AppleService {
 			if (response.getStatusCode().is2xxSuccessful()) {
 				log.info("Apple token 삭제 성공");
 				notificationRepository.deleteByUsers(users);
+				userReportNotificationRepository.deleteByUsersOrWarnUser(users, users);
 
-				List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriendByUserId(userId);
+				List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriendByUserId(
+					userId);
 				userDeleteService.deleteFriendRelationships(friendCompetitions);
 
 				friendsNotificationRepository.deleteByUsersOrFriend(users, users);
