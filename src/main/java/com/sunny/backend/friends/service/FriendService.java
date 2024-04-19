@@ -62,7 +62,10 @@ public class FriendService {
 			}
 		}
 
-		approveList.addAll(friendCompetitionRepository.getByFriendLeftJoinFriend(user.getId()));
+		approveList.addAll(friendCompetitionRepository.getByFriendLeftJoinFriend(user.getId())
+			.stream()
+			.map(FriendCompetitionResponse::from)
+			.toList());
 
 		List<FriendResponse> waitList = friendRepository.findByUsersAndStatus(user, FriendStatus.RECEIVE)
 			.stream()
