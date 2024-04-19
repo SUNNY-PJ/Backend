@@ -19,6 +19,6 @@ public interface CommentNotificationRepository extends JpaRepository<CommentNoti
 
 	List<CommentNotification> findByCreatedAtAfter(LocalDateTime createdAt);
 
-	void deleteByUsers(Users users);
+	void deleteAllByUsers(Users users);
 
 }

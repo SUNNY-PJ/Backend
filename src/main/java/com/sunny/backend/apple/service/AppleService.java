@@ -32,6 +32,7 @@ import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.friends.domain.FriendCompetition;
 import com.sunny.backend.friends.repository.FriendCompetitionRepository;
 import com.sunny.backend.friends.repository.FriendRepository;
+import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.notification.repository.FriendsNotificationRepository;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.notification.repository.UserReportNotificationRepository;
@@ -67,6 +68,7 @@ public class AppleService {
 	private final UserReportNotificationRepository userReportNotificationRepository;
 	private final TokenProvider tokenProvider;
 	private final UserDeleteService userDeleteService;
+	private final CommentNotificationRepository commentNotificationRepository;
 
 	public String generateClientSecret() throws IOException {
 		LocalDateTime expiration = LocalDateTime.now().plusMinutes(5);
@@ -149,6 +151,7 @@ public class AppleService {
 				communityReportRepository.deleteAllByCommunityInOrUsers(users.getCommunityList(), users);
 				commentReportRepository.deleteAllByCommentInOrUsers(users.getCommentList(), users);
 
+				commentNotificationRepository.deleteAllByUsers(users);
 				commentRepository.nullifyUsersId(users.getId());
 				userRepository.deleteById(users.getId());
 				log.info("Apple token 삭제 성공 code={}", HttpStatus.OK.value());
