@@ -35,7 +35,7 @@ public class CommentReport extends BaseTime {
 	@JoinColumn(name = "users_id")
 	private Users users;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "comment_id")
 	private Comment comment;
 

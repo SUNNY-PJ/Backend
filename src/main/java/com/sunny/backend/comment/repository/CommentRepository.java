@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sunny.backend.comment.domain.Comment;
@@ -27,7 +28,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, Comment
 	@Transactional
 	@Modifying
 	@Query("UPDATE Comment c SET c.users = null WHERE c.users.id = :userId")
-	void nullifyUsersId(Long userId);
+	void
+
+
+	nullifyUsersId(@Param(value = "userId") Long userId);
 
 	@Transactional
 	@Modifying
