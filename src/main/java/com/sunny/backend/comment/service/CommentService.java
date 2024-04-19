@@ -58,12 +58,13 @@ public class CommentService {
 		// 사용자가 차단한 유저들을 알기 위한 blockList
 		List<UsersBlock> blockList = blockRepository.findAllByUsers_Id(currentUser.getId());
 		List<UsersBlock> userBlockList = blockRepository.findAllByBlockedUser_Id(currentUser.getId());
-		boolean isCommentBlocked = blockList.stream()
-			.anyMatch(block -> block.getBlockedUser().getId().equals(comment.getUsers().getId()));
-		//사용자가 차단 당한 경우를 알기 위한 값
-		boolean isUserBlocked = userBlockList.stream()
-			.anyMatch(block -> block.getUsers().getId().equals(comment.getUsers().getId()));
+
 		if (comment.getUsers() != null && comment.getUsers().getId() != null) {
+			boolean isCommentBlocked = blockList.stream()
+				.anyMatch(block -> block.getBlockedUser().getId().equals(comment.getUsers().getId()));
+			//사용자가 차단 당한 경우를 알기 위한 값
+			boolean isUserBlocked = userBlockList.stream()
+				.anyMatch(block -> block.getUsers().getId().equals(comment.getUsers().getId()));
 			boolean isPrivate = comment.getIsPrivated();
 			boolean commentAuthor = currentUser.getBlockedUsers().equals(comment.getUsers().getId());
 			String writer = comment.getUsers().getNickname();
@@ -286,7 +287,7 @@ public class CommentService {
 		Comment comment = commentRepository.getById(commentId);
 		validateCommentByUser(users.getId(), comment.getUsers().getId());
 		comment.changeIsDeleted(true);
-		CommentResponse commentResponse = mapCommentToResponse(comment, users);
+		CommentResponse commentResponse = leaveCommentToDto(users, comment);
 		return responseService.getSingleResponse(HttpStatus.OK.value(), commentResponse, "댓글을 삭제 하였습니다.");
 	}
 
