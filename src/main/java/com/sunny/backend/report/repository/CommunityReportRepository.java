@@ -14,6 +14,8 @@ import com.sunny.backend.user.domain.Users;
 public interface CommunityReportRepository extends JpaRepository<CommunityReport, Long> {
 	void deleteAllByCommunityInOrUsers(List<Community> community, Users users);
 
+	List<CommunityReport> findByCommunity_Id(Long communityId);
+
 	default CommunityReport getById(Long id) {
 		return findById(id)
 			.orElseThrow(() -> new CustomException(REPORT_COMMUNITY_NOT_FOUND));

@@ -17,6 +17,8 @@ import com.sunny.backend.user.domain.Users;
 public interface CommentReportRepository extends JpaRepository<CommentReport, Long> {
 	void deleteAllByCommentInOrUsers(List<Comment> commentList, Users users);
 
+	List<CommentReport> findByComment_Id(Long communityId);
+
 	default CommentReport getById(Long id) {
 		return findById(id)
 			.orElseThrow(() -> new CustomException(REPORT_COMMENT_NOT_FOUND));

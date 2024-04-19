@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.nimbusds.oauth2.sdk.util.StringUtils;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
+import com.sunny.backend.comment.domain.Comment;
+import com.sunny.backend.comment.repository.CommentRepository;
 import com.sunny.backend.common.photo.Photo;
 import com.sunny.backend.common.photo.PhotoRepository;
 import com.sunny.backend.community.domain.BoardType;
@@ -25,6 +27,10 @@ import com.sunny.backend.community.dto.response.ViewAndCommentResponse;
 import com.sunny.backend.community.repository.CommunityRepository;
 import com.sunny.backend.notification.domain.CommentNotification;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
+import com.sunny.backend.report.domain.CommentReport;
+import com.sunny.backend.report.domain.CommunityReport;
+import com.sunny.backend.report.repository.CommentReportRepository;
+import com.sunny.backend.report.repository.CommunityReportRepository;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
 import com.sunny.backend.util.RedisUtil;
@@ -43,6 +49,9 @@ public class CommunityService {
 	private final RedisUtil redisUtil;
 	private final CommentNotificationRepository commentNotificationRepository;
 	private final UserRepository userRepository;
+	private final CommentReportRepository commentReportRepository;
+	private final CommunityReportRepository communityReportRepository;
+	private final CommentRepository commentRepository;
 
 	@Transactional
 	public CommunityResponse findCommunity(
@@ -169,13 +178,26 @@ public class CommunityService {
 		community.validateByUserId(users.getId());
 
 		List<CommentNotification> commentNotifications = commentNotificationRepository.findByCommunityId(communityId);
+
 		for (CommentNotification commentNotification : commentNotifications) {
 			commentNotificationRepository.deleteById(commentNotification.getId());
 		}
+
+		List<Comment> comments = commentRepository.findAllByCommunity_Id(communityId);
+		for (Comment comment : comments) {
+			List<CommentReport> commentReports = commentReportRepository.findByComment_Id(comment.getId());
+			for (CommentReport commentReport : commentReports) {
+				commentReportRepository.deleteById(commentReport.getId());
+			}
+		}
+
 		List<Photo> photoList = photoRepository.findByCommunityId(communityId);
 		for (Photo existingFile : photoList) {
 			s3Util.deleteFile(existingFile.getFileUrl());
 		}
+		List<CommunityReport> communityReports = communityReportRepository.findByCommunity_Id(communityId);
+		communityReportRepository.deleteAll(communityReports);
+
 		photoRepository.deleteByCommunityId(communityId);
 		communityRepository.deleteById(communityId);
 	}
