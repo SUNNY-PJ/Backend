@@ -36,6 +36,7 @@ public record AlarmListResponse(
 	Boolean isCompetition,
 	Boolean isRecieveCompetition,
 	boolean isToday,
+	String reportUser,
 	String reportContent,
 	String ReportReason,
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
@@ -58,10 +59,12 @@ public record AlarmListResponse(
 			commentUser.getProfile(),
 			COMMENT,
 			NotifiacationSubType.REGISTER,
+
 			null,
 			null,
 			null,
 			isToday,
+			null,
 			null,
 			null,
 			null,
@@ -88,19 +91,20 @@ public record AlarmListResponse(
 			null,
 			null,
 			null,
+			null,
 			friendsNotification.getCreatedAt()
 		);
 	}
 
 	public static AlarmListResponse fromUserReportAlert(UserReportNotification userReportNotification) {
-		String postAuthor =
+		String reportUser =
 			userReportNotification.getSubType() != NotifiacationSubType.WARN ?
 				userReportNotification.getWarnUser().getNickname() : null;
 		return new AlarmListResponse(
 			UUID.randomUUID().toString(),
 			userReportNotification.getId(), //상대방꺼 id
 			userReportNotification.getUsers().getId(),
-			postAuthor,
+			userReportNotification.getUsers().getNickname(),
 			userReportNotification.getTitle(),
 			userReportNotification.getBody(),
 			userReportNotification.getUsers().getProfile(),
@@ -110,6 +114,7 @@ public record AlarmListResponse(
 			null,
 			null,
 			userReportNotification.getCreatedAt().toLocalDate().isEqual(LocalDate.now()),
+			reportUser,
 			userReportNotification.getContent(),
 			userReportNotification.getReportContent(),
 			userReportNotification.getCreatedAt(),
@@ -135,6 +140,7 @@ public record AlarmListResponse(
 			competitionNotification.getFriendCompetition().getFriendCompetitionStatus()
 				== FriendCompetitionStatus.RECEIVE,
 			competitionNotification.getCreatedAt().toLocalDate().isEqual(LocalDate.now()),
+			null,
 			null,
 			null,
 			null,
