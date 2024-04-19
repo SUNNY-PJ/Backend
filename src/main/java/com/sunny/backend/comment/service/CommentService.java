@@ -63,7 +63,7 @@ public class CommentService {
 			boolean isCommentBlocked = blockList.stream()
 				.anyMatch(block -> block.getBlockedUser().getId().equals(comment.getUsers().getId()));
 			//사용자가 차단 당한 경우를 알기 위한 값
-			boolean isUserBlocked = userBlockList.stream()
+			boolean isUserBlocked = blockList.stream()
 				.anyMatch(block -> block.getUsers().getId().equals(comment.getUsers().getId()));
 			boolean isPrivate = comment.getIsPrivated();
 			boolean commentAuthor = currentUser.getId().equals(comment.getUsers().getId());
@@ -93,7 +93,7 @@ public class CommentService {
 					false,
 					comment.getIsPrivated(),
 					false,
-					isUserBlocked
+					isCommentBlocked
 				);
 			}
 			if (isUserBlocked) {
@@ -128,7 +128,7 @@ public class CommentService {
 					false,
 					comment.getIsPrivated(),
 					false,
-					isUserBlocked
+					isCommentBlocked
 				);
 			} else {
 				if (comment.getIsDeleted()) {
@@ -146,7 +146,7 @@ public class CommentService {
 						false,
 						comment.getIsPrivated(),
 						false,
-						isUserBlocked
+						isCommentBlocked
 					);
 				}
 			}
