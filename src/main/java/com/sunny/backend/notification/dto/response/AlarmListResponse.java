@@ -39,6 +39,7 @@ public record AlarmListResponse(
 	String reportUser,
 	String reportContent,
 	String ReportReason,
+	Long userReportCount,
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	LocalDateTime reportCreatedAt,
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm", timezone = "Asia/Seoul")
@@ -68,6 +69,7 @@ public record AlarmListResponse(
 			null,
 			null,
 			null,
+			null,
 			comment.getCreatedDate()
 		);
 	}
@@ -88,6 +90,7 @@ public record AlarmListResponse(
 			null,
 			null,
 			friendsNotification.getCreatedAt().toLocalDate().isEqual(LocalDate.now()),
+			null,
 			null,
 			null,
 			null,
@@ -117,6 +120,7 @@ public record AlarmListResponse(
 			reportUser,
 			userReportNotification.getContent(),
 			userReportNotification.getReportContent(),
+			(long)userReportNotification.getUsers().getReportCount(),
 			userReportNotification.getCreatedAt(),
 			userReportNotification.getCreatedAt() //수정
 		);
@@ -140,6 +144,7 @@ public record AlarmListResponse(
 			competitionNotification.getFriendCompetition().getFriendCompetitionStatus()
 				== FriendCompetitionStatus.RECEIVE,
 			competitionNotification.getCreatedAt().toLocalDate().isEqual(LocalDate.now()),
+			null,
 			null,
 			null,
 			null,
