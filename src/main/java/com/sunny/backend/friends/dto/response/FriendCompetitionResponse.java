@@ -34,6 +34,17 @@ public record FriendCompetitionResponse(
 
 	public static FriendCompetitionResponse fromFriend(FriendCompetitionQuery friendCompetitionQuery) {
 		FriendCompetitionStatus friendCompetitionStatus = friendCompetitionQuery.getFriendCompetitionStatus();
+
+		// friendCompetitionStatus가 RECEIVE 또는 SEND인 경우 유지, 그 외의 경우 NONE으로 설정
+		friendCompetitionStatus = (friendCompetitionStatus == FriendCompetitionStatus.RECEIVE ||
+			friendCompetitionStatus == FriendCompetitionStatus.SEND)
+			? friendCompetitionStatus
+			: FriendCompetitionStatus.NONE;
+
+		CompetitionOutputStatus output = (friendCompetitionQuery.getCompetitionId() != null || friendCompetitionStatus == FriendCompetitionStatus.NONE)
+			? CompetitionOutputStatus.NONE
+			: friendCompetitionQuery.getCompetitionOutputStatus();
+
 		return FriendCompetitionResponse.builder()
 			.friendId(friendCompetitionQuery.getFriendId())
 			.userFriendId(friendCompetitionQuery.getUserFriend())
@@ -41,13 +52,8 @@ public record FriendCompetitionResponse(
 			.nickname(friendCompetitionQuery.getNickname())
 			.profile(friendCompetitionQuery.getProfile())
 			.friendStatus(friendCompetitionQuery.getFriendStatus())
-			.competitionStatus(
-				(friendCompetitionStatus == FriendCompetitionStatus.RECEIVE
-					|| friendCompetitionStatus == FriendCompetitionStatus.RECEIVE)
-					? friendCompetitionQuery.getFriendCompetitionStatus()
-					: FriendCompetitionStatus.NONE)
-			.output(friendCompetitionQuery.getCompetitionId() != null ?
-				friendCompetitionQuery.getCompetitionOutputStatus() : CompetitionOutputStatus.NONE)
+			.competitionStatus(friendCompetitionStatus)
+			.output(output)
 			.build();
 	}
 }

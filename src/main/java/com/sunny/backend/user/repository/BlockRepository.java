@@ -8,15 +8,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.sunny.backend.common.exception.CustomException;
-import com.sunny.backend.user.domain.Block;
+import com.sunny.backend.user.domain.UsersBlock;
 
 @Repository
-public interface BlockRepository extends JpaRepository<Block, Long> {
-	List<Block> findAllByUser_Id(Long userId);
+public interface BlockRepository extends JpaRepository<UsersBlock, Long> {
+	List<UsersBlock> findAllByUsers_Id(Long userId);
 
-	List<Block> findAllByBlockedUser_Id(Long userId);
+	List<UsersBlock> findAllByBlockedUser_Id(Long userId);
 
-	default Block getById(Long id) {
+	default UsersBlock getById(Long id) {
 		return findById(id)
 			.orElseThrow(() -> new CustomException(BLOCK_LIST_NOT_FOUND));
 	}

@@ -3,9 +3,11 @@ package com.sunny.backend.user.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -15,7 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.common.response.CommonResponse;
+import com.sunny.backend.user.dto.request.UserBlockRequest;
 import com.sunny.backend.user.dto.response.ProfileResponse;
+import com.sunny.backend.user.dto.response.UserBlockResponse;
 import com.sunny.backend.user.dto.response.UserCommentResponse;
 import com.sunny.backend.user.dto.response.UserCommunityResponse;
 import com.sunny.backend.user.dto.response.UserScrapResponse;
@@ -77,13 +81,33 @@ public class UserController {
 		return userService.updateProfile(customUserPrincipal, profile);
 	}
 
+	@ApiOperation(tags = "0. User", value = "사용자 차단 목록 가져오기")
+	@GetMapping("block")
+	public ResponseEntity<List<UserBlockResponse>> blockUser(
+		@AuthUser CustomUserPrincipal customUserPrincipal
+	) {
+		List<UserBlockResponse> userBlockResponses = userService.getBlockedUser(customUserPrincipal);
+		return ResponseEntity.ok(userBlockResponses);
+	}
+
 	@ApiOperation(tags = "0. User", value = "사용자 차단")
-	@PostMapping("/{userId}/block")
+	@PostMapping("/block")
 	public ResponseEntity<Void> blockUser(
 		@AuthUser CustomUserPrincipal customUserPrincipal,
-		@PathVariable("userId") Long userIdToBlock) {
-		userService.blockUser(customUserPrincipal, userIdToBlock);
+		@RequestBody UserBlockRequest userBlockRequest
+	) {
+		userService.blockUser(customUserPrincipal, userBlockRequest);
+		return ResponseEntity.ok().build();
+	}
+
+	@ApiOperation(tags = "0. User", value = "사용자 차단 해제")
+	@DeleteMapping("/{userId}/block")
+	public ResponseEntity<Void> cancelBlockUser(
+		@AuthUser CustomUserPrincipal customUserPrincipal,
+		@PathVariable(name = "userId") Long userId
+	) {
+		userService.cancelBlockUser(customUserPrincipal, userId);
 		return ResponseEntity.noContent().build();
 	}
-	
+
 }

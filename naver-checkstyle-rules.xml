@@ -216,7 +216,7 @@ The following rules in the Naver coding convention cannot be checked by this con
             <property name="tokens"
                       value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_DO"/>
             <message key="line.same"
-                     value="[sub-flow-after-brace] ''{0}'' at column {1} should be on the same line as the next part of a multi-block statement (one that directly contains multiple blocks: if/else-if/else or try/catch/finally)."/>
+                     value="[sub-flow-after-brace] ''{0}'' at column {1} should be on the same line as the next part of a multi-usersBlock statement (one that directly contains multiple blocks: if/else-if/else or try/catch/finally)."/>
             <message key="line.break.before"
                      value="[sub-flow-after-brace] ''{0}'' at column {1} should have line break before."/>
         </module>
@@ -238,7 +238,7 @@ The following rules in the Naver coding convention cannot be checked by this con
                      value="[1-line-package-import] {0} statement should not be line-wrapped."/>
         </module>
 
-        <!-- [block-indentation][indentation-after-line-wrapping] -->
+        <!-- [usersBlock-indentation][indentation-after-line-wrapping] -->
         <!-- checkstyle 6.16 이상을 써야지 탭을 쓸때의 인덴트 체크가 제대로 동작함 -->
         <module name="Indentation">
             <property name="basicOffset" value="4"/>
@@ -315,9 +315,9 @@ The following rules in the Naver coding convention cannot be checked by this con
 
         <!-- [space-around-brace] -->
         <module name="WhitespaceAround">
-            <property name="allowEmptyConstructors" value="true"/> <!-- [permit-concise-empty-block] -->
-            <property name="allowEmptyMethods" value="true"/>  <!-- [permit-concise-empty-block] -->
-            <property name="allowEmptyLoops" value="true"/>  <!-- [permit-concise-empty-block] -->
+            <property name="allowEmptyConstructors" value="true"/> <!-- [permit-concise-empty-usersBlock] -->
+            <property name="allowEmptyMethods" value="true"/>  <!-- [permit-concise-empty-usersBlock] -->
+            <property name="allowEmptyLoops" value="true"/>  <!-- [permit-concise-empty-usersBlock] -->
             <property name="tokens" value="LCURLY, RCURLY, SLIST"/>
             <message key="ws.notFollowed"
                      value="[space-around-brace] ''{0}'' is not followed by whitespace."/>

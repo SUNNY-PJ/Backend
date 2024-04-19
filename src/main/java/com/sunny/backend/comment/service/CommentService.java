@@ -30,8 +30,8 @@ import com.sunny.backend.notification.dto.request.NotificationPushRequest;
 import com.sunny.backend.notification.repository.CommentNotificationRepository;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.notification.service.NotificationService;
-import com.sunny.backend.user.domain.Block;
 import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.domain.UsersBlock;
 import com.sunny.backend.user.repository.BlockRepository;
 import com.sunny.backend.user.repository.UserRepository;
 
@@ -56,13 +56,13 @@ public class CommentService {
 	public CommentResponse mapCommentToResponse(Comment comment, Users currentUser) {
 		CommentResponse commentResponse;
 		// 사용자가 차단한 유저들을 알기 위한 blockList
-		List<Block> blockList = blockRepository.findAllByUser_Id(currentUser.getId());
-		List<Block> userBlockList = blockRepository.findAllByBlockedUser_Id(currentUser.getId());
+		List<UsersBlock> blockList = blockRepository.findAllByUsers_Id(currentUser.getId());
+		List<UsersBlock> userBlockList = blockRepository.findAllByBlockedUser_Id(currentUser.getId());
 		boolean isCommentBlocked = blockList.stream()
 			.anyMatch(block -> block.getBlockedUser().getId().equals(comment.getUsers().getId()));
 		//사용자가 차단 당한 경우를 알기 위한 값
 		boolean isUserBlocked = userBlockList.stream()
-			.anyMatch(block -> block.getUser().getId().equals(comment.getUsers().getId()));
+			.anyMatch(block -> block.getUsers().getId().equals(comment.getUsers().getId()));
 		if (comment.getUsers() != null && comment.getUsers().getId() != null) {
 			boolean isPrivate = comment.getIsPrivated();
 			boolean commentAuthor = currentUser.getBlockedUsers().equals(comment.getUsers().getId());

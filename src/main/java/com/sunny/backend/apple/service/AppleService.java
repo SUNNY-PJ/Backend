@@ -43,6 +43,7 @@ import com.sunny.backend.report.repository.CommentReportRepository;
 import com.sunny.backend.report.repository.CommunityReportRepository;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.repository.UserRepository;
+import com.sunny.backend.user.service.UserDeleteService;
 import com.sunny.backend.util.RedisUtil;
 
 import io.jsonwebtoken.Jwts;
@@ -59,18 +60,16 @@ public class AppleService {
 	private final AppleProperties appleProperties;
 	private final UserRepository userRepository;
 	private final CommentRepository commentRepository;
-	private final CommentNotificationRepository commentNotificationRepository;
 	private final FriendsNotificationRepository friendsNotificationRepository;
 	private final FriendRepository friendRepository;
-	private final CompetitionRepository competitionRepository;
 	private final NotificationRepository notificationRepository;
 	private final ResponseService responseService;
 	private final RedisUtil redisUtil;
 	private final FriendCompetitionRepository friendCompetitionRepository;
-	private final CompetitionNotificationRepository competitionNotificationRepository;
 	private final CommentReportRepository commentReportRepository;
 	private final CommunityReportRepository communityReportRepository;
 	private final TokenProvider tokenProvider;
+	private final UserDeleteService userDeleteService;
 
 	public String generateClientSecret() throws IOException {
 		LocalDateTime expiration = LocalDateTime.now().plusMinutes(5);
@@ -144,16 +143,7 @@ public class AppleService {
 				notificationRepository.deleteByUsers(users);
 
 				List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriendByUserId(userId);
-				for (FriendCompetition friendCompetition : friendCompetitions) {
-					competitionNotificationRepository.deleteAllByFriendCompetition(friendCompetition);
-					friendCompetitionRepository.deleteById(friendCompetition.getId());
-				}
-				Set<Long> competitionIds = friendCompetitions.stream()
-					.map(friendCompetition -> friendCompetition.getCompetition().getId())
-					.collect(Collectors.toSet());
-				if (!competitionIds.isEmpty()) {
-					competitionRepository.deleteAllById(competitionIds);
-				}
+				userDeleteService.deleteFriendRelationships(friendCompetitions);
 
 				friendsNotificationRepository.deleteByUsersOrFriend(users, users);
 				friendRepository.deleteByUsersOrUserFriend(users, users);
