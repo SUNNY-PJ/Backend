@@ -55,7 +55,7 @@ public class CommentResponse {
 			return new CommentResponse(
 				comment.getId(),
 				null,
-				null,
+				"(알 수 없음)",
 				"삭제된 댓글입니다.",
 				null,
 				null,
