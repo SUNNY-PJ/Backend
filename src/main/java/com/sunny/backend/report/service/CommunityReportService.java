@@ -55,7 +55,8 @@ public class CommunityReportService implements ReportStrategy {
 		users.increaseReportCount();
 
 		//신고 승인 된 경우
-		String reportUserBodyTitle = "써니";
+		String reportUserBodyTitle = "신고 결과를 알려드려요.";
+		String UserBodyTitle = "신고가 접수되었어요.";
 		String reportUserBody = users.getReportCount() + "번째 경고를 받았습니다.";
 		String body = "회원님의 신고에 대한 결과를 알려드려요";
 		String cotents = communityReport.getCommunity().getContents();
@@ -68,7 +69,7 @@ public class CommunityReportService implements ReportStrategy {
 			reportUsers, //신고한 사람
 			users,
 			NotifiacationSubType.APPROVE, communityReport.getCreatedDate()); //신고 한 사람
-		reportNotificationService.sendUserReportNotifications(reportUserBodyTitle, reportUserBody, reportUserBodyTitle,
+		reportNotificationService.sendUserReportNotifications(reportUserBodyTitle, reportUserBody, UserBodyTitle,
 			cotents,
 			reportContent,
 			users, //신고한 사람
@@ -89,7 +90,7 @@ public class CommunityReportService implements ReportStrategy {
 		communityReport.validateWaitStatus();
 		Users reportUsers = communityReport.getUsers();
 		//신고 거절 된 경우
-		String reportUserBodyTitle = "써니";
+		String reportUserBodyTitle = "신고 결과를 알려드려요";
 		String body = "회원님의 신고에 대한 결과를 알려드려요";
 		String cotents = communityReport.getCommunity().getContents();
 		String reportContent = communityReport.getReason(); //신고 사유

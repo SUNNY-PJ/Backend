@@ -45,12 +45,13 @@ public class ReportNotificationService {
 		List<Notification> notificationList = notificationRepository.findByUsers_Id(postAuthor);
 		if (notificationList.size() != 0) {
 			String notificationBody = "신고 결과를 알려드려요";
+			String notificationBodyTitle = "써니";
 			NotificationPushRequest notificationPushRequest = new NotificationPushRequest(
 				postAuthor,
 				notificationBody,
-				bodyTitle
+				notificationBodyTitle
 			);
-			notificationService.sendNotificationToFriends(title, notificationPushRequest);
+			notificationService.sendNotificationToFriends(notificationBodyTitle, notificationPushRequest);
 		}
 	}
 
