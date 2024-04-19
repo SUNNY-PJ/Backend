@@ -79,4 +79,5 @@ public class FriendNotiService {
 			notificationService.sendNotificationToFriends(title, notificationPushRequest);
 		}
 	}
+
 }
