@@ -1,12 +1,11 @@
 package com.sunny.backend.user.service;
 
+import static com.sunny.backend.comment.exception.CommentErrorCode.*;
 import static com.sunny.backend.common.ComnConstant.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,23 +15,21 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.comment.repository.CommentRepository;
+import com.sunny.backend.common.exception.CustomException;
 import com.sunny.backend.common.response.CommonResponse;
 import com.sunny.backend.common.response.ResponseService;
 import com.sunny.backend.community.repository.CommunityRepository;
-import com.sunny.backend.competition.repository.CompetitionRepository;
 import com.sunny.backend.friends.domain.Friend;
 import com.sunny.backend.friends.domain.FriendCompetition;
 import com.sunny.backend.friends.repository.FriendCompetitionRepository;
 import com.sunny.backend.friends.repository.FriendRepository;
 import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.notification.dto.request.NotificationPushRequest;
-import com.sunny.backend.notification.repository.CompetitionNotificationRepository;
-import com.sunny.backend.notification.repository.FriendsNotificationRepository;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.notification.service.NotificationService;
 import com.sunny.backend.scrap.repository.ScrapRepository;
-import com.sunny.backend.user.domain.UsersBlock;
 import com.sunny.backend.user.domain.Users;
+import com.sunny.backend.user.domain.UsersBlock;
 import com.sunny.backend.user.dto.request.UserBlockRequest;
 import com.sunny.backend.user.dto.response.ProfileResponse;
 import com.sunny.backend.user.dto.response.UserBlockResponse;
@@ -161,10 +158,15 @@ public class UserService {
 		Users users = userRepository.getById(customUserPrincipal.getId());
 		Users blockUser = userRepository.getById(userBlockRequest.userId());
 
+		if (blockUser.getId() == users.getId()) {
+			throw new CustomException(REPLYING_NOT_ALLOWED);
+		}
+
 		Optional<Friend> optionalFriend = friendRepository.findByUsersAndUserFriend(users, blockUser);
 		if (optionalFriend.isPresent()) {
 			Friend friend = optionalFriend.get();
-			List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriend(users.getId(),
+			List<FriendCompetition> friendCompetitions = friendCompetitionRepository.getByUserOrUserFriend(
+				users.getId(),
 				friend.getUserFriend().getId());
 			userDeleteService.deleteFriendRelationshipsByUser(friendCompetitions, users, blockUser);
 		}

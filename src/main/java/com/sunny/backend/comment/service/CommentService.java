@@ -2,7 +2,7 @@ package com.sunny.backend.comment.service;
 
 import static com.sunny.backend.comment.domain.Comment.*;
 import static com.sunny.backend.comment.dto.response.CommentResponse.*;
-import static com.sunny.backend.comment.exception.CommentErrorCode.*;
+import static com.sunny.backend.user.exception.BlockListErrorCode.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -57,13 +57,15 @@ public class CommentService {
 		CommentResponse commentResponse;
 		// 사용자가 차단한 유저들을 알기 위한 blockList
 		List<UsersBlock> blockList = blockRepository.findAllByUsers_Id(currentUser.getId());
+		//사용자가 차단 당한 경우
 		List<UsersBlock> userBlockList = blockRepository.findAllByBlockedUser_Id(currentUser.getId());
 
 		if (comment.getUsers() != null && comment.getUsers().getId() != null) {
+			//사용자가 차단한 경우
 			boolean isCommentBlocked = blockList.stream()
 				.anyMatch(block -> block.getBlockedUser().getId().equals(comment.getUsers().getId()));
 			//사용자가 차단 당한 경우를 알기 위한 값
-			boolean isUserBlocked = blockList.stream()
+			boolean isUserBlocked = userBlockList.stream()
 				.anyMatch(block -> block.getUsers().getId().equals(comment.getUsers().getId()));
 			boolean isPrivate = comment.getIsPrivated();
 			boolean commentAuthor = currentUser.getId().equals(comment.getUsers().getId());
@@ -190,7 +192,7 @@ public class CommentService {
 			content = removeUserTag(content, parentComment);
 			comment.setContent(content);
 			if (parentComment.getParent() != null) {
-				throw new CustomException(REPLYING_NOT_ALLOWED);
+				throw new CustomException(SELF_BLOCK_ERROR);
 			}
 			comment.setParent(parentComment);
 		} else {
