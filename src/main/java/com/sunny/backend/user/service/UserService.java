@@ -1,7 +1,7 @@
 package com.sunny.backend.user.service;
 
-import static com.sunny.backend.comment.exception.CommentErrorCode.*;
 import static com.sunny.backend.common.ComnConstant.*;
+import static com.sunny.backend.user.exception.BlockListErrorCode.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -159,7 +159,7 @@ public class UserService {
 		Users blockUser = userRepository.getById(userBlockRequest.userId());
 
 		if (blockUser.getId() == users.getId()) {
-			throw new CustomException(REPLYING_NOT_ALLOWED);
+			throw new CustomException(SELF_BLOCK_ERROR);
 		}
 
 		Optional<Friend> optionalFriend = friendRepository.findByUsersAndUserFriend(users, blockUser);
