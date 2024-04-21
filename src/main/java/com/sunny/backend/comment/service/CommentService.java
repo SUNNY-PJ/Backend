@@ -2,7 +2,7 @@ package com.sunny.backend.comment.service;
 
 import static com.sunny.backend.comment.domain.Comment.*;
 import static com.sunny.backend.comment.dto.response.CommentResponse.*;
-import static com.sunny.backend.user.exception.BlockListErrorCode.*;
+import static com.sunny.backend.comment.exception.CommentErrorCode.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -192,7 +192,7 @@ public class CommentService {
 			content = removeUserTag(content, parentComment);
 			comment.setContent(content);
 			if (parentComment.getParent() != null) {
-				throw new CustomException(SELF_BLOCK_ERROR);
+				throw new CustomException(REPLYING_NOT_ALLOWED);
 			}
 			comment.setParent(parentComment);
 		} else {
