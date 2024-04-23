@@ -19,6 +19,7 @@ public record ProfileResponse(
 		return ProfileResponse.builder()
 			.id(users.getId())
 			.name(users.getNickname())
+			.name(users.getNickname())
 			.profile(users.getProfile())
 			.owner(true)
 			.build();
