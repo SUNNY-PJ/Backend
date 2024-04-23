@@ -43,9 +43,6 @@ public class FriendService {
 	private final FriendCompetitionRepository friendCompetitionRepository;
 	private final UserRepository userRepository;
 	private final FriendNotiService friendNotiService;
-	private final CompetitionNotificationRepository competitionNotificationRepository;
-	private final CompetitionRepository competitionRepository;
-	private final FriendsNotificationRepository friendsNotificationRepository;
 	private final UserDeleteService userDeleteService;
 
 	public FriendListResponse getFriends(CustomUserPrincipal customUserPrincipal) {
