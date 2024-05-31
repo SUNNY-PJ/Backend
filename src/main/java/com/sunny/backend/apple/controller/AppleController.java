@@ -40,6 +40,7 @@ public class AppleController {
 	@GetMapping("/callback")
 	public ResponseEntity<CommonResponse.SingleResponse<TokenResponse>> verifyToken(
 		@RequestParam("code") String idToken) {
+		log.info(idToken);
 		TokenResponse tokenResponse = appleOAuthClient.getOAuthMemberId(idToken);
 		log.info(String.valueOf(tokenResponse));
 		return responseService.getSingleResponse(HttpStatus.OK.value(),

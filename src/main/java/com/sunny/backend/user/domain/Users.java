@@ -5,6 +5,7 @@ import static com.sunny.backend.scrap.exception.ScrapErrorCode.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -104,7 +105,8 @@ public class Users extends BaseTime {
 	}
 
 	public static Users of(String email, String oauthId) {
-		return new Users(email, oauthId, null, Role.USER, SUNNY_DEFAULT_IMAGE, UserReport.from(0));
+		String randomNickname = generateRandomNickname();
+		return new Users(email, oauthId, randomNickname, Role.USER, SUNNY_DEFAULT_IMAGE, UserReport.from(0));
 	}
 
 	public void addComment(Comment comment) {
@@ -211,10 +213,9 @@ public class Users extends BaseTime {
 			.toList();
 	}
 
-	public List<Users> getdUsersBlockList() {
-		return usersBlocks.stream()
-			.map(UsersBlock::getUsers)
-			.toList();
+	// 닉네임을 랜덤으로 생성하는 메서드
+	private static String generateRandomNickname() {
+		return "SUNNY" + UUID.randomUUID().toString().substring(0, 8);
 	}
 }
 
