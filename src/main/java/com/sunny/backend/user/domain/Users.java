@@ -106,6 +106,7 @@ public class Users extends BaseTime {
 
 	public static Users of(String email, String oauthId) {
 		String randomNickname = generateRandomNickname();
+		System.out.println(randomNickname);
 		return new Users(email, oauthId, randomNickname, Role.USER, SUNNY_DEFAULT_IMAGE, UserReport.from(0));
 	}
 
@@ -215,7 +216,7 @@ public class Users extends BaseTime {
 
 	// 닉네임을 랜덤으로 생성하는 메서드
 	private static String generateRandomNickname() {
-		return "SUNNY" + UUID.randomUUID().toString().substring(0, 8);
+		return "SUNNY" + UUID.randomUUID().toString().substring(0, 5);
 	}
 }
 
