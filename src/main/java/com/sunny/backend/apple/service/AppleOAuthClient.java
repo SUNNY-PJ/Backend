@@ -56,6 +56,7 @@ public class AppleOAuthClient implements OAuth2Client {
 		Map<String, String> headers = jwtParser.parseHeaders(idToken);
 		PublicKey publicKey = appleOAuthPublicKeyGenerator.generatePublicKey(headers,
 			applePublicKeys);
+
 		Claims claims = jwtParser.parseClaims(idToken, publicKey);
 		String oAuthId = claims.getSubject();
 		String email = claims.get("email", String.class);
