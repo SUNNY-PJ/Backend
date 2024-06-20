@@ -95,7 +95,6 @@ public class S3Util {
 	// DeleteObject를 통해 S3 파일 삭제
 	public void deleteFile(String fileName) {
 		String objectKey = parseObjectKeyFromUrl(fileName);
-
 		// 삭제
 		DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, objectKey);
 		s3Client.deleteObject(deleteObjectRequest);

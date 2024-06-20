@@ -10,7 +10,7 @@ import com.sunny.backend.comment.repository.CommentRepository;
 import com.sunny.backend.notification.domain.NotifiacationSubType;
 import com.sunny.backend.report.domain.CommentReport;
 import com.sunny.backend.report.domain.ReportType;
-import com.sunny.backend.report.dto.ReportCreateRequest;
+import com.sunny.backend.report.dto.request.ReportCreateRequest;
 import com.sunny.backend.report.repository.CommentReportRepository;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.dto.response.ReportResponse;

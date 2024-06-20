@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.common.config.AuthUser;
 import com.sunny.backend.report.domain.ReportType;
-import com.sunny.backend.report.dto.ReportCreateRequest;
+import com.sunny.backend.report.dto.request.ReportCreateRequest;
 import com.sunny.backend.report.service.ReportService;
 import com.sunny.backend.user.dto.response.ReportResponse;
 import com.sunny.backend.user.dto.response.UserReportResponse;

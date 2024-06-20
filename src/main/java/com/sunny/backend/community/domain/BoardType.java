@@ -5,9 +5,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.Getter;
 
+/** 게시판 Type
+ * 자유 게시판 (FREE)
+ * 절약 꿀팁 (SAVING_TIPS)
+ * */
+
 @Getter
 public enum BoardType {
-	TIP("절약 꿀팁"), FREE("자유 게시판");
+	SAVING_TIPS("절약 꿀팁"), FREE("자유 게시판");
 	private final String value;
 
 	BoardType(String value) {

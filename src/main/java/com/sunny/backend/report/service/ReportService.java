@@ -1,6 +1,7 @@
 package com.sunny.backend.report.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -12,8 +13,12 @@ import com.sunny.backend.notification.domain.Notification;
 import com.sunny.backend.notification.dto.request.NotificationPushRequest;
 import com.sunny.backend.notification.repository.NotificationRepository;
 import com.sunny.backend.notification.service.NotificationService;
+import com.sunny.backend.report.domain.CommunityReport;
 import com.sunny.backend.report.domain.ReportType;
-import com.sunny.backend.report.dto.ReportCreateRequest;
+import com.sunny.backend.report.dto.request.ReportCreateRequest;
+import com.sunny.backend.report.dto.response.AllReportResponse;
+import com.sunny.backend.report.repository.CommentReportRepository;
+import com.sunny.backend.report.repository.CommunityReportRepository;
 import com.sunny.backend.user.domain.Users;
 import com.sunny.backend.user.dto.response.ReportResponse;
 import com.sunny.backend.user.dto.response.UserReportResponse;
@@ -26,6 +31,8 @@ public class ReportService {
 	private final ReportFactory reportFactory;
 	private final NotificationRepository notificationRepository;
 	private final NotificationService notificationService;
+	private final CommentReportRepository commentReportRepository;
+	private final CommunityReportRepository communityReportRepository;
 
 	public List<ReportResponse> getUserReports(ReportType reportType) {
 		ReportStrategy reportStrategy = reportFactory.findReportStrategy(reportType);
@@ -69,6 +76,16 @@ public class ReportService {
 			);
 			notificationService.sendNotificationToFriends(title, notificationPushRequest);
 		}
+	}
+
+	public List<AllReportResponse> ReportResult() {
+		List<CommunityReport> communityReportList = communityReportRepository.findAll();
+
+		List<AllReportResponse> communityReports = new ArrayList<>();
+		for (CommunityReport communityReport : communityReportList) {
+			communityReports.add(AllReportResponse.fromCommunityReport(communityReport));
+		}
+		return communityReports;
 	}
 
 }
