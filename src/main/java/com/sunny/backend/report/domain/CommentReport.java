@@ -2,7 +2,6 @@ package com.sunny.backend.report.domain;
 
 import static com.sunny.backend.report.exception.ReportErrorCode.*;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -54,16 +53,16 @@ public class CommentReport extends BaseTime {
 	}
 
 	public static CommentReport of(Users users, Comment comment, String reason) {
-		return new CommentReport(users, comment, reason, ReportStatus.WAIT);
+		return new CommentReport(users, comment, reason, ReportStatus.RECEIVING);
 	}
 
 	public void validateWaitStatus() {
-		if (status != ReportStatus.WAIT) {
+		if (status != ReportStatus.RECEIVING) {
 			throw new CustomException(ALREADY_PROCESS);
 		}
 	}
 
 	public void approveStatus() {
-		status = ReportStatus.APPROVE;
+		status = ReportStatus.APPROVED;
 	}
 }

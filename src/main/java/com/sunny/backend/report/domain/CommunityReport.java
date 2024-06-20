@@ -53,16 +53,16 @@ public class CommunityReport extends BaseTime {
 	}
 
 	public static CommunityReport of(Users users, Community community, String reason) {
-		return new CommunityReport(users, community, reason, ReportStatus.WAIT);
+		return new CommunityReport(users, community, reason, ReportStatus.RECEIVING);
 	}
 
 	public void validateWaitStatus() {
-		if (status != ReportStatus.WAIT) {
+		if (status != ReportStatus.RECEIVING) {
 			throw new CustomException(ALREADY_PROCESS);
 		}
 	}
 
 	public void approveStatus() {
-		status = ReportStatus.APPROVE;
+		status = ReportStatus.APPROVED;
 	}
 }
