@@ -5,9 +5,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.Getter;
 
+/** 게시판 정렬 type
+ * 조회순 (VIEW_COUNT)
+ * 최신순 (LATEST)
+ * */
+
 @Getter
 public enum SortType {
-	VIEW("조회순"), LATEST("최신순");
+	VIEW_COUNT("조회순"), LATEST("최신순");
 	private final String value;
 
 	SortType(String value) {

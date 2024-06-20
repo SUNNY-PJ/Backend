@@ -40,7 +40,7 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
 					.join(users).on(community.users.id.eq(users.id))
 					.join(usersBlock).on(users.id.eq(usersBlock.users.id))
 					.where(usersBlock.blockedUser.id.eq(user.getId()))))
-			.orderBy(sortType == SortType.VIEW ? community.viewCnt.desc() : community.createdAt.desc())
+			.orderBy(sortType == SortType.VIEW_COUNT ? community.viewCnt.desc() : community.createdAt.desc())
 			.limit(pageSize)
 			.fetch();
 
@@ -68,17 +68,12 @@ public class CommunityRepositoryImpl extends QuerydslRepositorySupport implement
 	}
 
 	private BooleanExpression eqBoardType(BoardType boardType) {
-		if (boardType == BoardType.TIP) {
-			return community.boardType.eq(BoardType.TIP);
+		if (boardType == BoardType.SAVING_TIPS) {
+			return community.boardType.eq(BoardType.SAVING_TIPS);
 		} else if (boardType == BoardType.FREE) {
 			return community.boardType.eq(BoardType.FREE);
 		}
 		return null;
 	}
 
-	public List<Long> extractUserIds(List<CommunityPageResponse> communityResponses) {
-		return communityResponses.stream()
-			.map(CommunityPageResponse::userId)
-			.toList();
-	}
 }

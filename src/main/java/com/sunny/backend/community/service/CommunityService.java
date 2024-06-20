@@ -1,17 +1,11 @@
 package com.sunny.backend.community.service;
 
-import static com.sunny.backend.common.ComnConstant.*;
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.nimbusds.oauth2.sdk.util.StringUtils;
 import com.sunny.backend.auth.jwt.CustomUserPrincipal;
 import com.sunny.backend.comment.domain.Comment;
 import com.sunny.backend.comment.repository.CommentRepository;
@@ -61,35 +55,10 @@ public class CommunityService {
 		Users user = userRepository.getById(customUserPrincipal.getId());
 		Community community = communityRepository.getById(communityId);
 
-		findByRedisAndSaveIfNotFound(user.getId(), community);
+		//조회수 중복 방지를 위해 check
+		redisUtil.incrementCommunityViewIfNotViewed(user.getId(), community.getId());
 
 		return CommunityResponse.of(user, community);
-	}
-
-	public void findByRedisAndSaveIfNotFound(Long userId, Community community) {
-		String redisUserKey = String.valueOf(userId);
-		String redisValues = redisUtil.getData(redisUserKey);
-		if (StringUtils.isBlank(redisValues)) {
-			saveRedisAndCommunityIncreaseView(redisUserKey, redisValues, community);
-		} else {
-			boolean isViewed = Arrays.stream(redisValues.split(REDIS_SEPARATOR))
-				.anyMatch(id -> id.equals(String.valueOf(community.getId())));
-			if (!isViewed) {
-				saveRedisAndCommunityIncreaseView(redisUserKey, redisValues, community);
-			}
-		}
-	}
-
-	public void saveRedisAndCommunityIncreaseView(String redisKey, String redisValues, Community community) {
-		redisValues += community.getId() + REDIS_SEPARATOR;
-		redisUtil.setValuesWithTimeout(redisKey, redisValues, calculateTimeUntilMidnight());
-		community.increaseView();
-	}
-
-	public long calculateTimeUntilMidnight() {
-		LocalDateTime now = LocalDateTime.now();
-		LocalDateTime midnight = now.truncatedTo(ChronoUnit.DAYS).plusDays(1);
-		return ChronoUnit.SECONDS.between(now, midnight);
 	}
 
 	@Transactional
@@ -105,7 +74,7 @@ public class CommunityService {
 			communityRequest.getType(),
 			user
 		);
-
+		//multipartFiles 객체 자체가 null이거나 multipartFiles 객체는 넘겨받았으나 빈 리스트일 경우
 		if (multipartFiles != null && !multipartFiles.isEmpty()) {
 			savePhotoFromMultipartFile(multipartFiles, community);
 		}
@@ -140,7 +109,6 @@ public class CommunityService {
 		Integer pageSize
 	) {
 		Users users = userRepository.getById(customUserPrincipal.getId());
-		// Users communityUser = communityRepository.getById(communityId).getUsers();
 		return communityRepository.paginationNoOffsetBuilder(users, communityId, sortType, boardType, searchText,
 			pageSize);
 	}
@@ -168,8 +136,7 @@ public class CommunityService {
 		}
 	}
 
-	// TODO
-	// 관계 정리되면 변경될 가능성 존재
+	// TODO 관계 정리되면 변경될 가능성 존재
 	@Transactional
 	public void deleteCommunity(
 		CustomUserPrincipal customUserPrincipal, Long communityId) {
