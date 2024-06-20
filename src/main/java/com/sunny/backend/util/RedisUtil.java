@@ -68,6 +68,7 @@ public class RedisUtil {
 		return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(userKey, postId.toString()));
 	}
 
+	//최초 게시글 조회 시 redis에 key,value,expire 추가
 	public void addUserView(Long userId, Long postId) {
 		String userKey = "user:" + userId;
 		redisTemplate.opsForSet().add(userKey, postId.toString());
