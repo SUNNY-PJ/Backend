@@ -70,6 +70,7 @@ public class NotificationService {
 				.isEmpty()) {
 				return responseService.getSingleResponse(HttpStatus.BAD_REQUEST.value(), null, "디바이스 토큰 값은 필수 값입니다.");
 			}
+			log.info("User DeviceToken= " + notificationAllowRequest.getTargetToken());
 			Notification notification = Notification.builder()
 				.deviceToken(notificationAllowRequest.getTargetToken())
 				.users(user)

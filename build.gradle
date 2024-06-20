@@ -1,14 +1,14 @@
 buildscript {
-	ext {
-		queryDslVersion = "5.0.0"
-	}
+    ext {
+        queryDslVersion = "5.0.0"
+    }
 }
 
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '2.7.7'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
-	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    id 'java'
+    id 'org.springframework.boot' version '2.7.7'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'com.sunny'
@@ -16,125 +16,135 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.projectlombok:lombok:1.18.22'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
-	//JPA
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.projectlombok:lombok:1.18.22'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
+    //JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-	// validation
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	//lombok
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testCompileOnly 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
+    //lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
-	//Mysql
-	implementation 'mysql:mysql-connector-java'
+    //Mysql
+    implementation 'mysql:mysql-connector-java'
 
-	// swagger ui
-	implementation 'io.springfox:springfox-boot-starter:3.0.0'
-	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+    // swagger ui
+    implementation 'io.springfox:springfox-boot-starter:3.0.0'
+    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
 
-	// Security
-	implementation 'org.springframework.boot:spring-boot-starter-security'
+    // Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 
-	// OAuth
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    // OAuth
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
-	//aws
-	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.415'
+    //aws
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.415'
 
-	// redis
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-	// JWT
+    // JWT
 
-	implementation "io.jsonwebtoken:jjwt:0.9.1"
+    implementation "io.jsonwebtoken:jjwt:0.9.1"
 
-	// h2
-	runtimeOnly 'com.h2database:h2'
+    // h2
+    runtimeOnly 'com.h2database:h2'
 
-	// querydsl
-	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
-	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.3'
-	// Use the latest version available
-	//Firebase
-	implementation 'com.google.firebase:firebase-admin:9.1.1'
-	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
+    // querydsl
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.3'
+    // Use the latest version available
+    //Firebase
+    implementation 'com.google.firebase:firebase-admin:9.1.1'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
 
-	// WebSocket
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	implementation 'org.webjars:webjars-locator-core'
-	implementation 'org.webjars:sockjs-client:1.0.2'
-	implementation 'org.webjars:stomp-websocket:2.3.3'
+    // WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.webjars:webjars-locator-core'
+    implementation 'org.webjars:sockjs-client:1.0.2'
+    implementation 'org.webjars:stomp-websocket:2.3.3'
 
-	//batch
-	implementation 'org.springframework.boot:spring-boot-starter-batch'
-	implementation 'org.springframework.boot:spring-boot-starter-quartz'
+    //batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-quartz'
 
-	// json
-	implementation 'com.google.code.gson:gson:2.10.1'
+    // json
+    implementation 'com.google.code.gson:gson:2.10.1'
 
 
-	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.1'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.1'
 
-	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
-	implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
-	implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
 
-	//json
-	implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.6'
-	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    //json
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.6'
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
-	//애플 탈퇴 시 필요
-	implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
-	implementation 'org.bouncycastle:bcpkix-jdk15on:1.70'
+    //애플 탈퇴 시 필요
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
+    implementation 'org.bouncycastle:bcpkix-jdk15on:1.70'
+
+
+    // Java JWT (com.auth0)
+    implementation 'com.auth0:java-jwt:3.18.2'
+    // Jackson for JSON processing
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+    // Spring Boot Web Starter
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Spring Boot Validation Starter
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 
-test{
-	useJUnitPlatform()
+test {
+    useJUnitPlatform()
 }
 
 def querydslDir = "$buildDir/generated/'querydsl'"
 // JPA 사용여부 및 사용 경로 설정
 querydsl {
-	jpa = true
-	querydslSourcesDir = querydslDir
+    jpa = true
+    querydslSourcesDir = querydslDir
 }
 
 // build시 사용할 sourceSet 추가 설정
 sourceSets {
-	main.java.srcDir querydslDir
+    main.java.srcDir querydslDir
 }
 
 
 // querydsl 컴파일 시 사용할 옵션 설정
 compileQuerydsl {
-	options.annotationProcessorPath = configurations.querydsl
+    options.annotationProcessorPath = configurations.querydsl
 }
 
 // querydsl-> compileClassPath 상속
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-	querydsl.extendsFrom compileClasspath
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
 }
