@@ -75,6 +75,7 @@ public class RedisUtil {
 		redisTemplate.expire(userKey, 24, TimeUnit.HOURS);
 	}
 
+	// 사용자가 조회한 게시글인지 아닌지 check
 	public void incrementCommunityViewIfNotViewed(Long userId, Long postId) {
 		Community community = communityRepository.getById(postId);
 		if (!hasUserViewedCommunity(userId, postId)) {
